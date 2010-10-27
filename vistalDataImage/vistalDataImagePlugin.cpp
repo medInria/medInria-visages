@@ -11,17 +11,18 @@
 // vistalDataImagePluginPrivate
 // /////////////////////////////////////////////////////////////////
 
-class vistalDataImagePluginPrivate 
+class vistalDataImagePluginPrivate
 {
-public:
-    // Class variables go here.
+    public:
+        // Class variables go here.
 };
 
 // /////////////////////////////////////////////////////////////////
 // vistalDataImagePlugin
 // /////////////////////////////////////////////////////////////////
 
-vistalDataImagePlugin::vistalDataImagePlugin(QObject *parent) : dtkPlugin(parent), d(new vistalDataImagePluginPrivate)
+vistalDataImagePlugin::vistalDataImagePlugin(QObject *parent) :
+    dtkPlugin(parent), d(new vistalDataImagePluginPrivate)
 {
 
 }
@@ -33,37 +34,41 @@ vistalDataImagePlugin::~vistalDataImagePlugin(void)
     d = NULL;
 }
 
-bool vistalDataImagePlugin::initialize(void)
+bool
+vistalDataImagePlugin::initialize(void)
 {
-    if(!vistalDataImageUChar3::registered())
-	dtkWarning() << "Unable to register vistalDataImageUChar3 type";
+    if (!vistalDataImageUChar3::registered())
+        dtkWarning() << "Unable to register vistalDataImageUChar3 type";
 
     return true;
 }
 
-bool vistalDataImagePlugin::uninitialize(void)
+bool
+vistalDataImagePlugin::uninitialize(void)
 {
     return true;
 }
 
-QString vistalDataImagePlugin::name(void) const
+QString
+vistalDataImagePlugin::name(void) const
 {
     return "vistalDataImagePlugin";
 }
 
-QString vistalDataImagePlugin::description(void) const
+QString
+vistalDataImagePlugin::description(void) const
 {
     return "Vistal data image plugin";
 }
 
-QStringList vistalDataImagePlugin::tags(void) const
+QStringList
+vistalDataImagePlugin::tags(void) const
 {
-  return QStringList() << "vistal"
-		       << "image"
-		       << "data";
+    return QStringList() << "vistal" << "image" << "data";
 }
 
-QStringList vistalDataImagePlugin::types(void) const
+QStringList
+vistalDataImagePlugin::types(void) const
 {
     return QStringList() << "vistalDataImageUChar3";
 }
