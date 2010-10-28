@@ -38,7 +38,9 @@ vistalDataImageWriter::~vistalDataImageWriter(void)
 bool
 vistalDataImageWriter::registered(void)
 {
+
     return dtkAbstractDataFactory::instance()->registerDataWriterType("vistalDataImageWriter", QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3",createVistalDataImageWriter);
+
 }
 
 QString
@@ -56,8 +58,10 @@ vistalDataImageWriter::handled() const
 bool
 vistalDataImageWriter::canWrite(QString path)
 {
-  qDebug() << "Can write?: " << QFile(path).isWritable();
-    return true;
+    //  qDebug() << "Can write?: " << QFile(path).isWritable();
+    //    return true;
+
+    return ((QFileInfo(path).suffix() == "dim") or (QFileInfo(path).suffix() == "ima"));
 }
 
 bool
@@ -69,7 +73,7 @@ vistalDataImageWriter::write(QString path)
     if (dtkAbstractData *dtkdata = this->data() ) {
 
         if (dtkdata->description() == "vistalDataImageUChar3") {
-            vistal::Image3D<unsigned char> * image = static_cast<vistal::Image3D<unsigned char>*> (this->data()->output());
+            vistal::Image3D<unsigned char> * image = static_cast<vistal::Image3D<unsigned char>*> (this->data()->data());
             if (image == NULL)
                 return false;
             std::string tmp(path.toAscii().data());

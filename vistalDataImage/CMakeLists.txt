@@ -34,6 +34,7 @@ include(${dtk_USE_FILE})
 include(dtkPlugin)
 
 find_package(Vistal REQUIRED)
+find_package(ITK REQUIRED)
 include(${VISTAL_USE_FILE})
 
 ## #################################################################
@@ -42,11 +43,15 @@ include(${VISTAL_USE_FILE})
 
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalDataImagePlugin.h
-  vistalDataImageUChar3.h)
+  vistalDataImageUChar3.h
+	vistalDataImageUShort3.h
+	vistalDataImageSShort3.h)
 
 set(${PROJECT_NAME}_SOURCES
   vistalDataImagePlugin.cpp
-  vistalDataImageUChar3.cpp)
+  vistalDataImageUChar3.cpp
+	vistalDataImageUShort3.cpp
+	vistalDataImageSShort3.cpp)
 
 ## #################################################################
 ## Build rules
@@ -61,6 +66,7 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
+	${ITK_LIBRARIES}
   dtkCore)
 
 dtk_build_doc(vistalDataImagePlugin)

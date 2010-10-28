@@ -56,7 +56,9 @@ bool vistalDataImageReader::canRead (QString path)
     return this->io->CanReadFile ( path.toAscii().constData() );
   return false;*/
   
-  return true; // QFile(path).isReadable();  
+  return ((QFileInfo(path).suffix() == "dim") or (QFileInfo(path).suffix() == "ima"));
+
+//  return true; // QFile(path).isReadable();
 }
 
 bool vistalDataImageReader::canRead (QStringList paths)
@@ -76,13 +78,15 @@ void vistalDataImageReader::readInformation (QString path)
   if(!data)
   {
     
-    if ("U8" == vistal::getImageType(path))
+    std::string string = path.toStdString();
+    
+    if ("U8" == vistal::io::getImageType(string))
           data = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
     
-    if ("S16" == vistal::getImageType(path))
+    if ("S16" == vistal::io::getImageType(string))
           data = dtkAbstractDataFactory::instance()->create("vistalDataImageSShort3");
     
-    if ("U16" == vistal::getImageType(path))
+    if ("U16" == vistal::io::getImageType(string))
           data = dtkAbstractDataFactory::instance()->create("vistalDataImageUShort3");
     
        
