@@ -38,7 +38,7 @@ vistalDataImageWriter::~vistalDataImageWriter(void)
 bool
 vistalDataImageWriter::registered(void)
 {
-    return dtkAbstractDataFactory::instance()->registerDataWriterType("vistalDataImageWriter", QStringList() << "vistalDataImageUChar3",createVistalDataImageWriter);
+    return dtkAbstractDataFactory::instance()->registerDataWriterType("vistalDataImageWriter", QStringList() << "vistalDataImageUChar3", createVistalDataImageWriter);
 }
 
 QString
@@ -56,8 +56,10 @@ vistalDataImageWriter::handled() const
 bool
 vistalDataImageWriter::canWrite(QString path)
 {
-  qDebug() << "Can write?: " << QFile(path).isWritable();
-    return true;
+    //  qDebug() << "Can write?: " << QFile(path).isWritable();
+    //    return true;
+
+    return ((QFileInfo(path).suffix() == "dim") or (QFileInfo(path).suffix() == "ima"));
 }
 
 bool

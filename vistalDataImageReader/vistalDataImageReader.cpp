@@ -56,7 +56,9 @@ bool vistalDataImageReader::canRead (QString path)
     return this->io->CanReadFile ( path.toAscii().constData() );
   return false;*/
   
-  return true; // QFile(path).isReadable();  
+  return ((QFileInfo(path).suffix() == "dim") or (QFileInfo(path).suffix() == "ima"));
+
+//  return true; // QFile(path).isReadable();
 }
 
 bool vistalDataImageReader::canRead (QStringList paths)
