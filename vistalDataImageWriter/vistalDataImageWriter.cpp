@@ -71,7 +71,7 @@ vistalDataImageWriter::write(QString path)
     if (dtkAbstractData *dtkdata = this->data() ) {
 
         if (dtkdata->description() == "vistalDataImageUChar3") {
-            vistal::Image3D<unsigned char> * image = static_cast<vistal::Image3D<unsigned char>*> (this->data()->output());
+            vistal::Image3D<unsigned char> * image = static_cast<vistal::Image3D<unsigned char>*> (this->data()->data());
             if (image == NULL)
                 return false;
             std::string tmp(path.toAscii().data());
