@@ -35,7 +35,6 @@ vistalDataImageReaderPlugin::~vistalDataImageReaderPlugin(void)
 
 bool vistalDataImageReaderPlugin::initialize(void)
 {
-  qDebug() << "Here!!";
     if(!vistalDataImageReader::registered())
 	dtkWarning() << "Unable to register vistalDataImageReader type";
 
