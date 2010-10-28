@@ -36,7 +36,7 @@ vistalDataImageReader::~vistalDataImageReader(void)
 
 bool vistalDataImageReader::registered(void)
 {
-    return dtkAbstractDataFactory::instance()->registerDataReaderType("vistalDataImageReader", QStringList() << "vistalDataImageUChar3", createVistalDataImageReader);
+    return dtkAbstractDataFactory::instance()->registerDataReaderType("vistalDataImageReader", QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3", createVistalDataImageReader);
 }
 
 QString vistalDataImageReader::description(void) const
@@ -46,7 +46,7 @@ QString vistalDataImageReader::description(void) const
 
 QStringList vistalDataImageReader::handled(void) const
 {
-  return QStringList() << "vistalDataImageUChar3";
+  return QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3";
 }
 
 
@@ -77,7 +77,16 @@ void vistalDataImageReader::readInformation (QString path)
   dtkAbstractData *data = this->data();
   if(!data)
   {
-    data = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+    
+    std::string string = path.toStdString();
+    
+    if ("U8" == vistal::io::getImageType(string))
+			data = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+    else if ("S16" == vistal::io::getImageType(string))
+			data = dtkAbstractDataFactory::instance()->create("vistalDataImageSShort3");
+    else if ("U16" == vistal::io::getImageType(string))
+			data = dtkAbstractDataFactory::instance()->create("vistalDataImageUShort3");
+       
     if(data) 
       this->setData(data);
         
@@ -110,7 +119,7 @@ bool vistalDataImageReader::read (QString path)
 
   this->setProgress (50);
 	
-  qDebug() << "Can read with: " << this->description();
+  qDebug() << "Can read with: " << this->description() << " " << this->data()->description();
   /*	
 	itk::DataImageReaderCommand::Pointer command = itk::DataImageReaderCommand::New();
 	command->SetDCMTKDataImageReader ( this );
@@ -128,8 +137,26 @@ bool vistalDataImageReader::read (QString path)
       dtkdata->setData(image);
            
     }
-    
-    
+    else if (dtkdata->description()=="vistalDataImageSShort3") 
+    {
+      
+      std::string file = path.toAscii().data();
+      vistal::Image3D<short> *image = new vistal::Image3D<short>;
+      vistal::io::readImage(file, *image);
+      dtkdata->setData(image);
+           
+    }
+    else if (dtkdata->description()=="vistalDataImageUShort3") 
+    {
+      
+      std::string file = path.toAscii().data();
+      vistal::Image3D<unsigned short> *image = new vistal::Image3D<unsigned short>;
+      vistal::io::readImage(file, *image);
+      dtkdata->setData(image);
+           
+    }
+        
+   
     else {
       qWarning() << "Unrecognized pixel type";
       return false;

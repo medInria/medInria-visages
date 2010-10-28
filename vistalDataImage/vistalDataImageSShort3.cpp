@@ -15,8 +15,8 @@
 class vistalDataImageSShort3Private
 {
 public:
-  vistal::Image3D<unsigned short> * image;
-	itkImage3D<unsigned short> * itkConverter;
+  vistal::Image3D<short> * image;
+	itkImage3D<short> * itkConverter;
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ void *vistalDataImageSShort3::data()
 void *vistalDataImageSShort3::output()
 {
 	if (!d->itkConverter)
-		d->itkConverter = new itkImage3D<unsigned short>;
+		d->itkConverter = new itkImage3D<short>;
 	
 	if (!d->image)
 		return 0;
@@ -64,7 +64,7 @@ void *vistalDataImageSShort3::output()
 
 void vistalDataImageSShort3::setData(void* data)
 {
-  d->image = static_cast<vistal::Image3D<unsigned short> *> (data);
+  d->image = static_cast<vistal::Image3D<short> *> (data);
 }
 
 int vistalDataImageSShort3::xDimension(void)
