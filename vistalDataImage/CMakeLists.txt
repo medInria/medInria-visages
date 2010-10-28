@@ -34,6 +34,7 @@ include(${dtk_USE_FILE})
 include(dtkPlugin)
 
 find_package(Vistal REQUIRED)
+find_package(ITK REQUIRED)
 include(${VISTAL_USE_FILE})
 
 ## #################################################################
@@ -61,6 +62,7 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
+	${ITK_LIBRARIES}
   dtkCore)
 
 dtk_build_doc(vistalDataImagePlugin)
