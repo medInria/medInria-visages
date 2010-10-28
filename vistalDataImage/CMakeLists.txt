@@ -43,11 +43,15 @@ include(${VISTAL_USE_FILE})
 
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalDataImagePlugin.h
-  vistalDataImageUChar3.h)
+  vistalDataImageUChar3.h
+	vistalDataImageUShort3.h
+	vistalDataImageSShort3.h)
 
 set(${PROJECT_NAME}_SOURCES
   vistalDataImagePlugin.cpp
-  vistalDataImageUChar3.cpp)
+  vistalDataImageUChar3.cpp
+	vistalDataImageUShort3.cpp
+	vistalDataImageSShort3.cpp)
 
 ## #################################################################
 ## Build rules

@@ -3,6 +3,8 @@
 // /////////////////////////////////////////////////////////////////
 
 #include "vistalDataImageUChar3.h"
+#include "vistalDataImageUShort3.h"
+#include "vistalDataImageSShort3.h"
 #include "vistalDataImagePlugin.h"
 
 #include <dtkCore/dtkLog.h>
@@ -37,10 +39,16 @@ vistalDataImagePlugin::~vistalDataImagePlugin(void)
 bool
 vistalDataImagePlugin::initialize(void)
 {
-    if (!vistalDataImageUChar3::registered())
-        dtkWarning() << "Unable to register vistalDataImageUChar3 type";
-
-    return true;
+	if (!vistalDataImageUChar3::registered())
+		dtkWarning() << "Unable to register vistalDataImageUChar3 type";
+	
+	if (!vistalDataImageUShort3::registered())
+		dtkWarning() << "Unable to register vistalDataImageUShort3 type";
+	
+	if (!vistalDataImageSShort3::registered())
+		dtkWarning() << "Unable to register vistalDataImageSShort3 type";
+	
+	return true;
 }
 
 bool
@@ -70,7 +78,7 @@ vistalDataImagePlugin::tags(void) const
 QStringList
 vistalDataImagePlugin::types(void) const
 {
-    return QStringList() << "vistalDataImageUChar3";
+    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3";
 }
 
 Q_EXPORT_PLUGIN2(vistalDataImagePlugin, vistalDataImagePlugin)
