@@ -81,14 +81,11 @@ void vistalDataImageReader::readInformation (QString path)
     std::string string = path.toStdString();
     
     if ("U8" == vistal::io::getImageType(string))
-          data = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
-    
-    if ("S16" == vistal::io::getImageType(string))
-          data = dtkAbstractDataFactory::instance()->create("vistalDataImageSShort3");
-    
-    if ("U16" == vistal::io::getImageType(string))
-          data = dtkAbstractDataFactory::instance()->create("vistalDataImageUShort3");
-    
+			data = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+    else if ("S16" == vistal::io::getImageType(string))
+			data = dtkAbstractDataFactory::instance()->create("vistalDataImageSShort3");
+    else if ("U16" == vistal::io::getImageType(string))
+			data = dtkAbstractDataFactory::instance()->create("vistalDataImageUShort3");
        
     if(data) 
       this->setData(data);
@@ -122,7 +119,7 @@ bool vistalDataImageReader::read (QString path)
 
   this->setProgress (50);
 	
-  qDebug() << "Can read with: " << this->description();
+  qDebug() << "Can read with: " << this->description() << " " << this->data()->description();
   /*	
 	itk::DataImageReaderCommand::Pointer command = itk::DataImageReaderCommand::New();
 	command->SetDCMTKDataImageReader ( this );
