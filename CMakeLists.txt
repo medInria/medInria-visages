@@ -69,7 +69,8 @@ subdirs(vistalDataImage)
 subdirs(vistalDataImageWriter)
 subdirs(vistalDataImageReader)
 subdirs(bvProcessBrainSegmentation)
-
+subdirs(itkDataImageConverter)
+subdirs(vistalDataImageConverter)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 include(pack)
