@@ -4,7 +4,9 @@
 
 #include "vistalDataImageToItkDataImageConverter.h"
 #include "itkImage3D.hh"
+#include "Image3D.hh"
 
+#include <dtkCore/dtkAbstractData.h>
 #include <dtkCore/dtkAbstractDataFactory.h>
 
 // /////////////////////////////////////////////////////////////////
@@ -68,7 +70,37 @@ vistalDataImageToItkDataImageConverter::toType(void) const
 dtkAbstractData *
 vistalDataImageToItkDataImageConverter::convert(void)
 {
+    if (!d->output)
+        return NULL;
 
+    dtkAbstractData *data = this->data();
+    if (!data)
+        return NULL;
+
+    if (data->description() == "vistalDataImageUChar3") {
+        if ( vistal::Image3D<unsigned char>* image = static_cast<vistal::Image3D<unsigned char>*>( data->data() ) ) {
+            if (d->uchar3Converter == NULL)
+                d->uchar3Converter = new itkImage3D<unsigned char> ;
+            d->uchar3Converter->SetImage3D(*image);
+            d->output->setData(d->uchar3Converter->GetOutput());
+        }
+    }
+    else if (data->description() == "vistalDataImageUShort3") {
+        if ( vistal::Image3D<unsigned short>* image = static_cast<vistal::Image3D<unsigned short>*>( data->data() ) ) {
+            if (d->ushort3Converter == NULL)
+                d->ushort3Converter = new itkImage3D<unsigned short> ;
+            d->ushort3Converter->SetImage3D(*image);
+            d->output->setData(d->ushort3Converter->GetOutput());
+        }
+    }
+    else if (data->description() == "vistalDataImageSShort3") {
+        if ( vistal::Image3D<short>* image = static_cast<vistal::Image3D<short>*>( data->data() ) ) {
+            if (d->sshort3Converter == NULL)
+                d->sshort3Converter = new itkImage3D<short> ;
+            d->sshort3Converter->SetImage3D(*image);
+            d->output->setData(d->sshort3Converter->GetOutput());
+        }
+    }
     return d->output;
 }
 
