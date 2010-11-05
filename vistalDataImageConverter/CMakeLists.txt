@@ -43,11 +43,15 @@ include(${VISTAL_USE_FILE})
 
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalDataImageConverterPlugin.h
-  vistalDataImageToItkDataImageConverter.h)
+  vistalDataImageToItkDataImageUShort3Converter.h
+  vistalDataImageToItkDataImageShort3Converter.h
+  vistalDataImageToItkDataImageUChar3Converter.h)
 
 set(${PROJECT_NAME}_SOURCES
   vistalDataImageConverterPlugin.cpp
-  vistalDataImageToItkDataImageConverter.cpp)
+  vistalDataImageToItkDataImageUShort3Converter.cpp
+  vistalDataImageToItkDataImageShort3Converter.cpp
+  vistalDataImageToItkDataImageUChar3Converter.cpp)
 
 ## #################################################################
 ## Build rules
