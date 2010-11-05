@@ -58,10 +58,10 @@ set(${PROJECT_NAME}_SOURCES
 	vistalDataImageSChar3.cpp
 	vistalDataImageUShort3.cpp
 	vistalDataImageSShort3.cpp
-	vistalDataImageUInt3.h
-	vistalDataImageSInt3.h
-	vistalDataImageDouble3.h
-	vistalDataImageFloat3.h )
+	vistalDataImageUInt3.cpp
+	vistalDataImageSInt3.cpp
+	vistalDataImageDouble3.cpp
+	vistalDataImageFloat3.cpp )
 
 ## #################################################################
 ## Build rules
