@@ -3,9 +3,16 @@
 // /////////////////////////////////////////////////////////////////
 
 #include "vistalDataImageUChar3.h"
+#include "vistalDataImageSChar3.h"
 #include "vistalDataImageUShort3.h"
 #include "vistalDataImageSShort3.h"
+#include "vistalDataImageUInt3.h"
+#include "vistalDataImageSInt3.h"
+#include "vistalDataImageFloat3.h"
+#include "vistalDataImageDouble3.h"
 #include "vistalDataImagePlugin.h"
+
+
 
 #include <dtkCore/dtkLog.h>
 
@@ -42,12 +49,28 @@ vistalDataImagePlugin::initialize(void)
 	if (!vistalDataImageUChar3::registered())
 		dtkWarning() << "Unable to register vistalDataImageUChar3 type";
 	
+	if (!vistalDataImageSChar3::registered())
+		dtkWarning() << "Unable to register vistalDataImageSChar3 type";
+
 	if (!vistalDataImageUShort3::registered())
 		dtkWarning() << "Unable to register vistalDataImageUShort3 type";
 	
 	if (!vistalDataImageSShort3::registered())
 		dtkWarning() << "Unable to register vistalDataImageSShort3 type";
+
+	if (!vistalDataImageUInt3::registered())
+		dtkWarning() << "Unable to register vistalDataImageUInt3 type";
+
+	if (!vistalDataImageSInt3::registered())
+		dtkWarning() << "Unable to register vistalDataImageSInt3 type";
 	
+	if (!vistalDataImageFloat3::registered())
+		dtkWarning() << "Unable to register vistalDataImageFloat3 type";
+
+	if (!vistalDataImageDouble3::registered())
+		dtkWarning() << "Unable to register vistalDataImageDouble3 type";
+
+
 	return true;
 }
 
@@ -78,7 +101,15 @@ vistalDataImagePlugin::tags(void) const
 QStringList
 vistalDataImagePlugin::types(void) const
 {
-    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3";
+    return QStringList() << "vistalDataImageUChar3"
+							<< "vistalDataImageSChar3"
+							<< "vistalDataImageUShort3"
+							<< "vistalDataImageSShort3"
+							<< "vistalDataImageUInt3"
+							<< "vistalDataImageSInt3"
+							<< "vistalDataImageFloat3"
+							<< "vistalDataImageDouble3";
+
 }
 
 Q_EXPORT_PLUGIN2(vistalDataImagePlugin, vistalDataImagePlugin)

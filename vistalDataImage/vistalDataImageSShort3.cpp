@@ -14,19 +14,20 @@
 
 class vistalDataImageSShort3Private
 {
-public:
-  vistal::Image3D<short> * image;
-	itkImage3D<short> * itkConverter;
+    public:
+        vistal::Image3D<short> * image;
+        itkImage3D<short> * itkConverter;
 };
 
 // /////////////////////////////////////////////////////////////////
 // vistalDataImageSShort3
 // /////////////////////////////////////////////////////////////////
 
-vistalDataImageSShort3::vistalDataImageSShort3(void) : dtkAbstractData(), d(new vistalDataImageSShort3Private)
+vistalDataImageSShort3::vistalDataImageSShort3(void) :
+    dtkAbstractData(), d(new vistalDataImageSShort3Private)
 {
-  d->image = 0;
-	d->itkConverter = 0;
+    d->image = 0;
+    d->itkConverter = 0;
 }
 
 vistalDataImageSShort3::~vistalDataImageSShort3(void)
@@ -34,77 +35,86 @@ vistalDataImageSShort3::~vistalDataImageSShort3(void)
 
 }
 
-bool vistalDataImageSShort3::registered(void)
+bool
+vistalDataImageSShort3::registered(void)
 {
     return dtkAbstractDataFactory::instance()->registerDataType("vistalDataImageSShort3", createVistalDataImageSShort3);
 }
 
-QString vistalDataImageSShort3::description(void) const
+QString
+vistalDataImageSShort3::description(void) const
 {
     return "vistalDataImageSShort3";
 }
 
-void *vistalDataImageSShort3::data()
+void *
+vistalDataImageSShort3::data()
 {
-  return d->image;
+    return d->image;
 }
 
-void *vistalDataImageSShort3::output()
+void *
+vistalDataImageSShort3::output()
 {
-	if (!d->itkConverter)
-		d->itkConverter = new itkImage3D<short>;
-	
-	if (!d->image)
-		return 0;
-	
-	d->itkConverter->SetImage3D(*d->image);
-	
-	return d->itkConverter->GetOutput();
+    if (!d->itkConverter)
+        d->itkConverter = new itkImage3D<short> ;
+
+    if (!d->image)
+        return 0;
+
+    d->itkConverter->SetImage3D(*d->image);
+
+    return d->itkConverter->GetOutput();
 }
 
-void vistalDataImageSShort3::setData(void* data)
+void
+vistalDataImageSShort3::setData(void* data)
 {
-  d->image = static_cast<vistal::Image3D<short> *> (data);
+    d->image = static_cast<vistal::Image3D<short> *> (data);
 }
 
-int vistalDataImageSShort3::xDimension(void)
+int
+vistalDataImageSShort3::xDimension(void)
 {
-  if (d->image != NULL)
-    return d->image->nbx;
-  else
-    return -1;
+    if (d->image != NULL)
+        return d->image->nbx;
+    else
+        return -1;
 }
 
-int vistalDataImageSShort3::yDimension(void)
+int
+vistalDataImageSShort3::yDimension(void)
 {
-  if (d->image != NULL)
-    return d->image->nby;
-  else
-    return -1;
+    if (d->image != NULL)
+        return d->image->nby;
+    else
+        return -1;
 }
 
-int vistalDataImageSShort3::zDimension(void)
+int
+vistalDataImageSShort3::zDimension(void)
 {
-  if (d->image != NULL)
-    return d->image->nbz;
-  else
-    return -1;
+    if (d->image != NULL)
+        return d->image->nbz;
+    else
+        return -1;
 }
 
-int vistalDataImageSShort3::tDimension(void)
+int
+vistalDataImageSShort3::tDimension(void)
 {
-  if (d->image != NULL)
-    return d->image->nbt;
-  else
-    return -1;
+    if (d->image != NULL)
+        return d->image->nbt;
+    else
+        return -1;
 }
-
 
 // /////////////////////////////////////////////////////////////////
 // Type instanciation
 // /////////////////////////////////////////////////////////////////
 
-dtkAbstractData *createVistalDataImageSShort3(void)
+dtkAbstractData *
+createVistalDataImageSShort3(void)
 {
     return new vistalDataImageSShort3;
 }

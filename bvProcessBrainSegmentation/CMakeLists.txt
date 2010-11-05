@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 2.8.1)
 
-project(vistalDataImagePlugin)
+project(bvProcessBrainSegmentationPlugin)
 
 ## #################################################################
 ## Setup version numbering
@@ -33,35 +33,17 @@ find_package(dtk REQUIRED)
 include(${dtk_USE_FILE})
 include(dtkPlugin)
 
-find_package(Vistal REQUIRED)
-find_package(ITK REQUIRED)
-include(${VISTAL_USE_FILE})
-
 ## #################################################################
 ## Input
 ## #################################################################
 
 set(${PROJECT_NAME}_HEADERS_MOC
-  vistalDataImagePlugin.h
-  vistalDataImageUChar3.h
-	vistalDataImageSChar3.h
-	vistalDataImageUShort3.h
-	vistalDataImageSShort3.h
-	vistalDataImageUInt3.h
-	vistalDataImageSInt3.h
-	vistalDataImageDouble3.h
-	vistalDataImageFloat3.h	)
+  bvProcessBrainSegmentationPlugin.h
+  bvProcessBrainSegmentation.h)
 
 set(${PROJECT_NAME}_SOURCES
-  vistalDataImagePlugin.cpp
-  vistalDataImageUChar3.cpp
-	vistalDataImageSChar3.cpp
-	vistalDataImageUShort3.cpp
-	vistalDataImageSShort3.cpp
-	vistalDataImageUInt3.h
-	vistalDataImageSInt3.h
-	vistalDataImageDouble3.h
-	vistalDataImageFloat3.h )
+  bvProcessBrainSegmentationPlugin.cpp
+  bvProcessBrainSegmentation.cpp)
 
 ## #################################################################
 ## Build rules
@@ -75,11 +57,9 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  ${VISTAL_LIBS}
-	${ITK_LIBRARIES}
   dtkCore)
 
-dtk_build_doc(vistalDataImagePlugin)
+dtk_build_doc(bvProcessBrainSegmentationPlugin)
 
 ## #################################################################
 ## Install rules

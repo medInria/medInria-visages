@@ -14,19 +14,20 @@
 
 class vistalDataImageUChar3Private
 {
-public:
-  vistal::Image3D<unsigned char> * image;
-	itkImage3D<unsigned char> * itkConverter;
+    public:
+        vistal::Image3D<unsigned char> * image;
+        itkImage3D<unsigned char> * itkConverter;
 };
 
 // /////////////////////////////////////////////////////////////////
 // vistalDataImageUChar3
 // /////////////////////////////////////////////////////////////////
 
-vistalDataImageUChar3::vistalDataImageUChar3(void) : dtkAbstractData(), d(new vistalDataImageUChar3Private)
+vistalDataImageUChar3::vistalDataImageUChar3(void) :
+    dtkAbstractData(), d(new vistalDataImageUChar3Private)
 {
-  d->image = 0;
-	d->itkConverter = 0;
+    d->image = 0;
+    d->itkConverter = 0;
 }
 
 vistalDataImageUChar3::~vistalDataImageUChar3(void)
@@ -34,77 +35,86 @@ vistalDataImageUChar3::~vistalDataImageUChar3(void)
 
 }
 
-bool vistalDataImageUChar3::registered(void)
+bool
+vistalDataImageUChar3::registered(void)
 {
     return dtkAbstractDataFactory::instance()->registerDataType("vistalDataImageUChar3", createVistalDataImageUChar3);
 }
 
-QString vistalDataImageUChar3::description(void) const
+QString
+vistalDataImageUChar3::description(void) const
 {
     return "vistalDataImageUChar3";
 }
 
-void *vistalDataImageUChar3::data()
+void *
+vistalDataImageUChar3::data()
 {
-  return d->image;
+    return d->image;
 }
 
-void *vistalDataImageUChar3::output()
+void *
+vistalDataImageUChar3::output()
 {
-	if (!d->itkConverter)
-		d->itkConverter = new itkImage3D<unsigned char>;
-	
-	if (!d->image)
-		return 0;
-	
-	d->itkConverter->SetImage3D(*d->image);
-	
-	return d->itkConverter->GetOutput();
+    if (!d->itkConverter)
+        d->itkConverter = new itkImage3D<unsigned char> ;
+
+    if (!d->image)
+        return 0;
+
+    d->itkConverter->SetImage3D(*d->image);
+
+    return d->itkConverter->GetOutput();
 }
 
-void vistalDataImageUChar3::setData(void* data)
+void
+vistalDataImageUChar3::setData(void* data)
 {
-  d->image = static_cast<vistal::Image3D<unsigned char> *> (data);
+    d->image = static_cast<vistal::Image3D<unsigned char> *> (data);
 }
 
-int vistalDataImageUChar3::xDimension(void)
+int
+vistalDataImageUChar3::xDimension(void)
 {
-  if (d->image != NULL)
-    return d->image->nbx;
-  else
-    return -1;
+    if (d->image != NULL)
+        return d->image->nbx;
+    else
+        return -1;
 }
 
-int vistalDataImageUChar3::yDimension(void)
+int
+vistalDataImageUChar3::yDimension(void)
 {
-  if (d->image != NULL)
-    return d->image->nby;
-  else
-    return -1;
+    if (d->image != NULL)
+        return d->image->nby;
+    else
+        return -1;
 }
 
-int vistalDataImageUChar3::zDimension(void)
+int
+vistalDataImageUChar3::zDimension(void)
 {
-  if (d->image != NULL)
-    return d->image->nbz;
-  else
-    return -1;
+    if (d->image != NULL)
+        return d->image->nbz;
+    else
+        return -1;
 }
 
-int vistalDataImageUChar3::tDimension(void)
+int
+vistalDataImageUChar3::tDimension(void)
 {
-  if (d->image != NULL)
-    return d->image->nbt;
-  else
-    return -1;
+    if (d->image != NULL)
+        return d->image->nbt;
+    else
+        return -1;
 }
-
 
 // /////////////////////////////////////////////////////////////////
 // Type instanciation
 // /////////////////////////////////////////////////////////////////
 
-dtkAbstractData *createVistalDataImageUChar3(void)
+dtkAbstractData *
+createVistalDataImageUChar3(void)
 {
     return new vistalDataImageUChar3;
 }

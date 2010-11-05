@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 2.8.1)
 
-project(vistalDataImagePlugin)
+project(vistalDataImageConverterPlugin)
 
 ## #################################################################
 ## Setup version numbering
@@ -42,26 +42,26 @@ include(${VISTAL_USE_FILE})
 ## #################################################################
 
 set(${PROJECT_NAME}_HEADERS_MOC
-  vistalDataImagePlugin.h
-  vistalDataImageUChar3.h
-	vistalDataImageSChar3.h
-	vistalDataImageUShort3.h
-	vistalDataImageSShort3.h
-	vistalDataImageUInt3.h
-	vistalDataImageSInt3.h
-	vistalDataImageDouble3.h
-	vistalDataImageFloat3.h	)
+  vistalDataImageConverterPlugin.h
+  vistalDataImageToItkDataImageDouble3Converter.h
+  vistalDataImageToItkDataImageFloat3Converter.h
+  vistalDataImageToItkDataImageSInt3Converter.h
+  vistalDataImageToItkDataImageUInt3Converter.h
+  vistalDataImageToItkDataImageUShort3Converter.h
+  vistalDataImageToItkDataImageShort3Converter.h
+  vistalDataImageToItkDataImageSChar3Converter.h
+  vistalDataImageToItkDataImageUChar3Converter.h)
 
 set(${PROJECT_NAME}_SOURCES
-  vistalDataImagePlugin.cpp
-  vistalDataImageUChar3.cpp
-	vistalDataImageSChar3.cpp
-	vistalDataImageUShort3.cpp
-	vistalDataImageSShort3.cpp
-	vistalDataImageUInt3.h
-	vistalDataImageSInt3.h
-	vistalDataImageDouble3.h
-	vistalDataImageFloat3.h )
+  vistalDataImageConverterPlugin.cpp
+  vistalDataImageToItkDataImageDouble3Converter.cpp
+  vistalDataImageToItkDataImageFloat3Converter.cpp
+  vistalDataImageToItkDataImageSInt3Converter.cpp
+  vistalDataImageToItkDataImageUInt3Converter.cpp
+  vistalDataImageToItkDataImageUShort3Converter.cpp
+  vistalDataImageToItkDataImageShort3Converter.cpp
+  vistalDataImageToItkDataImageSChar3Converter.cpp
+  vistalDataImageToItkDataImageUChar3Converter.cpp)
 
 ## #################################################################
 ## Build rules
@@ -76,10 +76,10 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
-	${ITK_LIBRARIES}
+  ${ITK_LIBRARIES}
   dtkCore)
 
-dtk_build_doc(vistalDataImagePlugin)
+dtk_build_doc(vistalDataImageConverterPlugin)
 
 ## #################################################################
 ## Install rules
