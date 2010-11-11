@@ -835,8 +835,24 @@ void v3dView::setData(dtkAbstractData *data)
 	    d->view2DCoronal->SetITKInput(image);
 	    d->view3D->SetITKInput(image);
 	}
-    }
-    else
+		}
+	else if (data->description()=="vistalDataImageUShort3") {
+		if( itk::Image<unsigned short, 3> *image = dynamic_cast<itk::Image<unsigned short, 3> *>( (itk::Object*)( data->output() ) ) ) {
+			d->view2DAxial->SetITKInput(image);
+			d->view2DSagittal->SetITKInput(image);
+			d->view2DCoronal->SetITKInput(image);
+			d->view3D->SetITKInput(image);
+		}
+	}
+	else if (data->description()=="vistalDataImageSShort3") {
+		if( itk::Image<short, 3> *image = dynamic_cast<itk::Image<short, 3> *>( (itk::Object*)( data->output() ) ) ) {
+			d->view2DAxial->SetITKInput(image);
+			d->view2DSagittal->SetITKInput(image);
+			d->view2DCoronal->SetITKInput(image);
+			d->view3D->SetITKInput(image);
+		}
+	}
+	else
 #endif
       if (data->description()=="v3dDataImage") {
 	  if(vtkImageData *dataset = dynamic_cast<vtkImageData*>((vtkDataObject *)(data->data()))) {
