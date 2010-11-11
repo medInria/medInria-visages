@@ -23,7 +23,7 @@ public:
 // vistalDataImageUShort3
 // /////////////////////////////////////////////////////////////////
 
-vistalDataImageUShort3::vistalDataImageUShort3(void) : dtkAbstractData(), d(new vistalDataImageUShort3Private)
+vistalDataImageUShort3::vistalDataImageUShort3(void) : dtkAbstractDataImage(), d(new vistalDataImageUShort3Private)
 {
   d->image = 0;
 	d->itkConverter = 0;

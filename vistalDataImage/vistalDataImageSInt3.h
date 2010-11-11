@@ -11,7 +11,7 @@
 
 class vistalDataImageSInt3Private;
 
-class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageSInt3 : public dtkAbstractData
+class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageSInt3 : public dtkAbstractDataImage
 {
     Q_OBJECT
 

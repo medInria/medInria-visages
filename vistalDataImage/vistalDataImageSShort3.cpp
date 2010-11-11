@@ -24,7 +24,7 @@ class vistalDataImageSShort3Private
 // /////////////////////////////////////////////////////////////////
 
 vistalDataImageSShort3::vistalDataImageSShort3(void) :
-    dtkAbstractData(), d(new vistalDataImageSShort3Private)
+    dtkAbstractDataImage(), d(new vistalDataImageSShort3Private)
 {
     d->image = 0;
     d->itkConverter = 0;

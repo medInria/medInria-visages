@@ -23,7 +23,7 @@ public:
 // vistalDataImageDouble3
 // /////////////////////////////////////////////////////////////////
 
-vistalDataImageDouble3::vistalDataImageDouble3(void) : dtkAbstractData(), d(new vistalDataImageDouble3Private)
+vistalDataImageDouble3::vistalDataImageDouble3(void) : dtkAbstractDataImage(), d(new vistalDataImageDouble3Private)
 {
   d->image = 0;
 	d->itkConverter = 0;
