@@ -812,27 +812,27 @@ vtkImageView3D *v3dView::view3D(void)
 
 vtkRenderWindowInteractor *v3dView::interactor(void)
 {
-	return d->vtkWidget->GetRenderWindow()->GetInteractor();
+    return d->vtkWidget->GetRenderWindow()->GetInteractor();
 }
 
 vtkRenderer *v3dView::rendererAxial(void)
 {
-	return d->renderer2DAxial;
+    return d->renderer2DAxial;
 }
 
 vtkRenderer *v3dView::rendererSagittal(void)
 {
-	return d->renderer2DSagittal;
+    return d->renderer2DSagittal;
 }
 
 vtkRenderer *v3dView::rendererCoronal(void)
 {
-	return d->renderer2DCoronal;
+    return d->renderer2DCoronal;
 }
 
 vtkRenderer *v3dView::renderer3D(void)
 {
-	return d->renderer3D;
+    return d->renderer3D;
 }
 
 void v3dView::setData(dtkAbstractData *data)
@@ -1088,7 +1088,91 @@ void v3dView::play(bool start)
 		d->timeline->stop();
 }
 
-void v3dView::linkwl (dtkAbstractView *view, bool value)
+void v3dView::linkPosition (dtkAbstractView *view, bool value)
+{
+    if (view==this)
+        return;
+  
+  if (v3dView *otherView = dynamic_cast<v3dView*>(view)) {
+
+    if (value) {
+      
+        otherView->setProperty ("PositionLinked", "true");
+	otherView->setProperty ("CameraLinked",   "true");
+	
+	otherView->viewAxial()->SetCurrentPoint    ( d->currentView->GetCurrentPoint() );
+	otherView->viewSagittal()->SetCurrentPoint ( d->currentView->GetCurrentPoint() );
+	otherView->viewCoronal()->SetCurrentPoint  ( d->currentView->GetCurrentPoint() );
+	otherView->view3D()->SetCurrentPoint       ( d->currentView->GetCurrentPoint() );
+
+	otherView->viewAxial()->SetTimeIndex    ( d->currentView->GetTimeIndex() );
+	otherView->viewSagittal()->SetTimeIndex ( d->currentView->GetTimeIndex() );
+	otherView->viewCoronal()->SetTimeIndex  ( d->currentView->GetTimeIndex() );
+	otherView->view3D()->SetTimeIndex       ( d->currentView->GetTimeIndex() );
+		
+		
+	d->collectionAxial->AddItem    ( otherView->viewAxial() );
+	d->collectionSagittal->AddItem ( otherView->viewSagittal() );
+	d->collectionCoronal->AddItem  ( otherView->viewCoronal() );
+	//d->collection3D->AddItem       ( otherView->view3D() );
+	
+	// zoom comes first, then pan (==translation)	
+	otherView->viewAxial()->SetZoom ( d->view2DAxial->GetZoom() );
+	otherView->viewAxial()->SetPan  ( d->view2DAxial->GetPan() );
+	
+	otherView->viewSagittal()->SetZoom ( d->view2DSagittal->GetZoom() );
+	otherView->viewSagittal()->SetPan  ( d->view2DSagittal->GetPan() );	
+
+	otherView->viewCoronal()->SetZoom ( d->view2DCoronal->GetZoom() );
+	otherView->viewCoronal()->SetPan  ( d->view2DCoronal->GetPan() );
+		
+	// 3D is more tricky than this
+	//otherView->view3D()->SetCameraPosition    ( d->view3D->GetCameraPosition() );
+	//otherView->view3D()->SetCameraFocalPoint  ( d->view3D->GetCameraFocalPoint() );
+	//otherView->view3D()->SetZoom              ( d->view3D->GetZoom() );
+	
+	d->collectionPos->AddItem ( d->view2DAxial );
+	d->collectionPos->AddItem ( d->view2DSagittal );
+	d->collectionPos->AddItem ( d->view2DCoronal );
+	d->collectionPos->AddItem ( d->view3D );
+
+	d->collectionPos->AddItem ( otherView->viewAxial() );
+	d->collectionPos->AddItem ( otherView->viewSagittal() );
+	d->collectionPos->AddItem ( otherView->viewCoronal() );
+	d->collectionPos->AddItem ( otherView->view3D() );
+    }
+    else {
+
+        otherView->setProperty ("PositionLinked", "false");
+	otherView->setProperty ("CameraLinked",   "false");
+	
+	d->collectionAxial->RemoveItem    ( otherView->viewAxial() );
+	d->collectionSagittal->RemoveItem ( otherView->viewSagittal() );
+	d->collectionCoronal->RemoveItem  ( otherView->viewCoronal() );
+	//d->collection3D->RemoveItem       ( otherView->view3D() );
+
+	d->collectionPos->RemoveItem ( otherView->viewAxial() );
+	d->collectionPos->RemoveItem ( otherView->viewSagittal() );
+	d->collectionPos->RemoveItem ( otherView->viewCoronal() );
+	d->collectionPos->RemoveItem ( otherView->view3D() );
+
+	if (d->collectionPos->GetNumberOfItems()==4) {
+	      d->collectionPos->RemoveItem ( d->view2DAxial );
+	      d->collectionPos->RemoveItem ( d->view2DSagittal );
+	      d->collectionPos->RemoveItem ( d->view2DCoronal );
+	      d->collectionPos->RemoveItem ( d->view3D );
+	}
+    }
+  }
+  
+}
+
+void v3dView::linkCamera (dtkAbstractView *view, bool value)
+{
+  this->linkPosition (view, value);
+}
+
+void v3dView::linkWindowing (dtkAbstractView *view, bool value)
 {
 	if (v3dView *vview = dynamic_cast<v3dView*>(view)) {
 		if (value) {
@@ -1225,6 +1309,7 @@ void v3dView::onOrientationPropertySet(QString value)
 			d->slider->setRange (0, d->imageData->zDimension()-1);
 		}
 	}
+    }
 	
 	if (value == "Sagittal") {
 		d->orientation = "Sagittal";
@@ -1274,16 +1359,12 @@ void v3dView::onOrientationPropertySet(QString value)
     if (vtkImageView2D *view2d = vtkImageView2D::SafeDownCast (d->currentView)) {
 			unsigned int zslice = view2d->GetSlice();
 	    d->slider->setValue (zslice);
-    }
-	}
-	else if (d->dimensionBox->currentText()==tr("Time")) {
-		d->slider->setValue(d->currentView->GetTimeIndex());
 	}
 	
 	d->slider->blockSignals (false);
 }
 
-void v3dView::onModePropertySet (QString value)
+void v3dView::on3DModePropertySet (QString value)
 {
 	if (value=="VR") {
 		d->view3D->SetRenderingModeToVR();
@@ -1315,7 +1396,7 @@ void v3dView::onModePropertySet (QString value)
 	} 
 }
 
-void v3dView::onVRModePropertySet (QString value)
+void v3dView::onRenderingPropertySet (QString value)
 {
 	if (value=="GPU") 
 		d->view3D->SetVolumeMapperToGPU();
@@ -1335,13 +1416,13 @@ void v3dView::onVRModePropertySet (QString value)
 
 void v3dView::onUseLODPropertySet (QString value)
 {
-  if (value == "On")
-    d->view3D->UseVRQualityOn();
-  else
-    d->view3D->UseVRQualityOff();
+    if (value == "On")
+        d->view3D->UseVRQualityOn();
+    else
+        d->view3D->UseVRQualityOff();
 }
 
-void v3dView::onScalarBarVisibilityPropertySet(QString value)
+void v3dView::onShowScalarBarPropertySet(QString value)
 {
 	if (value == "true") {
 		d->collection->SyncSetShowScalarBar(true);
@@ -1497,17 +1578,17 @@ void v3dView::onShowAxisPropertySet(QString value)
 
 void v3dView::onShowRulerPropertySet(QString value)
 {
-  d->collection->SyncSetShowRulerWidget ((value == "true"));  
+    d->collection->SyncSetShowRulerWidget ((value == "true"));  
 }
 
 void v3dView::onShowAnnotationsPropertySet(QString value)
 {
-  d->collection->SyncSetShowAnnotations ((value == "true"));
+    d->collection->SyncSetShowAnnotations ((value == "true"));
 }
 
-void v3dView::onLeftClickInteractionPropertySet(QString value)
+void v3dView::onMouseInteractionPropertySet(QString value)
 {
-  d->collection->SyncSetMiddleButtonInteractionStyle(vtkInteractorStyleImageView2D::InteractionTypeSlice);
+    d->collection->SyncSetMiddleButtonInteractionStyle(vtkInteractorStyleImageView2D::InteractionTypeSlice);
   
 	if (value == "Zooming") {
 		d->collection->SyncSetLeftButtonInteractionStyle(vtkInteractorStyleImageView2D::InteractionTypeZoom);
@@ -1761,11 +1842,15 @@ void v3dView::onDaddyPropertySet (QString value)
 	
 	d->anchorButton->blockSignals(false);
 	d->linkButton->blockSignals(false);
-	d->linkWLButton->blockSignals(false);
-	d->registerButton->blockSignals(false);
+    }
+
+    if (value=="false") {
+        d->linkButton->setChecked (false);
+	d->linkButton->blockSignals(false);
+    }
 }
 
-void v3dView::onLinkedWLPropertySet (QString value)
+void v3dView::onWindowingLinkedPropertySet (QString value)
 {
 	d->linkWLButton->blockSignals(true);
 	
@@ -1816,8 +1901,8 @@ void v3dView::onDimensionBoxChanged (QString value)
 
 void v3dView::onMetaDataSet(QString key, QString value)
 {
-  if (key == "VRQuality")        
-    d->view3D->SetVRQuality((float)(value.toInt())/100.0);
+    if (key == "VRQuality")        
+        d->view3D->SetVRQuality((float)(value.toInt())/100.0);
   
   if(key == "LOD")        
 		d->view3D->SetVRQuality((float)(value.toInt())/100.0);
@@ -1903,31 +1988,31 @@ void v3dView::onMenu3DOffTriggered (void)
 
 void v3dView::onMenuVRGPUTriggered (void)
 {
-  this->setProperty("VRMode", "GPU");
+  this->setProperty("Renderer", "GPU");
   d->view3D->Render();
 }
 
 void v3dView::onMenuVRRayCastAndTextureTriggered (void)
 {
-  this->setProperty("VRMode", "Ray Cast / Texture");
+  this->setProperty("Renderer", "Ray Cast / Texture");
   d->view3D->Render();
 }
 
 void v3dView::onMenuVRRayCastTriggered (void)
 {
-  this->setProperty("VRMode", "Ray Cast");
+  this->setProperty("Renderer", "Ray Cast");
   d->view3D->Render();
 }
 
 void v3dView::onMenuVRTextureTriggered (void)
 {
-  this->setProperty("VRMode", "Texture");
+  this->setProperty("Renderer", "Texture");
   d->view3D->Render();
 }
 
 void v3dView::onMenuVRDefaultTriggered (void)
 {
-  this->setProperty("VRMode", "Default");
+  this->setProperty("Renderer", "Default");
   d->view3D->Render();
 }
 
@@ -2176,4 +2261,73 @@ void v3dView::setCameraClippingRange(double nearRange, double farRange)
     vtkCamera *camera = d->renderer3D->GetActiveCamera();
     
     camera->SetClippingRange(nearRange, farRange);
+}
+
+QString v3dView::cameraProjectionMode(void)
+{
+    vtkCamera *camera = NULL;
+
+    if(this->property("Orientation") == "Axial")
+        camera = d->renderer2DAxial->GetActiveCamera();
+
+    if(this->property("Orientation") == "Coronal")
+        camera = d->renderer2DCoronal->GetActiveCamera();   
+
+    if(this->property("Orientation") == "Sagittal")
+        camera = d->renderer2DSagittal->GetActiveCamera();   
+
+    if(this->property("Orientation") == "3D")
+        camera = d->renderer3D->GetActiveCamera();   
+
+    if(!camera)
+        return QString("None");
+
+    if(camera->GetParallelProjection())
+        return QString("Parallel");
+    else
+        return QString("Perspective");
+}
+
+double v3dView::cameraViewAngle(void)
+{
+    vtkCamera *camera = NULL;
+
+    if(this->property("Orientation") == "Axial")
+        camera = d->renderer2DAxial->GetActiveCamera();
+
+    if(this->property("Orientation") == "Coronal")
+        camera = d->renderer2DCoronal->GetActiveCamera();   
+
+    if(this->property("Orientation") == "Sagittal")
+        camera = d->renderer2DSagittal->GetActiveCamera();   
+
+    if(this->property("Orientation") == "3D")
+        camera = d->renderer3D->GetActiveCamera();   
+
+    if(!camera)
+        return 0.0;
+    else
+        return camera->GetViewAngle();
+}
+
+double v3dView::cameraZoom(void)
+{
+    vtkImageView *view = NULL;
+
+    if(this->property("Orientation") == "Axial")
+        view = d->view2DAxial;
+
+    if(this->property("Orientation") == "Coronal")
+        view = d->view2DCoronal;
+
+    if(this->property("Orientation") == "Sagittal")
+        view = d->view2DSagittal;
+
+    if(this->property("Orientation") == "3D")
+        view = d->view3D;
+
+    if(!view)
+        return 1.0;
+    else
+        return view->GetZoom();
 }
