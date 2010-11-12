@@ -39,6 +39,9 @@ public slots:
     int zDimension(void);
     int tDimension(void);
 
+	int minRangeValue(void);
+	int maxRangeValue(void);
+	
 private:
     vistalDataImageUShort3Private *d;
 };

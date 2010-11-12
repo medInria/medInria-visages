@@ -8,10 +8,13 @@
 		vistal::Image3D< type > * image; \
 		QList<QImage> thumbnails;	\
 		QImage defaultThumbnail; \
+		type range_min, range_max; \
 	}; \
 	vistalDataImage##suffix::vistalDataImage##suffix(void) : dtkAbstractDataImage(), d(new vistalDataImage##suffix##Private) \
 	{ \
 		d->image = 0; \
+		d->range_min = 0; \
+		d->range_max = 0; \
 		d->defaultThumbnail = QImage(128, 128, QImage::Format_ARGB32); \
 		d->defaultThumbnail.fill(0); \
 	} \
@@ -82,6 +85,24 @@
 			return d->image->nbt; \
 		else \
 			return -1; \
+	} \
+	int vistalDataImage##suffix::minRangeValue(void) \
+	{ \
+		if (d->range_min == 0) \
+		{ \
+			if (d->image != 0) \
+				d->range_min = vistal::stats::GetMinPixelValue (*d->image); \
+		} \
+		return d->range_min; \
+	} \
+	int vistalDataImage##suffix::maxRangeValue(void) \
+	{ \
+		if (d->range_max == 0) \
+		{ \
+			if (d->image != 0) \
+				d->range_max = vistal::stats::GetMaxPixelValue (*d->image); \
+		} \
+		return d->range_max; \
 	} \
 	dtkAbstractData *createVistalDataImage##suffix(void) \
 	{ \
