@@ -16,12 +16,15 @@ class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageSShort3 : public dtkAbstractDa
     Q_OBJECT
 
 public:
-             vistalDataImageSShort3(void);
+    vistalDataImageSShort3(void);
     virtual ~vistalDataImageSShort3(void);
 
     virtual QString description(void) const;
 
     static bool registered(void);
+
+		virtual QImage &thumbnail(void)   const;
+		virtual QList<QImage> &thumbnails (void) const;
 
 public slots:
     // derived from dtkAbstractData

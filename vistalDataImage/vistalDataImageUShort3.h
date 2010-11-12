@@ -22,7 +22,10 @@ public:
     virtual QString description(void) const;
 
     static bool registered(void);
-
+	
+		virtual QImage &thumbnail(void)   const;
+		virtual QList<QImage> &thumbnails (void) const;
+	
 public slots:
     // derived from dtkAbstractData
     
