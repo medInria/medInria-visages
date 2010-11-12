@@ -72,7 +72,8 @@ vistalDataImageToItkDataImageUChar3Converter::convert(void)
         return NULL;
 
     if (data->description() == "vistalDataImageUChar3") {
-        if ( vistal::Image3D<unsigned char>* image = static_cast<vistal::Image3D<unsigned char>*>( data->data() ) ) {
+			vistal::Image3D<unsigned char>* image = static_cast<vistal::Image3D<unsigned char>*>( data->data() );
+        if ( image != NULL ) {
             if (d->uchar3Converter == NULL)
                 d->uchar3Converter = new itkImage3D<unsigned char> ;
             d->uchar3Converter->SetImage3D(*image);

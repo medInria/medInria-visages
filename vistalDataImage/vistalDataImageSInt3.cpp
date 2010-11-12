@@ -4,7 +4,6 @@
 
 #include "Image3D.hh"
 #include "vistalDataImageSInt3.h"
-#include "itkImage3D.hh"
 
 #include <dtkCore/dtkAbstractDataFactory.h>
 
@@ -16,7 +15,6 @@ class vistalDataImageSInt3Private
 {
 public:
   vistal::Image3D<int> * image;
-	itkImage3D<int> * itkConverter;
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -26,12 +24,15 @@ public:
 vistalDataImageSInt3::vistalDataImageSInt3(void) : dtkAbstractDataImage(), d(new vistalDataImageSInt3Private)
 {
   d->image = 0;
-	d->itkConverter = 0;
 }
 
 vistalDataImageSInt3::~vistalDataImageSInt3(void)
 {
-
+	if (d->image)
+		delete d->image;
+	
+	delete d;
+	d = 0;
 }
 
 bool vistalDataImageSInt3::registered(void)
@@ -51,15 +52,7 @@ void *vistalDataImageSInt3::data()
 
 void *vistalDataImageSInt3::output()
 {
-	if (!d->itkConverter)
-		d->itkConverter = new itkImage3D<int>;
-
-	if (!d->image)
-		return 0;
-
-	d->itkConverter->SetImage3D(*d->image);
-
-	return d->itkConverter->GetOutput();
+	return d->image;
 }
 
 void vistalDataImageSInt3::setData(void* data)
