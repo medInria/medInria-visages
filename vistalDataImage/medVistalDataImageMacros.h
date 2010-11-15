@@ -1,6 +1,60 @@
 #ifndef _med_VistalDataImageMacros_h_
 #define _med_VistalDataImageMacros_h_
 
+#include <Image3D.hh>
+#include <Stats.hh>
+
+template<typename DataType>
+void
+generateThumbnails(typename vistal::Image3D<DataType> & ima, QList<QImage> & thumbnails)
+{
+    if (ima == NULL)
+        return;
+
+    thumbnails.clear();
+
+    qDebug() << "generating thumbnails...";
+
+    DataType max=vistal::stats::GetMaxPixelValue ( ima );
+    DataType min=vistal::stats::GetMinPixelValue ( ima );
+
+    QImage * qImage = new QImage(ima.nbx, ima.nby, QImage::Format_Mono);
+    uchar * buffer = qImage->bits();
+    for (short k = 0; k<ima.nbz; k++){
+        for ( short j=0;j< ima.nby;j++ )
+            for ( short i=0;i< ima.nbx;i++,buffer++ )
+                *buffer = ( unsigned char ) ( ( ima.ptr[k][j][i] - min ) *255/ ( max-min ) );
+        qImage->scaled(128,128,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        thumbnails.push_back(*qImage);
+        qImage = new QImage(ima.nbx, ima.nby, QImage::Format_Mono);
+        buffer = qImage->bits();
+    }
+    qDebug() << "...generated " << thumbnails.length() << " thumbnails";
+}
+
+template<typename DataType>
+void
+getThumbnail(typename vistal::Image3D<DataType> & ima, QImage & thumbnail)
+{
+    if (ima == NULL)
+        return;
+
+    DataType max=vistal::stats::GetMaxPixelValue ( ima );
+    DataType min=vistal::stats::GetMinPixelValue ( ima );
+
+    QImage * qImage = new QImage(ima.nbx, ima.nby, QImage::Format_Mono);
+    uchar * buffer = qImage->bits();
+
+    short index = ima.nbz/2;
+
+    for ( short j=0;j< ima.nby;j++ )
+        for ( short i=0;i< ima.nbx;i++,buffer++ )
+            *buffer = ( unsigned char ) ( ( ima.ptr[index][j][i] - min ) *255/ ( max-min ) );
+            qImage->scaled(128,128,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+
+    thumbnail = *qImage;
+}
+
 #define medImplementVistalDataImage(type, suffix)		\
 	class vistalDataImage##suffix##Private \
 	{ \
@@ -35,10 +89,17 @@
 	} \
 	QImage & vistalDataImage##suffix::thumbnail(void) const \
 	{ \
+	     if (d->thumbnails.isEmpty()){\
+	              getThumbnail(*(d->image), d->defaultThumbnail);\
+	            }\
+	          else{\
+	              d->defaultThumbnail = d->thumbnails.at(int(d->image->nbz / 2));\
+	          }\
 		return d->defaultThumbnail; \
 	} \
 	QList<QImage> & vistalDataImage##suffix::thumbnails(void) const \
 	{ \
+	    generateThumbnails<type>(*(d->image), d->thumbnails);\
 		if (d->thumbnails.isEmpty()) \
 		{ \
 			for (int i = 0;i < d->image->nbz;++i) \
