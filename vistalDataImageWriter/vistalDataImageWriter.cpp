@@ -39,7 +39,8 @@ bool
 vistalDataImageWriter::registered(void)
 {
 
-    return dtkAbstractDataFactory::instance()->registerDataWriterType("vistalDataImageWriter", QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3",createVistalDataImageWriter);
+    return dtkAbstractDataFactory::instance()->registerDataWriterType("vistalDataImageWriter", QStringList() << "vistalDataImageUChar3" << "vistalDataImageSChar3" << "vistalDataImageUShort3"
+            << "vistalDataImageSShort3" << "vistalDataImageUInt3" << "vistalDataImageSInt3" << "vistalDataImageFloat3" << "vistalDataImageDouble3", createVistalDataImageWriter);
 
 }
 
@@ -52,7 +53,8 @@ vistalDataImageWriter::description(void) const
 QStringList
 vistalDataImageWriter::handled() const
 {
-    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3";
+    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageSChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3" << "vistalDataImageUInt3" << "vistalDataImageSInt3"
+            << "vistalDataImageFloat3" << "vistalDataImageDouble3";
 }
 
 bool
@@ -79,6 +81,13 @@ vistalDataImageWriter::write(QString path)
             std::string tmp(path.toAscii().data());
             vistal::io::writeImage(tmp, *image);
         }
+        else if (dtkdata->description() == "vistalDataImageSChar3") {
+            vistal::Image3D<char> * image = static_cast<vistal::Image3D<char>*> (this->data()->data());
+            if (image == NULL)
+                return false;
+            std::string tmp(path.toAscii().data());
+            vistal::io::writeImage(tmp, *image);
+        }
         else if (dtkdata->description() == "vistalDataImageUShort3") {
             vistal::Image3D<unsigned short> * image = static_cast<vistal::Image3D<unsigned short>*> (this->data()->output());
             if (image == NULL)
@@ -93,8 +102,35 @@ vistalDataImageWriter::write(QString path)
             std::string tmp(path.toAscii().data());
             vistal::io::writeImage(tmp, *image);
         }
-                
-        
+        else if (dtkdata->description() == "vistalDataImageUInt3") {
+            vistal::Image3D<unsigned int> * image = static_cast<vistal::Image3D<unsigned int>*> (this->data()->data());
+            if (image == NULL)
+                return false;
+            std::string tmp(path.toAscii().data());
+            vistal::io::writeImage(tmp, *image);
+        }
+        else if (dtkdata->description() == "vistalDataImageSInt3") {
+            vistal::Image3D<int> * image = static_cast<vistal::Image3D<int>*> (this->data()->data());
+            if (image == NULL)
+                return false;
+            std::string tmp(path.toAscii().data());
+            vistal::io::writeImage(tmp, *image);
+        }
+        else if (dtkdata->description() == "vistalDataImageFloat3") {
+            vistal::Image3D<float> * image = static_cast<vistal::Image3D<float>*> (this->data()->data());
+            if (image == NULL)
+                return false;
+            std::string tmp(path.toAscii().data());
+            vistal::io::writeImage(tmp, *image);
+        }
+        else if (dtkdata->description() == "vistalDataImageDouble3") {
+            vistal::Image3D<double> * image = static_cast<vistal::Image3D<double>*> (this->data()->data());
+            if (image == NULL)
+                return false;
+            std::string tmp(path.toAscii().data());
+            vistal::io::writeImage(tmp, *image);
+        }
+
         else {
             qWarning() << "Unrecognized pixel type";
             return false;

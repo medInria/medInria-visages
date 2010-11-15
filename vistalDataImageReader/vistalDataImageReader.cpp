@@ -10,21 +10,21 @@
 
 #include <vistalIO.h>
 
-
 // /////////////////////////////////////////////////////////////////
 // vistalDataImageReaderPrivate
 // /////////////////////////////////////////////////////////////////
 
 class vistalDataImageReaderPrivate
 {
-public:
+    public:
 };
 
 // /////////////////////////////////////////////////////////////////
 // vistalDataImageReader
 // /////////////////////////////////////////////////////////////////
 
-vistalDataImageReader::vistalDataImageReader(void) : dtkAbstractDataReader(), d(new vistalDataImageReaderPrivate)
+vistalDataImageReader::vistalDataImageReader(void) :
+    dtkAbstractDataReader(), d(new vistalDataImageReaderPrivate)
 {
 
 }
@@ -34,167 +34,213 @@ vistalDataImageReader::~vistalDataImageReader(void)
 
 }
 
-bool vistalDataImageReader::registered(void)
+bool
+vistalDataImageReader::registered(void)
 {
-    return dtkAbstractDataFactory::instance()->registerDataReaderType("vistalDataImageReader", QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3", createVistalDataImageReader);
+    return dtkAbstractDataFactory::instance()->registerDataReaderType("vistalDataImageReader", QStringList() << "vistalDataImageUChar3" << "vistalDataImageSChar3" << "vistalDataImageUShort3"
+            << "vistalDataImageSShort3" << "vistalDataImageSInt3" << "vistalDataImageUInt3" << "vistalDataImageFloat3" << "vistalDataImageDouble", createVistalDataImageReader);
 }
 
-QString vistalDataImageReader::description(void) const
+QString
+vistalDataImageReader::description(void) const
 {
     return "vistalDataImageReader";
 }
 
-QStringList vistalDataImageReader::handled(void) const
+QStringList
+vistalDataImageReader::handled(void) const
 {
-  return QStringList() << "vistalDataImageUChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3";
+    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageSChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3" << "vistalDataImageSInt3" << "vistalDataImageUInt3"
+            << "vistalDataImageFloat3" << "vistalDataImageDouble";
 }
 
-
-bool vistalDataImageReader::canRead (QString path)
+bool
+vistalDataImageReader::canRead(QString path)
 {
-  /*if (!this->io.IsNull())
-    return this->io->CanReadFile ( path.toAscii().constData() );
-  return false;*/
-  
-  return ((QFileInfo(path).suffix() == "dim") or (QFileInfo(path).suffix() == "ima"));
+    /*if (!this->io.IsNull())
+     return this->io->CanReadFile ( path.toAscii().constData() );
+     return false;*/
 
-//  return true; // QFile(path).isReadable();
+    return ((QFileInfo(path).suffix() == "dim") or (QFileInfo(path).suffix() == "ima"));
+
+    //  return true; // QFile(path).isReadable();
 }
 
-bool vistalDataImageReader::canRead (QStringList paths)
+bool
+vistalDataImageReader::canRead(QStringList paths)
 {
- 
-   if (!paths.count())
-   return false;
-   return this->canRead ( paths[0].toAscii().constData() );
- 
+
+    if (!paths.count())
+        return false;
+    return this->canRead(paths[0].toAscii().constData());
 
 }
 
-void vistalDataImageReader::readInformation (QString path)
+void
+vistalDataImageReader::readInformation(QString path)
 {
-  
-  dtkAbstractData *data = this->data();
-  if(!data)
-  {
-    
-    std::string string = path.toStdString();
-    
-    if ("U8" == vistal::io::getImageType(string))
-			data = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
-    else if ("S16" == vistal::io::getImageType(string))
-			data = dtkAbstractDataFactory::instance()->create("vistalDataImageSShort3");
-    else if ("U16" == vistal::io::getImageType(string))
-			data = dtkAbstractDataFactory::instance()->create("vistalDataImageUShort3");
-       
-    if(data) 
-      this->setData(data);
-        
-  }
-  
-  if(data)
-  {
-    data->addMetaData("FilePath", QStringList()<< path);
-    
-  }
-       
-}
 
+    dtkAbstractData *data = this->data();
+    if (!data) {
 
+        std::string string = path.toStdString();
 
+        if ("U8" == vistal::io::getImageType(string))
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+        else if ("S8" == vistal::io::getImageType(string))
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageSChar3");
+        else if ("S16" == vistal::io::getImageType(string))
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageSShort3");
+        else if ("U16" == vistal::io::getImageType(string))
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageUShort3");
+        else if ("S32" == vistal::io::getImageType(string))
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageSInt13");
+        else if ("U32" == vistal::io::getImageType(string))
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageUInt3");
+        else if ("FLOAT" == vistal::io::getImageType(string))
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3");
+        else if ("DOUBLE" == vistal::io::getImageType(string))
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageDouble3");
 
-void vistalDataImageReader::readInformation (QStringList paths)
-{
-  if (!paths.count())
-    return;
-  this->readInformation ( paths[0].toAscii().constData() );
-}
+        if (data)
+            this->setData(data);
 
-bool vistalDataImageReader::read (QString path)
-{
-  
-  this->setProgress (0);
-	
-  this->readInformation ( path );
-
-  this->setProgress (50);
-	
-  qDebug() << "Can read with: " << this->description() << " " << this->data()->description();
-  /*	
-	itk::DataImageReaderCommand::Pointer command = itk::DataImageReaderCommand::New();
-	command->SetDCMTKDataImageReader ( this );
-	this->io->AddObserver ( itk::ProgressEvent(), command);
-  */	
-	
-  if (dtkAbstractData *dtkdata = this->data() ) {
-		
-    if (dtkdata->description()=="vistalDataImageUChar3") 
-    {
-      
-      std::string file = path.toAscii().data();
-      vistal::Image3D<unsigned char> *image = new vistal::Image3D<unsigned char>;
-      vistal::io::readImage(file, *image);
-      dtkdata->setData(image);
-           
     }
-    else if (dtkdata->description()=="vistalDataImageSShort3") 
-    {
-      
-      std::string file = path.toAscii().data();
-      vistal::Image3D<short> *image = new vistal::Image3D<short>;
-      vistal::io::readImage(file, *image);
-      dtkdata->setData(image);
-           
-    }
-    else if (dtkdata->description()=="vistalDataImageUShort3") 
-    {
-      
-      std::string file = path.toAscii().data();
-      vistal::Image3D<unsigned short> *image = new vistal::Image3D<unsigned short>;
-      vistal::io::readImage(file, *image);
-      dtkdata->setData(image);
-           
-    }
-        
-   
-    else {
-      qWarning() << "Unrecognized pixel type";
-      return false;
-    }
-		
-  }
 
-  this->setProgress (100);
+    if (data) {
+        data->addMetaData("FilePath", QStringList() << path);
 
-  //this->io->RemoveAllObservers ();
-	
-  return true;
-	
+    }
+
 }
 
-bool vistalDataImageReader::read (QStringList paths)
+void
+vistalDataImageReader::readInformation(QStringList paths)
 {
-  if (!paths.count())
-    return false;
-  return this->read ( paths[0].toAscii().constData() );
+    if (!paths.count())
+        return;
+    this->readInformation(paths[0].toAscii().constData());
 }
 
-void vistalDataImageReader::setProgress (int value)
+bool
+vistalDataImageReader::read(QString path)
 {
-  emit progressed (value);
+
+    this->setProgress(0);
+
+    this->readInformation(path);
+
+    this->setProgress(50);
+
+    qDebug() << "Can read with: " << this->description() << " " << this->data()->description();
+    /*
+     itk::DataImageReaderCommand::Pointer command = itk::DataImageReaderCommand::New();
+     command->SetDCMTKDataImageReader ( this );
+     this->io->AddObserver ( itk::ProgressEvent(), command);
+     */
+
+    if (dtkAbstractData *dtkdata = this->data() ) {
+
+        if (dtkdata->description() == "vistalDataImageUChar3") {
+
+            std::string file = path.toAscii().data();
+            vistal::Image3D<unsigned char> *image = new vistal::Image3D<unsigned char>;
+            vistal::io::readImage(file, *image);
+            dtkdata->setData(image);
+
+        }
+        else if (dtkdata->description() == "vistalDataImageSChar3") {
+
+            std::string file = path.toAscii().data();
+            vistal::Image3D<char> *image = new vistal::Image3D<char>;
+            vistal::io::readImage(file, *image);
+            dtkdata->setData(image);
+
+        }
+        else if (dtkdata->description() == "vistalDataImageSShort3") {
+
+            std::string file = path.toAscii().data();
+            vistal::Image3D<short> *image = new vistal::Image3D<short>;
+            vistal::io::readImage(file, *image);
+            dtkdata->setData(image);
+
+        }
+        else if (dtkdata->description() == "vistalDataImageUShort3") {
+
+            std::string file = path.toAscii().data();
+            vistal::Image3D<unsigned short> *image = new vistal::Image3D<unsigned short>;
+            vistal::io::readImage(file, *image);
+            dtkdata->setData(image);
+
+        }
+        else if (dtkdata->description() == "vistalDataImageSInt3") {
+
+            std::string file = path.toAscii().data();
+            vistal::Image3D<int> *image = new vistal::Image3D<int>;
+            vistal::io::readImage(file, *image);
+            dtkdata->setData(image);
+
+        }
+        else if (dtkdata->description() == "vistalDataImageUInt3") {
+
+            std::string file = path.toAscii().data();
+            vistal::Image3D<unsigned int> *image = new vistal::Image3D<unsigned int>;
+            vistal::io::readImage(file, *image);
+            dtkdata->setData(image);
+
+        }
+        else if (dtkdata->description() == "vistalDataImageFloat3") {
+
+            std::string file = path.toAscii().data();
+            vistal::Image3D<float> *image = new vistal::Image3D<float>;
+            vistal::io::readImage(file, *image);
+            dtkdata->setData(image);
+
+        }
+        else if (dtkdata->description() == "vistalDataImageDouble3") {
+
+            std::string file = path.toAscii().data();
+            vistal::Image3D<double> *image = new vistal::Image3D<double>;
+            vistal::io::readImage(file, *image);
+            dtkdata->setData(image);
+
+        }
+        else {
+            qWarning() << "Unrecognized pixel type";
+            return false;
+        }
+
+    }
+
+    this->setProgress(100);
+
+    //this->io->RemoveAllObservers ();
+
+    return true;
+
 }
 
+bool
+vistalDataImageReader::read(QStringList paths)
+{
+    if (!paths.count())
+        return false;
+    return this->read(paths[0].toAscii().constData());
+}
 
-
+void
+vistalDataImageReader::setProgress(int value)
+{
+    emit progressed(value);
+}
 
 // /////////////////////////////////////////////////////////////////
 // Type instanciation
 // /////////////////////////////////////////////////////////////////
 
-dtkAbstractDataReader *createVistalDataImageReader(void)
+dtkAbstractDataReader *
+createVistalDataImageReader(void)
 {
     return new vistalDataImageReader;
 }
-
-
 
