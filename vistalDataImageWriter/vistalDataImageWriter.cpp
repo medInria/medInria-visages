@@ -39,8 +39,8 @@ bool
 vistalDataImageWriter::registered(void)
 {
 
-    return dtkAbstractDataFactory::instance()->registerDataWriterType("vistalDataImageWriter", QStringList() << "vistalDataImageUChar3" << "vistalDataImageSChar3" << "vistalDataImageUShort3"
-            << "vistalDataImageSShort3" << "vistalDataImageUInt3" << "vistalDataImageSInt3" << "vistalDataImageFloat3" << "vistalDataImageDouble3", createVistalDataImageWriter);
+    return dtkAbstractDataFactory::instance()->registerDataWriterType("vistalDataImageWriter", QStringList() << "vistalDataImageUChar3" << "vistalDataImageChar3" << "vistalDataImageUShort3"
+            << "vistalDataImageShort3" << "vistalDataImageUInt3" << "vistalDataImageInt3" << "vistalDataImageFloat3" << "vistalDataImageDouble3", createVistalDataImageWriter);
 
 }
 
@@ -53,7 +53,7 @@ vistalDataImageWriter::description(void) const
 QStringList
 vistalDataImageWriter::handled() const
 {
-    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageSChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3" << "vistalDataImageUInt3" << "vistalDataImageSInt3"
+    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageChar3" << "vistalDataImageUShort3" << "vistalDataImageShort3" << "vistalDataImageUInt3" << "vistalDataImageInt3"
             << "vistalDataImageFloat3" << "vistalDataImageDouble3";
 }
 
@@ -81,7 +81,7 @@ vistalDataImageWriter::write(QString path)
             std::string tmp(path.toAscii().data());
             vistal::io::writeImage(tmp, *image);
         }
-        else if (dtkdata->description() == "vistalDataImageSChar3") {
+        else if (dtkdata->description() == "vistalDataImageChar3") {
             vistal::Image3D<char> * image = static_cast<vistal::Image3D<char>*> (dtkdata->data());
             if (image == NULL)
                 return false;
@@ -95,7 +95,7 @@ vistalDataImageWriter::write(QString path)
             std::string tmp(path.toAscii().data());
             vistal::io::writeImage(tmp, *image);
         }
-        else if (dtkdata->description() == "vistalDataImageSShort3") {
+        else if (dtkdata->description() == "vistalDataImageShort3") {
             vistal::Image3D<short> * image = static_cast<vistal::Image3D<short>*> (dtkdata->data());
             if (image == NULL)
                 return false;
@@ -109,7 +109,7 @@ vistalDataImageWriter::write(QString path)
             std::string tmp(path.toAscii().data());
             vistal::io::writeImage(tmp, *image);
         }
-        else if (dtkdata->description() == "vistalDataImageSInt3") {
+        else if (dtkdata->description() == "vistalDataImageInt3") {
             vistal::Image3D<int> * image = static_cast<vistal::Image3D<int>*> (dtkdata->data());
             if (image == NULL)
                 return false;

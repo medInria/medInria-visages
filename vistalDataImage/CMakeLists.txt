@@ -44,22 +44,22 @@ include(${VISTAL_USE_FILE})
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalDataImagePlugin.h
   vistalDataImageUChar3.h
-	vistalDataImageSChar3.h
+	vistalDataImageChar3.h
 	vistalDataImageUShort3.h
-	vistalDataImageSShort3.h
+	vistalDataImageShort3.h
 	vistalDataImageUInt3.h
-	vistalDataImageSInt3.h
+	vistalDataImageInt3.h
 	vistalDataImageDouble3.h
 	vistalDataImageFloat3.h	)
 
 set(${PROJECT_NAME}_SOURCES
   vistalDataImagePlugin.cpp
   vistalDataImageUChar3.cpp
-	vistalDataImageSChar3.cpp
+	vistalDataImageChar3.cpp
 	vistalDataImageUShort3.cpp
-	vistalDataImageSShort3.cpp
+	vistalDataImageShort3.cpp
 	vistalDataImageUInt3.cpp
-	vistalDataImageSInt3.cpp
+	vistalDataImageInt3.cpp
 	vistalDataImageDouble3.cpp
 	vistalDataImageFloat3.cpp )
 

@@ -3,11 +3,11 @@
 // /////////////////////////////////////////////////////////////////
 
 #include "vistalDataImageUChar3.h"
-#include "vistalDataImageSChar3.h"
+#include "vistalDataImageChar3.h"
 #include "vistalDataImageUShort3.h"
-#include "vistalDataImageSShort3.h"
+#include "vistalDataImageShort3.h"
 #include "vistalDataImageUInt3.h"
-#include "vistalDataImageSInt3.h"
+#include "vistalDataImageInt3.h"
 #include "vistalDataImageFloat3.h"
 #include "vistalDataImageDouble3.h"
 #include "vistalDataImagePlugin.h"
@@ -49,20 +49,20 @@ vistalDataImagePlugin::initialize(void)
 	if (!vistalDataImageUChar3::registered())
 		dtkWarning() << "Unable to register vistalDataImageUChar3 type";
 	
-	if (!vistalDataImageSChar3::registered())
-		dtkWarning() << "Unable to register vistalDataImageSChar3 type";
+	if (!vistalDataImageChar3::registered())
+		dtkWarning() << "Unable to register vistalDataImageChar3 type";
 
 	if (!vistalDataImageUShort3::registered())
 		dtkWarning() << "Unable to register vistalDataImageUShort3 type";
 	
-	if (!vistalDataImageSShort3::registered())
-		dtkWarning() << "Unable to register vistalDataImageSShort3 type";
+	if (!vistalDataImageShort3::registered())
+		dtkWarning() << "Unable to register vistalDataImageShort3 type";
 
 	if (!vistalDataImageUInt3::registered())
 		dtkWarning() << "Unable to register vistalDataImageUInt3 type";
 
-	if (!vistalDataImageSInt3::registered())
-		dtkWarning() << "Unable to register vistalDataImageSInt3 type";
+	if (!vistalDataImageInt3::registered())
+		dtkWarning() << "Unable to register vistalDataImageInt3 type";
 	
 	if (!vistalDataImageFloat3::registered())
 		dtkWarning() << "Unable to register vistalDataImageFloat3 type";
@@ -102,11 +102,11 @@ QStringList
 vistalDataImagePlugin::types(void) const
 {
     return QStringList() << "vistalDataImageUChar3"
-							<< "vistalDataImageSChar3"
+							<< "vistalDataImageChar3"
 							<< "vistalDataImageUShort3"
-							<< "vistalDataImageSShort3"
+							<< "vistalDataImageShort3"
 							<< "vistalDataImageUInt3"
-							<< "vistalDataImageSInt3"
+							<< "vistalDataImageInt3"
 							<< "vistalDataImageFloat3"
 							<< "vistalDataImageDouble3";
 

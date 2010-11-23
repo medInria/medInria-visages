@@ -849,7 +849,7 @@ void v3dView::setData(dtkAbstractData *data)
 			d->view3D->SetITKInput(image);
 		}
 	}
-	else if (data->description()=="vistalDataImageSChar3") {
+	else if (data->description()=="vistalDataImageChar3") {
 		if( itk::Image<char, 3> *image = dynamic_cast<itk::Image<char, 3> *>( (itk::Object*)( data->convert("itkDataImageChar3")->data() ) ) ) {
 			d->view2DAxial->SetITKInput(image);
 			d->view2DSagittal->SetITKInput(image);
@@ -865,7 +865,7 @@ void v3dView::setData(dtkAbstractData *data)
 			d->view3D->SetITKInput(image);
 		}
 	}
-	else if (data->description()=="vistalDataImageSShort3") {
+	else if (data->description()=="vistalDataImageShort3") {
 		if( itk::Image<short, 3> *image = dynamic_cast<itk::Image<short, 3> *>( (itk::Object*)( data->convert("itkDataImageShort3")->data() ) ) ) {
 			d->view2DAxial->SetITKInput(image);
 			d->view2DSagittal->SetITKInput(image);
@@ -881,7 +881,7 @@ void v3dView::setData(dtkAbstractData *data)
 			d->view3D->SetITKInput(image);
 		}
 	}
-	else if (data->description()=="vistalDataImageSInt3") {
+	else if (data->description()=="vistalDataImageInt3") {
 		if( itk::Image<int, 3> *image = dynamic_cast<itk::Image<int, 3> *>( (itk::Object*)( data->convert("itkDataImageInt3")->data() ) ) ) {
 			d->view2DAxial->SetITKInput(image);
 			d->view2DSagittal->SetITKInput(image);

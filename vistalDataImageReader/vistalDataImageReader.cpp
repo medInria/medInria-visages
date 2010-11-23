@@ -37,8 +37,8 @@ vistalDataImageReader::~vistalDataImageReader(void)
 bool
 vistalDataImageReader::registered(void)
 {
-    return dtkAbstractDataFactory::instance()->registerDataReaderType("vistalDataImageReader", QStringList() << "vistalDataImageUChar3" << "vistalDataImageSChar3" << "vistalDataImageUShort3"
-            << "vistalDataImageSShort3" << "vistalDataImageSInt3" << "vistalDataImageUInt3" << "vistalDataImageFloat3" << "vistalDataImageDouble", createVistalDataImageReader);
+    return dtkAbstractDataFactory::instance()->registerDataReaderType("vistalDataImageReader", QStringList() << "vistalDataImageUChar3" << "vistalDataImageChar3" << "vistalDataImageUShort3"
+            << "vistalDataImageShort3" << "vistalDataImageInt3" << "vistalDataImageUInt3" << "vistalDataImageFloat3" << "vistalDataImageDouble", createVistalDataImageReader);
 }
 
 QString
@@ -50,7 +50,7 @@ vistalDataImageReader::description(void) const
 QStringList
 vistalDataImageReader::handled(void) const
 {
-    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageSChar3" << "vistalDataImageUShort3" << "vistalDataImageSShort3" << "vistalDataImageSInt3" << "vistalDataImageUInt3"
+    return QStringList() << "vistalDataImageUChar3" << "vistalDataImageChar3" << "vistalDataImageUShort3" << "vistalDataImageShort3" << "vistalDataImageInt3" << "vistalDataImageUInt3"
             << "vistalDataImageFloat3" << "vistalDataImageDouble";
 }
 
@@ -88,13 +88,13 @@ vistalDataImageReader::readInformation(QString path)
         if ("U8" == vistal::io::getImageType(string))
             data = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
         else if ("S8" == vistal::io::getImageType(string))
-            data = dtkAbstractDataFactory::instance()->create("vistalDataImageSChar3");
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageChar3");
         else if ("S16" == vistal::io::getImageType(string))
-            data = dtkAbstractDataFactory::instance()->create("vistalDataImageSShort3");
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageShort3");
         else if ("U16" == vistal::io::getImageType(string))
             data = dtkAbstractDataFactory::instance()->create("vistalDataImageUShort3");
         else if ("S32" == vistal::io::getImageType(string))
-            data = dtkAbstractDataFactory::instance()->create("vistalDataImageSInt13");
+            data = dtkAbstractDataFactory::instance()->create("vistalDataImageInt3");
         else if ("U32" == vistal::io::getImageType(string))
             data = dtkAbstractDataFactory::instance()->create("vistalDataImageUInt3");
         else if ("FLOAT" == vistal::io::getImageType(string))
@@ -149,7 +149,7 @@ vistalDataImageReader::read(QString path)
             dtkdata->setData(image);
 
         }
-        else if (dtkdata->description() == "vistalDataImageSChar3") {
+        else if (dtkdata->description() == "vistalDataImageChar3") {
 
             std::string file = path.toAscii().data();
             vistal::Image3D<char> *image = new vistal::Image3D<char>;
@@ -157,7 +157,7 @@ vistalDataImageReader::read(QString path)
             dtkdata->setData(image);
 
         }
-        else if (dtkdata->description() == "vistalDataImageSShort3") {
+        else if (dtkdata->description() == "vistalDataImageShort3") {
 
             std::string file = path.toAscii().data();
             vistal::Image3D<short> *image = new vistal::Image3D<short>;
@@ -173,7 +173,7 @@ vistalDataImageReader::read(QString path)
             dtkdata->setData(image);
 
         }
-        else if (dtkdata->description() == "vistalDataImageSInt3") {
+        else if (dtkdata->description() == "vistalDataImageInt3") {
 
             std::string file = path.toAscii().data();
             vistal::Image3D<int> *image = new vistal::Image3D<int>;

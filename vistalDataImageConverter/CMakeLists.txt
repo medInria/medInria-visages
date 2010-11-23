@@ -45,22 +45,22 @@ set(${PROJECT_NAME}_HEADERS_MOC
   vistalDataImageConverterPlugin.h
   vistalDataImageToItkDataImageDouble3Converter.h
   vistalDataImageToItkDataImageFloat3Converter.h
-  vistalDataImageToItkDataImageSInt3Converter.h
+  vistalDataImageToItkDataImageInt3Converter.h
   vistalDataImageToItkDataImageUInt3Converter.h
   vistalDataImageToItkDataImageUShort3Converter.h
   vistalDataImageToItkDataImageShort3Converter.h
-  vistalDataImageToItkDataImageSChar3Converter.h
+  vistalDataImageToItkDataImageChar3Converter.h
   vistalDataImageToItkDataImageUChar3Converter.h)
 
 set(${PROJECT_NAME}_SOURCES
   vistalDataImageConverterPlugin.cpp
   vistalDataImageToItkDataImageDouble3Converter.cpp
   vistalDataImageToItkDataImageFloat3Converter.cpp
-  vistalDataImageToItkDataImageSInt3Converter.cpp
+  vistalDataImageToItkDataImageInt3Converter.cpp
   vistalDataImageToItkDataImageUInt3Converter.cpp
   vistalDataImageToItkDataImageUShort3Converter.cpp
   vistalDataImageToItkDataImageShort3Converter.cpp
-  vistalDataImageToItkDataImageSChar3Converter.cpp
+  vistalDataImageToItkDataImageChar3Converter.cpp
   vistalDataImageToItkDataImageUChar3Converter.cpp)
 
 ## #################################################################
