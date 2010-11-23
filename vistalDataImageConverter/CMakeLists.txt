@@ -50,7 +50,16 @@ set(${PROJECT_NAME}_HEADERS_MOC
   vistalDataImageToItkDataImageUShort3Converter.h
   vistalDataImageToItkDataImageShort3Converter.h
   vistalDataImageToItkDataImageChar3Converter.h
-  vistalDataImageToItkDataImageUChar3Converter.h)
+  vistalDataImageToItkDataImageUChar3Converter.h
+  itkDataImageToVistalDataImageUChar3Converter.h
+  itkDataImageToVistalDataImageChar3Converter.h
+  itkDataImageToVistalDataImageUShort3Converter.h
+  itkDataImageToVistalDataImageShort3Converter.h
+  itkDataImageToVistalDataImageUInt3Converter.h
+  itkDataImageToVistalDataImageInt3Converter.h
+  itkDataImageToVistalDataImageFloat3Converter.h
+  itkDataImageToVistalDataImageDouble3Converter.h
+)
 
 set(${PROJECT_NAME}_SOURCES
   vistalDataImageConverterPlugin.cpp
@@ -61,7 +70,16 @@ set(${PROJECT_NAME}_SOURCES
   vistalDataImageToItkDataImageUShort3Converter.cpp
   vistalDataImageToItkDataImageShort3Converter.cpp
   vistalDataImageToItkDataImageChar3Converter.cpp
-  vistalDataImageToItkDataImageUChar3Converter.cpp)
+  vistalDataImageToItkDataImageUChar3Converter.cpp
+  itkDataImageToVistalDataImageUChar3Converter.cpp
+  itkDataImageToVistalDataImageChar3Converter.cpp
+  itkDataImageToVistalDataImageUShort3Converter.cpp
+  itkDataImageToVistalDataImageShort3Converter.cpp
+  itkDataImageToVistalDataImageUInt3Converter.cpp
+  itkDataImageToVistalDataImageInt3Converter.cpp
+  itkDataImageToVistalDataImageFloat3Converter.cpp
+  itkDataImageToVistalDataImageDouble3Converter.cpp
+)
 
 ## #################################################################
 ## Build rules

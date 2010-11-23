@@ -55,4 +55,59 @@ dtkAbstractDataConverter *createVistalDataImageToItkDataImage##suffix##Converter
 	return new vistalDataImageToItkDataImage##suffix##Converter; \
 }
 
+#define medImplementItkToVistalDataImageConverter(type, suffix)		\
+class itkDataImageToVistalDataImage##suffix##ConverterPrivate \
+{ \
+public: \
+	itkImage3D<type> * vistalConverter; \
+	dtkAbstractData * output; \
+}; \
+itkDataImageToVistalDataImage##suffix##Converter::itkDataImageToVistalDataImage##suffix##Converter(void) : \
+	dtkAbstractDataConverter(), d(new itkDataImageToVistalDataImage##suffix##ConverterPrivate) \
+{ \
+	d->output = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffix); \
+	d->vistalConverter = NULL; \
+} \
+itkDataImageToVistalDataImage##suffix##Converter::~itkDataImageToVistalDataImage##suffix##Converter(void) \
+{ \
+} \
+bool itkDataImageToVistalDataImage##suffix##Converter::registered(void) \
+{ \
+	return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("itkDataImageToVistalDataImage") + QString(""#suffix) + QString("Converter"), QStringList() << "itkDataImage"#suffix, "vistalDataImage"#suffix, createItkDataImageToVistalDataImage##suffix##Converter); \
+} \
+QString itkDataImageToVistalDataImage##suffix##Converter::description(void) const \
+{ \
+	return QString("itkDataImageToVistalDataImage") + QString(""#suffix) + QString("Converter"); \
+} \
+QStringList itkDataImageToVistalDataImage##suffix##Converter::fromTypes(void) const \
+{ \
+	return QStringList() << "itkDataImage"#suffix; \
+} \
+QString itkDataImageToVistalDataImage##suffix##Converter::toType(void) const \
+{ \
+	return "vistalDataImage"#suffix; \
+} \
+dtkAbstractData *itkDataImageToVistalDataImage##suffix##Converter::convert(void) \
+{ \
+	if (!d->output) \
+		return NULL; \
+	dtkAbstractData *data = this->data(); \
+	if (!data) \
+		return NULL; \
+	if (data->description() == "itkDataImage"#suffix) { \
+		if ( itk::Image<type, 3>::Pointer image = static_cast<itk::Image<type, 3> *>( data->data() ) ) { \
+			if (d->vistalConverter == NULL) \
+				d->vistalConverter = new itkImage3D<type> ; \
+			d->vistalConverter->SetInputDeep(image); \
+			vistal::Image3D <type> * tmpOut = new vistal::Image3D <type>(d->vistalConverter->GetImage3D()); \
+			d->output->setData(tmpOut); \
+		} \
+	} \
+	return d->output; \
+} \
+dtkAbstractDataConverter *createItkDataImageToVistalDataImage##suffix##Converter(void) \
+{ \
+	return new itkDataImageToVistalDataImage##suffix##Converter; \
+}
+
 #endif

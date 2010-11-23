@@ -10,6 +10,16 @@
 #include "vistalDataImageToItkDataImageInt3Converter.h"
 #include "vistalDataImageToItkDataImageFloat3Converter.h"
 #include "vistalDataImageToItkDataImageDouble3Converter.h"
+
+#include "itkDataImageToVistalDataImageUChar3Converter.h"
+#include "itkDataImageToVistalDataImageChar3Converter.h"
+#include "itkDataImageToVistalDataImageUShort3Converter.h"
+#include "itkDataImageToVistalDataImageShort3Converter.h"
+#include "itkDataImageToVistalDataImageUInt3Converter.h"
+#include "itkDataImageToVistalDataImageInt3Converter.h"
+#include "itkDataImageToVistalDataImageFloat3Converter.h"
+#include "itkDataImageToVistalDataImageDouble3Converter.h"
+
 #include "vistalDataImageConverterPlugin.h"
 
 #include <dtkCore/dtkLog.h>
@@ -44,23 +54,40 @@ vistalDataImageConverterPlugin::~vistalDataImageConverterPlugin(void)
 bool
 vistalDataImageConverterPlugin::initialize(void)
 {
-    if (!vistalDataImageToItkDataImageUChar3Converter::registered())
-        dtkWarning() << "Unable to register vistalDataImageToItkDataImageUChar3Converter type";
-    else if (!vistalDataImageToItkDataImageChar3Converter::registered())
-        dtkWarning() << "Unable to register vistalDataImageToItkDataImageChar3Converter type";
-    else if (!vistalDataImageToItkDataImageShort3Converter::registered())
-        dtkWarning() << "Unable to register vistalDataImageToItkDataImageShort3Converter type";
-    else if (!vistalDataImageToItkDataImageUShort3Converter::registered())
-        dtkWarning() << "Unable to register vistalDataImageToItkDataImageUShort3Converter type";
-    else if (!vistalDataImageToItkDataImageUInt3Converter::registered())
-        dtkWarning() << "Unable to register vistalDataImageToItkDataImageUInt3Converter type";
-    else if (!vistalDataImageToItkDataImageInt3Converter::registered())
-        dtkWarning() << "Unable to register vistalDataImageToItkDataImageInt3Converter type";
-    else if (!vistalDataImageToItkDataImageFloat3Converter::registered())
-        dtkWarning() << "Unable to register vistalDataImageToItkDataImageFloat3Converter type";
-    else if (!vistalDataImageToItkDataImageDouble3Converter::registered())
-        dtkWarning() << "Unable to register vistalDataImageToItkDataImageDouble3Converter type";
-    return true;
+	if (!vistalDataImageToItkDataImageUChar3Converter::registered())
+		dtkWarning() << "Unable to register vistalDataImageToItkDataImageUChar3Converter type";
+	else if (!vistalDataImageToItkDataImageChar3Converter::registered())
+		dtkWarning() << "Unable to register vistalDataImageToItkDataImageChar3Converter type";
+	else if (!vistalDataImageToItkDataImageShort3Converter::registered())
+		dtkWarning() << "Unable to register vistalDataImageToItkDataImageShort3Converter type";
+	else if (!vistalDataImageToItkDataImageUShort3Converter::registered())
+		dtkWarning() << "Unable to register vistalDataImageToItkDataImageUShort3Converter type";
+	else if (!vistalDataImageToItkDataImageUInt3Converter::registered())
+		dtkWarning() << "Unable to register vistalDataImageToItkDataImageUInt3Converter type";
+	else if (!vistalDataImageToItkDataImageInt3Converter::registered())
+		dtkWarning() << "Unable to register vistalDataImageToItkDataImageInt3Converter type";
+	else if (!vistalDataImageToItkDataImageFloat3Converter::registered())
+		dtkWarning() << "Unable to register vistalDataImageToItkDataImageFloat3Converter type";
+	else if (!vistalDataImageToItkDataImageDouble3Converter::registered())
+		dtkWarning() << "Unable to register vistalDataImageToItkDataImageDouble3Converter type";
+	else if (!itkDataImageToVistalDataImageUChar3Converter::registered())
+		dtkWarning() << "Unable to register itkDataImageToVistalDataImageUChar3Converter type";
+	else if (!itkDataImageToVistalDataImageChar3Converter::registered())
+		dtkWarning() << "Unable to register itkDataImageToVistalDataImageChar3Converter type";
+	else if (!itkDataImageToVistalDataImageUShort3Converter::registered())
+		dtkWarning() << "Unable to register itkDataImageToVistalDataImageUShort3Converter type";
+	else if (!itkDataImageToVistalDataImageShort3Converter::registered())
+		dtkWarning() << "Unable to register itkDataImageToVistalDataImageShort3Converter type";
+	else if (!itkDataImageToVistalDataImageUInt3Converter::registered())
+		dtkWarning() << "Unable to register itkDataImageToVistalDataImageUInt3Converter type";
+	else if (!itkDataImageToVistalDataImageInt3Converter::registered())
+		dtkWarning() << "Unable to register itkDataImageToVistalDataImageInt3Converter type";
+	else if (!itkDataImageToVistalDataImageFloat3Converter::registered())
+		dtkWarning() << "Unable to register itkDataImageToVistalDataImageFloat3Converter type";
+	else if (!itkDataImageToVistalDataImageDouble3Converter::registered())
+		dtkWarning() << "Unable to register itkDataImageToVistalDataImageDouble3Converter type";
+
+	return true;
 }
 
 bool
@@ -90,9 +117,22 @@ vistalDataImageConverterPlugin::tags(void) const
 QStringList
 vistalDataImageConverterPlugin::types(void) const
 {
-    return QStringList() << "vistalDataImageToItkDataImageUChar3Converter" << "vistalDataImageToItkDataImageChar3Converter" << "vistalDataImageToItkDataImageUShort3Converter"
-            << "vistalDataImageToItkDataImageShort3Converter" << "vistalDataImageToItkDataImageUInt3Converter" << "vistalDataImageToItkDataImageInt3Converter"
-            << "vistalDataImageToItkDataImageFloat3Converter" << "vistalDataImageToItkDataImageDouble3Converter";
+    return QStringList() << "vistalDataImageToItkDataImageUChar3Converter" 
+						<< "vistalDataImageToItkDataImageChar3Converter" 
+						<< "vistalDataImageToItkDataImageUShort3Converter"
+            << "vistalDataImageToItkDataImageShort3Converter" 
+						<< "vistalDataImageToItkDataImageUInt3Converter" 
+						<< "vistalDataImageToItkDataImageInt3Converter"
+            << "vistalDataImageToItkDataImageFloat3Converter" 
+						<< "vistalDataImageToItkDataImageDouble3Converter"
+						<< "itkDataImageToVistalDataImageUChar3Converter" 
+						<< "itkDataImageToVistalDataImageChar3Converter" 
+						<< "itkDataImageToVistalDataImageUShort3Converter" 
+						<< "itkDataImageToVistalDataImageShort3Converter" 
+						<< "itkDataImageToVistalDataImageUInt3Converter" 
+						<< "itkDataImageToVistalDataImageInt3Converter" 
+						<< "itkDataImageToVistalDataImageFloat3Converter" 
+						<< "itkDataImageToVistalDataImageDouble3Converter"; 
 }
 
 Q_EXPORT_PLUGIN2(vistalDataImageConverterPlugin, vistalDataImageConverterPlugin)
