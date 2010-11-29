@@ -105,7 +105,7 @@ vistalDataImageConverterPlugin::name(void) const
 QString
 vistalDataImageConverterPlugin::description(void) const
 {
-    return "Convert vistal data image to something";
+    return "Convert vistal data image to something and back";
 }
 
 QStringList
