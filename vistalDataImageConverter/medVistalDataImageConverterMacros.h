@@ -11,7 +11,7 @@ public: \
 vistalDataImageToItkDataImage##suffix##Converter::vistalDataImageToItkDataImage##suffix##Converter(void) : \
 dtkAbstractDataConverter(), d(new vistalDataImageToItkDataImage##suffix##ConverterPrivate) \
 { \
-	d->output = dtkAbstractDataFactory::instance()->create("itkDataImage"#suffix); \
+	d->output = NULL; \
   d->vistalConverter = NULL; \
 } \
 vistalDataImageToItkDataImage##suffix##Converter::~vistalDataImageToItkDataImage##suffix##Converter(void) \
@@ -37,8 +37,6 @@ QString vistalDataImageToItkDataImage##suffix##Converter::toType(void) const \
 } \
 dtkAbstractData *vistalDataImageToItkDataImage##suffix##Converter::convert(void) \
 { \
-	if (!d->output) \
-		return NULL; \
 	dtkAbstractData *data = this->data(); \
 	if (!data) \
 		return NULL; \
@@ -46,8 +44,11 @@ dtkAbstractData *vistalDataImageToItkDataImage##suffix##Converter::convert(void)
 		if ( vistal::Image3D<type>* image = static_cast<vistal::Image3D<type>*>( data->data() ) ) { \
 			if (d->vistalConverter == NULL) \
 				d->vistalConverter = new itkImage3D<type> ; \
+			if (!d->output) \
+				d->output = dtkAbstractDataFactory::instance()->create("itkDataImage"#suffix); \
 			d->vistalConverter->SetImage3D(*image); \
-			d->output->setData(d->vistalConverter->GetOutput()); \
+			if (d->output) \
+				d->output->setData(d->vistalConverter->GetOutput()); \
 		} \
 	} \
 	return d->output; \
@@ -68,7 +69,7 @@ public: \
 itkDataImageToVistalDataImage##suffix##Converter::itkDataImageToVistalDataImage##suffix##Converter(void) : \
 	dtkAbstractDataConverter(), d(new itkDataImageToVistalDataImage##suffix##ConverterPrivate) \
 { \
-	d->output = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffix); \
+	d->output = NULL; \
 	d->tmpOut = NULL; \
 	d->vistalConverter = NULL; \
 } \
@@ -106,6 +107,10 @@ dtkAbstractData *itkDataImageToVistalDataImage##suffix##Converter::convert(void)
 		if ( itk::Image<type, 3>::Pointer image = static_cast<itk::Image<type, 3> *>( data->data() ) ) { \
 			if (d->vistalConverter == NULL) \
 				d->vistalConverter = new itkImage3D<type> ; \
+			if (!d->output) \
+				d->output = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffix); \
+			if (!d->output) \
+				return NULL; \
 			d->vistalConverter->SetInputDeep(image); \
 			if (d->tmpOut) \
 				delete d->tmpOut; \

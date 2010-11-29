@@ -11,4 +11,4 @@
 
 #include "medVistalDataImageConverterMacros.h"
 
-medImplementItkToVistalDataImageConverter(short,Short3);
+medImplementItkToVistalDataImageConverter(short, Short3);
