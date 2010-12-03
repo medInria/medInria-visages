@@ -30,7 +30,8 @@ generateThumbnails(typename vistal::Image3D<DataType> * ima, QList<QImage> & thu
 							*buffer++ = 0xFF;
 						}
 
-        *qImage = qImage->scaled(128,128,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        *qImage = qImage->scaled(128,128,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+        qImage->fill(128);
         thumbnails.push_back(*qImage);
     }
 	

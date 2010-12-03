@@ -58,7 +58,7 @@ vistalDataImageWriter::handled() const
 }
 
 bool
-vistalDataImageWriter::canWrite(QString path)
+vistalDataImageWriter::canWrite(const QString & path)
 {
     //  qDebug() << "Can write?: " << QFile(path).isWritable();
     //    return true;
@@ -67,7 +67,7 @@ vistalDataImageWriter::canWrite(QString path)
 }
 
 bool
-vistalDataImageWriter::write(QString path)
+vistalDataImageWriter::write(const QString & path)
 {
     if (!this->data())
         return false;

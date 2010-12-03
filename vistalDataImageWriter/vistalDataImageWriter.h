@@ -27,9 +27,9 @@ class VISTALDATAIMAGEWRITERPLUGIN_EXPORT vistalDataImageWriter : public dtkAbstr
 
     public slots:
         bool
-        write(QString path);
+        write(const QString & path);
         bool
-        canWrite(QString path);
+        canWrite(const QString & path);
 
     private:
         vistalDataImageWriterPrivate *d;
