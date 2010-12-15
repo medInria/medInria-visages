@@ -5,66 +5,65 @@
 #include <Stats.hh>
 
 template<typename DataType>
-void
-generateThumbnails(typename vistal::Image3D<DataType> * ima, QList<QImage> & thumbnails)
-{
-    if (ima == NULL)
-        return;
+    void
+    generateThumbnails(typename vistal::Image3D<DataType> * ima, QList<QImage> & thumbnails)
+    {
+        if (ima == NULL)
+            return;
 
-    thumbnails.clear();
+        thumbnails.clear();
 
-    qDebug() << "generating thumbnails... ";
+        qDebug() << "generating thumbnails... ";
 
-    DataType max=vistal::stats::GetMaxPixelValue ( *ima );
-    DataType min=vistal::stats::GetMinPixelValue ( *ima );
+        DataType max = vistal::stats::GetMaxPixelValue(*ima);
+        DataType min = vistal::stats::GetMinPixelValue(*ima);
 
-    for (short k = 0; k < ima->nbz; k++){
-				QImage *qImage = new QImage(ima->nbx, ima->nby, QImage::Format_ARGB32);
-				uchar *buffer = qImage->bits();
-        for (short j = ima->nby-1;j >= 0;j--)
-            for (short i = 0;i < ima->nbx;i++)
-						{
-							float val = floor((ima->ptr[k][j][i] - min ) *255.0/ ( max-min ));
-							for (short a = 0;a < 3;++a)
-								*buffer++ = ( uchar ) val;
-							*buffer++ = 0xFF;
-						}
+        for (short k = 0; k < ima->nbz; k++) {
+            QImage *qImage = new QImage(ima->nbx, ima->nby, QImage::Format_ARGB32);
+            uchar *buffer = qImage->bits();
+            for (short j = ima->nby - 1; j >= 0; j--)
+                for (short i = 0; i < ima->nbx; i++) {
+                    float val = floor((ima->ptr[k][j][i] - min) * 255.0 / (max - min));
+                    for (short a = 0; a < 3; ++a)
+                        *buffer++ = (uchar) val;
+                    *buffer++ = 0xFF;
+                }
 
-        *qImage = qImage->scaled(128,128,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-        thumbnails.push_back(*qImage);
+            *qImage = qImage->scaled(128, 128, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+            qImage->fill(128);
+            thumbnails.push_back(*qImage);
+        }
+
+        qDebug() << "...generated " << thumbnails.length() << " thumbnails";
     }
-	
-    qDebug() << "...generated " << thumbnails.length() << " thumbnails";
-}
 
 template<typename DataType>
-void
-getThumbnail(typename vistal::Image3D<DataType> * ima, QImage & thumbnail)
-{
-    if (ima == NULL)
-        return;
-	
-    DataType max=vistal::stats::GetMaxPixelValue ( *ima );
-    DataType min=vistal::stats::GetMinPixelValue ( *ima );
+    void
+    getThumbnail(typename vistal::Image3D<DataType> * ima, QImage & thumbnail)
+    {
+        if (ima == NULL)
+            return;
 
-    QImage *qImage = new QImage(ima->nbx, ima->nby, QImage::Format_ARGB32);
-		uchar *buffer = qImage->bits();
+        DataType max = vistal::stats::GetMaxPixelValue(*ima);
+        DataType min = vistal::stats::GetMinPixelValue(*ima);
 
-    short index = ima->nbz/2;
+        QImage *qImage = new QImage(ima->nbx, ima->nby, QImage::Format_ARGB32);
+        uchar *buffer = qImage->bits();
 
-		for (short j = ima->nby-1;j >= 0;j--)
-        for (short i = 0;i < ima->nbx;i++)
-				{
-					float val = floor((ima->ptr[index][j][i] - min ) *255.0/ ( max-min ));
-					for (short a = 0;a < 3;++a)
-						*buffer++ = ( uchar ) val;
-					*buffer++ = 0xFF;
-				}
+        short index = ima->nbz / 2;
 
-		*qImage = qImage->scaled(128,128,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        for (short j = ima->nby - 1; j >= 0; j--)
+            for (short i = 0; i < ima->nbx; i++) {
+                float val = floor((ima->ptr[index][j][i] - min) * 255.0 / (max - min));
+                for (short a = 0; a < 3; ++a)
+                    *buffer++ = (uchar) val;
+                *buffer++ = 0xFF;
+            }
 
-    thumbnail = *qImage;
-}
+        *qImage = qImage->scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+        thumbnail = *qImage;
+    }
 
 #define medImplementVistalDataImage(type, suffix)		\
 	class vistalDataImage##suffix##Private \
