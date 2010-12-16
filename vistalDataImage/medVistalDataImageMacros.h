@@ -30,7 +30,7 @@ template<typename DataType>
                 }
 
             *qImage = qImage->scaled(128, 128, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-            qImage->fill(128);
+            //qImage->fill(128);
             thumbnails.push_back(*qImage);
         }
 
