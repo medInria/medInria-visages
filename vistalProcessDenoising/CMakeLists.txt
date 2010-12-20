@@ -29,9 +29,16 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 ## #################################################################
 
 find_package(dtk REQUIRED)
-
 include(${dtk_USE_FILE})
 include(dtkPlugin)
+
+# vistal
+find_package(VISTAL REQUIRED)
+include(${VISTAL_USE_FILE})
+
+
+
+
 
 ## #################################################################
 ## Input
@@ -57,6 +64,7 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
+  ${VISTAL_LIBS}
   dtkCore)
 
 dtk_build_doc(vistalProcessDenoisingPlugin)
