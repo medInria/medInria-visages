@@ -5,6 +5,15 @@
 #include "vistalProcessDenoising.h"
 
 #include <dtkCore/dtkAbstractProcessFactory.h>
+#include <dtkCore/dtkAbstractDataFactory.h>
+#include "itkDataImageToVistalDataImageDouble3Converter.h"
+#include "itkDataImageToVistalDataImageFloat3Converter.h"
+#include "itkDataImageToVistalDataImageInt3Converter.h"
+#include "itkDataImageToVistalDataImageShort3Converter.h"
+#include "itkDataImageToVistalDataImageChar3Converter.h"
+#include "itkDataImageToVistalDataImageUInt3Converter.h"
+#include "itkDataImageToVistalDataImageUShort3Converter.h"
+#include "itkDataImageToVistalDataImageUChar3Converter.h"
 
 #include "NLMeans_class.hh"
 #include <cstdlib>
@@ -79,7 +88,7 @@ QString vistalProcessDenoising::description(void) const
     return "vistalProcessDenoising";
 }
 
-void setInput(dtkAbstractData *data)
+void vistalProcessDenoising::setInput(dtkAbstractData *data)
 {
 
     // TO DO : convert and store converted data into d->input (private)
@@ -182,7 +191,7 @@ void setInput(dtkAbstractData *data)
 
 
 
-void setParameter(double  data, int channel)
+void vistalProcessDenoising::setParameter(double  data, int channel)
 {
         // TO DO : handle wrong channel id
         // TO DO : store parameters in vistalProcessDenoisingPrivate
@@ -234,7 +243,7 @@ void setParameter(double  data, int channel)
 }
 
 
-int update (void)
+int vistalProcessDenoising::update (void)
 {
         // TO DO : construct NLMeansDenoising<> according to data->description (if...else if..)
         // TO DO : setInput, set{parameters}, run, output
@@ -248,12 +257,12 @@ int update (void)
 
         if (d->input->description() == "vistalDataImageUChar3")
         {
-            NLMeansDenoising<unsigned char> *nlmeans = new NLMeansDenoising<unsigned char>;
+            vistal::NLMeansDenoising<unsigned char> *nlmeans = new vistal::NLMeansDenoising<unsigned char>;
 
             if(nlmeans == NULL)
                 return -1;
 
-            nlmeans->setInput(d->input->data());
+            nlmeans->setInput(static_cast<vistal::Image3D<unsigned char> * > (d->input->data()));
             nlmeans->setAdaptiveSlope(d->seuil_adapt);
             nlmeans->setSigma(d->seuil);
             nlmeans->setBeta(d->beta);
@@ -284,12 +293,12 @@ int update (void)
         }
         else if (d->input->description() == "vistalDataImageUShort3")
         {
-            NLMeansDenoising<unsigned short> *nlmeans = new NLMeansDenoising<unsigned short>;
+            vistal::NLMeansDenoising<unsigned short> *nlmeans = new vistal::NLMeansDenoising<unsigned short>;
 
             if(nlmeans == NULL)
                 return -1;
 
-            nlmeans->setInput(d->input->data());
+            nlmeans->setInput(static_cast<vistal::Image3D<unsigned short> * > (d->input->data()));
             nlmeans->setAdaptiveSlope(d->seuil_adapt);
             nlmeans->setSigma(d->seuil);
             nlmeans->setBeta(d->beta);
@@ -320,12 +329,12 @@ int update (void)
         }
         else if (d->input->description() == "vistalDataImageFloat3")
         {
-            NLMeansDenoising<float> *nlmeans = new NLMeansDenoising<float>;
+            vistal::NLMeansDenoising<float> *nlmeans = new vistal::NLMeansDenoising<float>;
 
             if(nlmeans == NULL)
                 return -1;
 
-            nlmeans->setInput(d->input->data());
+            nlmeans->setInput(static_cast<vistal::Image3D<float> * > (d->input->data()));
             nlmeans->setAdaptiveSlope(d->seuil_adapt);
             nlmeans->setSigma(d->seuil);
             nlmeans->setBeta(d->beta);
@@ -356,12 +365,12 @@ int update (void)
         }
         else if (d->input->description() == "vistalDataImageDouble3")
         {
-            NLMeansDenoising<double> *nlmeans = new NLMeansDenoising<double>;
+            vistal::NLMeansDenoising<double> *nlmeans = new vistal::NLMeansDenoising<double>;
 
             if(nlmeans == NULL)
                 return -1;
 
-            nlmeans->setInput(d->input->data());
+            nlmeans->setInput(static_cast<vistal::Image3D<double> * > (d->input->data()));
             nlmeans->setAdaptiveSlope(d->seuil_adapt);
             nlmeans->setSigma(d->seuil);
             nlmeans->setBeta(d->beta);
@@ -382,7 +391,8 @@ int update (void)
             if (d->output == NULL)
                 return -1;
 
-            d->output->setData(nlmeans->getOutput());
+             d->output->setData(nlmeans->getOutput());
+	    //d->output = static_cast<dtkAbstractData *> (nlmeans->getOutput());
 
             if(d->output->data() == NULL)
                 return -1;
@@ -392,12 +402,12 @@ int update (void)
         }
         else if (d->input->description() == "vistalDataImageShort3")
         {
-            NLMeansDenoising<short> *nlmeans = new NLMeansDenoising<short>;
+            vistal::NLMeansDenoising<short> *nlmeans = new vistal::NLMeansDenoising<short>;
 
             if(nlmeans == NULL)
                 return -1;
 
-            nlmeans->setInput(d->input->data());
+            nlmeans->setInput(static_cast<vistal::Image3D<short> * > (d->input->data()));
             nlmeans->setAdaptiveSlope(d->seuil_adapt);
             nlmeans->setSigma(d->seuil);
             nlmeans->setBeta(d->beta);
@@ -428,12 +438,12 @@ int update (void)
         }
         else if (d->input->description() == "vistalDataImageInt3")
         {
-            NLMeansDenoising<int> *nlmeans = new NLMeansDenoising<int>;
+            vistal::NLMeansDenoising<int> *nlmeans = new vistal::NLMeansDenoising<int>;
 
             if(nlmeans == NULL)
                 return -1;
 
-            nlmeans->setInput(d->input->data());
+            nlmeans->setInput(static_cast<vistal::Image3D<int> * > (d->input->data()));
             nlmeans->setAdaptiveSlope(d->seuil_adapt);
             nlmeans->setSigma(d->seuil);
             nlmeans->setBeta(d->beta);
@@ -463,12 +473,12 @@ int update (void)
         }
         else if (d->input->description() == "vistalDataImageUInt3")
         {
-            NLMeansDenoising<unsigned int> *nlmeans = new NLMeansDenoising<unsigned int>;
+            vistal::NLMeansDenoising<unsigned int> *nlmeans = new vistal::NLMeansDenoising<unsigned int>;
 
             if(nlmeans == NULL)
                 return -1;
 
-            nlmeans->setInput(d->input->data());
+            nlmeans->setInput(static_cast<vistal::Image3D<unsigned int> * > (d->input->data()));
             nlmeans->setAdaptiveSlope(d->seuil_adapt);
             nlmeans->setSigma(d->seuil);
             nlmeans->setBeta(d->beta);
@@ -504,16 +514,15 @@ int update (void)
 
 }
 
-dtkAbstractData *output(void)
+dtkAbstractData * vistalProcessDenoising::output(void)
 {
         // TO DO : what if: output == NULL ? (error, warning, message, signal, etc.)
         // TO DO : call d->output
         // TO DO : convert into type itkDataImage
 
-        if (d->output == NULL)
-            return -1;
-
-        return (d->output->data());
+//         if (!d->output)
+//             return;
+        return (static_cast<dtkAbstractData *> (d->output->data()));
 
 }
 
@@ -522,7 +531,7 @@ dtkAbstractData *output(void)
 // Type instanciation
 // /////////////////////////////////////////////////////////////////
 
-dtkAbstractProcess *createVistalProcessDenoising(void)
+dtkAbstractProcess * createVistalProcessDenoising(void)
 {
     return new vistalProcessDenoising;
 }

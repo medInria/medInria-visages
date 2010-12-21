@@ -6,10 +6,12 @@
 #define VISTALPROCESSDENOISING_H
 
 #include <dtkCore/dtkAbstractProcess.h>
+#include <dtkCore/dtkAbstractData.h>
 
 #include "vistalProcessDenoisingPluginExport.h"
 
 class vistalProcessDenoisingPrivate;
+class dtkAbstractData;
 
 class VISTALPROCESSDENOISINGPLUGIN_EXPORT vistalProcessDenoising : public dtkAbstractProcess
 {

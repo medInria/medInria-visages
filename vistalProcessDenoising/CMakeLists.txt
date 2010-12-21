@@ -33,11 +33,12 @@ include(${dtk_USE_FILE})
 include(dtkPlugin)
 
 # vistal
-find_package(VISTAL REQUIRED)
+find_package(Vistal REQUIRED)
 include(${VISTAL_USE_FILE})
+#include(${FindVISTAL.cmake})
+#include(vistalSettings.cmake)
 
-
-
+include_directories(${medular-plugins_SOURCE_DIR}/vistalDataImageConverter)
 
 
 ## #################################################################
