@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 2.8.1)
 
-project(vistalDataImagePlugin)
+project(vistalProcessDenoisingPlugin)
 
 ## #################################################################
 ## Setup version numbering
@@ -29,39 +29,29 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 ## #################################################################
 
 find_package(dtk REQUIRED)
-
 include(${dtk_USE_FILE})
 include(dtkPlugin)
 
+# vistal
 find_package(Vistal REQUIRED)
-find_package(ITK REQUIRED)
 include(${VISTAL_USE_FILE})
+#include(${FindVISTAL.cmake})
+#include(vistalSettings.cmake)
+
+include_directories(${medular-plugins_SOURCE_DIR}/vistalDataImageConverter)
+
 
 ## #################################################################
 ## Input
 ## #################################################################
 
 set(${PROJECT_NAME}_HEADERS_MOC
-  vistalDataImagePlugin.h
-  vistalDataImageUChar3.h
-	vistalDataImageChar3.h
-	vistalDataImageUShort3.h
-	vistalDataImageShort3.h
-	vistalDataImageUInt3.h
-	vistalDataImageInt3.h
-	vistalDataImageDouble3.h
-	vistalDataImageFloat3.h	)
+  vistalProcessDenoisingPlugin.h
+  vistalProcessDenoising.h)
 
 set(${PROJECT_NAME}_SOURCES
-  vistalDataImagePlugin.cpp
-  vistalDataImageUChar3.cpp
-	vistalDataImageChar3.cpp
-	vistalDataImageUShort3.cpp
-	vistalDataImageShort3.cpp
-	vistalDataImageUInt3.cpp
-	vistalDataImageInt3.cpp
-	vistalDataImageDouble3.cpp
-	vistalDataImageFloat3.cpp )
+  vistalProcessDenoisingPlugin.cpp
+  vistalProcessDenoising.cpp)
 
 ## #################################################################
 ## Build rules
@@ -76,10 +66,9 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
-  ${ITK_LIBRARIES}
   dtkCore)
 
-dtk_build_doc(vistalDataImagePlugin)
+dtk_build_doc(vistalProcessDenoisingPlugin)
 
 ## #################################################################
 ## Install rules
