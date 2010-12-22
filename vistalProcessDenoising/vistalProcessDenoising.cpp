@@ -104,86 +104,125 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
 
     if (data->description() == "itkDataImageUChar3")
     {
-        itkDataImageToVistalDataImageUChar3Converter *converter = new itkDataImageToVistalDataImageUChar3Converter;
-        if(converter == NULL)
-            return;
+        //itkDataImageToVistalDataImageUChar3Converter *converter = new itkDataImageToVistalDataImageUChar3Converter;
+        //if(converter == NULL)
+        //    return;
 
-        converter->setData(data);
-        d->input = converter->convert();
+        //converter->setData(data);
+        //d->input = converter->convert();
+        
+        d->input = data->convert("vistalDataImageUChar3");	
 
-        delete converter;
+	if (!d->input)
+	  return;
+	  
+
+
+        //delete converter;
     }
 
     else if (data->description() == "itkDataImageUShort3")
     {
-        itkDataImageToVistalDataImageUShort3Converter *converter = new itkDataImageToVistalDataImageUShort3Converter;
-        if(converter == NULL)
-            return;
+        //itkDataImageToVistalDataImageUShort3Converter *converter = new itkDataImageToVistalDataImageUShort3Converter;
+        //if(converter == NULL)
+        //    return;
 
-        converter->setData(data);
-        d->input = converter->convert();
+        //converter->setData(data);
+        //d->input = converter->convert();
+        
+        d->input = data->convert("vistalDataImageUShort3");
+	if (!d->input)
+	  return;
+	
 
-        delete converter;
+        //delete converter;
     }
 
     else if (data->description() == "itkDataImageFloat3")
     {
-        itkDataImageToVistalDataImageFloat3Converter *converter = new itkDataImageToVistalDataImageFloat3Converter;
-        if(converter == NULL)
-            return;
+        //itkDataImageToVistalDataImageFloat3Converter *converter = new itkDataImageToVistalDataImageFloat3Converter;
+        //if(converter == NULL)
+        //    return;
 
-        converter->setData(data);
-        d->input = converter->convert();
+        //converter->setData(data);
+        //d->input = converter->convert();
+        
+        d->input = data->convert("vistalDataImageFloat3");
+	if (!d->input)
+	  return;
+               
 
-        delete converter;
+        //delete converter;
     }
 
     else if (data->description() == "itkDataImageDouble3")
     {
-        itkDataImageToVistalDataImageDouble3Converter *converter = new itkDataImageToVistalDataImageDouble3Converter;
+        /*itkDataImageToVistalDataImageDouble3Converter *converter = new itkDataImageToVistalDataImageDouble3Converter;
         if(converter == NULL)
             return;
 
         converter->setData(data);
         d->input = converter->convert();
 
-        delete converter;
+        delete converter;*/
+	
+	d->input = data->convert("vistalDataImageDouble3");
+	if (!d->input)
+	  return;
+	
+	
     }
 
     else if (data->description() == "itkDataImageShort3")
     {
-        itkDataImageToVistalDataImageShort3Converter *converter = new itkDataImageToVistalDataImageShort3Converter;
+        /*itkDataImageToVistalDataImageShort3Converter *converter = new itkDataImageToVistalDataImageShort3Converter;
         if(converter == NULL)
             return;
 
         converter->setData(data);
         d->input = converter->convert();
 
-        delete converter;
+        delete converter;*/
+	
+	d->input = data->convert("vistalDataImageShort3");
+	if (!d->input)
+	  return;
+	
+	
+	
     }
 
     else if (data->description() == "itkDataImageInt3")
     {
-        itkDataImageToVistalDataImageInt3Converter *converter = new itkDataImageToVistalDataImageInt3Converter;
+        /*itkDataImageToVistalDataImageInt3Converter *converter = new itkDataImageToVistalDataImageInt3Converter;
         if(converter == NULL)
             return;
 
         converter->setData(data);
         d->input = converter->convert();
 
-        delete converter;
+        delete converter;*/
+	
+	d->input = data->convert("vistalDataImageInt3");
+	if (!d->input)
+	  return;
+	
     }
 
     else if (data->description() == "itkDataImageUInt3")
     {
-        itkDataImageToVistalDataImageUInt3Converter *converter = new itkDataImageToVistalDataImageUInt3Converter;
+        /*itkDataImageToVistalDataImageUInt3Converter *converter = new itkDataImageToVistalDataImageUInt3Converter;
         if(converter == NULL)
             return;
 
         converter->setData(data);
         d->input = converter->convert();
 
-        delete converter;
+        delete converter;*/
+	
+	d->input = data->convert("vistalDataImageUInt3");
+	if (!d->input)
+	  return;
     }
     else
         return;
@@ -291,7 +330,7 @@ int vistalProcessDenoising::update (void)
             delete nlmeans;
 
         }
-        else if (d->input->description() == "vistalDataImageUShort3")
+/*        else if (d->input->description() == "vistalDataImageUShort3")
         {
             vistal::NLMeansDenoising<unsigned short> *nlmeans = new vistal::NLMeansDenoising<unsigned short>;
 
@@ -510,7 +549,7 @@ int vistalProcessDenoising::update (void)
         else
             return -1;
 
-        return EXIT_SUCCESS;
+*/        return EXIT_SUCCESS;
 
 }
 
