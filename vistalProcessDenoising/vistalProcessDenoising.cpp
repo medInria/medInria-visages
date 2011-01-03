@@ -330,7 +330,7 @@ int vistalProcessDenoising::update (void)
             delete nlmeans;
 
         }
-/*        else if (d->input->description() == "vistalDataImageUShort3")
+        else if (d->input->description() == "vistalDataImageUShort3")
         {
             vistal::NLMeansDenoising<unsigned short> *nlmeans = new vistal::NLMeansDenoising<unsigned short>;
 
@@ -549,7 +549,7 @@ int vistalProcessDenoising::update (void)
         else
             return -1;
 
-*/        return EXIT_SUCCESS;
+        return EXIT_SUCCESS;
 
 }
 
