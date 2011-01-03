@@ -53,12 +53,12 @@ QString vistalProcessDenoisingPlugin::name(void) const
 
 QString vistalProcessDenoisingPlugin::description(void) const
 {
-    return "";
+    return "NLMeans Denoising Plugin";
 }
 
 QStringList vistalProcessDenoisingPlugin::tags(void) const
 {
-    return QStringList();
+    return QStringList() << "vistal" << "process" << "nlmeans";
 }
 
 QStringList vistalProcessDenoisingPlugin::types(void) const

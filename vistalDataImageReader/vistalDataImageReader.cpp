@@ -55,7 +55,7 @@ vistalDataImageReader::handled(void) const
 }
 
 bool
-vistalDataImageReader::canRead(QString path)
+vistalDataImageReader::canRead(const QString & path)
 {
     /*if (!this->io.IsNull())
      return this->io->CanReadFile ( path.toAscii().constData() );
@@ -67,7 +67,7 @@ vistalDataImageReader::canRead(QString path)
 }
 
 bool
-vistalDataImageReader::canRead(QStringList paths)
+vistalDataImageReader::canRead(const QStringList & paths)
 {
 
     if (!paths.count())
@@ -77,7 +77,7 @@ vistalDataImageReader::canRead(QStringList paths)
 }
 
 void
-vistalDataImageReader::readInformation(QString path)
+vistalDataImageReader::readInformation(const QString & path)
 {
 
     dtkAbstractData *data = this->data();
@@ -115,7 +115,7 @@ vistalDataImageReader::readInformation(QString path)
 }
 
 void
-vistalDataImageReader::readInformation(QStringList paths)
+vistalDataImageReader::readInformation(const QStringList & paths)
 {
     if (!paths.count())
         return;
@@ -123,7 +123,7 @@ vistalDataImageReader::readInformation(QStringList paths)
 }
 
 bool
-vistalDataImageReader::read(QString path)
+vistalDataImageReader::read(const QString & path)
 {
 
     this->setProgress(0);
@@ -221,7 +221,7 @@ vistalDataImageReader::read(QString path)
 }
 
 bool
-vistalDataImageReader::read(QStringList paths)
+vistalDataImageReader::read(const QStringList & paths)
 {
     if (!paths.count())
         return false;

@@ -43,10 +43,9 @@ dtkAbstractData *vistalDataImageToItkDataImage##suffix##Converter::convert(void)
 	if (data->description() == "vistalDataImage"#suffix) { \
 		if ( vistal::Image3D<type>* image = static_cast<vistal::Image3D<type>*>( data->data() ) ) { \
 			if (d->vistalConverter == NULL) \
-				d->vistalConverter = new itkImage3D<type> ; \
+				d->vistalConverter = new itkImage3D<type> (*image); \
 			if (!d->output) \
 				d->output = dtkAbstractDataFactory::instance()->create("itkDataImage"#suffix); \
-			d->vistalConverter->SetImage3D(*image); \
 			if (d->output) \
 				d->output->setData(d->vistalConverter->GetOutput()); \
 		} \
