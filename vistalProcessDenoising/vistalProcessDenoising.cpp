@@ -41,6 +41,7 @@ public:
         int weight_method;
         int block;
         int b_space;
+	unsigned int N_thread;
         //char* temp;
 
         // TO DO : parameters and options
@@ -70,6 +71,7 @@ vistalProcessDenoising::vistalProcessDenoising(void) : dtkAbstractProcess(), d(n
         d->weight_method = 0;
         d->block = 1;
         d->b_space = 2;
+	d->N_thread = 1;
         //temp = NULL;
 	
 	qDebug() << "toto construct";
@@ -156,16 +158,19 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
 
     else if (data->description() == "itkDataImageFloat3")
     {
-        //itkDataImageToVistalDataImageFloat3Converter *converter = new itkDataImageToVistalDataImageFloat3Converter;
-        //if(converter == NULL)
-        //    return;
+        itkDataImageToVistalDataImageFloat3Converter *converter = new itkDataImageToVistalDataImageFloat3Converter;
+        if(converter == NULL)
+	{
+	    qDebug() << "converter == NULL";
+            return;
+	}
 
-        //converter->setData(data);
-        //d->input = converter->convert();
+        converter->setData(data);
+        d->input = converter->convert();
         
-        qDebug() << "itkDataImageFloat3 toto";
+        //qDebug() << "itkDataImageFloat3 toto";
         
-        d->input = data->convert("vistalDataImageFloat3");
+        //d->input = data->convert("vistalDataImageFloat3");
 	if (!d->input)
 	{
 	  qDebug() << "conversion failed toto";
@@ -199,22 +204,24 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
     {
         /*itkDataImageToVistalDataImageShort3Converter *converter = new itkDataImageToVistalDataImageShort3Converter;
         if(converter == NULL)
+	{
+	    qDebug() << "converter == NULL";
             return;
+	}
 
         converter->setData(data);
         d->input = converter->convert();
-
         delete converter;*/
 	
 	qDebug() << "itkDataImageShort3 toto";
 	
+	//data->enableConverter("vistalDataImageShort3");
 	d->input = data->convert("vistalDataImageShort3");
 	if (!d->input)
-	  
+	{	  
 	  qDebug() << "conversion fails toto";	  	  
 	  return;
-	
-	
+	}	
 	
     }
 
@@ -327,6 +334,9 @@ void vistalProcessDenoising::setParameter(double  data, int channel)
         case (12):
                 d->b_space = data;
                 break;
+	case (13):
+		d->N_thread = data;
+		break;
         default :
                 return;
         }
