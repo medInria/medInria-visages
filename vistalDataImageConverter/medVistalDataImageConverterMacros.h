@@ -97,20 +97,18 @@ QString itkDataImageToVistalDataImage##suffix##Converter::toType(void) const \
 } \
 dtkAbstractData *itkDataImageToVistalDataImage##suffix##Converter::convert(void) \
 { \
-	if (!d->output) \
-		return NULL; \
 	dtkAbstractData *data = this->data(); \
 	if (!data) \
 		return NULL; \
 	if (data->description() == "itkDataImage"#suffix) { \
 		if ( itk::Image<type, 3>::Pointer image = static_cast<itk::Image<type, 3> *>( data->data() ) ) { \
+			qDebug() << "create converter"; \
 			if (d->vistalConverter == NULL) \
-				d->vistalConverter = new itkImage3D<type> ; \
+				d->vistalConverter = new itkImage3D<type> (image); \
 			if (!d->output) \
 				d->output = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffix); \
 			if (!d->output) \
 				return NULL; \
-			d->vistalConverter->SetInputDeep(image); \
 			if (d->tmpOut) \
 				delete d->tmpOut; \
 			d->tmpOut = new vistal::Image3D <type>(d->vistalConverter->GetImage3D()); \
