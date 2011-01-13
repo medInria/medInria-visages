@@ -25,7 +25,7 @@
 class vistalProcessDenoisingPrivate
 {
 public:
-        dtkAbstractData *input;
+        dtkAbstractData *input;	
         dtkAbstractData *output;
 
         double seuil;
@@ -43,11 +43,8 @@ public:
         int b_space;
 	unsigned int N_thread;
         //char* temp;
-
-        // TO DO : parameters and options
-        // TO DO : input and output images
-        // TO DO : temp: directory for slice preview
-        // TO DO : use QSettings to store parameters ? or not
+	
+        // TO DO : temp directory for slice preview
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -73,17 +70,15 @@ vistalProcessDenoising::vistalProcessDenoising(void) : dtkAbstractProcess(), d(n
         d->b_space = 2;
 	d->N_thread = 1;
         //temp = NULL;
-	
-	qDebug() << "toto construct";
 }
 
 vistalProcessDenoising::~vistalProcessDenoising(void)
-{
-        // TO DO: useless ?
+{                
         delete d->input;
-        delete d->output;
+	d->input = NULL;
 	
-	qDebug() << "toto destruct";
+        delete d->output;
+	d->output = NULL;	
 }
 
 bool vistalProcessDenoising::registered(void)
@@ -92,196 +87,151 @@ bool vistalProcessDenoising::registered(void)
 }
 
 QString vistalProcessDenoising::description(void) const
-{
-    qDebug() << "toto description";
-  
+{  
     return "vistalProcessDenoising";
 }
 
 void vistalProcessDenoising::setInput(dtkAbstractData *data)
-{
-
-    // TO DO : convert and store converted data into d->input (private)
-    // TO DO : Should we expect itkDataImages only ? (answer: no, but we'll see later)
-    // TO DO : warning or similar action to handle incompatible input types
-    // TO DO : what if: input == NULL ?
-    // TO DO : correct : D->INPUT
-    // TO DO : D->INPUT (test NULL after new and convert)
-    // TO DO : correct use of converter: see AbstractDataConverter
-    
-    qDebug() << "setInput method starts here, toto";    
-
-    if (!data)
+{    
+    if (!data)  
     {
-	qDebug() << "no data toto!";
         return;
     }
-    else if (data->description() == "itkDataImageUChar3")
-    {
-        //itkDataImageToVistalDataImageUChar3Converter *converter = new itkDataImageToVistalDataImageUChar3Converter;
-        //if(converter == NULL)
-        //    return;
+    
+    else if (data->description() == "itkDataImageChar3")
+    {              
+        d->input = data->convert("vistalDataImageChar3");	
 
-        //converter->setData(data);
-        //d->input = converter->convert();
-        
+	if (!d->input)
+	  return;  
+    }   
+ 
+    else if (data->description() == "itkDataImageUChar3")
+    {      
         qDebug() << "itkDataImageUChar3 toto";
         
         d->input = data->convert("vistalDataImageUChar3");	
 
 	if (!d->input)
-	  return;
-	  
-
-
-        //delete converter;
-    }
-
-    else if (data->description() == "itkDataImageUShort3")
-    {
-        //itkDataImageToVistalDataImageUShort3Converter *converter = new itkDataImageToVistalDataImageUShort3Converter;
-        //if(converter == NULL)
-        //    return;
-
-        //converter->setData(data);
-        //d->input = converter->convert();
-        
-        qDebug() << "itkDataImageUShort3 toto";
-        
-        d->input = data->convert("vistalDataImageUShort3");
-	if (!d->input)  
-	  return;
-	
-
-        //delete converter;
-    }
-
-    else if (data->description() == "itkDataImageFloat3")
-    {
-        itkDataImageToVistalDataImageFloat3Converter *converter = new itkDataImageToVistalDataImageFloat3Converter;
-        if(converter == NULL)
-	{
-	    qDebug() << "converter == NULL";
-            return;
-	}
-
-        converter->setData(data);
-        d->input = converter->convert();
-        
-        //qDebug() << "itkDataImageFloat3 toto";
-        
-        //d->input = data->convert("vistalDataImageFloat3");
-	if (!d->input)
-	{
-	  qDebug() << "conversion failed toto";
-	  return;	  
-	}             
-
-        //delete converter;
-    }
-
-    else if (data->description() == "itkDataImageDouble3")
-    {
-        /*itkDataImageToVistalDataImageDouble3Converter *converter = new itkDataImageToVistalDataImageDouble3Converter;
-        if(converter == NULL)
-            return;
-
-        converter->setData(data);
-        d->input = converter->convert();
-
-        delete converter;*/
-	
-	qDebug() << "itkDataImageDouble3 toto";
-	
-	d->input = data->convert("vistalDataImageDouble3");
-	if (!d->input)
-	  return;
-	
-	
+	  return;  
     }
 
     else if (data->description() == "itkDataImageShort3")
     {
-        /*itkDataImageToVistalDataImageShort3Converter *converter = new itkDataImageToVistalDataImageShort3Converter;
-        if(converter == NULL)
-	{
-	    qDebug() << "converter == NULL";
-            return;
-	}
-
-        converter->setData(data);
-        d->input = converter->convert();
-        delete converter;*/
-	
-	qDebug() << "itkDataImageShort3 toto";
-	
-	//data->enableConverter("vistalDataImageShort3");
 	d->input = data->convert("vistalDataImageShort3");
-	if (!d->input)
-	{	  
-	  qDebug() << "conversion fails toto";	  	  
-	  return;
-	}	
+	if (!d->input)	  	  
+	  return;	
+    }
+
+    else if (data->description() == "itkDataImageUShort3")
+    {       
+        d->input = data->convert("vistalDataImageUShort3");
 	
+	if (!d->input)  
+	  return;
     }
 
     else if (data->description() == "itkDataImageInt3")
-    {
-        /*itkDataImageToVistalDataImageInt3Converter *converter = new itkDataImageToVistalDataImageInt3Converter;
-        if(converter == NULL)
-            return;
-
-        converter->setData(data);
-        d->input = converter->convert();
-
-        delete converter;*/
-	
-	qDebug() << "itkDataImageInt3 toto";
-	
+    {		
 	d->input = data->convert("vistalDataImageInt3");
-	if (!d->input)
-	  return;
 	
+	if (!d->input)
+	  return;	
     }
-
+    
     else if (data->description() == "itkDataImageUInt3")
-    {
-        /*itkDataImageToVistalDataImageUInt3Converter *converter = new itkDataImageToVistalDataImageUInt3Converter;
-        if(converter == NULL)
-            return;
-
-        converter->setData(data);
-        d->input = converter->convert();
-
-        delete converter;*/
-	
-	qDebug() << "itkDataImageUInt3 toto";
-	
+    {		
 	d->input = data->convert("vistalDataImageUInt3");
+	
 	if (!d->input)
 	  return;
     }
+
+    else if (data->description() == "itkDataImageFloat3")
+    {
+        d->input = data->convert("vistalDataImageFloat3");       
+
+	if (!(d->input))
+	  return;	  
+    }
+
+    else if (data->description() == "itkDataImageDouble3")
+    {	
+	d->input = data->convert("vistalDataImageDouble3");
+	
+	if (!d->input)
+	  return;	
+    }
+
+    else if(data->description() == "vistalDataImageChar3")
+    {
+      d->input = data;
+     
+      if(!d->input)
+	  return;      
+    }  
+
+    else if(data->description() == "vistalDataImageUChar3")
+    {
+      d->input = data;
+     
+      if(!d->input)
+	  return;      
+    }  
+    
     else if(data->description() == "vistalDataImageShort3")
     {
-      qDebug() << "correct input data type found, toto...";
-      //d->input = static_cast<dtkAbstractData *> (data->data());
       d->input = data;
-      qDebug() << "after static_cast and assignement to d->input, toto";
       
-      if(!d->input)
-	{	  
-	  qDebug() << "...but bad allocation/assignement";
-	  return;	  
-	}
+      if(!d->input)	
+	  return;
+    } 
 
-      qDebug() << "d->input is not NULL";
+    else if(data->description() == "vistalDataImageUShort3")
+    {
+      d->input = data;
       
-    }
-    
-    
+      if(!d->input)	
+	  return;
+    } 
+
+
+    else if(data->description() == "vistalDataImageInt3")
+    {
+      d->input = data;
+      
+      if(!d->input)	
+	  return;
+    } 
+
+
+    else if(data->description() == "vistalDataImageUInt3")
+    {
+      d->input = data;
+      
+      if(!d->input)	
+	  return;
+    } 
+
+    else if(data->description() == "vistalDataImageFloat3")
+    {
+      d->input = data;
+      
+      if(!d->input)	
+	  return;
+    } 
+
+    else if(data->description() == "vistalDataImageDouble3")
+    {
+      d->input = data;
+      
+      if(!d->input)	
+	  return;
+    } 
+   
     else
     {
-      qDebug() << "else input type toto";      
+      qDebug() << "in setInput method : else input type";      
       return;     
     }
 }
@@ -290,9 +240,6 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
 
 void vistalProcessDenoising::setParameter(double  data, int channel)
 {
-        // TO DO : handle wrong channel id
-        // TO DO : store parameters in vistalProcessDenoisingPrivate
-
     switch (channel){
 
         case (0):
@@ -335,7 +282,9 @@ void vistalProcessDenoising::setParameter(double  data, int channel)
                 d->b_space = data;
                 break;
 	case (13):
-		d->N_thread = data;
+		d->N_thread = (unsigned int)data;
+		qDebug() << "channel = " << channel << "  data = " << data;
+		qDebug() << "N_thread = " << d->N_thread;
 		break;
         default :
                 return;
@@ -344,19 +293,10 @@ void vistalProcessDenoising::setParameter(double  data, int channel)
 
 
 int vistalProcessDenoising::update (void)
-{
-        // TO DO : construct NLMeansDenoising<> according to data->description (if...else if..)
-        // TO DO : setInput, set{parameters}, run, output
-        // TO DO : delete nlmeans after process
-        // TO DO : unresolved input descriptions
-        // TO DO : output stored in d->output
-        // TO DO : see again: *output allocation
-        
-        qDebug() << "we enter the method update, toto";
-
+{        
         if (d->input == NULL)
 	{
-	    qDebug() << "input equals NULL toto";	  
+	    qDebug() << "in update method : d->input == NULL";	  
             return -1;
 	}
 
@@ -381,20 +321,24 @@ int vistalProcessDenoising::update (void)
             nlmeans->setVarMinRatio(d->v_min);
             nlmeans->setWeightingMethod(d->weight_method);
             nlmeans->setDistanceBetweenBlocks(d->b_space);
+	    nlmeans->setNumberOfThreads(d->N_thread);
 
             nlmeans->run();
 
-            d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+	    vistal::Image3D<unsigned char> * result = new vistal::Image3D<unsigned char>(*nlmeans->getOutput());
+	    
+	    d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
             if (d->output == NULL)
-                return -1;
+                return -1;	    
 
-            d->output->setData(nlmeans->getOutput());
-
-            if(d->output->data() == NULL)
-                return -1;
+            d->output->setData(result); 
+	    
+	    if(d->output->data() == NULL)
+	      return -1;
 
             delete nlmeans;
-
+	    //delete result;
+	    
         }
         else if (d->input->description() == "vistalDataImageUShort3")
         {
@@ -417,23 +361,27 @@ int vistalProcessDenoising::update (void)
             nlmeans->setVarMinRatio(d->v_min);
             nlmeans->setWeightingMethod(d->weight_method);
             nlmeans->setDistanceBetweenBlocks(d->b_space);
+	    nlmeans->setNumberOfThreads(d->N_thread);
 
             nlmeans->run();
+	    
+	    vistal::Image3D<unsigned short> * result = new vistal::Image3D<unsigned short>(*nlmeans->getOutput());
 
             d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageUShort3");
             if (d->output == NULL)
-                return -1;
+	      return -1;
 
-            d->output->setData(nlmeans->getOutput());
+            d->output->setData(result);
 
             if(d->output->data() == NULL)
                 return -1;
 
             delete nlmeans;
+	    //delete result;
 
         }
         else if (d->input->description() == "vistalDataImageFloat3")
-        {
+        {	    
             vistal::NLMeansDenoising<float> *nlmeans = new vistal::NLMeansDenoising<float>;
 
             if(nlmeans == NULL)
@@ -453,19 +401,23 @@ int vistalProcessDenoising::update (void)
             nlmeans->setVarMinRatio(d->v_min);
             nlmeans->setWeightingMethod(d->weight_method);
             nlmeans->setDistanceBetweenBlocks(d->b_space);
+	    nlmeans->setNumberOfThreads(d->N_thread);
 
             nlmeans->run();
+	   
+	    vistal::Image3D<float> * result = new vistal::Image3D<float>(*nlmeans->getOutput());
 
             d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3");
             if (d->output == NULL)
                 return -1;
 
-            d->output->setData(nlmeans->getOutput());
+            d->output->setData(result);
 
             if(d->output->data() == NULL)
                 return -1;
 
             delete nlmeans;
+	    //delete result;
 
         }
         else if (d->input->description() == "vistalDataImageDouble3")
@@ -489,36 +441,31 @@ int vistalProcessDenoising::update (void)
             nlmeans->setVarMinRatio(d->v_min);
             nlmeans->setWeightingMethod(d->weight_method);
             nlmeans->setDistanceBetweenBlocks(d->b_space);
+	    nlmeans->setNumberOfThreads(d->N_thread);
 
             nlmeans->run();
+	    
+	    vistal::Image3D<double> * result = new vistal::Image3D<double>(*nlmeans->getOutput());
 
             d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageDouble3");
             if (d->output == NULL)
                 return -1;
 
-             d->output->setData(nlmeans->getOutput());
-	    //d->output = static_cast<dtkAbstractData *> (nlmeans->getOutput());
+            d->output->setData(result);
 
             if(d->output->data() == NULL)
                 return -1;
 
             delete nlmeans;
+	    //delete result;
 
         }
         else if (d->input->description() == "vistalDataImageShort3")
-        {
-	    qDebug() << "description == vistalDataImageShort3, toto";
-	  
-	  
+        {	  
             vistal::NLMeansDenoising<short> *nlmeans = new vistal::NLMeansDenoising<short>;
-	    
-	    qDebug() << "after nlmeans pointer new method, toto";
 
             if(nlmeans == NULL)
-	    {
 	      return -1;
-	      qDebug() << "Sorry toto, nlmeans==NULL";
-	    }
 
             nlmeans->setInput(static_cast<vistal::Image3D<short> * > (d->input->data()));
 	    qDebug() << "After nlmeans->setInput method, toto";
@@ -535,29 +482,23 @@ int vistalProcessDenoising::update (void)
             nlmeans->setVarMinRatio(d->v_min);
             nlmeans->setWeightingMethod(d->weight_method);
             nlmeans->setDistanceBetweenBlocks(d->b_space);
+	    nlmeans->setNumberOfThreads(d->N_thread);
 	    
-	    qDebug() << "A last cigarette before calling nlmeans->run(), toto";
-
             nlmeans->run();
 	    
-	    qDebug() << "Just after calling method nlmeans->run(), toto";
-
+	    vistal::Image3D<short> * result = new vistal::Image3D<short>(*nlmeans->getOutput());
+	    
             d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageShort3");
             if (d->output == NULL)
-	    {
-		qDebug() << "After creating an instance for d->output, it is NULL, toto";
                 return -1;
-	    }
 
-            d->output->setData(nlmeans->getOutput());
+            d->output->setData(result);
 	    
             if(d->output->data() == NULL)
-	    {
-		qDebug() << "d->output->data() returns NULL, toto";
                 return -1;
-	    }
 
             delete nlmeans;
+	    //delete result;
 
         }
         else if (d->input->description() == "vistalDataImageInt3")
@@ -581,18 +522,23 @@ int vistalProcessDenoising::update (void)
             nlmeans->setVarMinRatio(d->v_min);
             nlmeans->setWeightingMethod(d->weight_method);
             nlmeans->setDistanceBetweenBlocks(d->b_space);
+	    nlmeans->setNumberOfThreads(d->N_thread);	    
+	    
             nlmeans->run();
+	    
+	    vistal::Image3D<int> * result = new vistal::Image3D<int>(*nlmeans->getOutput());
 
             d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageInt3");
             if (d->output == NULL)
                 return -1;
 
-            d->output->setData(nlmeans->getOutput());
+            d->output->setData(result);
 
             if(d->output->data() == NULL)
                 return -1;
 
             delete nlmeans;
+	    //delete result;
 
         }
         else if (d->input->description() == "vistalDataImageUInt3")
@@ -616,19 +562,23 @@ int vistalProcessDenoising::update (void)
             nlmeans->setVarMinRatio(d->v_min);
             nlmeans->setWeightingMethod(d->weight_method);
             nlmeans->setDistanceBetweenBlocks(d->b_space);
+	    nlmeans->setNumberOfThreads(d->N_thread);
 
             nlmeans->run();
+	    
+	    vistal::Image3D<unsigned int> * result = new vistal::Image3D<unsigned int>(*nlmeans->getOutput());
 
             d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageUInt3");
             if (d->output == NULL)
                 return -1;
 
-            d->output->setData(nlmeans->getOutput());
+            d->output->setData(result);
 
             if(d->output->data() == NULL)
                 return -1;
 
             delete nlmeans;
+	    //delete result;
 
         }
         else
@@ -639,16 +589,7 @@ int vistalProcessDenoising::update (void)
 }
 
 dtkAbstractData * vistalProcessDenoising::output(void)
-{
-        // TO DO : what if: output == NULL ? (error, warning, message, signal, etc.)
-        // TO DO : call d->output
-        // TO DO : convert into type itkDataImage
-
-//         if (!d->output)
-//             return;
-
-	qDebug() << "in the output method, toto";
-        //return (d->output->convert(""));
+{	
 	return (d->output);
 }
 
