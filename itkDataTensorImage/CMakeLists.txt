@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 2.8.1)
 
-project(itkDataImagePlugin)
+project(itkDataTensorImagePlugin)
 
 ## #################################################################
 ## Setup version numbering
@@ -32,13 +32,10 @@ find_package(dtk REQUIRED)
 include(${dtk_USE_FILE})
 include(dtkPlugin)
 
+find_package(TTK REQUIRED)
+include(${TTK_USE_FILE})
+
 find_package(ITK REQUIRED)
-  if(NOT ITK_USE_REVIEW)
-    message(FATAL_ERROR "ITK must be build with option ITK_USE_REVIEW to ON")
-  endif(NOT ITK_USE_REVIEW)
-  if(NOT ITK_USE_REVIEW_STATISTICS)
-    message(FATAL_ERROR "ITK must be build with option ITK_USE_REVIEW_STATISTICS to ON")
-  endif(NOT ITK_USE_REVIEW_STATISTICS)
 include(${ITK_USE_FILE})
 
 ## #################################################################
@@ -46,46 +43,14 @@ include(${ITK_USE_FILE})
 ## #################################################################
 
 set(${PROJECT_NAME}_HEADERS_MOC
-  itkDataImagePlugin.h
-  itkDataImageChar3.h
-  itkDataImageUChar3.h
-  itkDataImageShort3.h
-  itkDataImageUShort3.h
-  itkDataImageUShort4.h
-  itkDataImageInt3.h
-  itkDataImageUInt3.h
-  itkDataImageLong3.h
-  itkDataImageULong3.h
-  itkDataImageFloat3.h
-  itkDataImageFloat4.h
-  itkDataImageDouble3.h
-  itkDataImageVector3.h
-  itkDataImageRGB3.h
-  itkDataImageShort4.h)
-
-set(${PROJECT_NAME}_HEADERS
-  ${${PROJECT_NAME}_HEADERS_MOC})
+  itkDataTensorImagePlugin.h
+  itkDataTensorImageDouble3.h
+  itkDataTensorImageFloat3.h)
 
 set(${PROJECT_NAME}_SOURCES
-  itkDataImagePlugin.cpp
-  itkDataImageChar3.cpp
-  itkDataImageUChar3.cpp
-  itkDataImageShort3.cpp
-  itkDataImageUShort3.cpp
-  itkDataImageUShort4.cpp
-  itkDataImageInt3.cpp
-  itkDataImageUInt3.cpp
-  itkDataImageLong3.cpp
-  itkDataImageULong3.cpp
-  itkDataImageFloat3.cpp
-  itkDataImageFloat4.cpp
-  itkDataImageDouble3.cpp
-  itkDataImageVector3.cpp
-  itkDataImageRGB3.cpp
-  itkDataImageShort4.cpp)
-
-# Include header files for Visual Studio.
-SOURCE_GROUP("Header Files" REGULAR_EXPRESSION .*\\.h\$)
+  itkDataTensorImagePlugin.cpp
+  itkDataTensorImageDouble3.cpp
+  itkDataTensorImageFloat3.cpp)
 
 ## #################################################################
 ## Build rules
@@ -95,17 +60,12 @@ qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_SOURCES_MOC} 
-  ${${PROJECT_NAME}_HEADERS} 
   ${${PROJECT_NAME}_SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
+  ${ITK_LIBRARIES}
   ${QT_LIBRARIES}
-  dtkCore
-  ${ITK_LIBRARIES})
-
-if (BUILD_TESTING)
-  add_subdirectory(Testing)
-endif (BUILD_TESTING)
+  dtkCore)
 
 ## #################################################################
 ## Install rules

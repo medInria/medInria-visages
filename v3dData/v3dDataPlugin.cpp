@@ -6,6 +6,7 @@
 #include "v3dDataImage.h"
 #include "v3dDataFibers.h"
 #include "v3dDataFibersWriter.h"
+#include "v3dDataFibersReader.h"
 
 #include <dtkCore/dtkLog.h>
 
@@ -54,6 +55,9 @@ bool v3dDataPlugin::initialize(void)
     if(!v3dDataFibersWriter::registered())
 	dtkWarning() << "Unable to register v3dDataFibersWriter type";
 
+    if(!v3dDataFibersReader::registered())
+	dtkWarning() << "Unable to register v3dDataFibersReader type";
+
     return true;
 }
 
@@ -79,7 +83,10 @@ QStringList v3dDataPlugin::tags(void) const
 
 QStringList v3dDataPlugin::types(void) const
 {
-    return QStringList() << "v3dDataImage";
+    return QStringList() << "v3dDataImage"
+			 << "v3dDataFibers"
+			 << "v3dDataFibersWriter"
+			 << "v3dDataFibersReader";
 }
 
 Q_EXPORT_PLUGIN2(v3dDataPlugin, v3dDataPlugin)
