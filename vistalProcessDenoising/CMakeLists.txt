@@ -38,7 +38,7 @@ include(${VISTAL_USE_FILE})
 #include(${FindVISTAL.cmake})
 #include(vistalSettings.cmake)
 
-include_directories(${medular-plugins_SOURCE_DIR}/vistalDataImageConverter)
+include_directories(${medinria-plugins_SOURCE_DIR}/vistalDataImageConverter)
 
 
 ## #################################################################
