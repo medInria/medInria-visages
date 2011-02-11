@@ -35,8 +35,10 @@ include(dtkPlugin)
 # vistal
 find_package(Vistal REQUIRED)
 include(${VISTAL_USE_FILE})
-#include(${FindVISTAL.cmake})
-#include(vistalSettings.cmake)
+
+# medinria
+find_package(medinria REQUIRED)
+include(${medinria_USE_FILE})
 
 include_directories(${medinria-plugins_SOURCE_DIR}/vistalDataImageConverter)
 
@@ -47,10 +49,12 @@ include_directories(${medinria-plugins_SOURCE_DIR}/vistalDataImageConverter)
 
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalProcessDenoisingPlugin.h
+  vistalProcessDenoisingToolBox.h
   vistalProcessDenoising.h)
 
 set(${PROJECT_NAME}_SOURCES
   vistalProcessDenoisingPlugin.cpp
+  vistalProcessDenoisingToolBox.cpp
   vistalProcessDenoising.cpp)
 
 ## #################################################################
@@ -66,7 +70,9 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
-  dtkCore)
+  dtkCore
+  medCore
+  medGui)
 
 dtk_build_doc(vistalProcessDenoisingPlugin)
 

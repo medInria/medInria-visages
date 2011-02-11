@@ -4,6 +4,7 @@
 
 #include "vistalProcessDenoising.h"
 #include "vistalProcessDenoisingPlugin.h"
+#include "vistalProcessDenoisingToolBox.h"
 
 #include <dtkCore/dtkLog.h>
 
@@ -37,6 +38,9 @@ bool vistalProcessDenoisingPlugin::initialize(void)
 {
     if(!vistalProcessDenoising::registered())
 	dtkWarning() << "Unable to register vistalProcessDenoising type";
+    
+    if(!vistalProcessDenoisingToolBox::registered())
+	dtkWarning() << "Unable to register vistalProcessDenoising toolbox";
 
     return true;
 }
@@ -58,7 +62,7 @@ QString vistalProcessDenoisingPlugin::description(void) const
 
 QStringList vistalProcessDenoisingPlugin::tags(void) const
 {
-    return QStringList() << "vistal" << "process" << "nlmeans";
+    return QStringList() << "vistal" << "process" << "nlmeans" << "denoising" << "preprocessing";
 }
 
 QStringList vistalProcessDenoisingPlugin::types(void) const
