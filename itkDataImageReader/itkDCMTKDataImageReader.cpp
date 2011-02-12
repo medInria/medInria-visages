@@ -73,12 +73,18 @@ bool itkDCMTKDataImageReader::registered(void)
 								    << "itkDataImageLong3"
 								    << "itkDataImageUInt3"
 								    << "itkDataImageInt3"
+								    << "itkDataImageInt4"
+								    << "itkDataImageLong4"
+								    << "itkDataImageUInt4"
+								    << "itkDataImageULong4"
 								    << "itkDataImageUShort3"
 								    << "itkDataImageUShort4"
+								    << "itkDataImageUChar4"
 								    << "itkDataImageShort3"
 								    << "itkDataImageShort4"
 								    << "itkDataImageUChar3"
 								    << "itkDataImageChar3"
+								    << "itkDataImageChar4"
 								    << "itkDataImageRGB3",
 								    createItkDCMTKDataImageReader);
 }
@@ -92,12 +98,18 @@ QStringList itkDCMTKDataImageReader::handled(void) const
 		       << "itkDataImageLong3"
 		       << "itkDataImageUInt3"
 		       << "itkDataImageInt3"
+		       << "itkDataImageInt4"
+		       << "itkDataImageLong4"
+		       << "itkDataImageUInt4"
+		       << "itkDataImageULong4"
 		       << "itkDataImageUShort3"
 		       << "itkDataImageUShort4"
 		       << "itkDataImageShort3"
 		       << "itkDataImageShort4"
 		       << "itkDataImageUChar3"
+		       << "itkDataImageUChar4"
 		       << "itkDataImageChar3"
+		       << "itkDataImageChar4"
 		       << "itkDataImageRGB3";
 }
 
@@ -363,6 +375,14 @@ bool itkDCMTKDataImageReader::read (const QStringList& paths)
     { ReadImageMacro (unsigned int, 3); }	
     else if (dtkdata->description()=="itkDataImageInt3")
     { ReadImageMacro (int, 3); }	
+    else if (dtkdata->description()=="itkDataImageInt4")
+    { ReadImageMacro (int, 4); }
+    else if (dtkdata->description()=="itkDataImageLong4")
+    { ReadImageMacro (long, 4); }
+    else if (dtkdata->description()=="itkDataImageUInt4")
+    { ReadImageMacro (unsigned int, 4); }
+    else if (dtkdata->description()=="itkDataImageULong4")
+    { ReadImageMacro (unsigned long, 4); }
     else if (dtkdata->description()=="itkDataImageULong3")
     { ReadImageMacro (unsigned long, 3); }
     else if (dtkdata->description()=="itkDataImageLong3")
@@ -375,8 +395,12 @@ bool itkDCMTKDataImageReader::read (const QStringList& paths)
     { ReadImageMacro (itk::RGBPixel<unsigned char>, 3); }
     else if (dtkdata->description()=="itkDataImageUShort4")
     { ReadImageMacro (unsigned short, 4); }
+    else if (dtkdata->description()=="itkDataImageUChar4")
+    { ReadImageMacro (unsigned char, 4); }
     else if (dtkdata->description()=="itkDataImageShort4")
     { ReadImageMacro (short, 4); }	
+    else if (dtkdata->description()=="itkDataImageChar4")
+        { ReadImageMacro (char, 4); }
     else
     {
       qWarning() << "Unrecognized pixel type";
