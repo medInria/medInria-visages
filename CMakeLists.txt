@@ -66,6 +66,7 @@ option(MEDINRIA_BUILD_VTKDATAMESHWRITER_PLUGIN            "Build vtkDataMeshWrit
 option(MEDINRIA_BUILD_ITKDATADIFFUSIONGRADIENTLIST_PLUGIN "Build itkDataDiffusionGradientList plugin" "ON")
 option(MEDINRIA_BUILD_ITKDATATENSORIMAGE_PLUGIN           "Build itkDataTensorImage plugin" "ON")
 option(MEDINRIA_BUILD_ITKDATATENSORIMAGEREADER_PLUGIN     "Build itkDataTensorImageReader plugin" "ON")
+option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     	  "Build qtshanoirDataSource plugin" "ON")
 
 if (MEDINRIA_BUILD_V3DDATA_PLUGIN)
   subdirs(v3dData)
@@ -113,6 +114,10 @@ endif()
 
 if (MEDINRIA_BUILD_ITKDATATENSORIMAGEREADER_PLUGIN)
     subdirs(itkDataTensorImageReader)
+endif()
+
+if (MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN)
+    subdirs(qtshanoirDataSource)
 endif()
 
 if (MEDINRIA_BUILD_V3DDATA_PLUGIN OR
