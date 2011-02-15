@@ -58,6 +58,7 @@ void qtshanoirDataSource::initWidgets(void)
   
 	if(!d->mainWidget)
 	  	d->mainWidget = new QtShanoirTreeWidget();
+	
 	if(!d->rightWidget)
 		d->rightWidget = new QtShanoirSettingsWidget();
 	
@@ -67,11 +68,13 @@ void qtshanoirDataSource::initWidgets(void)
 
 qtshanoirDataSource::~qtshanoirDataSource(void)
 {
-  if(d->mainWidget)
-	delete d->mainWidget;
-  if(d->rightWidget)
-        delete d->rightWidget;
-  delete d;  
+  //if(d->mainWidget)
+	//	delete d->mainWidget;
+  //if(d->rightWidget)
+	//	delete d->rightWidget;
+  
+	delete d;  
+	d = NULL;
 }
 
 bool qtshanoirDataSource::registered(void)
