@@ -111,7 +111,7 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
 
       //Toolbox:
       this->setTitle("NL means - Toolbox");
-      this->setWidget(widget);
+      this->addWidget(widget);
       
       connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
