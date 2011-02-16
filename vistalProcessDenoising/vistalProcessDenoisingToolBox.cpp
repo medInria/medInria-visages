@@ -20,6 +20,23 @@
 class vistalProcessDenoisingToolBoxPrivate
 {
 public:
+        QCheckBox *slope;
+        QLineEdit *sigma;
+        QLineEdit *beta;
+        QLineEdit *neighborhoodSize;
+        QLineEdit *volumeOfSearch;
+        QCheckBox *weightingMethod;
+        QCheckBox *neighborhoodType;
+
+        QCheckBox *blockApproach;
+        QLineEdit *distanceBetweenBlocks;
+        QCheckBox *testOnMean;
+        QLineEdit *minimumMeanRatio;
+        QCheckBox *testOnVar;
+        QLineEdit *minimumVarianceRatio;
+        QLineEdit *n_thread;
+
+        dtkAbstractProcess *process;
 
 };
 
@@ -27,59 +44,53 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
 {
       // Parameters:
 
-      QCheckBox *slope = new QCheckBox();
-      slope->setChecked(true);
+      d->slope = new QCheckBox();
+      d->slope->setChecked(true);
 
-      QLineEdit *sigma = new QLineEdit("0");
-      QLineEdit *beta = new QLineEdit("1");
-      QLineEdit *neighborhoodSize = new QLineEdit("1");
-      QLineEdit *volumeOfSearch = new QLineEdit("5");
+      d->sigma = new QLineEdit("0");
+      d->beta = new QLineEdit("1");
+      d->neighborhoodSize = new QLineEdit("1");
+      d->volumeOfSearch = new QLineEdit("5");
 
-      QCheckBox *weightingMethod = new QCheckBox();
-      weightingMethod->setChecked(true);
+      d->weightingMethod = new QCheckBox();
+      d->weightingMethod->setChecked(true);
 
-      QCheckBox *neighborhoodType = new QCheckBox();
-      neighborhoodType->setChecked(true);
+      d->neighborhoodType = new QCheckBox();
+      d->neighborhoodType->setChecked(true);
 
       QFormLayout *parametersLayout = new QFormLayout();
-      parametersLayout->addRow("Adaptive or constant slope ?",slope);
-      parametersLayout->addRow("S&igma :",sigma);
-      parametersLayout->addRow("&Beta :",beta);
-      parametersLayout->addRow("&Neighboring size :",neighborhoodSize);
-      parametersLayout->addRow("&Volume of search :",volumeOfSearch);
-      parametersLayout->addRow("&Weighting method (Pearson divergence or classical exponential) ?",weightingMethod);
-      parametersLayout->addRow("&Isotropic or cubic neighborhood ?",neighborhoodType);
+      parametersLayout->addRow("Adaptive/Constant slope ?",d->slope);
+      parametersLayout->addRow("S&igma :",d->sigma);
+      parametersLayout->addRow("&Beta :",d->beta);
+      parametersLayout->addRow("&Neighboring size :",d->neighborhoodSize);
+      parametersLayout->addRow("&Volume of search :",d->volumeOfSearch);
+      parametersLayout->addRow("&Weighting method (Pearson divergence/classic exponential) ?",d->weightingMethod);
+      parametersLayout->addRow("&Isotropic/Cubic neighborhood ?",d->neighborhoodType);
 
       QGroupBox *groupParameters = new QGroupBox("Parameters");
       groupParameters->setLayout(parametersLayout);
 
       // Options:
 
-      QCheckBox *blockApproach = new QCheckBox();
-      blockApproach->setChecked(true);
-
-      QLineEdit *distanceBetweenBlocks = new QLineEdit("2");
-
-      QCheckBox *testOnMean = new QCheckBox();
-      testOnMean->setChecked(true);
-
-      QLineEdit *minimumMeanRatio = new QLineEdit("0.95");
-
-      QCheckBox *testOnVar = new QCheckBox();
-      testOnVar->setChecked(true);
-
-      QLineEdit *minimumVarianceRatio = new QLineEdit("0.5");
-
-      QLineEdit *n_thread = new QLineEdit("1");
+      d->blockApproach = new QCheckBox();
+      d->blockApproach->setChecked(true);
+      d->distanceBetweenBlocks = new QLineEdit("2");
+      d->testOnMean = new QCheckBox();
+      d->testOnMean->setChecked(true);
+      d->minimumMeanRatio = new QLineEdit("0.95");
+      d->testOnVar = new QCheckBox();
+      d->testOnVar->setChecked(true);
+      d->minimumVarianceRatio = new QLineEdit("0.5");
+      d->n_thread = new QLineEdit("1");
 
       QFormLayout *optionsLayout = new QFormLayout();
-      optionsLayout->addRow("NL means based on block approach ?",blockApproach);
-      optionsLayout->addRow("Distance between blocks :",distanceBetweenBlocks);
-      optionsLayout->addRow("Test on mean ?",testOnMean);
-      optionsLayout->addRow("Lowest bound of mean ratio :",minimumMeanRatio);
-      optionsLayout->addRow("Test on variance ?",testOnVar);
-      optionsLayout->addRow("Lowest bound of variance ratio :",minimumVarianceRatio);
-      optionsLayout->addRow("Number of threads :",n_thread);
+      optionsLayout->addRow("Block approach ?",d->blockApproach);
+      optionsLayout->addRow("Distance between blocks :",d->distanceBetweenBlocks);
+      optionsLayout->addRow("Test on mean ?",d->testOnMean);
+      optionsLayout->addRow("Lowest bound of mean ratio :",d->minimumMeanRatio);
+      optionsLayout->addRow("Test on variance ?",d->testOnVar);
+      optionsLayout->addRow("Lowest bound of variance ratio :",d->minimumVarianceRatio);
+      optionsLayout->addRow("Number of threads :",d->n_thread);
 
       QGroupBox *groupOptions = new QGroupBox("Options");
       groupOptions->setLayout(optionsLayout);
@@ -104,25 +115,6 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       
       connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
-
-//      connect(slope,SIGNAL(stateChanged()),this,SLOT(setSlopeType(int)));
-//      connect(sigma,SIGNAL(textChanged()),this,SLOT(setSigma));
-//      connect(beta,SIGNAL(textChanged()),this,SLOT(setBeta));
-//      connect(neighborhoodSize,SIGNAL(),this,SLOT(setNeighborhoodSize));
-//      connect(volumeOfSearch,SIGNAL(),this,SLOT(setSearchVolumeSize));
-//      connect(weightingMethod,SIGNAL(),this,SLOT(setWeightingMethod));
-//      connect(neighborhoodType,SIGNAL(),this,SLOT(setNeighborhoodType));
-//
-//      connect(blockApproach,SIGNAL(),this,SLOT(setBlockApproach));
-//      connect(distanceBetweenBlocks,SIGNAL(),this,SLOT(setDistanceBetweenBlocks));
-//      connect(testOnMean,SIGNAL(),this,SLOT(setTestOnMean));
-//      connect(minimumMeanRatio,SIGNAL(),this,SLOT(setMinimumMeanRatio));
-//      connect(testOnVar,SIGNAL(),this,SLOT(setTestOnVar));
-//      connect(minimumVarianceRatio,SIGNAL(),this,SLOT(setMinimumVarRatio));
-//      connect(n_thread,SIGNAL(),this,SLOT(setNumberOfThreads));
-//
-//      connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
-
 }
 
 vistalProcessDenoisingToolBox::~vistalProcessDenoisingToolBox(void)
@@ -138,53 +130,50 @@ bool vistalProcessDenoisingToolBox::registered(void)
                                                                            createVistalProcessDenoisingToolBox);
 }
 
+
+dtkAbstractData* vistalProcessDenoisingToolBox::processOutput(void)
+{
+        if(!d->process)
+            return NULL;
+
+        return d->process->output();
+}
+
+
+
+
 void vistalProcessDenoisingToolBox::run(void)
 {
     if(!this->parent())
         return;
 
-    // Many choices here
+    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessDenoising");
 
-//    dtkAbstractProcess *process = dtkAbstractProcessFactory::instance()->create("vistalProcessDenoising");
+    if(!this->parent()->data())
+        return;
 
-    // itkProcessRegistration *process_registration = dynamic_cast<itkProcessRegistration *>(process);
-    // process->setMyWonderfullParameter(fronTheGui);
-    // process->setMyWonderfullParameter(fronTheGui);
+    d->process->setInput(this->parent()->data());
 
-    // or ...
+    d->process->setParameter(d->sigma->text().toDouble(),0);
+    d->process->setParameter(d->beta->text().toDouble(),1);
+    d->process->setParameter(d->slope->checkState() == Qt::Checked,2);
+    d->process->setParameter(d->neighborhoodType->checkState() == Qt::Checked,3);
+    d->process->setParameter(d->neighborhoodSize->text().toDouble(),4);
+    d->process->setParameter(d->volumeOfSearch->text().toDouble(),5);
+    d->process->setParameter(d->testOnMean->checkState() == Qt::Checked,6);
+    d->process->setParameter(d->testOnVar->checkState() == Qt::Checked,7);
+    d->process->setParameter(d->minimumMeanRatio->text().toDouble(),8);
+    d->process->setParameter(d->minimumVarianceRatio->text().toDouble(),9);
+    d->process->setParameter(d->weightingMethod->checkState() == Qt::Checked,10);
+    d->process->setParameter(d->blockApproach->checkState() == Qt::Checked,11);
+    d->process->setParameter(d->distanceBetweenBlocks->text().toDouble(),12);
+    d->process->setParameter(d->n_thread->text().toDouble(),13);
 
-    // itkProcessRegistration *process = new itkProcessRegistration;
-    // process->setMyWonderfullParameter(fronTheGui);
-    // process->setMyWonderfullParameter(fronTheGui);
+    if(d->process->update()==0)
+        emit success();
+    else
+        emit failure();
 
-    // ----
-
-//    if (!process)
-//        return;
-    
-/*    process->setInput(fixedData,  0);
-    process->setInput(movingData, 1);
-
-    if (process->run()==0) {
-
-        dtkAbstractData *output = process->output();
-
-	if(output) {
-	    movingView->setData(output);
-	    fixedView->unlink (movingView);
-	    fixedView->link (movingView);
-	    movingView->update();
-	    
-	    if (fuseView) {
-	        if (dtkAbstractViewInteractor *interactor = fuseView->interactor("v3dViewFuseInteractor")) {
-		    interactor->setData(output, 1);
-		    fuseView->update();
-		}
-	    }
-	}
-    }
-*/    
-//    delete process;
 }
 
 medToolBoxFilteringCustom *createVistalProcessDenoisingToolBox(void)

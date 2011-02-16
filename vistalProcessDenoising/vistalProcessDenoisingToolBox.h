@@ -16,28 +16,15 @@ public:
 
 public:
     static bool registered(void);
+    dtkAbstractData* processOutput();
    
-//signals:
+signals:
+    void success(void);
+    void failure(void);
     
 public slots:
 
     void run(void);
-
-//    void setSlopeType(int);
-//    void setSigma(double);
-//    void setBeta(double);
-//    void setNeighborhoodSize(double);
-//    void setSearchVolumeSize(double);
-//    void setWeightingMethod(int);
-//    void setNeighborhoodType(int);
-//
-//    void setBlockApproach(int);
-//    void setTestOnMean(int);
-//    void setTestOnVar(int);
-//    void setMinimumMeanRatio(double);
-//    void setMinimumVarRatio(double);
-//    void setDistanceBetweenBlocks(int);
-//    void setNumberOfThreads(unsigned int);
 
 private:
     vistalProcessDenoisingToolBoxPrivate *d;
@@ -46,3 +33,4 @@ private:
 medToolBoxFilteringCustom *createVistalProcessDenoisingToolBox(void);
 
 #endif
+
