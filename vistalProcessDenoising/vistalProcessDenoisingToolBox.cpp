@@ -156,16 +156,16 @@ void vistalProcessDenoisingToolBox::run(void)
 
     d->process->setParameter(d->sigma->text().toDouble(),0);
     d->process->setParameter(d->beta->text().toDouble(),1);
-    d->process->setParameter(d->slope->checkState() == Qt::Checked,2);
-    d->process->setParameter(d->neighborhoodType->checkState() == Qt::Checked,3);
+    d->process->setParameter((float)(d->slope->checkState() == Qt::Checked),2);
+    d->process->setParameter((float)(d->neighborhoodType->checkState() == Qt::Checked),3);
     d->process->setParameter(d->neighborhoodSize->text().toDouble(),4);
     d->process->setParameter(d->volumeOfSearch->text().toDouble(),5);
-    d->process->setParameter(d->testOnMean->checkState() == Qt::Checked,6);
-    d->process->setParameter(d->testOnVar->checkState() == Qt::Checked,7);
+    d->process->setParameter((float)(d->testOnMean->checkState() == Qt::Checked),6);
+    d->process->setParameter((float)(d->testOnVar->checkState() == Qt::Checked),7);
     d->process->setParameter(d->minimumMeanRatio->text().toDouble(),8);
     d->process->setParameter(d->minimumVarianceRatio->text().toDouble(),9);
-    d->process->setParameter(d->weightingMethod->checkState() == Qt::Checked,10);
-    d->process->setParameter(d->blockApproach->checkState() == Qt::Checked,11);
+    d->process->setParameter((float)(d->weightingMethod->checkState() == Qt::Checked),10);
+    d->process->setParameter((float)(d->blockApproach->checkState() == Qt::Checked),11);
     d->process->setParameter(d->distanceBetweenBlocks->text().toDouble(),12);
     d->process->setParameter(d->n_thread->text().toDouble(),13);
 
