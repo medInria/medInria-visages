@@ -72,7 +72,7 @@ option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageRea
 option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWriter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISING_PLUGIN     "Build vistalProcessDenoising plugin" "ON")
-option(BUILD_DOCUMENTATION "Build documentation"
+option(BUILD_DOCUMENTATION "Build documentation")
 
 if (MEDINRIA_BUILD_V3DDATA_PLUGIN)
   subdirs(v3dData)
