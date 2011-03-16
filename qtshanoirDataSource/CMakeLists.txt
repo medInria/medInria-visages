@@ -77,8 +77,7 @@ target_link_libraries(${PROJECT_NAME}
   ${QTSHANOIR_LIBS}
   dtkCore
   medCore
-  medGui
-  medSql)
+  medGui)
 
 dtk_build_doc(qtshanoirDataSourcePlugin)
 
