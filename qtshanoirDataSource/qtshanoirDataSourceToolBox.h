@@ -14,11 +14,13 @@ public:
 	qtshanoirDataSourceToolBox(QWidget *parent = 0);
 	~qtshanoirDataSourceToolBox(void);
 	
-	virtual medAbstractSourceDataPlugin *plugin();
-	
 public:
 	static bool registered(void);
 
+signals:
+  void importButtonPressed(void);
+  void findButtonPressed(void);
+  
 private:
 	qtshanoirDataSourceToolBoxPrivate *d;
 };

@@ -4,8 +4,10 @@
 
 #include "qtshanoirDataSource.h"
 
-#include <medCore/medSourceDataPluginFactory.h>
-#include <medSql/medDatabaseImporter.h>
+#include <medCore/medAbstractDataSourceFactory.h>
+#include <medGui/medToolBoxSourceData.h>
+#include <medGui/medToolBoxFactory.h>
+
 #include <QtShanoir.h>
 #include <QtShanoirTreeWidget.h>
 #include <QtShanoirSettingsWidget.h>
@@ -18,19 +20,26 @@
 class qtshanoirDataSourcePrivate
 {
 public:
-  	QtShanoirTreeWidget *mainWidget;
+  QtShanoirTreeWidget *mainWidget;
 	QtShanoirSettingsWidget *rightWidget;  
   
+  QList <medToolBoxSourceData *> additional_toolboxes;
 };
 
 // /////////////////////////////////////////////////////////////////
 // qtshanoirDataSource
 // /////////////////////////////////////////////////////////////////
 
-qtshanoirDataSource::qtshanoirDataSource(void) : medAbstractSourceDataPlugin(), d(new qtshanoirDataSourcePrivate)
+qtshanoirDataSource::qtshanoirDataSource(void) : medAbstractDataSource(), d(new qtshanoirDataSourcePrivate)
 {
 	d->mainWidget = NULL;
 	d->rightWidget = NULL;	
+
+  d->additional_toolboxes.clear();
+  d->additional_toolboxes.push_back(medToolBoxFactory::instance()->createSourceDataToolBox("qtshanoirDataSourceToolBox"));
+  
+  connect(d->additional_toolboxes.back(),SIGNAL(importButtonPressed()),this,SLOT(onImportData()));
+  connect(d->additional_toolboxes.back(),SIGNAL(findButtonPressed()),this,SLOT(find()));
 }
 
 QWidget *qtshanoirDataSource::widget()
@@ -57,7 +66,7 @@ void qtshanoirDataSource::initWidgets(void)
 	  return;
   
 	if(!d->mainWidget)
-	  	d->mainWidget = new QtShanoirTreeWidget();
+    d->mainWidget = new QtShanoirTreeWidget();
 	
 	if(!d->rightWidget)
 		d->rightWidget = new QtShanoirSettingsWidget();
@@ -68,23 +77,18 @@ void qtshanoirDataSource::initWidgets(void)
 
 qtshanoirDataSource::~qtshanoirDataSource(void)
 {
-  //if(d->mainWidget)
-	//	delete d->mainWidget;
-  //if(d->rightWidget)
-	//	delete d->rightWidget;
-  
 	delete d;  
 	d = NULL;
 }
 
 bool qtshanoirDataSource::registered(void)
 {
-    return medSourceDataPluginFactory::instance()->registerSourceDataPlugin("qtshanoirDataSource", createQtshanoirDataSource);
+  return medAbstractDataSourceFactory::instance()->registerDataSource("qtshanoirDataSource", createQtshanoirDataSource);
 }
 
 QString qtshanoirDataSource::description(void) const
 {
-    return "qtshanoirDataSource";
+  return "qtshanoirDataSource";
 }
 
 QString qtshanoirDataSource::tabName()
@@ -102,10 +106,8 @@ void qtshanoirDataSource::onImportData()
 }
 
 void qtshanoirDataSource::onDownloadFinished(QString fileName)
-{ 
-  	medDatabaseImporter *importer = new medDatabaseImporter(fileName);
-	connect(importer,SIGNAL(success()),this,SIGNAL(importedSuccess()));
-	QThreadPool::globalInstance()->start(importer);  
+{
+  emit dataImport(fileName);
 }
 
 void qtshanoirDataSource::find()
@@ -113,13 +115,26 @@ void qtshanoirDataSource::find()
 	QtShanoir::instance()->find();  
 }
 
+unsigned int qtshanoirDataSource::getNumberOfAdditionalToolBoxes()
+{
+  return d->additional_toolboxes.size();
+}
+
+medToolBoxSourceData * qtshanoirDataSource::getAdditionalToolBox(unsigned int i)
+{
+  if (i > this->getNumberOfAdditionalToolBoxes())
+    return NULL;
+  
+  return d->additional_toolboxes[i];
+}
+
 // /////////////////////////////////////////////////////////////////
 // Type instanciation
 // /////////////////////////////////////////////////////////////////
 
-medAbstractSourceDataPlugin *createQtshanoirDataSource(void)
+medAbstractDataSource *createQtshanoirDataSource(void)
 {
-    return new qtshanoirDataSource;
+  return new qtshanoirDataSource;
 }
 
 

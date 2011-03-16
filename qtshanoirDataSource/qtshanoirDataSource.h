@@ -5,43 +5,43 @@
 #ifndef QTSHANOIRDATASOURCE_H
 #define QTSHANOIRDATASOURCE_H
 
-#include <medCore/medAbstractSourceDataPlugin.h>
+#include <medCore/medAbstractDataSource.h>
 
 #include "qtshanoirDataSourcePluginExport.h"
 
 class qtshanoirDataSourcePrivate;
 class QtShanoirTreeWidget;
 
-class QTSHANOIRDATASOURCEPLUGIN_EXPORT qtshanoirDataSource : public medAbstractSourceDataPlugin
+class QTSHANOIRDATASOURCEPLUGIN_EXPORT qtshanoirDataSource : public medAbstractDataSource
 {
-    Q_OBJECT
-
+  Q_OBJECT
+  
 public:
-             qtshanoirDataSource(void);
-	    ~qtshanoirDataSource(void);
-
-    QString description(void) const;
-
-    static bool registered(void);
-    
-    QWidget *widget();
-    QWidget *sourceSelectorWidget();
-    QString tabName();
-    
-signals:
-     void importedSuccess(void);   
-	
+  qtshanoirDataSource(void);
+  ~qtshanoirDataSource(void);
+  
+  QString description(void) const;
+  
+  static bool registered(void);
+  
+  QWidget *widget();
+  QWidget *sourceSelectorWidget();
+  QString tabName();
+  
+  virtual unsigned int getNumberOfAdditionalToolBoxes();
+  virtual medToolBoxSourceData * getAdditionalToolBox(unsigned int i);
+  	
 public slots:
-    void find(void);
-    void onImportData(void);   
-    void onDownloadFinished(QString fileName);
-    
+  void find(void);
+  void onImportData(void);   
+  void onDownloadFinished(QString fileName);
+  
 private:
-    qtshanoirDataSourcePrivate *d;
-    void initWidgets(void);
+  qtshanoirDataSourcePrivate *d;
+  void initWidgets(void);
 };
 
-medAbstractSourceDataPlugin *createQtshanoirDataSource(void);
+medAbstractDataSource *createQtshanoirDataSource(void);
 
 #endif
 
