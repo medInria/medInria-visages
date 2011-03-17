@@ -15,7 +15,7 @@
 class qtshanoirDataSourcePluginPrivate 
 {
 public:
-    // Class variables go here.
+  // Class variables go here.
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -24,50 +24,47 @@ public:
 
 qtshanoirDataSourcePlugin::qtshanoirDataSourcePlugin(QObject *parent) : dtkPlugin(parent), d(new qtshanoirDataSourcePluginPrivate)
 {
-
+  
 }
 
 qtshanoirDataSourcePlugin::~qtshanoirDataSourcePlugin(void)
 {
-    delete d;
-
-    d = NULL;
+  delete d;
+  
+  d = NULL;
 }
 
 bool qtshanoirDataSourcePlugin::initialize(void)
 {
-    if(!qtshanoirDataSource::registered())
-	dtkWarning() << "Unable to register qtshanoirDataSource type";
-    
-    if(!qtshanoirDataSourceToolBox::registered())
-	dtkWarning() << "Unable to register qtshanoirDataSourceToolBox type";
-
-    return true;
+  if(!qtshanoirDataSource::registered())
+    dtkWarning() << "Unable to register qtshanoirDataSource type";
+  
+  return true;
 }
 
 bool qtshanoirDataSourcePlugin::uninitialize(void)
 {
-    return true;
+  return true;
 }
 
 QString qtshanoirDataSourcePlugin::name(void) const
 {
-    return "qtshanoirDataSourcePlugin";
+  return "qtshanoirDataSourcePlugin";
 }
 
 QString qtshanoirDataSourcePlugin::description(void) const
 {
-    return "Shanoir data source plugin";
+  return "Shanoir data source plugin";
 }
 
 QStringList qtshanoirDataSourcePlugin::tags(void) const
 {
-    return QStringList() << "shanoir" << "data" << "source";
+  return QStringList() << "shanoir" << "data" << "source";
 }
 
 QStringList qtshanoirDataSourcePlugin::types(void) const
 {
-    return QStringList() << "qtshanoirDataSource";
+  return QStringList() << "qtshanoirDataSource";
 }
 
 Q_EXPORT_PLUGIN2(qtshanoirDataSourcePlugin, qtshanoirDataSourcePlugin)

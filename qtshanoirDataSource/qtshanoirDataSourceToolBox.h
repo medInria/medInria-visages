@@ -1,12 +1,11 @@
 #ifndef QTSHANOIRDATASOURCETOOLBOX_H
 #define QTSHANOIRDATASOURCETOOLBOX_H
 
-#include <medGui/medToolBoxSourceData.h>
+#include <medGui/medToolBox.h>
 
 class qtshanoirDataSourceToolBoxPrivate;
-class medAbstractSourceDataPlugin;
 
-class qtshanoirDataSourceToolBox : public medToolBoxSourceData
+class qtshanoirDataSourceToolBox : public medToolBox
 {
 	Q_OBJECT
 	
@@ -14,9 +13,6 @@ public:
 	qtshanoirDataSourceToolBox(QWidget *parent = 0);
 	~qtshanoirDataSourceToolBox(void);
 	
-public:
-	static bool registered(void);
-
 signals:
   void importButtonPressed(void);
   void findButtonPressed(void);
@@ -24,7 +20,5 @@ signals:
 private:
 	qtshanoirDataSourceToolBoxPrivate *d;
 };
-
-medToolBoxSourceData *createqtshanoirDataSourceToolBox(void);
 
 #endif

@@ -29,7 +29,7 @@ public:
   QString tabName();
   
   virtual unsigned int getNumberOfAdditionalToolBoxes();
-  virtual medToolBoxSourceData * getAdditionalToolBox(unsigned int i);
+  virtual medToolBox * getAdditionalToolBox(unsigned int i);
   	
 public slots:
   void find(void);

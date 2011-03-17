@@ -3,10 +3,10 @@
 // /////////////////////////////////////////////////////////////////
 
 #include "qtshanoirDataSource.h"
+#include "qtshanoirDataSourceToolBox.h"
 
 #include <medCore/medAbstractDataSourceFactory.h>
-#include <medGui/medToolBoxSourceData.h>
-#include <medGui/medToolBoxFactory.h>
+#include <medGui/medToolBox.h>
 
 #include <QtShanoir.h>
 #include <QtShanoirTreeWidget.h>
@@ -23,7 +23,7 @@ public:
   QtShanoirTreeWidget *mainWidget;
 	QtShanoirSettingsWidget *rightWidget;  
   
-  QList <medToolBoxSourceData *> additional_toolboxes;
+  QList <medToolBox *> additional_toolboxes;
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ qtshanoirDataSource::qtshanoirDataSource(void) : medAbstractDataSource(), d(new 
 	d->rightWidget = NULL;	
 
   d->additional_toolboxes.clear();
-  d->additional_toolboxes.push_back(medToolBoxFactory::instance()->createSourceDataToolBox("qtshanoirDataSourceToolBox"));
+  d->additional_toolboxes.push_back(new qtshanoirDataSourceToolBox);
   
   connect(d->additional_toolboxes.back(),SIGNAL(importButtonPressed()),this,SLOT(onImportData()));
   connect(d->additional_toolboxes.back(),SIGNAL(findButtonPressed()),this,SLOT(find()));
@@ -120,7 +120,7 @@ unsigned int qtshanoirDataSource::getNumberOfAdditionalToolBoxes()
   return d->additional_toolboxes.size();
 }
 
-medToolBoxSourceData * qtshanoirDataSource::getAdditionalToolBox(unsigned int i)
+medToolBox * qtshanoirDataSource::getAdditionalToolBox(unsigned int i)
 {
   if (i > this->getNumberOfAdditionalToolBoxes())
     return NULL;

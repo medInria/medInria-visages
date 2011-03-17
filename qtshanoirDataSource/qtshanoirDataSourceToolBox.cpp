@@ -1,8 +1,6 @@
 #include "qtshanoirDataSource.h"
 #include "qtshanoirDataSourceToolBox.h"
 
-#include <medGui/medToolBoxFactory.h>
-#include <medGui/medToolBoxSourceData.h>
 #include <medCore/medAbstractDataSource.h>
 #include <medCore/medAbstractDataSourceFactory.h>
 #include <QtGui>
@@ -13,7 +11,7 @@ public:
 	QWidget *parent;
 };
 
-qtshanoirDataSourceToolBox::qtshanoirDataSourceToolBox(QWidget *parent) : medToolBoxSourceData(parent), d(new qtshanoirDataSourceToolBoxPrivate)
+qtshanoirDataSourceToolBox::qtshanoirDataSourceToolBox(QWidget *parent) : medToolBox(parent), d(new qtshanoirDataSourceToolBoxPrivate)
 {
 	// Parameters:
 	d->parent = parent;
@@ -43,14 +41,4 @@ qtshanoirDataSourceToolBox::~qtshanoirDataSourceToolBox(void)
 {
 	delete d;	
 	d = NULL;
-}
-
-bool qtshanoirDataSourceToolBox::registered(void)
-{
-	return medToolBoxFactory::instance()->registerSourceDataToolBox("qtshanoirDataSourceToolBox",createqtshanoirDataSourceToolBox);
-}
-
-medToolBoxSourceData *createqtshanoirDataSourceToolBox(void)
-{
-	return new qtshanoirDataSourceToolBox;
 }
