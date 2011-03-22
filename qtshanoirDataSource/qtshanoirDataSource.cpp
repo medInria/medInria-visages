@@ -107,7 +107,8 @@ void qtshanoirDataSource::onImportData()
 
 void qtshanoirDataSource::onDownloadFinished(QString fileName)
 {
-  emit dataImport(fileName);
+//  emit dataImport(fileName);
+  emit dataReceived(fileName);
 }
 
 void qtshanoirDataSource::find()

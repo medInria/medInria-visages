@@ -5,6 +5,8 @@
 #ifndef QTSHANOIRDATASOURCE_H
 #define QTSHANOIRDATASOURCE_H
 
+#include <QtGui>
+
 #include <medCore/medAbstractDataSource.h>
 
 #include "qtshanoirDataSourcePluginExport.h"
