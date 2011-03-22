@@ -67,16 +67,13 @@ option(MEDINRIA_BUILD_VTKDATAMESHWRITER_PLUGIN            "Build vtkDataMeshWrit
 option(MEDINRIA_BUILD_ITKDATADIFFUSIONGRADIENTLIST_PLUGIN "Build itkDataDiffusionGradientList plugin" "ON")
 option(MEDINRIA_BUILD_ITKDATATENSORIMAGE_PLUGIN           "Build itkDataTensorImage plugin" "ON")
 option(MEDINRIA_BUILD_ITKDATATENSORIMAGEREADER_PLUGIN     "Build itkDataTensorImageReader plugin" "ON")
-<<<<<<< HEAD
 option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     	  "Build qtshanoirDataSource plugin" "ON")
-=======
 option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageReader plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWriter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISING_PLUGIN     "Build vistalProcessDenoising plugin" "ON")
 option(BUILD_DOCUMENTATION "Build documentation")
->>>>>>> 1b7528cad994dcae13918fffe0b6ab49d2ef1baf
 
 if (MEDINRIA_BUILD_V3DDATA_PLUGIN)
   subdirs(v3dData)
