@@ -6,14 +6,6 @@
 
 #include <dtkCore/dtkAbstractProcessFactory.h>
 #include <dtkCore/dtkAbstractDataFactory.h>
-#include "itkDataImageToVistalDataImageDouble3Converter.h"
-#include "itkDataImageToVistalDataImageFloat3Converter.h"
-#include "itkDataImageToVistalDataImageInt3Converter.h"
-#include "itkDataImageToVistalDataImageShort3Converter.h"
-#include "itkDataImageToVistalDataImageChar3Converter.h"
-#include "itkDataImageToVistalDataImageUInt3Converter.h"
-#include "itkDataImageToVistalDataImageUShort3Converter.h"
-#include "itkDataImageToVistalDataImageUChar3Converter.h"
 
 #include "NLMeans_class.hh"
 #include <cstdlib>
