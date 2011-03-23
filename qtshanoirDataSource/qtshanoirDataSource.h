@@ -24,12 +24,11 @@ public:
   
   static bool registered(void);
   
-  QWidget *widget();
+  QWidget *mainViewWidget();
   QWidget *sourceSelectorWidget();
   QString tabName();
   
-  virtual unsigned int getNumberOfAdditionalToolBoxes();
-  virtual medToolBox * getAdditionalToolBox(unsigned int i);
+  QList<medToolBox*> getToolboxes();
   	
 public slots:
   void find(void);

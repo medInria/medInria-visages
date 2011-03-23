@@ -42,7 +42,7 @@ qtshanoirDataSource::qtshanoirDataSource(void) : medAbstractDataSource(), d(new 
   connect(d->additional_toolboxes.back(),SIGNAL(findButtonPressed()),this,SLOT(find()));
 }
 
-QWidget *qtshanoirDataSource::widget()
+QWidget *qtshanoirDataSource::mainViewWidget()
 {
 	if (d->mainWidget)
 		return d->mainWidget;
@@ -107,7 +107,7 @@ void qtshanoirDataSource::onImportData()
 
 void qtshanoirDataSource::onDownloadFinished(QString fileName)
 {
-  emit dataImport(fileName);
+  emit dataReceived(fileName);
 }
 
 void qtshanoirDataSource::find()
@@ -115,17 +115,9 @@ void qtshanoirDataSource::find()
 	QtShanoir::instance()->find();  
 }
 
-unsigned int qtshanoirDataSource::getNumberOfAdditionalToolBoxes()
-{
-  return d->additional_toolboxes.size();
-}
-
-medToolBox * qtshanoirDataSource::getAdditionalToolBox(unsigned int i)
-{
-  if (i > this->getNumberOfAdditionalToolBoxes())
-    return NULL;
-  
-  return d->additional_toolboxes[i];
+QList<medToolBox*> qtshanoirDataSource::getToolboxes()
+{  
+  return d->additional_toolboxes;
 }
 
 // /////////////////////////////////////////////////////////////////
