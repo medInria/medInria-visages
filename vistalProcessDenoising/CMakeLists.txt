@@ -36,6 +36,11 @@ include(dtkPlugin)
 find_package(Vistal REQUIRED)
 include(${VISTAL_USE_FILE})
 
+# medinria
+find_package(medinria REQUIRED)
+include(${medinria_USE_FILE})
+
+
 ## #################################################################
 ## Input
 ## #################################################################

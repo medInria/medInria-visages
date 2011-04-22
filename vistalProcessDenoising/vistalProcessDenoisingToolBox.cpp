@@ -176,7 +176,7 @@ void vistalProcessDenoisingToolBox::run(void)
 
 }
 
-medToolBoxFilteringCustom *createVistalProcessDenoisingToolBox(void)
+medToolBoxFilteringCustom *createVistalProcessDenoisingToolBox(QWidget *parent)
 {
-    return new vistalProcessDenoisingToolBox;
+    return new vistalProcessDenoisingToolBox(parent);
 }
