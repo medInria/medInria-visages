@@ -72,7 +72,7 @@ void qtshanoirDataSource::initWidgets(void)
 		d->rightWidget = new QtShanoirSettingsWidget();
 	
 	QtShanoir::instance()->attachTreeWidget(d->mainWidget);
-	QtShanoir::instance()->initWS();     
+	QtShanoir::instance()->init();     
 }
 
 qtshanoirDataSource::~qtshanoirDataSource(void)
