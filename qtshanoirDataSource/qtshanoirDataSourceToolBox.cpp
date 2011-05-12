@@ -1,5 +1,6 @@
 #include "qtshanoirDataSource.h"
 #include "qtshanoirDataSourceToolBox.h"
+#include <QtShanoirSearchWidget.h>
 
 #include <medCore/medAbstractDataSource.h>
 #include <medCore/medAbstractDataSourceFactory.h>
@@ -22,11 +23,15 @@ qtshanoirDataSourceToolBox::qtshanoirDataSourceToolBox(QWidget *parent) : medToo
 	findButton->setIcon(QIcon(":/icons/zoom.png"));
 	QPushButton * downloadButton = new QPushButton("Import", this);
 	downloadButton->setIcon(QIcon(":/icons/download.png"));
-	
+  	
 	QObject::connect(findButton, SIGNAL(clicked()), this, SIGNAL(findButtonPressed()));
 	QObject::connect(downloadButton, SIGNAL(clicked()), this, SIGNAL(importButtonPressed()));
 	
 	QVBoxLayout *shanoirToolboxLayout = new QVBoxLayout(widget);
+  
+  QtShanoirSearchWidget *searchWidget = new QtShanoirSearchWidget;
+	shanoirToolboxLayout->addWidget(searchWidget);
+  
 	shanoirToolboxLayout->addWidget(findButton);
 	shanoirToolboxLayout->addWidget(downloadButton);
   
