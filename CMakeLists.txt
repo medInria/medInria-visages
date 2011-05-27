@@ -86,7 +86,7 @@ if (MEDINRIA_BUILD_VISTALPROCESSDENOISING_PLUGIN)
     subdirs(vistalProcessDenoising)
 endif()
 
-if (MEDINRIA_BUILD_VISTALPROCESSDENOISING_PLUGIN)
+if (MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN)
     subdirs(qtshanoirDataSource)
 endif()
 
