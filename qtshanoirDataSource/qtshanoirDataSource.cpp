@@ -25,7 +25,7 @@ class qtshanoirDataSourcePrivate
 {
 public:
   QtShanoirTreeWidget *mainWidget;
-	QtShanoirSettingsWidget *rightWidget;  
+	QtShanoirSettingsWidget *rightWidget;
   
   QString lastSuccessfulReaderDescription;
   
@@ -39,7 +39,7 @@ public:
 qtshanoirDataSource::qtshanoirDataSource(void) : medAbstractDataSource(), d(new qtshanoirDataSourcePrivate)
 {
 	d->mainWidget = NULL;
-	d->rightWidget = NULL;	
+	d->rightWidget = NULL;
 
   d->additional_toolboxes.clear();
   d->additional_toolboxes.push_back(new qtshanoirDataSourceToolBox);
