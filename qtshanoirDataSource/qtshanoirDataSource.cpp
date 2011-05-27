@@ -164,12 +164,11 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
 
 dtkAbstractDataReader* qtshanoirDataSource::getSuitableReader(QStringList filename)
 {
-  typedef dtkAbstractDataFactory::dtkAbstractDataTypeHandler dtkAbstractDataTypeHandler;
-  QList<dtkAbstractDataTypeHandler> readers = dtkAbstractDataFactory::instance()->readers();
+  QList<QString> readers = dtkAbstractDataFactory::instance()->readers();
   
   // cycle through readers to see if the last used reader can handle the file
   for (int i=0; i<readers.size(); i++) {
-    dtkAbstractDataReader* dataReader = dtkAbstractDataFactory::instance()->reader(readers[i].first, readers[i].second);
+    dtkAbstractDataReader* dataReader = dtkAbstractDataFactory::instance()->reader(readers[i]);
     if (d->lastSuccessfulReaderDescription == dataReader->description() && dataReader->canRead( filename ))
       return dataReader;
     else
@@ -177,7 +176,7 @@ dtkAbstractDataReader* qtshanoirDataSource::getSuitableReader(QStringList filena
   }
   
   for (int i=0; i<readers.size(); i++) {
-    dtkAbstractDataReader* dataReader = dtkAbstractDataFactory::instance()->reader(readers[i].first, readers[i].second);
+    dtkAbstractDataReader* dataReader = dtkAbstractDataFactory::instance()->reader(readers[i]);
     if (dataReader->canRead( filename )){
       d->lastSuccessfulReaderDescription = dataReader->description();
       return dataReader;
