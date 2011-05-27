@@ -4,6 +4,7 @@
 
 #include "qtshanoirDataSource.h"
 #include "qtshanoirDataSourceToolBox.h"
+#include "qtshanoirDataSourceProgressToolBox.h"
 
 #include <medCore/medAbstractDataSourceFactory.h>
 #include <medGui/medToolBox.h>
@@ -42,10 +43,13 @@ qtshanoirDataSource::qtshanoirDataSource(void) : medAbstractDataSource(), d(new 
 	d->rightWidget = NULL;
 
   d->additional_toolboxes.clear();
+  
   d->additional_toolboxes.push_back(new qtshanoirDataSourceToolBox);
   
   connect(d->additional_toolboxes.back(),SIGNAL(importButtonPressed()),this,SLOT(onImportData()));
   connect(d->additional_toolboxes.back(),SIGNAL(findButtonPressed()),this,SLOT(find()));
+
+  d->additional_toolboxes.push_back(new qtshanoirDataSourceProgressToolBox);
 }
 
 QWidget *qtshanoirDataSource::mainViewWidget()

@@ -1,7 +1,6 @@
 #include "qtshanoirDataSource.h"
 #include "qtshanoirDataSourceToolBox.h"
 #include <QtShanoirSearchWidget.h>
-#include <QtShanoirProgressWidget.h>
 #include <QtShanoir.h>
 
 #include <medCore/medAbstractDataSource.h>
@@ -12,14 +11,12 @@ class qtshanoirDataSourceToolBoxPrivate
 {
 public:
 	QWidget *parent;
-  QtShanoirProgressWidget *progressWidget;
 };
 
 qtshanoirDataSourceToolBox::qtshanoirDataSourceToolBox(QWidget *parent) : medToolBox(parent), d(new qtshanoirDataSourceToolBoxPrivate)
 {
 	// Parameters:
 	d->parent = parent;
-  d->progressWidget = NULL;
 	
   QWidget *widget = new QWidget(this);
 	
@@ -39,13 +36,6 @@ qtshanoirDataSourceToolBox::qtshanoirDataSourceToolBox(QWidget *parent) : medToo
 	shanoirToolboxLayout->addWidget(findButton);
 	shanoirToolboxLayout->addWidget(downloadButton);
   
-	if(!d->progressWidget)
-    d->progressWidget = new QtShanoirProgressWidget();
-
-	shanoirToolboxLayout->addWidget(d->progressWidget);
-  
-  QtShanoir::instance()->attachProgressWidget(d->progressWidget);
-
 	widget->setLayout(shanoirToolboxLayout);
 	
 	this->addWidget(widget);
