@@ -49,6 +49,7 @@ endif (QTSHANOIR_FOUND)
 set(${PROJECT_NAME}_HEADERS_MOC
   qtshanoirDataSourcePlugin.h
   qtshanoirDataSource.h
+  qtshanoirDataSourceProgressToolBox.h
   qtshanoirDataSourceToolBox.h)
 
 set(${PROJECT_NAME}_HEADERS
@@ -57,6 +58,7 @@ set(${PROJECT_NAME}_HEADERS
 set(${PROJECT_NAME}_SOURCES
   qtshanoirDataSourcePlugin.cpp
   qtshanoirDataSource.cpp
+  qtshanoirDataSourceProgressToolBox.cpp
   qtshanoirDataSourceToolBox.cpp)
 
 ## #################################################################

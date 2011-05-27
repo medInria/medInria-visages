@@ -13,6 +13,7 @@
 
 class qtshanoirDataSourcePrivate;
 class QtShanoirTreeWidget;
+class dtkAbstractDataReader;
 
 class QTSHANOIRDATASOURCEPLUGIN_EXPORT qtshanoirDataSource : public medAbstractDataSource
 {
@@ -35,10 +36,11 @@ public:
 public slots:
   void find(void);
   void onImportData(void);   
-  void onDownloadFinished(QString fileName);
+  void onDownloadFinished(QString fileName, QString xmlName);
   
 private:
   qtshanoirDataSourcePrivate *d;
+  dtkAbstractDataReader* getSuitableReader(QStringList filename);
   void initWidgets(void);
 };
 
