@@ -148,7 +148,10 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
     }
 
     else if (data->description() == "itkDataImageDouble3")
-    {	
+    {
+        qDebug() << "entering case itkDataImageDouble3";
+        data->addConverter("itkDataImageToVistalDataImageDouble3Converter");
+        data->enableConverter("itkDataImageToVistalDataImageDouble3Converter");
 	d->input = data->convert("vistalDataImageDouble3");
 	
 	if (!d->input)
