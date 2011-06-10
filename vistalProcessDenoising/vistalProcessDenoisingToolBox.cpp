@@ -120,13 +120,6 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       parametersLayout->addWidget(d->neighborhoodType);
       parametersLayout->addWidget(cubic);
 
-//      parametersLayout->addWidget(d->sigma);
-//      parametersLayout->addWidget("&Beta :",d->beta);
-//      parametersLayout->addWidget("&Neighboring size :",d->neighborhoodSize);
-//      parametersLayout->addWidget("&Volume of search :",d->volumeOfSearch);
-//      parametersLayout->addWidget("&Weighting method (Pearson divergence/classic exponential) ?",d->weightingMethod);
-//      parametersLayout->addWidget("&Isotropic/Cubic neighborhood ?",d->neighborhoodType);
-
       QGroupBox *groupParameters = new QGroupBox("Mandatory");
       groupParameters->setLayout(parametersLayout);
 
@@ -178,17 +171,9 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       optionsLayout->addWidget(numberOfThreads);
       optionsLayout->addWidget(d->n_thread);
 
-//      optionsLayout->addWidget("Use block approach ?",d->blockApproach);
-//      optionsLayout->addWidget("Distance between blocks :",d->distanceBetweenBlocks);
-//      optionsLayout->addWidget("Test on mean ?",d->testOnMean);
-//      optionsLayout->addWidget("Lowest bound of mean ratio :",d->minimumMeanRatio);
-//      optionsLayout->addWidget("Test on variance ?",d->testOnVar);
-//      optionsLayout->addWidget("Lowest bound of variance ratio :",d->minimumVarianceRatio);
-//      optionsLayout->addWidget("Number of threads :",d->n_thread);
-
       QGroupBox *groupOptions = new QGroupBox("Optional");
       groupOptions->setLayout(optionsLayout);
-//
+
       // Run button:
 
       QPushButton *runButton = new QPushButton(tr("Run"));
@@ -199,14 +184,14 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       layprinc->addWidget(groupParameters);
       layprinc->addWidget(groupOptions);
       layprinc->addWidget(runButton);
-//
+
       QWidget *widget = new QWidget(this);
       widget->setLayout(layprinc);
-//
-      //Toolbox:
+
+      // Main toolbox:
       this->setTitle("NLMeans settings");
       this->addWidget(widget);
-//
+
       connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
 }
