@@ -61,7 +61,7 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       sigmaBox->addWidget(d->sigma);
 
       QLabel *betaLabel = new QLabel("Beta : ");
-      d->beta = new QLineEdit("1");
+      d->beta = new QLineEdit("0.5");
 
       QHBoxLayout *betaBox = new QHBoxLayout();
       betaBox->addWidget(betaLabel);
@@ -156,7 +156,7 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       minVarRat->addWidget(d->minimumVarianceRatio);
 
       QLabel *numberOfThreads = new QLabel("Multithread :");
-      d->n_thread = new QLineEdit("1");
+      d->n_thread = new QLineEdit("2");
 
       QVBoxLayout *optionsLayout = new QVBoxLayout();
       optionsLayout->addWidget(d->blockApproach);
