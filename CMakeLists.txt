@@ -58,7 +58,7 @@ option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" 
 option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageReader plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWriter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
-option(MEDINRIA_BUILD_VISTALPROCESSDENOISING_PLUGIN     "Build vistalProcessDenoising plugin" "ON")
+option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build vistalProcessDenoisingNLMeans plugin" "ON")
 option(BUILD_DOCUMENTATION "Build documentation")
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
@@ -81,8 +81,8 @@ if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
     set(MEDINRIA_REQUIRES_ITK TRUE)
 endif()
 
-if (MEDINRIA_BUILD_VISTALPROCESSDENOISING_PLUGIN)
-    subdirs(vistalProcessDenoising)
+if (MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN)
+    subdirs(vistalProcessDenoisingNLMeans)
 endif()
 
 if(BUILD_DOCUMENTATION)
