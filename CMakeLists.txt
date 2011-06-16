@@ -60,6 +60,7 @@ option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWri
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISING_PLUGIN     "Build vistalProcessDenoising plugin" "ON")
 option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "ON")
+option(MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN     "Build qtdcmDataSource plugin" "ON")
 option(BUILD_DOCUMENTATION "Build documentation")
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
@@ -88,6 +89,10 @@ endif()
 
 if (MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN)
     subdirs(qtshanoirDataSource)
+endif()
+
+if (MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN)
+    subdirs(qtdcmDataSource)
 endif()
 
 if(BUILD_DOCUMENTATION)
