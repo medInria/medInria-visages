@@ -91,7 +91,9 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
     }
     
     else if (data->description() == "itkDataImageChar3")
-    {              
+    {
+        data->addConverter("itkDataImageToVistalDataImageChar3Converter");
+        data->enableConverter("itkDataImageToVistalDataImageChar3Converter");
         d->input = data->convert("vistalDataImageChar3");	
 
 	if (!d->input)
@@ -99,9 +101,9 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
     }   
  
     else if (data->description() == "itkDataImageUChar3")
-    {      
-        qDebug() << "itkDataImageUChar3 toto";
-        
+    {
+        data->addConverter("itkDataImageToVistalDataImageUChar3Converter");
+        data->enableConverter("itkDataImageToVistalDataImageUChar3Converter");
         d->input = data->convert("vistalDataImageUChar3");	
 
 	if (!d->input)
@@ -110,13 +112,17 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
 
     else if (data->description() == "itkDataImageShort3")
     {
+        data->addConverter("itkDataImageToVistalDataImageShort3Converter");
+        data->enableConverter("itkDataImageToVistalDataImageShort3Converter");
 	d->input = data->convert("vistalDataImageShort3");
 	if (!d->input)	  	  
 	  return;	
     }
 
     else if (data->description() == "itkDataImageUShort3")
-    {       
+    {
+        data->addConverter("itkDataImageToVistalDataImageUShort3Converter");
+        data->enableConverter("itkDataImageToVistalDataImageUShort3Converter");
         d->input = data->convert("vistalDataImageUShort3");
 	
 	if (!d->input)  
@@ -124,7 +130,9 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
     }
 
     else if (data->description() == "itkDataImageInt3")
-    {		
+    {
+        data->addConverter("itkDataImageToVistalDataImageInt3Converter");
+        data->enableConverter("itkDataImageToVistalDataImageInt3Converter");
 	d->input = data->convert("vistalDataImageInt3");
 	
 	if (!d->input)
@@ -132,7 +140,9 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
     }
     
     else if (data->description() == "itkDataImageUInt3")
-    {		
+    {
+        data->addConverter("itkDataImageToVistalDataImageUInt3Converter");
+        data->enableConverter("itkDataImageToVistalDataImageUInt3Converter");
 	d->input = data->convert("vistalDataImageUInt3");
 	
 	if (!d->input)
@@ -141,6 +151,8 @@ void vistalProcessDenoising::setInput(dtkAbstractData *data)
 
     else if (data->description() == "itkDataImageFloat3")
     {
+        data->addConverter("itkDataImageToVistalDataImageFloat3Converter");
+        data->enableConverter("itkDataImageToVistalDataImageFloat3Converter");
         d->input = data->convert("vistalDataImageFloat3");       
 
 	if (!(d->input))
@@ -279,7 +291,7 @@ void vistalProcessDenoising::setParameter(double  data, int channel)
 	case (13):
 		d->N_thread = (unsigned int)data;
 		qDebug() << "channel = " << channel << "  data = " << data;
-		qDebug() << "N_thread = " << d->N_thread;
+		qDebug() << "number of threads : " << d->N_thread;
 		break;
         default :
                 return;
