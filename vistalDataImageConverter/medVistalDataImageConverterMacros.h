@@ -74,8 +74,6 @@ itkDataImageToVistalDataImage##suffix##Converter::itkDataImageToVistalDataImage#
 } \
 itkDataImageToVistalDataImage##suffix##Converter::~itkDataImageToVistalDataImage##suffix##Converter(void) \
 { \
-	if (d->tmpOut) \
-		delete d->tmpOut; \
 	if (d->vistalConverter) \
 		delete d->vistalConverter; \
 } \
@@ -102,9 +100,10 @@ dtkAbstractData *itkDataImageToVistalDataImage##suffix##Converter::convert(void)
 		return NULL; \
 	if (data->description() == "itkDataImage"#suffix) { \
 		if ( itk::Image<type, 3>::Pointer image = static_cast<itk::Image<type, 3> *>( data->data() ) ) { \
-			qDebug() << "create converter"; \
 			if (d->vistalConverter == NULL) \
+      { \
 				d->vistalConverter = new itkImage3D<type> (image); \
+      } \
 			if (!d->output) \
 				d->output = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffix); \
 			if (!d->output) \
