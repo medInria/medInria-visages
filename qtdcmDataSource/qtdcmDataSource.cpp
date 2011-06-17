@@ -9,6 +9,8 @@
 
 #include <QtDcm.h>
 #include <QtDcmPreferencesWidget.h>
+#include <QtDcmManager.h>
+#include <QtDcmPreferences.h>
 
 #include <dtkCore/dtkAbstractDataReader.h>
 #include <dtkCore/dtkAbstractDataFactory.h>
@@ -85,7 +87,7 @@ QString qtdcmDataSource::tabName()
 
 QList<medToolBox*> qtdcmDataSource::getToolboxes()
 {
-  return QList<medToolBox *> ();
+    return QList<medToolBox *> ();
 }
 
 void qtdcmDataSource::initWidgets ( void )
@@ -94,11 +96,15 @@ void qtdcmDataSource::initWidgets ( void )
         return;
 
     if ( !d->mainWidget )
+    {
         d->mainWidget = new QtDCM();
 
-    if ( !d->rightWidget )
-        d->rightWidget = new QtDcmPreferencesWidget();
-
+        if ( !d->rightWidget )
+        {
+            d->rightWidget = new QtDcmPreferencesWidget();
+            d->rightWidget->setPreferences(d->mainWidget->getManager()->getPreferences());
+        }
+    }
 //     QtShanoir::instance()->attachTreeWidget(d->mainWidget);
 //     QtShanoir::instance()->init();
 }
