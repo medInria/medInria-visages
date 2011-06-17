@@ -91,7 +91,7 @@ int main(int argc, char **argv)
         sinkImage->enableReader("vistalDataImageReader");
         sinkImage->read(sink);
 
-        dtkAbstractProcess *process = dynamic_cast <dtkAbstractProcess *>(dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentation"));
+        dtkAbstractProcess *process = dynamic_cast <dtkAbstractProcess *>(dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentationSTREM"));
 
         process->setInput(inputImage,0); // input image
 

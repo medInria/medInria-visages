@@ -52,12 +52,18 @@ include(Dart)
 ## Input
 ## #################################################################
 
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
 set(DEPENDS_ON_DTK 1)
 
 option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageReader plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWriter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
+option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN     "Build vistalProcessSegmentationSTREM plugin" "ON")
+
+
 option(BUILD_DOCUMENTATION "Build documentation")
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
@@ -75,6 +81,13 @@ endif()
 if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
     subdirs(vistalDataImageConverter)
 endif()
+
+if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN)
+
+    subdirs(vistalProcessSegmentationSTREM)
+endif()
+
+
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)    
     set(MEDINRIA_REQUIRES_ITK TRUE)

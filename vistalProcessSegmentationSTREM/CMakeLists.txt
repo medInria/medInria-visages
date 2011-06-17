@@ -41,6 +41,17 @@ include(${VISTAL_USE_FILE})
 find_package(medinria REQUIRED)
 include(${medinria_USE_FILE})
 
+
+
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
+# mstools
+#    find_package(MSTools REQUIRED)
+
+
+SET(MSTOOLS_INC /Users/nwiestda/Work/Neurinfo/mstools/trunk/Sources/Libraries/Common /Users/nwiestda/Work/Neurinfo/mstools/trunk/Sources/Libraries/Classification)
+SET(MSTOOLS_LIB /Users/nwiestda/Work/Neurinfo/mstools/build/lib/libmstools.a)
+
 ## #################################################################
 ## Input
 ## #################################################################
@@ -69,11 +80,15 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
+  ${MSTOOLS_LIB}
   ${VISTAL_LIBS}
   dtkCore
   medCore)
 
 dtk_build_doc(vistalProcessSegmentationSTREMPlugin)
+
+
+include_directories(${MSTOOLS_INC})
 
 add_executable(${PROJECT_NAME}Testing
   vistalProcessSegmentationSTREMTestingApp.cpp
