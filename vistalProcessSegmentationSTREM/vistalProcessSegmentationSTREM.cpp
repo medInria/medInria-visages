@@ -15,6 +15,26 @@
 #include "mstoolsGaussian.h"
 #include "mstoolsStraInitializer.h"
 #include "mstoolsHierarchicalInitializer.h"
+
+
+#include "mstoolsClassificationFunctions.h"
+
+#include "mstoolsAtlasRandomInitializer.h"
+#include "mstoolsModelInitializer.h"
+#include "mstoolsJointHistogramNdims.h"
+
+#include "mstoolsClassEstimator.h"
+#include "mstoolsGaussian.h"
+#include "mstoolsGaussianREMEstimator.h"
+#include "mstoolsGaussianEMEstimator.h"
+#include "mstoolsGaussianCeleuxREMEstimator.h"
+#include "mstoolsGaussianCeleuxEMEstimator.h"
+#include "mstoolsImageClassifier.h" 
+#include "mstoolsRulesLesionClassifier.h"
+
+#include "mstoolsClassificationStrategy.h"
+
+
 //#include "mstoolsIO.h"
 
 
@@ -28,17 +48,28 @@ public:
 	vistalProcessSegmentationSTREMPrivate();
 	~vistalProcessSegmentationSTREMPrivate();
 	// Channel 0 to 2
-	std::vector< vistal::Image3D<unsigned char>* > input;
+	std::vector< vistal::Image3D<unsigned char>* > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
 	// Channel 3
-	vistal::Image3D<unsigned char>* mask;
+	vistal::Image3D<unsigned char>* mask; // Mask image
 
 
-		enum InitialisationMethod { StraInit, HierarchicalPD, HierarchicalFLAIR } initMethod;
+	enum InitialisationMethod { StraInit, HierarchicalPD, HierarchicalFLAIR } initMethod; // Type of initialisation for the EM, D. Garcia used Hierachical PD or FLAIR depending on the input
+	// Rejection Ratio 
+	double rejectionRatio;
 	
+	enum ApproachEM { GaussianEM, GaussianCeleuxREM, GaussianREM } approachEM;
+	
+	double minDistance; // = 1e-4;
+	int emIter; 
+	int strem;
 	
 };
 
-vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): input(3)
+vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): 
+	input(3), 
+	rejectionRatio(0.2),  minDistance(1e-4), emIter(10), strem(0)
+// -0 -iter 200 dist 1e-3 
+// show outliers, set iteration to 200, mindistance 1e-3, 
 {
 	
 }
@@ -92,6 +123,9 @@ void vistalProcessSegmentationSTREM::setParameter(double  data, int channel)
         switch(channel){
 
 		   case(0):
+				//if (data == 0)
+//					d->initMethod = vistalProcessSegmentationSTREMPrivate::Unset;
+//				else
 				if (data == 0)
 					d->initMethod = vistalProcessSegmentationSTREMPrivate::StraInit;
 				else if (data == 1)
@@ -99,6 +133,31 @@ void vistalProcessSegmentationSTREM::setParameter(double  data, int channel)
 				else if (data == 2)
 					d->initMethod = vistalProcessSegmentationSTREMPrivate::HierarchicalFLAIR;
 				break;				
+				
+			case 1:
+				if (data > 0 && data < 1)				
+					d->rejectionRatio = data;
+				else d->rejectionRatio = 0;
+				
+				break;
+				
+			case 2:
+				if (data == 0)
+					d->approachEM = vistalProcessSegmentationSTREMPrivate::GaussianEM;
+			else if (data == 1)
+				d->approachEM = vistalProcessSegmentationSTREMPrivate::GaussianCeleuxREM;
+			else if (data == 2)
+				d->approachEM = vistalProcessSegmentationSTREMPrivate::GaussianREM  ;
+				break;
+				
+			case 3:
+				d->minDistance = data;//1e-4;
+				break;
+				
+			case 4:
+				d->emIter = data;
+				break;
+				
 //                    d->alpha = data;
 //                    break;
 //            case(1):
@@ -136,7 +195,8 @@ void vistalProcessSegmentationSTREM::setParameter(double  data, int channel)
 int vistalProcessSegmentationSTREM::update(void)
 {
 	using namespace mstools;
-	// Stra Init Part
+	// Starting  strainit binary code
+	
 	std::vector<vistal::Image3D<unsigned char> > input;
 	for (unsigned i = 0; i < d->input.size(); ++i)
 		input.push_back(*d->input[i]);
@@ -158,14 +218,14 @@ int vistalProcessSegmentationSTREM::update(void)
 				if(!init. getInitialization(initia)) return -1;
 			break;
 		}
-		case vistalProcessSegmentationSTREMPrivate::HierarchicalPD:
+		case vistalProcessSegmentationSTREMPrivate::HierarchicalPD: // If third image is T2 use this init
 		{
 			std::vector<std::string> seq;
 			HierarchicalInitializer init(input,*d->mask,seq,false,0.01,false);
 			if(!init. getInitialization(initia)) return -1;
 			break;
 		}
-		case vistalProcessSegmentationSTREMPrivate::HierarchicalFLAIR:
+		case vistalProcessSegmentationSTREMPrivate::HierarchicalFLAIR: // If third image is FLAIR use this init
 		{
 			std::vector<std::string> seq;
 			HierarchicalInitializer init(input,*d->mask,seq,true,0.01,false);
@@ -175,7 +235,83 @@ int vistalProcessSegmentationSTREM::update(void)
 		default:
 		 return -1;
 	}
+	
+	// Starting Classification binary code
+	
+	int modalities = 3;
+	
+	JointHistogramNdims jointHistogram;
+	std::vector<double> min( modalities, 255.0 ); //min values for random initialization
+	std::vector<double> max( modalities, 0.0 ); //max values for random initialization
+	
+	for (unsigned i = 0; i < 3; ++i) min[i] = vistal::stats::GetMinPixelValue( input[ i ] , *d->mask );
+	for (unsigned i = 0; i < 3; ++i) max[i] = vistal::stats::GetMaxPixelValue( input[ i ] , *d->mask );
+	
+	if (! jointHistogram.createJointHistogram( input, *d->mask, false ))
+			return -1;  // Joint histogram construction failure
+	
+	
+	std::vector<unsigned int> emSteps( 1, 1 );
+	std::vector<unsigned int> iterSteps( 1, 100 );
+	
+	ClassEstimator *estimator = NULL;
+	
+	switch (d->approachEM)
+	{
+		case vistalProcessSegmentationSTREMPrivate::GaussianCeleuxREM:
+				estimator = new GaussianCeleuxREMEstimator( iterSteps[ 0 ], d->minDistance, d->emIter, d->strem );
+				dynamic_cast<GaussianCeleuxREMEstimator *>( estimator ) ->setRejectionRatio( d->rejectionRatio );
+			break;
+		case vistalProcessSegmentationSTREMPrivate::GaussianEM:
+			  estimator = new GaussianEMEstimator( iterSteps[ 0 ], d->minDistance );
+			break;
+		case vistalProcessSegmentationSTREMPrivate::GaussianREM:
+			estimator = new GaussianREMEstimator( iterSteps[ 0 ], d->minDistance, d->emIter, d->strem );
+			dynamic_cast<GaussianREMEstimator *>( estimator ) ->setRejectionRatio( d->rejectionRatio );
 
+			break;
+	}
+	
+	estimator->setJointHistogram(jointHistogram);
+	
+	estimator->setModel(initia);
+	
+	unsigned iterations = 0;
+	
+	double value = estimator->run(iterations);
+	
+	
+	FiniteModel solution = estimator->getModel();
+	
+	// Got the segmentation ....
+	
+	if (solution.size() != 0)
+	{
+		ImageClassifier classifier;
+        //Create classification output
+        classifier.setModel( solution );
+		
+		vistal::Image3D<unsigned char> outima;
+		
+		classifier.getOutputImage( input , *d->mask, outima );
+
+		// Fixme tell medINRIA that outima is the output....
+		
+	//	if (d->showOutliers)
+//		{
+//		}
+//		
+		
+		
+	}
+	
+	delete estimator;
+	
+	
+	// Now apply the nlesions binary
+	
+	
+	
 	
 	
   return EXIT_SUCCESS;
