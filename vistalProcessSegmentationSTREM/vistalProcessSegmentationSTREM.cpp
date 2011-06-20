@@ -33,6 +33,12 @@
 #include "mstoolsRulesLesionClassifier.h"
 
 #include "mstoolsClassificationStrategy.h"
+#include "Labelize.hh"
+#include "mstoolsRulesLesionClassifier.h"
+#include "mstoolsMahalanobisThreshold.h"
+#include "mstoolsChi2.h"
+
+
 
 
 //#include "mstoolsIO.h"
@@ -51,8 +57,8 @@ public:
 	std::vector< vistal::Image3D<unsigned char>* > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
 	// Channel 3
 	vistal::Image3D<unsigned char>* mask; // Mask image
-
-
+	
+	
 	enum InitialisationMethod { StraInit, HierarchicalPD, HierarchicalFLAIR } initMethod; // Type of initialisation for the EM, D. Garcia used Hierachical PD or FLAIR depending on the input
 	// Rejection Ratio 
 	double rejectionRatio;
@@ -63,11 +69,19 @@ public:
 	int emIter; 
 	int strem;
 	
+	/* nlesions parameterts*/
+	double mahalanobisThreshold, rulesThreshold;
+	int minsize, wmneighbor;
+	
+
 };
 
 vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): 
-	input(3), 
-	rejectionRatio(0.2),  minDistance(1e-4), emIter(10), strem(0)
+input(3), 
+rejectionRatio(0.2),  minDistance(1e-4), emIter(10), strem(0),
+mahalanobisThreshold(.4), rulesThreshold(3.),
+minsize(6), wmneighbor(0.05)
+
 // -0 -iter 200 dist 1e-3 
 // show outliers, set iteration to 200, mindistance 1e-3, 
 {
@@ -113,82 +127,100 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 		d->input[channel] = static_cast<vistal::Image3D<unsigned char>* >(data->convert("vistalDataImageUChar3")->data());
 	if (channel == 3)
 		d->mask = static_cast<vistal::Image3D<unsigned char>* >(data->convert("vistalDataImageUChar3")->data());
-
-
+	
+	
 }
 
 
 void vistalProcessSegmentationSTREM::setParameter(double  data, int channel)
 {
-        switch(channel){
-
-		   case(0):
-				//if (data == 0)
-//					d->initMethod = vistalProcessSegmentationSTREMPrivate::Unset;
-//				else
-				if (data == 0)
-					d->initMethod = vistalProcessSegmentationSTREMPrivate::StraInit;
-				else if (data == 1)
-					d->initMethod = vistalProcessSegmentationSTREMPrivate::HierarchicalPD;
-				else if (data == 2)
-					d->initMethod = vistalProcessSegmentationSTREMPrivate::HierarchicalFLAIR;
-				break;				
-				
-			case 1:
-				if (data > 0 && data < 1)				
-					d->rejectionRatio = data;
-				else d->rejectionRatio = 0;
-				
-				break;
-				
-			case 2:
-				if (data == 0)
-					d->approachEM = vistalProcessSegmentationSTREMPrivate::GaussianEM;
+	switch(channel){
+			
+		case(0):
+			//if (data == 0)
+			//					d->initMethod = vistalProcessSegmentationSTREMPrivate::Unset;
+			//				else
+			if (data == 0)
+				d->initMethod = vistalProcessSegmentationSTREMPrivate::StraInit;
+			else if (data == 1)
+				d->initMethod = vistalProcessSegmentationSTREMPrivate::HierarchicalPD;
+			else if (data == 2)
+				d->initMethod = vistalProcessSegmentationSTREMPrivate::HierarchicalFLAIR;
+			break;				
+			
+		case 1:
+			if (data > 0 && data < 1)				
+				d->rejectionRatio = data;
+			else d->rejectionRatio = 0;
+			
+			break;
+			
+		case 2:
+			if (data == 0)
+				d->approachEM = vistalProcessSegmentationSTREMPrivate::GaussianEM;
 			else if (data == 1)
 				d->approachEM = vistalProcessSegmentationSTREMPrivate::GaussianCeleuxREM;
 			else if (data == 2)
 				d->approachEM = vistalProcessSegmentationSTREMPrivate::GaussianREM  ;
-				break;
-				
-			case 3:
-				d->minDistance = data;//1e-4;
-				break;
-				
-			case 4:
-				d->emIter = data;
-				break;
-				
-//                    d->alpha = data;
-//                    break;
-//            case(1):
-//                    if(data == 0)
-//                        d->tlinkMode = vistal::Tlinks::Gaussian;
-//                    else if(data == 1)
-//                        d->tlinkMode = vistal::Tlinks::Strem;
-//                    else if(data == 2)
-//                        d->tlinkMode = vistal::Tlinks::Parzen;
-//                    else if(data ==3)
-//                        d->tlinkMode = vistal::Tlinks::Density;
-//                    else
-//                        return;
-//
-//                    break;
-//
-//            case(2):
-//                    d->beta = data;
-//                    break;
-//
-//            case(3):
-//                    d->useSpecGrad = data;
-//                    break;
-//
-//            case(4):
-//                    d->sigma = data;
-//                    break;
+			break;
+			
+		case 3:
+			d->minDistance = data;//1e-4;
+			break;
+			
+		case 4:
+			d->emIter = data;
+			break;
+			
+		case 5:
+			d->strem = data;
+			break;
+		case 6:
+			d->mahalanobisThreshold = data;
+			break;
+		case 7:
+			d->rulesThreshold = data;
+			break;
+		case 8:
+			d->minsize = data;
+			break;
+		case 9:
+			d->wmneighbor = data;
+			break;
+						
 
-            default:
-                return;
-        }
+			
+			//                    d->alpha = data;
+			//                    break;
+			//            case(1):
+			//                    if(data == 0)
+			//                        d->tlinkMode = vistal::Tlinks::Gaussian;
+			//                    else if(data == 1)
+			//                        d->tlinkMode = vistal::Tlinks::Strem;
+			//                    else if(data == 2)
+			//                        d->tlinkMode = vistal::Tlinks::Parzen;
+			//                    else if(data ==3)
+			//                        d->tlinkMode = vistal::Tlinks::Density;
+			//                    else
+			//                        return;
+			//
+			//                    break;
+			//
+			//            case(2):
+			//                    d->beta = data;
+			//                    break;
+			//
+			//            case(3):
+			//                    d->useSpecGrad = data;
+			//                    break;
+			//
+			//            case(4):
+			//                    d->sigma = data;
+			//                    break;
+			
+		default:
+			return;
+	}
 }
 
 // Run the STREM Algorithm
@@ -202,7 +234,7 @@ int vistalProcessSegmentationSTREM::update(void)
 		input.push_back(*d->input[i]);
 	
 	FiniteModel initia;
-
+	
 	for(unsigned int i=0; i<3; i++)
 	{		
 		Distribution::Pointer p=Gaussian::New( 3);
@@ -215,7 +247,7 @@ int vistalProcessSegmentationSTREM::update(void)
 		{
 			StraInitializer init(input,*d->mask);
 			init.setDebugMode(false);
-				if(!init. getInitialization(initia)) return -1;
+			if(!init. getInitialization(initia)) return -1;
 			break;
 		}
 		case vistalProcessSegmentationSTREMPrivate::HierarchicalPD: // If third image is T2 use this init
@@ -233,7 +265,7 @@ int vistalProcessSegmentationSTREM::update(void)
 			break;
 		}
 		default:
-		 return -1;
+			return -1;
 	}
 	
 	// Starting Classification binary code
@@ -248,7 +280,7 @@ int vistalProcessSegmentationSTREM::update(void)
 	for (unsigned i = 0; i < 3; ++i) max[i] = vistal::stats::GetMaxPixelValue( input[ i ] , *d->mask );
 	
 	if (! jointHistogram.createJointHistogram( input, *d->mask, false ))
-			return -1;  // Joint histogram construction failure
+		return -1;  // Joint histogram construction failure
 	
 	
 	std::vector<unsigned int> emSteps( 1, 1 );
@@ -259,16 +291,16 @@ int vistalProcessSegmentationSTREM::update(void)
 	switch (d->approachEM)
 	{
 		case vistalProcessSegmentationSTREMPrivate::GaussianCeleuxREM:
-				estimator = new GaussianCeleuxREMEstimator( iterSteps[ 0 ], d->minDistance, d->emIter, d->strem );
-				dynamic_cast<GaussianCeleuxREMEstimator *>( estimator ) ->setRejectionRatio( d->rejectionRatio );
+			estimator = new GaussianCeleuxREMEstimator( iterSteps[ 0 ], d->minDistance, d->emIter, d->strem );
+			dynamic_cast<GaussianCeleuxREMEstimator *>( estimator ) ->setRejectionRatio( d->rejectionRatio );
 			break;
 		case vistalProcessSegmentationSTREMPrivate::GaussianEM:
-			  estimator = new GaussianEMEstimator( iterSteps[ 0 ], d->minDistance );
+			estimator = new GaussianEMEstimator( iterSteps[ 0 ], d->minDistance );
 			break;
 		case vistalProcessSegmentationSTREMPrivate::GaussianREM:
 			estimator = new GaussianREMEstimator( iterSteps[ 0 ], d->minDistance, d->emIter, d->strem );
 			dynamic_cast<GaussianREMEstimator *>( estimator ) ->setRejectionRatio( d->rejectionRatio );
-
+			
 			break;
 	}
 	
@@ -294,13 +326,13 @@ int vistalProcessSegmentationSTREM::update(void)
 		vistal::Image3D<unsigned char> outima;
 		
 		classifier.getOutputImage( input , *d->mask, outima );
-
+		
 		// Fixme tell medINRIA that outima is the output....
 		
-	//	if (d->showOutliers)
-//		{
-//		}
-//		
+		//	if (d->showOutliers)
+		//		{
+		//		}
+		//		
 		
 		
 	}
@@ -311,16 +343,80 @@ int vistalProcessSegmentationSTREM::update(void)
 	// Now apply the nlesions binary
 	
 	
+	vistal::Image3D<unsigned char> thImage;
+	MahalanobisThreshold threshold;
+    threshold.setModel( solution );
+    threshold.setThreshold( d->mahalanobisThreshold );
+	
+	threshold.getThresholdImage( input, *d->mask, thImage );
+	
+	vistal::Image3D<unsigned char> rulesIma;
+	double rules3[3];
+	rules3[0]=d->rulesThreshold;
+	rules3[1]=d->rulesThreshold;
+	rules3[2]=d->rulesThreshold;
+	
+	// Lesions in rules Ima are ==5
+	if(!rulesT2lesions(rulesIma, thImage, input, solution, rules3, false /* verbose*/ ))
+		return -1;
+	
+	vistal::Image3D<unsigned int > labels;
+	int numLabels=0;
+	vistal::Image3D<unsigned int> tmpIma(*d->mask, 0);
+	for (vistal::Image3D<unsigned>::iterator it = tmpIma.begin(); it != tmpIma.end(); ++it)
+		if (rulesIma(it.Position()) == 5) 
+			*it = 1;
+	
+	numLabels = Labelize( tmpIma, labels, 0 );
+	
+	vistal::Image3D<unsigned int> biglesions(tmpIma);
+	rulesLesionSize(biglesions,*d->mask,labels, d->minsize,/* verbose = */ false);
+	
+	// Removing border lesions
+	//////////////////////////////
+	vistal::Image3D<unsigned int> noborderlesions;
+	
+	if(!rulesBorder( noborderlesions, *d->mask, biglesions,/* verbose = */false ))
+	{
+		std::cout<<" ** ERROR in rulesBorder"<<std::endl;
+		return -1;
+	}
+	
+	vistal::Image3D<unsigned char> classifIma;
+	ImageClassifier classifier;
+	classifier.setModel( solution );
+	classifier.getOutputImage( input , *d->mask, classifIma );
+	
+	
+	vistal::Image3D<unsigned char> classifplus(classifIma);
+	Voxel p;
+	
+	
+	for (vistal::Image3D<unsigned char>::iterator it = classifplus.begin(); it != classifplus.end(); ++it)		
+		if(noborderlesions(it.Position()))
+			*it = solution.size()+1;
+	// Choose and remove small GM regions
+	
+	vistal::Image3D<unsigned char> nclassif;
+	int minGMsize=15;
+	//			std::cout<<" -- Cleaning GM in classification: minsize: "<<minGMsize<<std::endl;
+	rules4GM(nclassif,classifplus,minGMsize,solution.size()-1,/*verbose=*/false);
+	
+	
+	//			std::cout<<" -- Cleaning lesions that are not neighbors to the WM!"<<std::endl;
+	vistal::Image3D<unsigned char> fclassif;
+	rulesWM4lesions(fclassif,noborderlesions,nclassif,solution.size()+1,d->wmneighbor,/*verbose=*/false);
 	
 	
 	
-  return EXIT_SUCCESS;
+	
+	return EXIT_SUCCESS;
 }
 
 dtkAbstractData * vistalProcessSegmentationSTREM::output(void)
 {
 	return NULL;
-      //  return d->output;
+	//  return d->output;
 }
 
 // /////////////////////////////////////////////////////////////////

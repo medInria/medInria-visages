@@ -15,28 +15,41 @@
 
 class LSArguments: public GenericArguments
 {
-	MANDATORY(1,std::string, i1, "", "", "Reference Image (4D volume)", InputArgument, "Image4D");
-	OPTIONAL(2, std::string, pars, "p", "parameters", "Parameters for computing the mapping \n\t-flip angles\n\t-multiple TR", "", InputArgument, "");
+//	MANDATORY(1,std::string, i1, "", "", "Reference Image (4D volume)", InputArgument, "Image4D");
+	OPTIONAL(1, std::string, t1, "t", "t1-image", "T1 Weighted Image", "", InputArgument, "Image3D");
+	OPTIONAL(2, std::string, pd, "pd", "pd-image", "Proton Density Weighted image", "", InputArgument, "Image3D");
+
+	OPTIONAL(3, std::string, t2, "t2", "t2-image", "T2 Weighted image", "", InputArgument, "Image3D");
+
+	OPTIONAL(4, std::string, flair, "flair", "flair-image", "FLAIR image", "", InputArgument, "Image3D");
+
+	ENUM(5, initMethod, "I", "init-method", "Method for initialisation", (StraInit)(HierarchicalPD)(HierarchicalFLAIR), StraInit);
 	
-	MANDATORY(3,std::string, output, "", "", "Result", OutputArgument, "Image3D");
+	OPTIONAL(6, float, rejectionRatio, "rej", "rejectionRatio", "Robust estimation rejection Ratio", .2, InputArgument, "Image3D");
+
+	ENUM(7, EMAlgorithm, "EM", "EM-Algorithm", "EM Algorithm", (GaussianEM)(GaussianCeleuxREM)(GaussianREM), GaussianREM);
 	
-	ENUM(4, map, "m", "map", "Mapping to perform",
-		 (T1)(T1TR)(T2)(MTR), T1);
+	OPTIONAL(8, float, minDistance, "minD", "minDistance", "Minimum distance in EM (stoping criteria)", 1e-4, InputArgument, "");
+
+	OPTIONAL(9, int, emIter, "eit", "emIter", "Iterations of the EM Algorithm", 1e-4, InputArgument, "");
 	
-	OPTIONAL(5, std::string, mask, "M", "mask", "Mask for computation", "", InputArgument, "Image3D");
-	OPTIONAL(6, std::string, priorT1, "P", "prior-t1", "Prior knowledge for T2 computation (Map of T1)", "", InputArgument, "Image3D");
-	OPTIONAL(7, float, TR, "TR", "TR", "TR of acquisition if using prior T1 knowledge", "", InputArgument, "");
+	FLAG(10, strem, "st", "Strem", "Start the first iteration with STREM?", false);
 	
-	OPTIONAL(8, int, skipEcho, "s", "skip", "Skip echoes", 0, InputArgument, "");
+	//OPTIONAL(11, float, emIter, "eit", "emIter", "Iterations of the EM Algorithm", 10, InputArgument, "");
 	
-	FLAG(9, offset, "o", "offset", "Compute with offset correction", false);
-	OPTIONAL(10, float, threshold, "t", "threshold", "Apply a threshold at  0 ms, and at specified value (or default if 0, and not used if == -1)", -1, InputArgument, "");
-	OPTIONAL(11, std::list<int>, pickedImages, "S", "selected-images", "Select a subset of input images (default none)", "", InputArgument, "");
 	
+	OPTIONAL(11, float, mahalanobisThreshold, "mTh", "mahalanobisThreshold", "Iterations of the EM Algorithm", .4, InputArgument, "");
+	OPTIONAL(12, float, rulesThreshold, "rTh", "rulesThreshold", "Iterations of the EM Algorithm", 3., InputArgument, "");
+	OPTIONAL(13, float, minsize, "msize", "minsize", "Iterations of the EM Algorithm", 6, InputArgument, "");
+	OPTIONAL(14, float, wmneighbor, "wm", "wmneighbor", "Iterations of the EM Algorithm", 0.05, InputArgument, "");
+
+	OPTIONAL(15, std::string, output, "out", "output-image", "output image", "", OutputArgument, "Image3D");
+
+
 	//	FLAG(11, nonlinear, "n", "non-linear", "Perform non linear estimation (if available)", false);
-	FLAG(12, help, "h", "help", "Call this help", false);
+	FLAG(16, help, "h", "help", "Call this help", false);
 	
-	CONSTRUCTORS(LSArguments, 11);
+	CONSTRUCTORS(LSArguments, 16);
 };
 
 
