@@ -72,7 +72,9 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${QTDCM_LIBS}
-  dtkCore)
+  dtkCore
+  medCore
+  medGui)
 
 dtk_build_doc(qtdcmDataSourcePlugin)
 
