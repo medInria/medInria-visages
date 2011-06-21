@@ -23,7 +23,7 @@
 class qtdcmDataSourcePrivate
 {
 public:
-    QtDCM * mainWidget;
+    QtDcm * mainWidget;
     QtDcmPreferencesWidget * rightWidget;
 
     ~qtdcmDataSourcePrivate();
@@ -97,7 +97,7 @@ void qtdcmDataSource::initWidgets ( void )
 
     if ( !d->mainWidget )
     {
-        d->mainWidget = new QtDCM();
+        d->mainWidget = new QtDcm();
 
         if ( !d->rightWidget )
         {
