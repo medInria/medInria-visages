@@ -11,9 +11,13 @@
 #include <dtkCore/dtkAbstractView.h>
 #include <dtkCore/dtkAbstractViewInteractor.h>
 
+#include <medCore/medRunnableProcess.h>
+#include <medCore/medJobManager.h>
+
 #include <medGui/medToolBoxFactory.h>
 #include <medGui/medToolBoxFiltering.h>
 #include <medGui/medToolBoxFilteringCustom.h>
+//#include <medGui/medProgressionStack.h>
 
 #include <QtGui>
 
@@ -37,6 +41,7 @@ public:
         QLineEdit *n_thread;
 
         dtkAbstractProcess *process;
+//        medProgressionStack * progression_stack;
 };
 
 vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessDenoisingToolBoxPrivate)
@@ -246,10 +251,21 @@ void vistalProcessDenoisingToolBox::run(void)
     d->process->setParameter(d->distanceBetweenBlocks->text().toDouble(),12);
     d->process->setParameter(d->n_thread->text().toDouble(),13);
 
-    if(d->process->update()==0)
-        emit success();
-    else
-        emit failure();
+    medRunnableProcess *runProcess = new medRunnableProcess;
+    runProcess->setProcess (d->process);
+
+//    d->progression_stack->addJobItem(runProcess, "Progress:");
+
+    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
+    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
+
+    medJobManager::instance()->registerJobItem(runProcess);
+    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
+
+//    if(d->process->update()==0)
+//        emit success();
+//    else
+//        emit failure();
 
 }
 
