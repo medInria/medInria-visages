@@ -591,6 +591,13 @@ int vistalProcessDenoising::update (void)
         else
             return -1;
 
+        foreach(QString list, d->input->metaDataList())
+        {
+                qDebug() << "list : "<< list;
+                qDebug() << "metaDataValues : " << d->input->metaDataValues(list);
+                d->output->addMetaData(list, d->input->metaDataValues(list));
+        }
+
         return EXIT_SUCCESS;
 
 }
