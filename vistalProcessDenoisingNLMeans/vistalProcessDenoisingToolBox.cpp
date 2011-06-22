@@ -17,7 +17,7 @@
 #include <medGui/medToolBoxFactory.h>
 #include <medGui/medToolBoxFiltering.h>
 #include <medGui/medToolBoxFilteringCustom.h>
-//#include <medGui/medProgressionStack.h>
+#include <medGui/medProgressionStack.h>
 
 #include <QtGui>
 
@@ -41,7 +41,7 @@ public:
         QLineEdit *n_thread;
 
         dtkAbstractProcess *process;
-//        medProgressionStack * progression_stack;
+        medProgressionStack * progression_stack;
 };
 
 vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessDenoisingToolBoxPrivate)
@@ -185,12 +185,16 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
 
       // Principal layout:
 
+      QWidget *widget = new QWidget(this);
+
+      d->progression_stack = new medProgressionStack(widget);
+
       QVBoxLayout *layprinc = new QVBoxLayout();
       layprinc->addWidget(groupParameters);
       layprinc->addWidget(groupOptions);
       layprinc->addWidget(runButton);
+      layprinc->addWidget(d->progression_stack);
 
-      QWidget *widget = new QWidget(this);
       widget->setLayout(layprinc);
 
       // Main toolbox:
@@ -254,7 +258,7 @@ void vistalProcessDenoisingToolBox::run(void)
     medRunnableProcess *runProcess = new medRunnableProcess;
     runProcess->setProcess (d->process);
 
-//    d->progression_stack->addJobItem(runProcess, "Progress:");
+    d->progression_stack->addJobItem(runProcess, "Progress:");
 
     connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
     connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
