@@ -205,7 +205,7 @@ vistalProcessDenoisingToolBox::~vistalProcessDenoisingToolBox(void)
 
 bool vistalProcessDenoisingToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("NLmeansDenoising",
+    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("NL Means Denoising",
                                                                            createVistalProcessDenoisingToolBox);
 }
 
@@ -224,7 +224,7 @@ void vistalProcessDenoisingToolBox::run(void)
     if(!this->parent())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessDenoising");
+    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessDenoisingNLMEANS");
 
     if(!this->parent()->data())
         return;

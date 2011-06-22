@@ -52,7 +52,7 @@ bool vistalProcessDenoisingPlugin::uninitialize(void)
 
 QString vistalProcessDenoisingPlugin::name(void) const
 {
-    return "vistalProcessDenoisingPlugin";
+    return "vistalProcessDenoisingNLMEANSPlugin";
 }
 
 QString vistalProcessDenoisingPlugin::description(void) const

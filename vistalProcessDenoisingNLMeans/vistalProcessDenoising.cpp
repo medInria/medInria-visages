@@ -75,12 +75,12 @@ vistalProcessDenoising::~vistalProcessDenoising(void)
 
 bool vistalProcessDenoising::registered(void)
 {
-    return dtkAbstractProcessFactory::instance()->registerProcessType("vistalProcessDenoising", createVistalProcessDenoising);
+    return dtkAbstractProcessFactory::instance()->registerProcessType("vistalProcessDenoisingNLMEANS", createVistalProcessDenoising);
 }
 
 QString vistalProcessDenoising::description(void) const
 {  
-    return "vistalProcessDenoising";
+    return "vistalProcessDenoisingNLMEANS";
 }
 
 void vistalProcessDenoising::setInput(dtkAbstractData *data)
@@ -590,13 +590,9 @@ int vistalProcessDenoising::update (void)
         }
         else
             return -1;
-
+    
         foreach(QString list, d->input->metaDataList())
-        {
-                qDebug() << "list : "<< list;
-                qDebug() << "metaDataValues : " << d->input->metaDataValues(list);
                 d->output->addMetaData(list, d->input->metaDataValues(list));
-        }
 
         return EXIT_SUCCESS;
 
