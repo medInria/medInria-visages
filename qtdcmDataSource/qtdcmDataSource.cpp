@@ -101,6 +101,7 @@ void qtdcmDataSource::initWidgets ( void )
     if ( !d->mainWidget )
     {
         d->mainWidget = new QtDcm();
+        d->mainWidget->getManager()->useConverter(false);
         QObject::connect(d->mainWidget->getManager(), SIGNAL(serieMoved(QString)), this, SLOT(onSerieMoved(QString)));
 
         if ( !d->rightWidget )
