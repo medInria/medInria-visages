@@ -116,19 +116,7 @@ void qtdcmDataSource::initWidgets ( void )
 
 void qtdcmDataSource::onSerieMoved ( QString directory )
 {
-    qDebug() << directory << " qtdcmDataSource";
-    QFileInfo info(directory);
-    medDatabaseImporter *importer = new medDatabaseImporter(info.absoluteFilePath());
-    connect(importer, SIGNAL(success(QObject*)), this, SLOT(onFileImported()), Qt::QueuedConnection);
-    connect(importer, SIGNAL(failure(QObject*)), this, SLOT(onFileImported()), Qt::QueuedConnection);
-    medJobManager::instance()->registerJobItem(importer);
-    QThreadPool::globalInstance()->start(importer);
-}
-
-void qtdcmDataSource::onFileImported()
-{
-    medDatabaseController::instance()->import("");
-//     d->dbSource->update();
+    emit dataReceived(directory);
 }
 
 
