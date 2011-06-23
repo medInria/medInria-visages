@@ -29,6 +29,10 @@ public:
 
     QList<medToolBox*> getToolboxes();
 
+public slots:
+    void onSerieMoved(QString directory);
+    void onFileImported();
+
 private:
     qtdcmDataSourcePrivate *d;
 

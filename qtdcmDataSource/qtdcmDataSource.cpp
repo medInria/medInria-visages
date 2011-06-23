@@ -4,6 +4,9 @@
 
 #include "qtdcmDataSource.h"
 
+#include <medSql/medDatabaseImporter.h>
+#include <medSql/medDatabaseController.h>
+#include <medCore/medJobManager.h>
 #include <medCore/medAbstractDataSourceFactory.h>
 #include <medGui/medToolBox.h>
 
@@ -98,6 +101,7 @@ void qtdcmDataSource::initWidgets ( void )
     if ( !d->mainWidget )
     {
         d->mainWidget = new QtDcm();
+        QObject::connect(d->mainWidget->getManager(), SIGNAL(serieMoved(QString)), this, SLOT(onSerieMoved(QString)));
 
         if ( !d->rightWidget )
         {
@@ -108,6 +112,25 @@ void qtdcmDataSource::initWidgets ( void )
 //     QtShanoir::instance()->attachTreeWidget(d->mainWidget);
 //     QtShanoir::instance()->init();
 }
+
+void qtdcmDataSource::onSerieMoved ( QString directory )
+{
+    qDebug() << directory << " qtdcmDataSource";
+    QFileInfo info(directory);
+    medDatabaseImporter *importer = new medDatabaseImporter(info.absoluteFilePath());
+    connect(importer, SIGNAL(success(QObject*)), this, SLOT(onFileImported()), Qt::QueuedConnection);
+    connect(importer, SIGNAL(failure(QObject*)), this, SLOT(onFileImported()), Qt::QueuedConnection);
+    medJobManager::instance()->registerJobItem(importer);
+    QThreadPool::globalInstance()->start(importer);
+}
+
+void qtdcmDataSource::onFileImported()
+{
+    medDatabaseController::instance()->import("");
+//     d->dbSource->update();
+}
+
+
 
 // /////////////////////////////////////////////////////////////////
 // Type instantiation
