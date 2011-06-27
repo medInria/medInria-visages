@@ -1,6 +1,17 @@
 #ifndef _med_VistalDataImageConverterMacros_h_
 #define _med_VistalDataImageConverterMacros_h_
 
+#include "VistalConverters.hh"
+// The function taking medinria internal vistal names and converts to desired name
+
+#include "boost/function.hpp"
+
+
+
+
+// The converter toward Itk image data
+
+
 #define medImplementVistalDataImageConverter(type, suffix)		\
 class vistalDataImageToItkDataImage##suffix##ConverterPrivate \
 { \
@@ -21,7 +32,12 @@ vistalDataImageToItkDataImage##suffix##Converter::~vistalDataImageToItkDataImage
 } \
 bool vistalDataImageToItkDataImage##suffix##Converter::registered(void) \
 { \
-	return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("vistalDataImageToItkDataImage") + QString(""#suffix) + QString("Converter"), QStringList() << "vistalDataImage"#suffix, "itkDataImage"#suffix, createVistalDataImageToItkDataImage##suffix##Converter); \
+return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("vistalDataImageToItkDataImage") + QString(""#suffix) + QString("Converter"), \
+																	QStringList()	<< "vistalDataImageChar3" <<  "vistalDataImageUChar3" \
+																					<<  "vistalDataImageShort3" <<  "vistalDataImageUShort3" \
+																					<<  "vistalDataImageInt3" <<  "vistalDataImageUInt3"  \
+																					<< "vistalDataImageFloat3" <<  "vistalDataImageDouble3",\
+																	"itkDataImage"#suffix, createVistalDataImageToItkDataImage##suffix##Converter); \
 } \
 QString vistalDataImageToItkDataImage##suffix##Converter::description(void) const \
 { \
@@ -29,7 +45,10 @@ QString vistalDataImageToItkDataImage##suffix##Converter::description(void) cons
 } \
 QStringList vistalDataImageToItkDataImage##suffix##Converter::fromTypes(void) const \
 { \
-	return QStringList() << "vistalDataImage"#suffix; \
+ return QStringList() << "vistalDataImageChar3" <<  "vistalDataImageUChar3" \
+	<<  "vistalDataImageShort3" <<  "vistalDataImageUShort3" \
+	<<  "vistalDataImageInt3" <<  "vistalDataImageUInt3"  \
+	<< "vistalDataImageFloat3" <<  "vistalDataImageDouble3"; \
 } \
 QString vistalDataImageToItkDataImage##suffix##Converter::toType(void) const \
 { \
@@ -40,22 +59,15 @@ dtkAbstractData *vistalDataImageToItkDataImage##suffix##Converter::convert(void)
 	dtkAbstractData *data = this->data(); \
 	if (!data) \
 		return NULL; \
-	if (data->description() == "vistalDataImage"#suffix) { \
-		if ( vistal::Image3D<type>* image = static_cast<vistal::Image3D<type>*>( data->data() ) ) { \
-			if (d->vistalConverter == NULL) \
-				d->vistalConverter = new itkImage3D<type> (*image); \
-			if (!d->output) \
-				d->output = dtkAbstractDataFactory::instance()->create("itkDataImage"#suffix); \
-			if (d->output) \
-				d->output->setData(d->vistalConverter->GetOutput()); \
-		} \
-	} \
+	vistal::medinria::convertToItk(data->description(), ""#suffix, data, d->output);\
 	return d->output; \
 } \
 dtkAbstractDataConverter *createVistalDataImageToItkDataImage##suffix##Converter(void) \
 { \
 	return new vistalDataImageToItkDataImage##suffix##Converter; \
 }
+
+// Converter from Itk to vistal format
 
 #define medImplementItkToVistalDataImageConverter(type, suffix)		\
 class itkDataImageToVistalDataImage##suffix##ConverterPrivate \

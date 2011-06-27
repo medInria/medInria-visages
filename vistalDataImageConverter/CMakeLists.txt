@@ -79,6 +79,7 @@ set(${PROJECT_NAME}_SOURCES
   itkDataImageToVistalDataImageInt3Converter.cpp
   itkDataImageToVistalDataImageFloat3Converter.cpp
   itkDataImageToVistalDataImageDouble3Converter.cpp
+  VistalConverters.cpp
 )
 
 ## #################################################################
