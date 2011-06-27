@@ -21,6 +21,8 @@ namespace vistal
 		
 		struct Parameters// Used to specify the conversion parameters
 		{
+			Parameters(): lquantile(0), rquantile(0), complement(false), copy(false), clamp(false)
+			{}
 			float lquantile;  // Large size Type to Lower sized type quantile
 			float rquantile;  // Large size Type to Lower sized type quantile
 			bool complement;
@@ -129,7 +131,9 @@ namespace vistal
 		namespace medinria	
 		{
 			void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut);
-		}	
+			void convertFromItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut);
+			void convert(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut);
+}	
 }
 
 #endif
