@@ -76,9 +76,7 @@ public:
 	int minsize, wmneighbor;
 
 	
-	// Function to convert vistal format to locla
-	template <class DataType> void vistalConvert(dtkAbstractData* data, vistal::Image3D<DataType>*);
-	
+	dtkAbstractData *output;
 
 };
 
@@ -90,7 +88,6 @@ minsize(6), wmneighbor(0.05)
 // -0 -iter 200 dist 1e-3 
 // show outliers, set iteration to 200, mindistance 1e-3, 
 {
-	input.resize(3);	
 }
 
 vistalProcessSegmentationSTREMPrivate::~vistalProcessSegmentationSTREMPrivate()
@@ -101,19 +98,6 @@ vistalProcessSegmentationSTREMPrivate::~vistalProcessSegmentationSTREMPrivate()
 }
 
 
-
-
-template <class DataType> vistalProcessSegmentationSTREMPrivate::vistalConvert(dtkAbstractData* data, vistal::Image3D<DataType>* res)
-{
-	// known types are 
-	//	vistalDataImageUChar3 vistalDataImageChar3 
-	// vistalDataImageShort3 vistalDataImageUShort3 
-	// vistalDataImageInt3 vistalDataImageUInt3 
-	// vistalDataImageFloat3 vistalDataImageDouble3
-	
-	
-	return 0;	
-}
 
 
 
@@ -145,23 +129,28 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 {
 	
 	// data->name().startsWith("vistalDataImage") // special conversion
-	
+	qDebug() << d << channel;
+	if (!d) return;
+	qDebug() << d->input.size();
+	if (d->input.size() != 3) d->input.resize(3);
+	qDebug() << d->input.size();
 	
 	qDebug() << "Inside setInput" << data << channel;
+	dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
+	if (!dU8) 
+	{
+		qDebug() << "DataType conversion error";
+		return;
+	}
+	
+	
 	
 	if (!data)
 		return;
 	if (channel >= 0 && channel < 3)
-	{
-		if (!data->name().startsWith("vistalDataImage")) // special conversion
-					d->input[channel] = static_cast<vistal::Image3D<unsigned char>* >(data->convert("vistalDataImageUChar3")->data());
-		else {
-			d->vistalConvert(data, d->input[channel]);
-		}
-
-	}
+		d->input[channel] = static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
 	if (channel == 3)
-		d->mask = static_cast<vistal::Image3D<unsigned char>* >(data/*->convert("vistalDataImageUChar3")*/->data());
+		d->mask = static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
 	
 	
 }
@@ -452,19 +441,18 @@ int vistalProcessSegmentationSTREM::update(void)
 	
 	
 	//			std::cout<<" -- Cleaning lesions that are not neighbors to the WM!"<<std::endl;
-	vistal::Image3D<unsigned char> fclassif;
-	rulesWM4lesions(fclassif,noborderlesions,nclassif,solution.size()+1,d->wmneighbor,/*verbose=*/false);
-	
-	
-	
-	
+	vistal::Image3D<unsigned char> *fclassif = new vistal::Image3D<unsigned char>;
+	rulesWM4lesions(*fclassif,noborderlesions,nclassif,solution.size()+1,d->wmneighbor,/*verbose=*/false);
+		
+	d->output = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
+	d->output->setData(fclassif);	
+		
 	return EXIT_SUCCESS;
 }
 
 dtkAbstractData * vistalProcessSegmentationSTREM::output(void)
 {
-	return NULL;
-	//  return d->output;
+	return d->output;
 }
 
 // /////////////////////////////////////////////////////////////////

@@ -126,7 +126,10 @@ int main(int argc, char **argv)
 	mask->setData(&msk);	
 	
 	dtkAbstractProcess *process = dynamic_cast <dtkAbstractProcess *>(dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentationSTREM"));
-	
+	if (!process) { 
+		qDebug() << "I am not able to find myself!!! ouiiiiiiiiiiinnnnnnnnnn !!!!!!!!";
+		return -1;
+	}	
 	process->setInput(inputImage,0); // input image
 	
 	process->setInput(PD,1); // target
