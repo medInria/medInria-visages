@@ -8,6 +8,8 @@
 #include <dtkCore/dtkAbstractDataFactory.h>
 #include <dtkCore/dtkAbstractData.h>
 
+#include <QDebug>
+
 #include "mstoolsFiniteModel.h"
 #include "Matrice.hh"
 #include "Image3D.hh"
@@ -72,12 +74,15 @@ public:
 	/* nlesions parameterts*/
 	double mahalanobisThreshold, rulesThreshold;
 	int minsize, wmneighbor;
+
+	
+	// Function to convert vistal format to locla
+	template <class DataType> void vistalConvert(dtkAbstractData* data, vistal::Image3D<DataType>*);
 	
 
 };
 
 vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): 
-input(3), 
 rejectionRatio(0.2),  minDistance(1e-4), emIter(10), strem(0),
 mahalanobisThreshold(.4), rulesThreshold(3.),
 minsize(6), wmneighbor(0.05)
@@ -85,7 +90,7 @@ minsize(6), wmneighbor(0.05)
 // -0 -iter 200 dist 1e-3 
 // show outliers, set iteration to 200, mindistance 1e-3, 
 {
-	
+	input.resize(3);	
 }
 
 vistalProcessSegmentationSTREMPrivate::~vistalProcessSegmentationSTREMPrivate()
@@ -94,6 +99,23 @@ vistalProcessSegmentationSTREMPrivate::~vistalProcessSegmentationSTREMPrivate()
 		delete input[i];
 	delete mask;
 }
+
+
+
+
+template <class DataType> vistalProcessSegmentationSTREMPrivate::vistalConvert(dtkAbstractData* data, vistal::Image3D<DataType>* res)
+{
+	// known types are 
+	//	vistalDataImageUChar3 vistalDataImageChar3 
+	// vistalDataImageShort3 vistalDataImageUShort3 
+	// vistalDataImageInt3 vistalDataImageUInt3 
+	// vistalDataImageFloat3 vistalDataImageDouble3
+	
+	
+	return 0;	
+}
+
+
 
 
 // /////////////////////////////////////////////////////////////////
@@ -121,12 +143,25 @@ QString vistalProcessSegmentationSTREM::description(void) const
 
 void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel)
 {
+	
+	// data->name().startsWith("vistalDataImage") // special conversion
+	
+	
+	qDebug() << "Inside setInput" << data << channel;
+	
 	if (!data)
 		return;
 	if (channel >= 0 && channel < 3)
-		d->input[channel] = static_cast<vistal::Image3D<unsigned char>* >(data->convert("vistalDataImageUChar3")->data());
+	{
+		if (!data->name().startsWith("vistalDataImage")) // special conversion
+					d->input[channel] = static_cast<vistal::Image3D<unsigned char>* >(data->convert("vistalDataImageUChar3")->data());
+		else {
+			d->vistalConvert(data, d->input[channel]);
+		}
+
+	}
 	if (channel == 3)
-		d->mask = static_cast<vistal::Image3D<unsigned char>* >(data->convert("vistalDataImageUChar3")->data());
+		d->mask = static_cast<vistal::Image3D<unsigned char>* >(data/*->convert("vistalDataImageUChar3")*/->data());
 	
 	
 }
@@ -231,7 +266,20 @@ int vistalProcessSegmentationSTREM::update(void)
 	
 	std::vector<vistal::Image3D<unsigned char> > input;
 	for (unsigned i = 0; i < d->input.size(); ++i)
+	{
+		if (d->input[i] == 0)
+		{
+			qDebug() << "Null input, stopping process";
+			return -1;
+		}
 		input.push_back(*d->input[i]);
+	}
+	
+	if (d->mask == 0)
+	{
+		qDebug() << "Null mask input, stopping process";
+		return -1;
+	}
 	
 	FiniteModel initia;
 	
