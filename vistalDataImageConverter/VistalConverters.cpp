@@ -237,7 +237,7 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, "Double3", double);\
 		
 #define TryVistalVistalConvertDetailsCopy(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut ) \
-{ \
+{ qDebug() << "Copy" << ""#suffix << ""#suffixOut;\
 vistal::Image3D<TypeIn>* image = static_cast<vistal::Image3D<TypeIn>*>( imageIn->data() ); \
 if (!image) return; \
 vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(*image, 0); \
@@ -254,7 +254,7 @@ return; \
 		
 #define TryVistalVistalConvertDetails(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut ) \
-{ \
+{ qDebug()<< "Details" << ""#suffix << ""#suffixOut;\
 vistal::Image3D<TypeIn>* image = static_cast<vistal::Image3D<TypeIn>*>( imageIn->data() ); \
 if (!image) return; \
 vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(*image, 0); \
@@ -268,74 +268,74 @@ return; \
 		
 		
 		
-#define TryVistalVistalConvert(suffix, TypeIn)\
+#define TryVistalVistalConvert(suffix, TypeIn) \
 if (typeIn == "vistalDataImage"#suffix)\
-{\
-TryVistalConvertFromITKDetails(suffix, TypeIn, "Char3", char);\
-TryVistalConvertFromITKDetails(suffix, TypeIn, "UChar3", unsigned char);\
+{ qDebug() << "TryConvert " << typeIn;\
+TryVistalVistalConvertDetails(suffix, TypeIn, Char3, char);\
+TryVistalVistalConvertDetails(suffix, TypeIn, UChar3, unsigned char);\
 \
-TryVistalConvertFromITKDetails(suffix, TypeIn, "Short3", short);\
-TryVistalConvertFromITKDetails(suffix, TypeIn, "UShort3", unsigned short);\
+TryVistalVistalConvertDetails(suffix, TypeIn, Short3, short);\
+TryVistalVistalConvertDetails(suffix, TypeIn, UShort3, unsigned short);\
 \
-TryVistalConvertFromITKDetails(suffix, TypeIn, "Int3", int);\
-TryVistalConvertFromITKDetails(suffix, TypeIn, "UInt3", unsigned);\
+TryVistalVistalConvertDetails(suffix, TypeIn, Int3, int);\
+TryVistalVistalConvertDetails(suffix, TypeIn, UInt3, unsigned);\
 \
-TryVistalConvertFromITKDetails(suffix, TypeIn, "Float3", float);\
-TryVistalConvertFromITKDetails(suffix, TypeIn, "Double3", double);\
+TryVistalVistalConvertDetails(suffix, TypeIn, Float3, float);\
+TryVistalVistalConvertDetails(suffix, TypeIn, Double3, double);\
 }		
 		
 		// Simple vistal converter
 		void convert(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut)
 		{
-			qDebug() << "Vistal Converter " << typeIn << " to " << typeOut << imageIn;
+			//qDebug() << "Vistal Converter " << typeIn << " to " << typeOut;
 			// Bunch of function to distribute over types going from short type to larger one,
 			// Avoiding the rescaling of input to the output, does just a copy of data in the new type
 
-			TryVistalVistalConvertDetailsCopy("Char3", char, "Short3", short);
-			TryVistalVistalConvertDetailsCopy("Char3", char, "Int3", int);
-			TryVistalVistalConvertDetailsCopy("Char3", char, "Float3", float);
-			TryVistalVistalConvertDetailsCopy("Char3", char, "Double3", double);
+			TryVistalVistalConvertDetailsCopy(Char3, char, Short3, short);
+			TryVistalVistalConvertDetailsCopy(Char3, char, Int3, int);
+			TryVistalVistalConvertDetailsCopy(Char3, char, Float3, float);
+			TryVistalVistalConvertDetailsCopy(Char3, char, Double3, double);
 			
-			TryVistalVistalConvertDetailsCopy("Short3", short, "Int3", int);
-			TryVistalVistalConvertDetailsCopy("Short3", short, "Float3", float);
-			TryVistalVistalConvertDetailsCopy("Short3", short, "Double3", double);
+			TryVistalVistalConvertDetailsCopy(Short3, short, Int3, int);
+			TryVistalVistalConvertDetailsCopy(Short3, short, Float3, float);
+			TryVistalVistalConvertDetailsCopy(Short3, short, Double3, double);
 			
-			TryVistalVistalConvertDetailsCopy("Int3", int, "Float3", float);
-			TryVistalVistalConvertDetailsCopy("Int3", int, "Double3", double);
+			TryVistalVistalConvertDetailsCopy(Int3, int, Float3, float);
+			TryVistalVistalConvertDetailsCopy(Int3, int, Double3, double);
 			
-			TryVistalVistalConvertDetailsCopy("Float3", float, "Double3", double);
+			TryVistalVistalConvertDetailsCopy(Float3, float, Double3, double);
 			
-			TryVistalVistalConvertDetailsCopy("UChar3",unsigned char, "Short3", short);
-			TryVistalVistalConvertDetailsCopy("UChar3", unsigned char, "UShort3", unsigned short);
+			TryVistalVistalConvertDetailsCopy(UChar3,unsigned char, Short3, short);
+			TryVistalVistalConvertDetailsCopy(UChar3, unsigned char, UShort3, unsigned short);
 			
-			TryVistalVistalConvertDetailsCopy("UChar3",unsigned char, "Int3", int);
-			TryVistalVistalConvertDetailsCopy("UChar3",unsigned char, "UInt3", unsigned int);
+			TryVistalVistalConvertDetailsCopy(UChar3,unsigned char, Int3, int);
+			TryVistalVistalConvertDetailsCopy(UChar3,unsigned char, UInt3, unsigned int);
 			
-			TryVistalVistalConvertDetailsCopy("UChar3",unsigned char, "Float3", float);
-			TryVistalVistalConvertDetailsCopy("UChar3",unsigned char, "Double3", double);
+			TryVistalVistalConvertDetailsCopy(UChar3,unsigned char, Float3, float);
+			TryVistalVistalConvertDetailsCopy(UChar3,unsigned char, Double3, double);
 			
-			TryVistalVistalConvertDetailsCopy("UShort3",unsigned short, "Int3", int);
-			TryVistalVistalConvertDetailsCopy("UShort3",unsigned short, "UInt3",unsigned int);
-			TryVistalVistalConvertDetailsCopy("UShort3",unsigned short, "Float3", float);
-			TryVistalVistalConvertDetailsCopy("UShort3",unsigned short, "Double3", double);
+			TryVistalVistalConvertDetailsCopy(UShort3,unsigned short, Int3, int);
+			TryVistalVistalConvertDetailsCopy(UShort3,unsigned short, UInt3,unsigned int);
+			TryVistalVistalConvertDetailsCopy(UShort3,unsigned short, Float3, float);
+			TryVistalVistalConvertDetailsCopy(UShort3,unsigned short, Double3, double);
 			
-			TryVistalVistalConvertDetailsCopy("UInt3", unsigned, "Float3", float);
-			TryVistalVistalConvertDetailsCopy("UInt3", unsigned, "Double3", double);																			
+			TryVistalVistalConvertDetailsCopy(UInt3, unsigned, Float3, float);
+			TryVistalVistalConvertDetailsCopy(UInt3, unsigned, Double3, double);																			
 			
 				// Use dispatcher to any type, this generate all the conversion (code with scaling)
 			
-			TryVistalVistalConvert("Char3", char);			
-			TryVistalVistalConvert("UChar3", unsigned char);
+			TryVistalVistalConvert(Char3, char);			
+			TryVistalVistalConvert(UChar3, unsigned char);
 			
-			TryVistalVistalConvert("Short3", short);
-			TryVistalVistalConvert("UShort3", unsigned short);			
+			TryVistalVistalConvert(Short3, short);
+			TryVistalVistalConvert(UShort3, unsigned short);			
 			
-			TryVistalVistalConvert("Int3", int);
-			TryVistalVistalConvert("UInt3", unsigned);
+			TryVistalVistalConvert(Int3, int);
+			TryVistalVistalConvert(UInt3, unsigned);
 			
-			TryVistalVistalConvert("Float3", float);
+			TryVistalVistalConvert(Float3, float);
 			
-			TryVistalVistalConvert("Double3", double);									
+			TryVistalVistalConvert(Double3, double);									
 			
 		}
 		
