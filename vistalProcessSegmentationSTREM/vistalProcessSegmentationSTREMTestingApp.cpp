@@ -96,10 +96,10 @@ int main(int argc, char **argv)
 	if (t1== "" || pd == "" && (flair == "" || t2 == ""))
 		abort();	
 	
-	vistal::Image3D<unsigned char> im1;
+	vistal::Image3D<float> im1;
 	loadImage(arg.gett1(), im1, 0);
 	
-	dtkAbstractData *inputImage = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
+	dtkAbstractData *inputImage = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3"));
 	inputImage->setData(&im1);
 	
 	
