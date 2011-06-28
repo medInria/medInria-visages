@@ -237,7 +237,7 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, Double3, double);\
 		
 #define TryVistalVistalConvertDetailsCopy(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut ) \
-{ qDebug() << "Copy" << ""#suffix << ""#suffixOut;\
+{ \
 vistal::Image3D<TypeIn>* image = static_cast<vistal::Image3D<TypeIn>*>( imageIn->data() ); \
 if (!image) return; \
 vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(*image, 0); \
@@ -254,7 +254,7 @@ return; \
 		
 #define TryVistalVistalConvertDetails(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut ) \
-{ qDebug()<< "Details" << ""#suffix << ""#suffixOut;\
+{ \
 vistal::Image3D<TypeIn>* image = static_cast<vistal::Image3D<TypeIn>*>( imageIn->data() ); \
 if (!image) return; \
 vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(*image, 0); \
@@ -263,7 +263,6 @@ vistal::converters::Parameters parameters; /* conversion parameters */ \
 vistal::converters::ConvertImages(*image, *res, parameters); \
 if (res) imageOut = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
 if (imageOut) imageOut->setData(res); \
-qDebug() << "Conversion went ok";\
 return; \
 } 
 		

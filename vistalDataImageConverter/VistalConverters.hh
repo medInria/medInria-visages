@@ -130,10 +130,15 @@ namespace vistal
 	
 		namespace medinria	
 		{
+			// Function to convert a dtkAbstractData pointer containing a vistal image of type typeIn to a dtkAbstractData itk image of type typeOut
 			void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut);
+			
+			// Function to convert a dtkAbstractData pointer containing a itk image of type typeIn to a dtkAbstractData vistal image of type typeOut
 			void convertFromItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut);
+			
+			// Function to convert a vistal image of type typeIn to a vistal image of type typeOut stored in a dtkAbstractData
 			void convert(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut);
-}	
+		}	
 }
 
 #endif
