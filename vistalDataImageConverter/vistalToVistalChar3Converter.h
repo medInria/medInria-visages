@@ -5,8 +5,6 @@
 
 #include "vistalDataImageConverterPluginExport.h"
 
-class VistalToVistalChar3ConverterPrivate;
-
 class VISTALDATAIMAGECONVERTERPLUGIN_EXPORT VistalToVistalChar3Converter : public dtkAbstractDataConverter
 {
     Q_OBJECT
@@ -24,8 +22,6 @@ public:
 public slots:
     dtkAbstractData *convert(void);
 
-private:
-    VistalToVistalChar3ConverterPrivate *d;
 };
 
 dtkAbstractDataConverter *createVistalToVistalChar3Converter(void);

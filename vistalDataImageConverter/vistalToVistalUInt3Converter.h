@@ -4,9 +4,6 @@
 #include <dtkCore/dtkAbstractDataConverter.h>
 
 #include "vistalDataImageConverterPluginExport.h"
-
-class VistalToVistalUInt3ConverterPrivate;
-
 class VISTALDATAIMAGECONVERTERPLUGIN_EXPORT VistalToVistalUInt3Converter : public dtkAbstractDataConverter
 {
     Q_OBJECT
@@ -24,8 +21,6 @@ public:
 public slots:
     dtkAbstractData *convert(void);
 
-private:
-    VistalToVistalUInt3ConverterPrivate *d;
 };
 
 dtkAbstractDataConverter *createVistalToVistalUInt3Converter(void);

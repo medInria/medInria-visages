@@ -56,8 +56,9 @@ namespace vistal
 
 				inline void ConvertImages(Image3D<DataType1>& im, Image3D<DataType2>& res, const Parameters& p)
 			{
-				res = Image3D<DataType2> (im, 0);
-				
+				if (res.nbx != im.nbx || res.nby != im.nby || res.nbz != im.nbz)
+					res = Image3D<DataType2> (im, 0);
+					
 				vistal::copie_param_volume(res, im);
 				
 				

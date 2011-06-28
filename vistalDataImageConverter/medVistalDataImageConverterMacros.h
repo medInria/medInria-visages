@@ -129,17 +129,9 @@ dtkAbstractDataConverter *createItkDataImageToVistalDataImage##suffix##Converter
 
 
 #define medImplementVistaltoVistalDataImageConverter(type, suffix)		\
-class VistalToVistal##suffix##ConverterPrivate \
-{ \
-public: \
-	vistal::Image3D<type> * tmpOut; \
-	dtkAbstractData * output; \
-}; \
 VistalToVistal##suffix##Converter::VistalToVistal##suffix##Converter(void) : \
-dtkAbstractDataConverter(), d(new VistalToVistal##suffix##ConverterPrivate) \
+dtkAbstractDataConverter()\
 { \
-d->output = NULL; \
-d->tmpOut = NULL; \
 } \
 VistalToVistal##suffix##Converter::~VistalToVistal##suffix##Converter(void) \
 { \
@@ -171,12 +163,12 @@ return "vistalDataImage"#suffix; \
 dtkAbstractData *VistalToVistal##suffix##Converter::convert(void) \
 { \
 dtkAbstractData *data = this->data(); \
+dtkAbstractData *output; \
 if (!data) \
 return NULL; \
-qDebug() << "Vistal convert "#suffix << data;\
-if (data->description() == "vistalDataImage"#suffix) { d->output = data; return d->output; } \
-vistal::medinria::convert(data->description(), ""#suffix, data, d->output);\
-return d->output; \
+if (data->description() == "vistalDataImage"#suffix) { output = data; return output; } \
+vistal::medinria::convert(data->description(), ""#suffix, data, output);\
+return output; \
 } \
 dtkAbstractDataConverter *createVistalToVistal##suffix##Converter(void) \
 { \

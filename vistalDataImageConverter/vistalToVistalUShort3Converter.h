@@ -5,7 +5,6 @@
 
 #include "vistalDataImageConverterPluginExport.h"
 
-class VistalToVistalUShort3ConverterPrivate;
 
 class VISTALDATAIMAGECONVERTERPLUGIN_EXPORT VistalToVistalUShort3Converter : public dtkAbstractDataConverter
 {
@@ -24,8 +23,6 @@ public:
 public slots:
     dtkAbstractData *convert(void);
 
-private:
-    VistalToVistalUShort3ConverterPrivate *d;
 };
 
 dtkAbstractDataConverter *createVistalToVistalUShort3Converter(void);
