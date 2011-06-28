@@ -173,6 +173,8 @@ dtkAbstractData *VistalToVistal##suffix##Converter::convert(void) \
 dtkAbstractData *data = this->data(); \
 if (!data) \
 return NULL; \
+qDebug() << "Vistal convert "#suffix << data;\
+if (data->description() == "vistalDataImage"#suffix) { d->output = data; return d->output; } \
 vistal::medinria::convert(data->description(), ""#suffix, data, d->output);\
 return d->output; \
 } \

@@ -12,6 +12,9 @@ namespace vistal
 	namespace medinria	
 	{		
 		
+		// MACRO to convert from vistal image with type TypeIn to itk image of type TypeOut
+		// this does just copy data to the desired type (hence the "Copy" in name)
+		
 #define TryVistalConvertDetailsCopy(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut ) \
 { \
@@ -26,7 +29,7 @@ if (vistalConverter) imageOut = dtkAbstractDataFactory::instance()->create("itkD
 if (imageOut) imageOut->setData(vistalConverter->GetOutput()); \
 return; \
 } 
-		
+		// MACRO to convert from vistal image with type TypeIn to itk image of type TypeOut
 #define TryVistalConvertDetails(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut ) \
 { \
@@ -41,6 +44,8 @@ if (imageOut) imageOut->setData(vistalConverter->GetOutput()); \
 return; \
 } 
 		
+		
+// MACRO to dispatch conversion from suffix type to any scalar type (vistal to ITK conversion)
 #define TryVistalConvert(suffix, TypeIn)\
 if (typeIn == "vistalDataImage"#suffix)\
 {\
@@ -61,7 +66,8 @@ TryVistalConvertDetails(suffix, TypeIn, "Double3", double);\
 		 void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut)
 		{
 			
-			// if output type can handle larger datatype compared to output set parameters to copy
+			// Bunch of function to distribute over types going from short type to larger one,
+			// Avoiding the rescaling of input to the output, does just a copy of data in the new type
 			
 			TryVistalConvertDetailsCopy("Char3", char, "Short3", short);
 			TryVistalConvertDetailsCopy("Char3", char, "Int3", int);
@@ -93,7 +99,9 @@ TryVistalConvertDetails(suffix, TypeIn, "Double3", double);\
 			
 			TryVistalConvertDetailsCopy("UInt3", unsigned, "Float3", float);
 			TryVistalConvertDetailsCopy("UInt3", unsigned, "Double3", double);										
-			
+						
+			// Use dispatcher to any type, this generate all the conversion (code with scaling)
+	
 			TryVistalConvert("Char3", char);			
 			TryVistalConvert("UChar3", unsigned char);
 			
@@ -171,6 +179,9 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, "Double3", double);\
 		// 		
 		void convertFromItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut)
 		{
+			// Bunch of function to distribute over types going from short type to larger one,
+			// Avoiding the rescaling of input to the output, does just a copy of data in the new type
+
 			TryVistalConvertFromITKDetailsCopy("Char3", char, "Short3", short);
 			TryVistalConvertFromITKDetailsCopy("Char3", char, "Int3", int);
 			TryVistalConvertFromITKDetailsCopy("Char3", char, "Float3", float);
@@ -202,7 +213,7 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, "Double3", double);\
 			TryVistalConvertFromITKDetailsCopy("UInt3", unsigned, "Float3", float);
 			TryVistalConvertFromITKDetailsCopy("UInt3", unsigned, "Double3", double);										
 			
-			
+				// Use dispatcher to any type, this generate all the conversion (code with scaling)
 			
 			
 			TryVistalConvertFromITK("Char3", char);			
@@ -276,7 +287,10 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, "Double3", double);\
 		// Simple vistal converter
 		void convert(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut)
 		{
-			
+			qDebug() << "Vistal Converter " << typeIn << " to " << typeOut << imageIn;
+			// Bunch of function to distribute over types going from short type to larger one,
+			// Avoiding the rescaling of input to the output, does just a copy of data in the new type
+
 			TryVistalVistalConvertDetailsCopy("Char3", char, "Short3", short);
 			TryVistalVistalConvertDetailsCopy("Char3", char, "Int3", int);
 			TryVistalVistalConvertDetailsCopy("Char3", char, "Float3", float);
@@ -308,7 +322,7 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, "Double3", double);\
 			TryVistalVistalConvertDetailsCopy("UInt3", unsigned, "Float3", float);
 			TryVistalVistalConvertDetailsCopy("UInt3", unsigned, "Double3", double);																			
 			
-			
+				// Use dispatcher to any type, this generate all the conversion (code with scaling)
 			
 			TryVistalVistalConvert("Char3", char);			
 			TryVistalVistalConvert("UChar3", unsigned char);
