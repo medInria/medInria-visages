@@ -18,9 +18,9 @@ namespace vistal
 		// this does just copy data to the desired type (hence the "Copy" in name)
 		
 #define TryVistalConvertDetailsCopy(suffix, TypeIn, suffixOut, TypeOut) \
-if (typeOut == ""#suffixOut ) \
+if (typeOut == ""#suffixOut && typeIn == "vistalDataImage"#suffix ) \
 { \
-vistal::Image3D<TypeIn>* image = static_cast<vistal::Image3D<TypeIn>*>( imageIn->data() ); \
+vistal::Image3D<TypeIn>* image = dynamic_cast<vistal::Image3D<TypeIn>*>( (vistal::Image3D<TypeIn>*)imageIn->data() ); \
 if (!image) return; \
 vistal::Image3D<TypeOut> conv;\
 vistal::converters::Parameters parameters; /* conversion parameters */ \
@@ -39,9 +39,9 @@ return; \
 } 
 		// MACRO to convert from vistal image with type TypeIn to itk image of type TypeOut
 #define TryVistalConvertDetails(suffix, TypeIn, suffixOut, TypeOut) \
-if (typeOut == ""#suffixOut ) \
+if (typeOut == ""#suffixOut && typeIn == "vistalDataImage"#suffix ) \
 { \
-vistal::Image3D<TypeIn>* image = static_cast<vistal::Image3D<TypeIn>*>( imageIn->data() ); \
+vistal::Image3D<TypeIn>* image = dynamic_cast<vistal::Image3D<TypeIn>*>( (vistal::Image3D<TypeIn>*)imageIn->data() ); \
 if (!image) return; \
 vistal::Image3D<TypeOut> conv;\
 vistal::converters::Parameters parameters; /* conversion parameters */ \
@@ -79,6 +79,7 @@ TryVistalConvertDetails(suffix, TypeIn, Double3, double);\
 		
 		 void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut)
 		{
+			//qDebug() << "Converting from" << typeIn << "to" << typeOut;
 			
 			// Bunch of function to distribute over types going from short type to larger one,
 			// Avoiding the rescaling of input to the output, does just a copy of data in the new type
@@ -95,6 +96,7 @@ TryVistalConvertDetails(suffix, TypeIn, Double3, double);\
 			TryVistalConvertDetailsCopy(Int3, int, Float3, float);
 			TryVistalConvertDetailsCopy(Int3, int, Double3, double);
 			
+			TryVistalConvertDetailsCopy(Float3, float, Float3, float);
 			TryVistalConvertDetailsCopy(Float3, float, Double3, double);
 			
 			TryVistalConvertDetailsCopy(UChar3,unsigned char, Short3, short);
@@ -138,9 +140,9 @@ TryVistalConvertDetails(suffix, TypeIn, Double3, double);\
 		
 		
 #define TryVistalConvertFromITKDetailsCopy(suffix, TypeIn, suffixOut, TypeOut) \
-if (typeOut == ""#suffixOut ) \
+if (typeOut == ""#suffixOut &&typeIn == "itkDataImage"#suffix) \
 { \
-itk::Image<TypeIn, 3>::Pointer image = static_cast<itk::Image<TypeIn, 3> *>( imageIn->data() );\
+itk::Image<TypeIn, 3>::Pointer image = dynamic_cast<itk::Image<TypeIn, 3> *>( (itk::Image<TypeIn, 3> *)imageIn->data() );\
 if (!image) return; \
 itkImage3D<TypeIn> vistalConverter(image); \
 vistal::Image3D<TypeIn> conv = vistalConverter.GetImage3D(); \
@@ -157,9 +159,9 @@ return; \
 		
 		
 #define TryVistalConvertFromITKDetails(suffix, TypeIn, suffixOut, TypeOut) \
-if (typeOut == ""#suffixOut ) \
+if (typeOut == ""#suffixOut &&typeIn == "itkDataImage"#suffix) \
 { \
-	itk::Image<TypeIn, 3>::Pointer image = static_cast<itk::Image<TypeIn, 3> *>( imageIn->data() );\
+	itk::Image<TypeIn, 3>::Pointer image = dynamic_cast<itk::Image<TypeIn, 3> *>((itk::Image<TypeIn, 3> *) imageIn->data() );\
 	if (!image) return; \
 	itkImage3D<TypeIn>  vistalConverter(image); \
 	vistal::Image3D<TypeIn> conv = vistalConverter.GetImage3D(); \
@@ -208,6 +210,7 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, Double3, double);\
 			TryVistalConvertFromITKDetailsCopy(Int3, int, Float3, float);
 			TryVistalConvertFromITKDetailsCopy(Int3, int, Double3, double);
 			
+			TryVistalConvertFromITKDetailsCopy(Float3, float, Float3, float);			
 			TryVistalConvertFromITKDetailsCopy(Float3, float, Double3, double);
 			
 			TryVistalConvertFromITKDetailsCopy(UChar3,unsigned char, Short3, short);
@@ -250,9 +253,9 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, Double3, double);\
 		
 		
 #define TryVistalVistalConvertDetailsCopy(suffix, TypeIn, suffixOut, TypeOut) \
-if (typeOut == ""#suffixOut ) \
+if (typeOut == ""#suffixOut &&typeIn == "vistalDataImage"#suffix ) \
 { \
-vistal::Image3D<TypeIn>* image = static_cast<vistal::Image3D<TypeIn>*>( imageIn->data() ); \
+vistal::Image3D<TypeIn>* image = dynamic_cast<vistal::Image3D<TypeIn>*>( (vistal::Image3D<TypeIn>*)imageIn->data() ); \
 if (!image) return; \
 vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(*image, 0); \
 if (!res) return; \
@@ -267,9 +270,9 @@ return; \
 		
 		
 #define TryVistalVistalConvertDetails(suffix, TypeIn, suffixOut, TypeOut) \
-if (typeOut == ""#suffixOut ) \
+if (typeOut == ""#suffixOut&&typeIn == "vistalDataImage"#suffix ) \
 { \
-vistal::Image3D<TypeIn>* image = static_cast<vistal::Image3D<TypeIn>*>( imageIn->data() ); \
+vistal::Image3D<TypeIn>* image = dynamic_cast<vistal::Image3D<TypeIn>*>( (vistal::Image3D<TypeIn>*)imageIn->data() ); \
 if (!image) return; \
 vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(*image, 0); \
 if (!res) return; \
@@ -317,6 +320,7 @@ TryVistalVistalConvertDetails(suffix, TypeIn, Double3, double);\
 			TryVistalVistalConvertDetailsCopy(Int3, int, Float3, float);
 			TryVistalVistalConvertDetailsCopy(Int3, int, Double3, double);
 			
+			TryVistalVistalConvertDetailsCopy(Float3, float, Float3, float);
 			TryVistalVistalConvertDetailsCopy(Float3, float, Double3, double);
 			
 			TryVistalVistalConvertDetailsCopy(UChar3,unsigned char, Short3, short);

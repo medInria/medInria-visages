@@ -55,11 +55,11 @@ namespace vistal
 		template <class DataType1, class DataType2>
 
 				inline void ConvertImages(Image3D<DataType1>& im, Image3D<DataType2>& res, const Parameters& p)
-			{
+			{				
 				if (res.nbx != im.nbx || res.nby != im.nby || res.nbz != im.nbz)
 					res = Image3D<DataType2> (im, 0);
 					
-				vistal::copie_param_volume(res, im);
+				//vistal::copie_param_volume(res, im);
 				
 				
 				if (p.complement)
@@ -106,7 +106,7 @@ namespace vistal
 				}
 				else
 				{
-					
+					//qDebug() << "Copy or Clamp mode";
 					typename Image3D<DataType1>::iterator it1 = im.begin();
 					typename Image3D<DataType1>::iterator iend = im.end();
 					typename Image3D<DataType2>::iterator it2 = res.begin();
