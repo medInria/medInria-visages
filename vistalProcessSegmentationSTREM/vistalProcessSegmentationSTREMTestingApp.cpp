@@ -96,60 +96,65 @@ int main(int argc, char **argv)
 	if (t1== "" || pd == "" && (flair == "" || t2 == ""))
 		abort();	
 	
-	vistal::Image3D<unsigned char> im1;
-	loadImage(arg.gett1(), im1, 0);
+	vistal::Image3D<unsigned char> *im1 = new 	vistal::Image3D<unsigned char>;
+	loadImage(arg.gett1(), *im1, 0);
 	
 	dtkAbstractData *inputImage = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-	inputImage->setData(&im1);
+	inputImage->setData(im1);
 	
-	
-	vistal::Image3D<unsigned char> im2;
-	loadImage(arg.getpd(), im2, 0);
+	vistal::Image3D<unsigned char>* im2 = new 	vistal::Image3D<unsigned char>;
+	loadImage(arg.getpd(), *im2, 0);
 	
 	dtkAbstractData *PD = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-	PD->setData(&im2);
+	PD->setData(im2);
 	
 	
-	vistal::Image3D<unsigned char> im3;
+	vistal::Image3D<unsigned char> *im3 = new 	vistal::Image3D<unsigned char>;
 	if (t2 == "" && flair != "")
-		loadImage(arg.getflair(), im3, 0);	
+		loadImage(arg.getflair(), *im3, 0);	
 	else
-		loadImage(arg.gett2(), im3, 0);	
+		loadImage(arg.gett2(), *im3, 0);	
 
 	dtkAbstractData *Third = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));	
-	Third->setData(&im3);
+	Third->setData(im3);
 	
-	vistal::Image3D<unsigned char> msk;
-	loadImage(arg.getmask(), msk, 0);	
+	vistal::Image3D<unsigned char>* msk = new 	vistal::Image3D<unsigned char>;
+	loadImage(arg.getmask(), *msk, 0);	
 
 	dtkAbstractData *mask = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-	mask->setData(&msk);	
+	mask->setData(msk);	
 	
 	dtkAbstractProcess *process = dynamic_cast <dtkAbstractProcess *>(dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentationSTREM"));
 	if (!process) { 
 		qDebug() << "I am not able to find myself!!! ouiiiiiiiiiiinnnnnnnnnn !!!!!!!!";
 		return -1;
 	}	
-	process->setInput(inputImage,0); // input image
 	
-	process->setInput(PD,1); // target
-	
-	process->setInput(Third,2); // sink
-
-	process->setInput(mask,3); // sink
 
 	
+	process->setInput(inputImage,0);
+	
+	process->setInput(PD,1);
+	
+	process->setInput(Third,2);
+
+	process->setInput(mask,3); 
 	
 	process->update();
-	/*
+
 	dtkAbstractData *outputImage = process->output();
-	outputImage->enableWriter("vistalDataImageWriter");
-	
+	outputImage->enableWriter("vistalDataImageWriter");	
 	outputImage->write(arg.getoutput().c_str());
-	*/
 	
 	
 	dtkPluginManager::instance()->uninitialize();
+	
+
+	delete inputImage;
+	delete PD;
+	delete Third;
+	delete mask;
+	
 	
 	return DTK_SUCCEED;
 }

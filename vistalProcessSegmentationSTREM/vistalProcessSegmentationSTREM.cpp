@@ -74,10 +74,10 @@ public:
 	/* nlesions parameterts*/
 	double mahalanobisThreshold, rulesThreshold;
 	int minsize, wmneighbor;
-
+	
 	
 	dtkAbstractData *output;
-
+	
 };
 
 vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): 
@@ -124,12 +124,12 @@ QString vistalProcessSegmentationSTREM::description(void) const
 
 void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel)
 {
-	
-	// data->name().startsWith("vistalDataImage") // special conversion
 	if (!d) return;
 	if (d->input.size() != 3) d->input.resize(3);
 	
 	dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
+	//	qDebug() << data->data() << dU8->data();
+	
 	if (!dU8) 
 	{
 		qDebug() << "DataType conversion error";
@@ -139,9 +139,11 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 	if (!data)
 		return;
 	if (channel >= 0 && channel < 3)
-		d->input[channel] = vistal::Image3D<unsigned char>(*static_cast<vistal::Image3D<unsigned char>* >(dU8->data()));
+	{
+//		d->input[channel] = *static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
+	}
 	if (channel == 3)
-		d->mask = vistal::Image3D<unsigned char>(*static_cast<vistal::Image3D<unsigned char>* >(dU8->data()));
+		d->mask = *static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
 	
 	
 }
@@ -202,37 +204,6 @@ void vistalProcessSegmentationSTREM::setParameter(double  data, int channel)
 		case 9:
 			d->wmneighbor = data;
 			break;
-						
-
-			
-			//                    d->alpha = data;
-			//                    break;
-			//            case(1):
-			//                    if(data == 0)
-			//                        d->tlinkMode = vistal::Tlinks::Gaussian;
-			//                    else if(data == 1)
-			//                        d->tlinkMode = vistal::Tlinks::Strem;
-			//                    else if(data == 2)
-			//                        d->tlinkMode = vistal::Tlinks::Parzen;
-			//                    else if(data ==3)
-			//                        d->tlinkMode = vistal::Tlinks::Density;
-			//                    else
-			//                        return;
-			//
-			//                    break;
-			//
-			//            case(2):
-			//                    d->beta = data;
-			//                    break;
-			//
-			//            case(3):
-			//                    d->useSpecGrad = data;
-			//                    break;
-			//
-			//            case(4):
-			//                    d->sigma = data;
-			//                    break;
-			
 		default:
 			return;
 	}
@@ -245,7 +216,7 @@ int vistalProcessSegmentationSTREM::update(void)
 	// Starting  strainit binary code
 	
 	std::vector<vistal::Image3D<unsigned char> >& input = d->input;
-		
+	
 	if (input.size() != 3) 
 	{
 		qDebug() << "Bad Input :" << input.size();
@@ -431,10 +402,10 @@ int vistalProcessSegmentationSTREM::update(void)
 	//			std::cout<<" -- Cleaning lesions that are not neighbors to the WM!"<<std::endl;
 	vistal::Image3D<unsigned char> *fclassif = new vistal::Image3D<unsigned char>;
 	rulesWM4lesions(*fclassif,noborderlesions,nclassif,solution.size()+1,d->wmneighbor,/*verbose=*/false);
-		
+	
 	d->output = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
 	d->output->setData(fclassif);	
-		
+	
 	return EXIT_SUCCESS;
 }
 
