@@ -56,9 +56,9 @@ public:
 	vistalProcessSegmentationSTREMPrivate();
 	~vistalProcessSegmentationSTREMPrivate();
 	// Channel 0 to 2
-	std::vector< vistal::Image3D<unsigned char>* > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
+	std::vector< vistal::Image3D<unsigned char> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
 	// Channel 3
-	vistal::Image3D<unsigned char>* mask; // Mask image
+	vistal::Image3D<unsigned char> mask; // Mask image
 	
 	
 	enum InitialisationMethod { StraInit, HierarchicalPD, HierarchicalFLAIR } initMethod; // Type of initialisation for the EM, D. Garcia used Hierachical PD or FLAIR depending on the input
@@ -91,10 +91,7 @@ minsize(6), wmneighbor(0.05)
 }
 
 vistalProcessSegmentationSTREMPrivate::~vistalProcessSegmentationSTREMPrivate()
-{
-	for (unsigned i = 0; i < input.size(); ++i)
-		delete input[i];
-	delete mask;
+{	
 }
 
 
@@ -129,13 +126,9 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 {
 	
 	// data->name().startsWith("vistalDataImage") // special conversion
-	qDebug() << d << channel;
 	if (!d) return;
-	qDebug() << d->input.size();
 	if (d->input.size() != 3) d->input.resize(3);
-	qDebug() << d->input.size();
 	
-	qDebug() << "Inside setInput" << data << channel;
 	dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
 	if (!dU8) 
 	{
@@ -143,14 +136,12 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 		return;
 	}
 	
-	
-	
 	if (!data)
 		return;
 	if (channel >= 0 && channel < 3)
-		d->input[channel] = static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
+		d->input[channel] = vistal::Image3D<unsigned char>(*static_cast<vistal::Image3D<unsigned char>* >(dU8->data()));
 	if (channel == 3)
-		d->mask = static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
+		d->mask = vistal::Image3D<unsigned char>(*static_cast<vistal::Image3D<unsigned char>* >(dU8->data()));
 	
 	
 }
@@ -253,15 +244,12 @@ int vistalProcessSegmentationSTREM::update(void)
 	using namespace mstools;
 	// Starting  strainit binary code
 	
-	std::vector<vistal::Image3D<unsigned char> > input;
-	for (unsigned i = 0; i < d->input.size(); ++i)
+	std::vector<vistal::Image3D<unsigned char> >& input = d->input;
+		
+	if (input.size() != 3) 
 	{
-		if (d->input[i] == 0)
-		{
-			qDebug() << "Null input, stopping process";
-			return -1;
-		}
-		input.push_back(*d->input[i]);
+		qDebug() << "Bad Input :" << input.size();
+		return -1;
 	}
 	
 	if (d->mask == 0)
@@ -282,7 +270,7 @@ int vistalProcessSegmentationSTREM::update(void)
 	switch (d->initMethod) {
 		case vistalProcessSegmentationSTREMPrivate::StraInit:
 		{
-			StraInitializer init(input,*d->mask);
+			StraInitializer init(input,d->mask);
 			init.setDebugMode(false);
 			if(!init. getInitialization(initia)) return -1;
 			break;
@@ -290,14 +278,14 @@ int vistalProcessSegmentationSTREM::update(void)
 		case vistalProcessSegmentationSTREMPrivate::HierarchicalPD: // If third image is T2 use this init
 		{
 			std::vector<std::string> seq;
-			HierarchicalInitializer init(input,*d->mask,seq,false,0.01,false);
+			HierarchicalInitializer init(input,d->mask,seq,false,0.01,false);
 			if(!init. getInitialization(initia)) return -1;
 			break;
 		}
 		case vistalProcessSegmentationSTREMPrivate::HierarchicalFLAIR: // If third image is FLAIR use this init
 		{
 			std::vector<std::string> seq;
-			HierarchicalInitializer init(input,*d->mask,seq,true,0.01,false);
+			HierarchicalInitializer init(input,d->mask,seq,true,0.01,false);
 			if(!init. getInitialization(initia)) return -1;
 			break;
 		}
@@ -313,10 +301,10 @@ int vistalProcessSegmentationSTREM::update(void)
 	std::vector<double> min( modalities, 255.0 ); //min values for random initialization
 	std::vector<double> max( modalities, 0.0 ); //max values for random initialization
 	
-	for (unsigned i = 0; i < 3; ++i) min[i] = vistal::stats::GetMinPixelValue( input[ i ] , *d->mask );
-	for (unsigned i = 0; i < 3; ++i) max[i] = vistal::stats::GetMaxPixelValue( input[ i ] , *d->mask );
+	for (unsigned i = 0; i < 3; ++i) min[i] = vistal::stats::GetMinPixelValue( input[ i ] , d->mask );
+	for (unsigned i = 0; i < 3; ++i) max[i] = vistal::stats::GetMaxPixelValue( input[ i ] , d->mask );
 	
-	if (! jointHistogram.createJointHistogram( input, *d->mask, false ))
+	if (! jointHistogram.createJointHistogram( input, d->mask, false ))
 		return -1;  // Joint histogram construction failure
 	
 	
@@ -362,7 +350,7 @@ int vistalProcessSegmentationSTREM::update(void)
 		
 		vistal::Image3D<unsigned char> outima;
 		
-		classifier.getOutputImage( input , *d->mask, outima );
+		classifier.getOutputImage( input , d->mask, outima );
 		
 		// Fixme tell medINRIA that outima is the output....
 		
@@ -385,7 +373,7 @@ int vistalProcessSegmentationSTREM::update(void)
     threshold.setModel( solution );
     threshold.setThreshold( d->mahalanobisThreshold );
 	
-	threshold.getThresholdImage( input, *d->mask, thImage );
+	threshold.getThresholdImage( input, d->mask, thImage );
 	
 	vistal::Image3D<unsigned char> rulesIma;
 	double rules3[3];
@@ -399,7 +387,7 @@ int vistalProcessSegmentationSTREM::update(void)
 	
 	vistal::Image3D<unsigned int > labels;
 	int numLabels=0;
-	vistal::Image3D<unsigned int> tmpIma(*d->mask, 0);
+	vistal::Image3D<unsigned int> tmpIma(d->mask, 0);
 	for (vistal::Image3D<unsigned>::iterator it = tmpIma.begin(); it != tmpIma.end(); ++it)
 		if (rulesIma(it.Position()) == 5) 
 			*it = 1;
@@ -407,13 +395,13 @@ int vistalProcessSegmentationSTREM::update(void)
 	numLabels = Labelize( tmpIma, labels, 0 );
 	
 	vistal::Image3D<unsigned int> biglesions(tmpIma);
-	rulesLesionSize(biglesions,*d->mask,labels, d->minsize,/* verbose = */ false);
+	rulesLesionSize(biglesions,d->mask,labels, d->minsize,/* verbose = */ false);
 	
 	// Removing border lesions
 	//////////////////////////////
 	vistal::Image3D<unsigned int> noborderlesions;
 	
-	if(!rulesBorder( noborderlesions, *d->mask, biglesions,/* verbose = */false ))
+	if(!rulesBorder( noborderlesions, d->mask, biglesions,/* verbose = */false ))
 	{
 		std::cout<<" ** ERROR in rulesBorder"<<std::endl;
 		return -1;
@@ -422,7 +410,7 @@ int vistalProcessSegmentationSTREM::update(void)
 	vistal::Image3D<unsigned char> classifIma;
 	ImageClassifier classifier;
 	classifier.setModel( solution );
-	classifier.getOutputImage( input , *d->mask, classifIma );
+	classifier.getOutputImage( input , d->mask, classifIma );
 	
 	
 	vistal::Image3D<unsigned char> classifplus(classifIma);
