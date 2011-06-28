@@ -130,9 +130,9 @@ namespace vistal
 	
 		namespace medinria	
 		{
-			void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut);
-			void convertFromItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut);
-			void convert(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut);
+			void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut);
+			void convertFromItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut);
+			void convert(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut);
 }	
 }
 

@@ -63,7 +63,7 @@ TryVistalConvertDetails(suffix, TypeIn, Double3, double);\
 }		
 		
 		
-		 void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut)
+		 void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut)
 		{
 			
 			// Bunch of function to distribute over types going from short type to larger one,
@@ -177,7 +177,7 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, Double3, double);\
 		
 		
 		// 		
-		void convertFromItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut)
+		void convertFromItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut)
 		{
 			// Bunch of function to distribute over types going from short type to larger one,
 			// Avoiding the rescaling of input to the output, does just a copy of data in the new type
@@ -263,6 +263,7 @@ vistal::converters::Parameters parameters; /* conversion parameters */ \
 vistal::converters::ConvertImages(*image, *res, parameters); \
 if (res) imageOut = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
 if (imageOut) imageOut->setData(res); \
+qDebug() << "Conversion went ok";\
 return; \
 } 
 		
@@ -285,7 +286,7 @@ TryVistalVistalConvertDetails(suffix, TypeIn, Double3, double);\
 }		
 		
 		// Simple vistal converter
-		void convert(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData* imageOut)
+		void convert(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut)
 		{
 			//qDebug() << "Vistal Converter " << typeIn << " to " << typeOut;
 			// Bunch of function to distribute over types going from short type to larger one,
