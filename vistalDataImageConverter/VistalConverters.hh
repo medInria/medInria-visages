@@ -116,7 +116,7 @@ namespace vistal
 					
 					while (it1 != iend)
 					{
-						if (p.copy && !p.clamp)
+						if (p.copy )
 							*it2 = (DataType2)*it1;
 						else
 							*it2 = (DataType2)std::min(DT2max, std::max(DT2min, (double)*it1));

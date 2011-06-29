@@ -84,6 +84,7 @@ TryVistalConvertDetails(suffix, TypeIn, Double3, double);\
 			// Bunch of function to distribute over types going from short type to larger one,
 			// Avoiding the rescaling of input to the output, does just a copy of data in the new type
 			
+			
 			TryVistalConvertDetailsCopy(Char3, char, Short3, short);
 			TryVistalConvertDetailsCopy(Char3, char, Int3, int);
 			TryVistalConvertDetailsCopy(Char3, char, Float3, float);
