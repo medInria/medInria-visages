@@ -59,7 +59,7 @@ public:
 	std::vector< vistal::Image3D<unsigned char> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
 	// Channel 3
 	vistal::Image3D<unsigned char> mask; // Mask image
-	
+	int imported;
 	
 	enum InitialisationMethod { StraInit, HierarchicalPD, HierarchicalFLAIR } initMethod; // Type of initialisation for the EM, D. Garcia used Hierachical PD or FLAIR depending on the input
 	// Rejection Ratio 
@@ -80,7 +80,7 @@ public:
 	
 };
 
-vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): 
+vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): imported(0),
 rejectionRatio(0.2),  minDistance(1e-4), emIter(10), strem(0),
 mahalanobisThreshold(.4), rulesThreshold(3.),
 minsize(6), wmneighbor(0.05)
@@ -128,7 +128,7 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 	if (d->input.size() != 3) d->input.resize(3);
 	
 	dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
-	//	qDebug() << data->data() << dU8->data();
+	//qDebug() << data->data() << dU8->data();
 	
 	if (!dU8) 
 	{
@@ -140,12 +140,15 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 		return;
 	if (channel >= 0 && channel < 3)
 	{
-//		d->input[channel] = *static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
+		d->input[channel] = *static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
 	}
 	if (channel == 3)
+	{
 		d->mask = *static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
-	
-	
+	}
+
+	d->imported |= (1<< channel);
+
 }
 
 
@@ -214,20 +217,11 @@ int vistalProcessSegmentationSTREM::update(void)
 {
 	using namespace mstools;
 	// Starting  strainit binary code
+
+	if (!(d->imported & 15)) return -1;
 	
 	std::vector<vistal::Image3D<unsigned char> >& input = d->input;
 	
-	if (input.size() != 3) 
-	{
-		qDebug() << "Bad Input :" << input.size();
-		return -1;
-	}
-	
-	if (d->mask == 0)
-	{
-		qDebug() << "Null mask input, stopping process";
-		return -1;
-	}
 	
 	FiniteModel initia;
 	
