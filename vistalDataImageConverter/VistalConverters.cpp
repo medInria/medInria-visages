@@ -28,15 +28,20 @@ parameters.copy = true; \
 vistal::converters::ConvertImages(*image, conv, parameters); \
 itkImage3D<TypeOut> vistalConverter(conv); \
 imageOut = dtkAbstractDataFactory::instance()->create("itkDataImage"#suffixOut); \
-itkImage3D<TypeOut>::imT* itp;\
-typedef  itk::CastImageFilter<itkImage3D<TypeOut>::imT, itkImage3D<TypeOut>::imT>  NullFilterType; \
- NullFilterType::Pointer myNullFilter = NullFilterType::New(); \
-myNullFilter->SetInput(vistalConverter.GetOutput());\
-myNullFilter->Update();\
-itp = myNullFilter->GetOutput();\
-if (imageOut) imageOut->setData(itp); \
+if (imageOut) imageOut->setData(vistalConverter.GetOutput()); \
 return; \
 } 
+
+		/*
+		 itkImage3D<TypeOut>::imT* itp;\
+		 typedef  itk::CastImageFilter<itkImage3D<TypeOut>::imT, itkImage3D<TypeOut>::imT>  NullFilterType; \
+		 NullFilterType::Pointer myNullFilter = NullFilterType::New(); \
+		 myNullFilter->SetInput(vistalConverter.GetOutput());\
+		 myNullFilter->Update();\
+		 itp = myNullFilter->GetOutput();\
+		 if (imageOut) imageOut->setData(itp); \
+*/		 
+		
 		// MACRO to convert from vistal image with type TypeIn to itk image of type TypeOut
 #define TryVistalConvertDetails(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut && typeIn == "vistalDataImage"#suffix ) \
@@ -48,13 +53,7 @@ vistal::converters::Parameters parameters; /* conversion parameters */ \
 vistal::converters::ConvertImages(*image, conv, parameters); \
 itkImage3D<TypeOut> vistalConverter(conv); \
 imageOut = dtkAbstractDataFactory::instance()->create("itkDataImage"#suffixOut); \
-itkImage3D<TypeOut>::imT* itp;\
-typedef  itk::CastImageFilter<itkImage3D<TypeOut>::imT, itkImage3D<TypeOut>::imT>  NullFilterType; \
- NullFilterType::Pointer myNullFilter = NullFilterType::New(); \
-myNullFilter->SetInput(vistalConverter.GetOutput());\
-myNullFilter->Update();\
-itp = myNullFilter->GetOutput();\
-if (imageOut) imageOut->setData(itp); \
+if (imageOut) imageOut->setData(vistalConverter.GetOutput()); \
 return; \
 } 
 		
