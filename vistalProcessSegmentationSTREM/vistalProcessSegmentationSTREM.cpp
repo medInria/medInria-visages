@@ -57,6 +57,7 @@ public:
 	~vistalProcessSegmentationSTREMPrivate();
 	// Channel 0 to 2
 	std::vector< vistal::Image3D<unsigned char> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
+	vistal::Image3D<unsigned char> im1,im2, im3;
 	// Channel 3
 	vistal::Image3D<unsigned char> mask; // Mask image
 	int imported;
@@ -124,11 +125,20 @@ QString vistalProcessSegmentationSTREM::description(void) const
 
 void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel)
 {
+	if (!data)	return;
+	
 	if (!d) return;
-	if (d->input.size() != 3) d->input.resize(3);
+//	if (d->input.size() != 3) 
+//	{
+////		qDebug() << "Setting the size of temporary input";
+////		vistal::Image3D<unsigned char> ima;
+////		d->input.push_back(ima);
+////		d->input.push_back(ima);
+////		d->input.push_back(ima);
+//	}
 	
 	dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
-	//qDebug() << data->data() << dU8->data();
+//	qDebug() << "channel:" << channel << "datapointers:"<< data->data() << dU8->data();
 	
 	if (!dU8) 
 	{
@@ -136,15 +146,23 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 		return;
 	}
 	
-	if (!data)
-		return;
 	if (channel >= 0 && channel < 3)
 	{
-		d->input[channel] = *static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
+		
+		vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )dU8->data());
+		if (!ima) { qDebug() << "What the fuck the image is fucked up here!!!"; return; }
+
+//		if (channel == 0) d->im1 = *ima;
+//		if (channel == 1) d->im2 = *ima;
+//		if (channel == 2) d->im3 = *ima;
+		
+		d->input[channel] = *ima;
 	}
 	if (channel == 3)
 	{
-		d->mask = *static_cast<vistal::Image3D<unsigned char>* >(dU8->data());
+		vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )dU8->data());
+		if (!ima) { qDebug() << "What the fuck the image is fucked up here!!!"; return; }		
+		d->mask = *ima;
 	}
 
 	d->imported |= (1<< channel);
@@ -218,9 +236,18 @@ int vistalProcessSegmentationSTREM::update(void)
 	using namespace mstools;
 	// Starting  strainit binary code
 
-	if (!(d->imported & 15)) return -1;
+	if (!(d->imported & 15)) 
+	{
+		qDebug() << "Error data not properly imported";
+		return -1;
+	}
 	
-	std::vector<vistal::Image3D<unsigned char> >& input = d->input;
+	std::vector<vistal::Image3D<unsigned char> > &input = d->input ;
+
+//	input.push_back(d->im1);
+//	input.push_back(d->im2);
+//	input.push_back(d->im3);
+	
 	
 	
 	FiniteModel initia;
@@ -237,25 +264,40 @@ int vistalProcessSegmentationSTREM::update(void)
 		{
 			StraInitializer init(input,d->mask);
 			init.setDebugMode(false);
-			if(!init. getInitialization(initia)) return -1;
+			if(!init. getInitialization(initia))
+			{
+				qDebug() << "Error in initialisation";
+				return -1;
+			}
 			break;
 		}
 		case vistalProcessSegmentationSTREMPrivate::HierarchicalPD: // If third image is T2 use this init
 		{
 			std::vector<std::string> seq;
 			HierarchicalInitializer init(input,d->mask,seq,false,0.01,false);
-			if(!init. getInitialization(initia)) return -1;
+			if(!init. getInitialization(initia))
+			{
+				qDebug() << "Error in initialisation";
+return -1;
+			}
 			break;
 		}
 		case vistalProcessSegmentationSTREMPrivate::HierarchicalFLAIR: // If third image is FLAIR use this init
 		{
 			std::vector<std::string> seq;
 			HierarchicalInitializer init(input,d->mask,seq,true,0.01,false);
-			if(!init. getInitialization(initia)) return -1;
+			if(!init. getInitialization(initia)) 			{
+				qDebug() << "Error in initialisation";
+return -1;
+			}
 			break;
 		}
 		default:
+		{
+			qDebug() << "Error in initialisation";
+
 			return -1;
+		}
 	}
 	
 	// Starting Classification binary code
@@ -270,8 +312,10 @@ int vistalProcessSegmentationSTREM::update(void)
 	for (unsigned i = 0; i < 3; ++i) max[i] = vistal::stats::GetMaxPixelValue( input[ i ] , d->mask );
 	
 	if (! jointHistogram.createJointHistogram( input, d->mask, false ))
+	{
+		qDebug() << "Error in Joint Histogram creation";
 		return -1;  // Joint histogram construction failure
-	
+	}
 	
 	std::vector<unsigned int> emSteps( 1, 1 );
 	std::vector<unsigned int> iterSteps( 1, 100 );
@@ -348,8 +392,11 @@ int vistalProcessSegmentationSTREM::update(void)
 	
 	// Lesions in rules Ima are ==5
 	if(!rulesT2lesions(rulesIma, thImage, input, solution, rules3, false /* verbose*/ ))
+	{
+		qDebug() << "Error in Lesions Rules application";
+
 		return -1;
-	
+	}	
 	vistal::Image3D<unsigned int > labels;
 	int numLabels=0;
 	vistal::Image3D<unsigned int> tmpIma(d->mask, 0);

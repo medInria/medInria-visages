@@ -95,8 +95,11 @@ add_executable(${PROJECT_NAME}Testing
 )
 
 target_link_libraries(${PROJECT_NAME}Testing
-  ${PROJECT_NAME}
-)
+ ${QT_LIBRARIES}
+  ${MSTOOLS_LIB}
+  ${VISTAL_LIBS}
+  dtkCore
+  medCore)
 
 ## #################################################################
 ## Install rules

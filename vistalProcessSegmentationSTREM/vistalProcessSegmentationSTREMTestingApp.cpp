@@ -142,9 +142,23 @@ int main(int argc, char **argv)
 	
 	process->update();
 
-	dtkAbstractData *outputImage = process->output();
-	outputImage->enableWriter("vistalDataImageWriter");	
-	outputImage->write(arg.getoutput().c_str());
+	if (!process->output())
+	{
+		qDebug() << "Warning output not available";
+		
+	}
+	else {
+		
+
+	vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )process->output()->data());
+
+	vistal::gis::saveVolume(arg.getoutput().c_str(), *ima, 0);
+//	dtkAbstractData *outputImage = process->output();
+//	outputImage->enableWriter("vistalDataImageWriter");	
+//	outputImage->write(arg.getoutput().c_str());
+	}
+
+	
 	
 	
 	dtkPluginManager::instance()->uninitialize();
