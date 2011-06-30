@@ -164,10 +164,10 @@ int main(int argc, char **argv)
 	dtkPluginManager::instance()->uninitialize();
 	
 
-	delete inputImage;
-	delete PD;
-	delete Third;
-	delete mask;
+//	delete inputImage;
+//	delete PD;
+//	delete Third;
+//	delete mask;
 	
 	
 	return DTK_SUCCEED;

@@ -84,7 +84,7 @@ public:
 vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): imported(0),
 rejectionRatio(0.2),  minDistance(1e-4), emIter(10), strem(0),
 mahalanobisThreshold(.4), rulesThreshold(3.),
-minsize(6), wmneighbor(0.05)
+minsize(6), wmneighbor(0.05), output(0)
 
 // -0 -iter 200 dist 1e-3 
 // show outliers, set iteration to 200, mindistance 1e-3, 
@@ -128,23 +128,23 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 	if (!data)	return;
 	
 	if (!d) return;
-//	if (d->input.size() != 3) 
-//	{
-////		qDebug() << "Setting the size of temporary input";
-////		vistal::Image3D<unsigned char> ima;
-////		d->input.push_back(ima);
-////		d->input.push_back(ima);
-////		d->input.push_back(ima);
-//	}
+	if (d->input.size() != 3) 
+	{
+//		qDebug() << "Setting the size of temporary input";
+		vistal::Image3D<unsigned char> ima;
+		d->input.push_back(ima);
+		d->input.push_back(ima);
+		d->input.push_back(ima);
+	}
 	
 	dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
-//	qDebug() << "channel:" << channel << "datapointers:"<< data->data() << dU8->data();
 	
 	if (!dU8) 
 	{
 		qDebug() << "DataType conversion error";
 		return;
 	}
+	qDebug() << "channel:" << channel << "datapointers:"<< data << dU8;
 	
 	if (channel >= 0 && channel < 3)
 	{
