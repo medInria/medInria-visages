@@ -138,6 +138,7 @@ return "vistalDataImage"#suffix; \
 } \
 dtkAbstractData *VistalToVistal##suffix##Converter::convert(void) \
 { \
+qDebug() << "Vistal self Conversion to "#suffix << "from"<< this->data();\
 dtkAbstractData *data = this->data(); \
 dtkAbstractData *output; \
 if (!data) \
