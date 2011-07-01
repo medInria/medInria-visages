@@ -81,7 +81,8 @@ public:
 	
 };
 
-vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): imported(0),
+vistalProcessSegmentationSTREMPrivate::vistalProcessSegmentationSTREMPrivate(): imported(0), 
+	initMethod(HierarchicalFLAIR), approachEM(GaussianREM),
 rejectionRatio(0.2),  minDistance(1e-4), emIter(10), strem(0),
 mahalanobisThreshold(.4), rulesThreshold(3.),
 minsize(6), wmneighbor(0.05), output(0)
@@ -274,7 +275,7 @@ int vistalProcessSegmentationSTREM::update(void)
 		case vistalProcessSegmentationSTREMPrivate::HierarchicalPD: // If third image is T2 use this init
 		{
 			std::vector<std::string> seq;
-			HierarchicalInitializer init(input,d->mask,seq,false,0.01,false);
+			HierarchicalInitializer init(input,d->mask,seq,false,0.01, 0);
 			if(!init. getInitialization(initia))
 			{
 				qDebug() << "Error in initialisation";
@@ -285,7 +286,7 @@ return -1;
 		case vistalProcessSegmentationSTREMPrivate::HierarchicalFLAIR: // If third image is FLAIR use this init
 		{
 			std::vector<std::string> seq;
-			HierarchicalInitializer init(input,d->mask,seq,true,0.01,false);
+			HierarchicalInitializer init(input, d->mask, seq, true, 0.01, 0);
 			if(!init. getInitialization(initia)) 			{
 				qDebug() << "Error in initialisation";
 return -1;
