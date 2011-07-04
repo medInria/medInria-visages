@@ -130,7 +130,43 @@ int main(int argc, char **argv)
 		return -1;
 	}	
 	
-
+	
+	/* Set Options
+	 ENUM(5, initMethod, "I", "init-method", "Method for initialisation", (StraInit)(HierarchicalPD)(HierarchicalFLAIR), StraInit);
+	 
+	 OPTIONAL(6, float, rejectionRatio, "rej", "rejectionRatio", "Robust estimation rejection Ratio", .2, InputArgument, "Image3D");
+	 
+	 ENUM(7, EMAlgorithm, "EM", "EM-Algorithm", "EM Algorithm", (GaussianEM)(GaussianCeleuxREM)(GaussianREM), GaussianREM);
+	 
+	 OPTIONAL(8, float, minDistance, "minD", "minDistance", "Minimum distance in EM (stoping criteria)", 1e-4, InputArgument, "");
+	 
+	 OPTIONAL(9, int, emIter, "eit", "emIter", "Iterations of the EM Algorithm", 1e-4, InputArgument, "");
+	 
+	 FLAG(10, strem, "st", "Strem", "Start the first iteration with STREM?", false);
+	 
+	 //OPTIONAL(11, float, emIter, "eit", "emIter", "Iterations of the EM Algorithm", 10, InputArgument, "");
+	 
+	 
+	 OPTIONAL(11, float, mahalanobisThreshold, "mTh", "mahalanobisThreshold", "Iterations of the EM Algorithm", .4, InputArgument, "");
+	 OPTIONAL(12, float, rulesThreshold, "rTh", "rulesThreshold", "Iterations of the EM Algorithm", 3., InputArgument, "");
+	 OPTIONAL(13, float, minsize, "msize", "minsize", "Iterations of the EM Algorithm", 6, InputArgument, "");
+	 OPTIONAL(14, float, wmneighbor, "wm", "wmneighbor", "Iterations of the EM Algorithm", 0.05, InputArgument, "");
+	 
+	 */
+	
+	process->setParameter((double)arg.getinitMethod(), 0);
+	process->setParameter((double)arg.getrejectionRatio(), 1);
+	process->setParameter((double)arg.getEMAlgorithm(), 2);
+	process->setParameter((double)arg.getminDistance(), 3 );
+	process->setParameter((double)arg.getemIter(), 4);
+	process->setParameter((double)arg.getstrem(), 5);
+	process->setParameter((double)arg.getmahalanobisThreshold(), 6);
+	process->setParameter((double)arg.getrulesThreshold(), 7);
+	process->setParameter((double)arg.getminsize(), 8);
+	process->setParameter((double)arg.getwmneighbor(), 9);
+	
+/* Set algorithm input images
+ */
 	
 	process->setInput(inputImage,0);
 	
@@ -151,11 +187,11 @@ int main(int argc, char **argv)
 		
 
 	vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )process->output()->data());
-
+		
 	vistal::gis::saveVolume(arg.getoutput().c_str(), *ima, 0);
-//	dtkAbstractData *outputImage = process->output();
-//	outputImage->enableWriter("vistalDataImageWriter");	
-//	outputImage->write(arg.getoutput().c_str());
+	dtkAbstractData *outputImage = process->output();
+	outputImage->enableWriter("vistalDataImageWriter");	
+	outputImage->write(arg.getoutput().c_str());
 	}
 
 	
@@ -164,10 +200,10 @@ int main(int argc, char **argv)
 	dtkPluginManager::instance()->uninitialize();
 	
 
-//	delete inputImage;
-//	delete PD;
-//	delete Third;
-//	delete mask;
+	delete inputImage;
+	delete PD;
+	delete Third;
+	delete mask;
 	
 	
 	return DTK_SUCCEED;

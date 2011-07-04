@@ -145,7 +145,7 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 		qDebug() << "DataType conversion error";
 		return;
 	}
-	qDebug() << "channel:" << channel << "datapointers:"<< data << dU8;
+//	qDebug() << "channel:" << channel << "datapointers:"<< data << dU8;
 	
 	if (channel >= 0 && channel < 3)
 	{
