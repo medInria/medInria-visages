@@ -1,6 +1,6 @@
 
-#include "vistalProcessDenoising.h"
-#include "vistalProcessDenoisingToolBox.h"
+#include "vistalProcessBiasRemoval.h"
+#include "vistalProcessBiasRemovalToolBox.h"
 
 #include <dtkCore/dtkAbstractDataFactory.h>
 #include <dtkCore/dtkAbstractData.h>
@@ -17,7 +17,7 @@
 
 #include <QtGui>
 
-class vistalProcessDenoisingToolBoxPrivate
+class vistalProcessBiasRemovalToolBoxPrivate
 {
 public:
         QRadioButton *slope;
@@ -39,7 +39,7 @@ public:
         dtkAbstractProcess *process;
 };
 
-vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessDenoisingToolBoxPrivate)
+vistalProcessBiasRemovalToolBox::vistalProcessBiasRemovalToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessBiasRemovalToolBoxPrivate)
 {
       // Parameters:
 
@@ -196,21 +196,21 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
 
 }
 
-vistalProcessDenoisingToolBox::~vistalProcessDenoisingToolBox(void)
+vistalProcessBiasRemovalToolBox::~vistalProcessBiasRemovalToolBox(void)
 {
     delete d;
     
     d = NULL;
 }
 
-bool vistalProcessDenoisingToolBox::registered(void)
+bool vistalProcessBiasRemovalToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->registerCustomFilteringToolBox("NLmeansDenoising",
                                                                            createVistalProcessDenoisingToolBox);
 }
 
 
-dtkAbstractData* vistalProcessDenoisingToolBox::processOutput(void)
+dtkAbstractData* vistalProcessBiasRemovalToolBox::processOutput(void)
 {
         if(!d->process)
             return NULL;
@@ -219,12 +219,12 @@ dtkAbstractData* vistalProcessDenoisingToolBox::processOutput(void)
 }
 
 
-void vistalProcessDenoisingToolBox::run(void)
+void vistalProcessBiasRemovalToolBox::run(void)
 {
     if(!this->parent())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessDenoising");
+    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessBiasRemoval");
 
     if(!this->parent()->data())
         return;
@@ -253,7 +253,7 @@ void vistalProcessDenoisingToolBox::run(void)
 
 }
 
-medToolBoxFilteringCustom *createVistalProcessDenoisingToolBox(QWidget *parent)
+medToolBoxFilteringCustom *createVistalProcessBiasRemovalToolBox(QWidget *parent)
 {
-    return new vistalProcessDenoisingToolBox(parent);
+    return new vistalProcessBiasRemovalToolBox(parent);
 }

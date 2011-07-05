@@ -1,18 +1,22 @@
 
-#ifndef VISTALPROCESSDENOISINGTOOLBOX_H
-#define VISTALPROCESSDENOISINGTOOLBOX_H
+#ifndef VISTALPROCESSBIASREMOVALTOOLBOX_H
+#define VISTALPROCESSBIASREMOVALTOOLBOX_H
 
+#include <QObject>
 #include <medGui/medToolBoxFilteringCustom.h>
 
-class vistalProcessDenoisingToolBoxPrivate;
 
-class vistalProcessDenoisingToolBox : public medToolBoxFilteringCustom
+class medToolBoxFilteringCustom;
+class dtkAbstractData;
+class vistalProcessBiasRemovalToolBoxPrivate;
+
+class vistalProcessBiasRemovalToolBox : public medToolBoxFilteringCustom
 {
     Q_OBJECT
 
 public:
-     vistalProcessDenoisingToolBox(QWidget *parent = 0);
-    ~vistalProcessDenoisingToolBox(void);
+     vistalProcessBiasRemovalToolBox(QWidget *parent = 0);
+    ~vistalProcessBiasRemovalToolBox(void);
 
 public:
     static bool registered(void);
@@ -27,10 +31,10 @@ public slots:
     void run(void);
 
 private:
-    vistalProcessDenoisingToolBoxPrivate *d;
+    vistalProcessBiasRemovalToolBoxPrivate *d;
 };
 
-medToolBoxFilteringCustom *createVistalProcessDenoisingToolBox(QWidget *parent);
+medToolBoxFilteringCustom *createVistalProcessBiasRemovalToolBox(QWidget *parent);
 
 #endif
 
