@@ -63,6 +63,7 @@ option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWri
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
 option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "OFF")
 option(MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN     "Build qtdcmDataSource plugin" "OFF")
+option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
 option(BUILD_DOCUMENTATION "Build documentation")
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
@@ -94,7 +95,7 @@ if (MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN)
 endif()
 
 if (MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN)
-    subdirs(vistalProcessDenoisingNLMeans)
+    add_subdirectory(vistalProcessDenoisingNLMeans)
 endif()
 
 if(BUILD_DOCUMENTATION)
