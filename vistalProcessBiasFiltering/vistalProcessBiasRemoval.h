@@ -13,7 +13,7 @@
 class vistalProcessBiasRemovalPrivate;
 class dtkAbstractData;
 
-class VISTALPROCESSBIASREMOVALPLUGIN_EXPORT vistalProcessBiasRemoval : public dtkAbstractProcess
+class  vistalProcessBiasRemoval : public dtkAbstractProcess
 {
     Q_OBJECT
 

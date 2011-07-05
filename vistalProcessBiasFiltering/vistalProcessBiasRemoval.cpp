@@ -43,7 +43,7 @@ public:
 // vistalProcessBiasRemoval
 // /////////////////////////////////////////////////////////////////
 
-vistalProcessBiasRemoval::vistalProcessBiasRemoval(void) : dtkAbstractProcess(), d(new vistalProcessBiasRemovalPrivate)
+vistalProcessBiasRemoval::vistalProcessBiasRemoval() : dtkAbstractProcess(), d(new vistalProcessBiasRemovalPrivate)
 {
 	d->input = NULL;
 	d->output = NULL;  
@@ -64,7 +64,7 @@ vistalProcessBiasRemoval::vistalProcessBiasRemoval(void) : dtkAbstractProcess(),
         //temp = NULL;
 }
 
-vistalProcessBiasRemoval::~vistalProcessBiasRemoval(void)
+vistalProcessBiasRemoval::~vistalProcessBiasRemoval()
 {                
         delete d->input;
 	d->input = NULL;
