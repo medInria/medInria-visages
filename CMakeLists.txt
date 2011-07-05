@@ -93,6 +93,10 @@ if (MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN)
     add_subdirectory(qtdcmDataSource)
 endif()
 
+if (MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN)
+    subdirs(vistalProcessDenoisingNLMeans)
+endif()
+
 if(BUILD_DOCUMENTATION)
   add_subdirectory(doc)
 endif(BUILD_DOCUMENTATION)
