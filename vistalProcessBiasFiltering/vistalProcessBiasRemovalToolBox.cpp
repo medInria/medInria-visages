@@ -20,202 +20,162 @@
 class vistalProcessBiasRemovalToolBoxPrivate
 {
 public:
-        QRadioButton *slope;
-        QLineEdit *sigma;
-        QLineEdit *beta;
-        QLineEdit *neighborhoodSize;
-        QLineEdit *volumeOfSearch;
-        QRadioButton *weightingMethod;
-        QRadioButton *neighborhoodType;
+    QDoubleSpinBox *cutoff;
+    QSpinBox *bins;
+    QDoubleSpinBox *regularization;
 
-        QCheckBox *blockApproach;
-        QLineEdit *distanceBetweenBlocks;
-        QCheckBox *testOnMean;
-        QLineEdit *minimumMeanRatio;
-        QCheckBox *testOnVar;
-        QLineEdit *minimumVarianceRatio;
-        QLineEdit *n_thread;
+    QComboBox *basistype;
+    QCheckBox *random;
+    QCheckBox *skip0;
 
-        dtkAbstractProcess *process;
+    QDoubleSpinBox *threshold;
+
+    QSpinBox *iter;
+    QDoubleSpinBox *optThresh;
+
+    QCheckBox *biasOutput;
+
+
+    dtkAbstractProcess *process;
 };
 
 vistalProcessBiasRemovalToolBox::vistalProcessBiasRemovalToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessBiasRemovalToolBoxPrivate)
 {
-      // Parameters:
+    // Parameters:
 
-      QLabel *slopeLabel = new QLabel("Slope :");
-      d->slope = new QRadioButton("adaptive");
-      d->slope->setChecked(true);
-      QRadioButton *constantSlope = new QRadioButton("constant");
+    QLabel *cutoffLbl = new QLabel("Cut off Freq. :");
+    d->cutoff = new QDoubleSpinBox();
+    d->cutoff->setRange(5, 200);
 
-      QButtonGroup *slopeButtonGroup = new QButtonGroup(this);
-      slopeButtonGroup->addButton(d->slope);
-      slopeButtonGroup->addButton(constantSlope);
-      slopeButtonGroup->setExclusive(true);
+    d->cutoff->setValue(30);
 
-      QLabel *sigmaLabel = new QLabel("Sigma : ");
-      d->sigma = new QLineEdit("0");
+    QHBoxLayout *cutoffBox = new QHBoxLayout();
+    cutoffBox->addWidget(cutoffLbl);
+    cutoffBox->addWidget(d->cutoff);
 
-      QHBoxLayout *sigmaBox = new QHBoxLayout();
-      sigmaBox->addWidget(sigmaLabel);
-      sigmaBox->addWidget(d->sigma);
+    QLabel *binsLbl = new QLabel("Number of Bins :");
+    d->bins = new QSpinBox();
+    d->bins->setValue(1024);
 
-      QLabel *betaLabel = new QLabel("Beta : ");
-      d->beta = new QLineEdit("0.5");
+    QHBoxLayout *binsBox = new QHBoxLayout();
+    binsBox->addWidget(binsLbl);
+    binsBox->addWidget(d->bins);
 
-      QHBoxLayout *betaBox = new QHBoxLayout();
-      betaBox->addWidget(betaLabel);
-      betaBox->addWidget(d->beta);
+    QLabel *regLbl = new QLabel("Regularization parameter :");
+    d->regularization = new QDoubleSpinBox();
+    d->regularization->setRange(1e-9, 1);
+    d->regularization->setDecimals(8);
+    d->regularization->setValue(1e-5);
 
-      QLabel *neighborhoodSizeLabel = new QLabel("Neighborhood size :");
-      d->neighborhoodSize = new QLineEdit("1");
+    QHBoxLayout *regBox = new QHBoxLayout();
+    regBox->addWidget(regLbl);
+    regBox->addWidget(d->regularization);
 
-      QHBoxLayout *nghborhd = new QHBoxLayout();
-      nghborhd->addWidget(neighborhoodSizeLabel);
-      nghborhd->addWidget(d->neighborhoodSize);
+    QLabel *basLbl = new QLabel("Type of Basis :");
+    d->basistype = new QComboBox();
+    d->basistype->addItems(QStringList() << "Discrete Cosines" << "Legendre Polynomials" << "Hermite Polynomials");
 
-      QLabel *volumeOfSearchLabel = new QLabel("Volume Of Search :");
-      d->volumeOfSearch = new QLineEdit("5");
+    QHBoxLayout *basBox = new QHBoxLayout();
+    basBox->addWidget(basLbl);
+    basBox->addWidget(d->regularization);
 
-      QHBoxLayout *volOfSrch = new QHBoxLayout();
-      volOfSrch->addWidget(volumeOfSearchLabel);
-      volOfSrch->addWidget(d->volumeOfSearch);
+    d->random = new QCheckBox("Noisy input");
+    d->random->setChecked(true);
 
-      QLabel *weightingMethodLabel = new QLabel("Weighting method :");
-      d->weightingMethod = new QRadioButton("Pearson divergence");
-      d->weightingMethod->setChecked(true);
-      QRadioButton *classicExp = new QRadioButton("classic exponentional");
+    d->skip0 = new QCheckBox("Skip null values");
+    d->skip0->setChecked(false);
 
-      QButtonGroup *weightingMethodGroup = new QButtonGroup(this);
-      weightingMethodGroup->addButton(d->weightingMethod);
-      weightingMethodGroup->addButton(classicExp);
-      weightingMethodGroup->setExclusive(true);
+    QLabel *thrLbl = new QLabel("Background removal:");
+    d->threshold = new QDoubleSpinBox();
+    d->threshold->setValue(-1);
+    d->threshold->setRange(-1, 10000);
 
-      QLabel *neighborhoodLabel = new QLabel("Neighborhood type: ");
-      d->neighborhoodType = new QRadioButton("isotropic");
-      d->neighborhoodType->setChecked(true);
-      QRadioButton *cubic = new QRadioButton("cubic");
+    QHBoxLayout *thBox = new QHBoxLayout();
+    thBox->addWidget(thrLbl);
+    thBox->addWidget(d->threshold);
 
-      QButtonGroup *neighborhoodGroup = new QButtonGroup(this);
-      neighborhoodGroup->addButton(d->neighborhoodType);
-      neighborhoodGroup->addButton(cubic);
-      neighborhoodGroup->setExclusive(true);
+    QLabel *iterLbl = new QLabel("Number of Iterations:");
+    d->iter = new QSpinBox();
+    d->iter->setRange(1, 1000);
+    d->iter->setValue(128);
 
-      QVBoxLayout *parametersLayout = new QVBoxLayout();
-      parametersLayout->addWidget(slopeLabel);
-      parametersLayout->addWidget(d->slope);
-      parametersLayout->addWidget(constantSlope);
-      parametersLayout->addWidget(sigmaLabel);
-      parametersLayout->addLayout(sigmaBox);
-      parametersLayout->addWidget(betaLabel);
-      parametersLayout->addLayout(betaBox);
-      parametersLayout->addWidget(neighborhoodSizeLabel);
-      parametersLayout->addLayout(nghborhd);
-      parametersLayout->addWidget(volumeOfSearchLabel);
-      parametersLayout->addLayout(volOfSrch);
-      parametersLayout->addWidget(weightingMethodLabel);
-      parametersLayout->addWidget(d->weightingMethod);
-      parametersLayout->addWidget(classicExp);
-      parametersLayout->addWidget(neighborhoodLabel);
-      parametersLayout->addWidget(d->neighborhoodType);
-      parametersLayout->addWidget(cubic);
+    QHBoxLayout *iterBox = new QHBoxLayout();
+    iterBox->addWidget(iterLbl);
+    iterBox->addWidget(d->iter);
 
-      QGroupBox *groupParameters = new QGroupBox("Mandatory");
-      groupParameters->setLayout(parametersLayout);
+    QLabel *optThLbl = new QLabel("Optimisation End:");
+    d->optThresh = new QDoubleSpinBox();
+    d->optThresh->setRange(1e-9, 1);
+    d->optThresh->setDecimals(8);
+    d->optThresh->setValue(1e-5);
 
-      // Options:
+    QHBoxLayout *optThBox = new QHBoxLayout();
+    optThBox->addWidget(optThLbl);
+    optThBox->addWidget(d->optThresh);
 
-      d->blockApproach = new QCheckBox("Use block approach");
-      d->blockApproach->setChecked(true);
+    d->skip0 = new QCheckBox("Bias field");
+    d->skip0->setChecked(false);
 
-      QLabel *distanceBetBlocks = new QLabel("Distance between blocks :");
-      d->distanceBetweenBlocks = new QLineEdit("2");
+    QVBoxLayout *parametersLayout = new QVBoxLayout();
+    parametersLayout->addLayout(cutoffBox);
+    parametersLayout->addLayout(binsBox);
+    parametersLayout->addLayout(regBox);
+    parametersLayout->addLayout(basBox);
+    parametersLayout->addWidget(d->random);
+    parametersLayout->addWidget(d->skip0);
+    parametersLayout->addLayout(thBox);
+    parametersLayout->addLayout(iterBox);
+    parametersLayout->addLayout(optThBox);
 
-      QHBoxLayout *distBetBlocks = new QHBoxLayout();
-      distBetBlocks->addWidget(distanceBetBlocks);
-      distBetBlocks->addWidget(d->distanceBetweenBlocks);
+    parametersLayout->addWidget(d->biasOutput);
 
-      d->testOnMean = new QCheckBox("Use test on mean");
-      d->testOnMean->setChecked(true);
+    QGroupBox *groupParameters = new QGroupBox("Mandatory");
+    groupParameters->setLayout(parametersLayout);
 
-      QLabel *minMeanRatioLabel = new QLabel("Lowest bound of mean ratio :");
-      d->minimumMeanRatio = new QLineEdit("0.95");
+    // Options:
 
-      QHBoxLayout *minMeanRat = new QHBoxLayout();
-      minMeanRat->addWidget(minMeanRatioLabel);
-      minMeanRat->addWidget(d->minimumMeanRatio);
+    // Run button:
 
-      d->testOnVar = new QCheckBox("Use test on variance");
-      d->testOnVar->setChecked(true);
+    QPushButton *runButton = new QPushButton(tr("Run"));
 
-      QLabel *minVarRatioLabel = new QLabel("Lowest bound of variance ratio :");
-      d->minimumVarianceRatio = new QLineEdit("0.5");
+    // Principal layout:
 
-      QHBoxLayout *minVarRat = new QHBoxLayout();
-      minVarRat->addWidget(minVarRatioLabel);
-      minVarRat->addWidget(d->minimumVarianceRatio);
+    QVBoxLayout *layprinc = new QVBoxLayout();
+    layprinc->addWidget(groupParameters);
+//    layprinc->addWidget(groupOptions);
+    layprinc->addWidget(runButton);
 
-      QLabel *numberOfThreads = new QLabel("Multithread :");
-      d->n_thread = new QLineEdit("2");
+    QWidget *widget = new QWidget(this);
+    widget->setLayout(layprinc);
 
-      QVBoxLayout *optionsLayout = new QVBoxLayout();
-      optionsLayout->addWidget(d->blockApproach);
-      optionsLayout->addWidget(distanceBetBlocks);
-      optionsLayout->addWidget(d->distanceBetweenBlocks);
-      optionsLayout->addWidget(d->testOnMean);
-      optionsLayout->addWidget(minMeanRatioLabel);
-      optionsLayout->addWidget(d->minimumMeanRatio);
-      optionsLayout->addWidget(d->testOnVar);
-      optionsLayout->addWidget(minVarRatioLabel);
-      optionsLayout->addWidget(d->minimumVarianceRatio);
-      optionsLayout->addWidget(numberOfThreads);
-      optionsLayout->addWidget(d->n_thread);
+    // Main toolbox:
+    this->setTitle("Bias Filtering settings");
+    this->addWidget(widget);
 
-      QGroupBox *groupOptions = new QGroupBox("Optional");
-      groupOptions->setLayout(optionsLayout);
-
-      // Run button:
-
-      QPushButton *runButton = new QPushButton(tr("Run"));
-
-      // Principal layout:
-
-      QVBoxLayout *layprinc = new QVBoxLayout();
-      layprinc->addWidget(groupParameters);
-      layprinc->addWidget(groupOptions);
-      layprinc->addWidget(runButton);
-
-      QWidget *widget = new QWidget(this);
-      widget->setLayout(layprinc);
-
-      // Main toolbox:
-      this->setTitle("NLMeans settings");
-      this->addWidget(widget);
-
-      connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
+    connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
 }
 
 vistalProcessBiasRemovalToolBox::~vistalProcessBiasRemovalToolBox(void)
 {
     delete d;
-    
+
     d = NULL;
 }
 
 bool vistalProcessBiasRemovalToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->registerCustomFilteringToolBox("BiasRemovalFilter",
-                                                                           createVistalProcessBiasRemovalToolBox);
+                                                                         createVistalProcessBiasRemovalToolBox);
 }
 
 
 dtkAbstractData* vistalProcessBiasRemovalToolBox::processOutput(void)
 {
-        if(!d->process)
-            return NULL;
+    if(!d->process)
+        return NULL;
 
-        return d->process->output();
+    return d->process->output();
 }
 
 
@@ -231,20 +191,17 @@ void vistalProcessBiasRemovalToolBox::run(void)
 
     d->process->setInput(this->parent()->data());
 
-    d->process->setParameter(d->sigma->text().toDouble(),0);
-    d->process->setParameter(d->beta->text().toDouble(),1);
-    d->process->setParameter((float)(d->slope->isChecked()),2);
-    d->process->setParameter((float)(d->neighborhoodType->isChecked()),3);
-    d->process->setParameter(d->neighborhoodSize->text().toDouble(),4);
-    d->process->setParameter(d->volumeOfSearch->text().toDouble(),5);
-    d->process->setParameter((float)(d->testOnMean->checkState() == Qt::Checked),6);
-    d->process->setParameter((float)(d->testOnVar->checkState() == Qt::Checked),7);
-    d->process->setParameter(d->minimumMeanRatio->text().toDouble(),8);
-    d->process->setParameter(d->minimumVarianceRatio->text().toDouble(),9);
-    d->process->setParameter((float)(d->weightingMethod->isChecked() == Qt::Checked),10);
-    d->process->setParameter((float)(d->blockApproach->checkState() == Qt::Checked),11);
-    d->process->setParameter(d->distanceBetweenBlocks->text().toDouble(),12);
-    d->process->setParameter(d->n_thread->text().toDouble(),13);
+    d->process->setParameter(d->cutoff->value(), 0);
+    d->process->setParameter((double)d->bins->value(), 1);
+    d->process->setParameter(d->regularization->value(),2);
+    d->process->setParameter(d->basistype->currentIndex(), 3);
+    d->process->setParameter(d->random->checkState(),4);
+    d->process->setParameter(d->skip0->checkState(),5);
+    d->process->setParameter(d->threshold->value(), 6);
+    d->process->setParameter((double)d->iter->value(), 7);
+    d->process->setParameter(d->optThresh->value(), 8);
+    d->process->setParameter(d->biasOutput->checkState(), 9);
+
 
     if(d->process->update()==0)
         emit success();
