@@ -59,25 +59,25 @@ KPMatrix KP(const BaseMatrix&, const BaseMatrix&);
 class vistalProcessBiasRemovalPrivate
 {
 public:
-	dtkAbstractData *input;	
-	dtkAbstractData *output;
-	
-	double cutoff; // per axis frequency cut off
-	int bins; // Number of bins for histogram computation
-	double regularization; // Regularization parameter
-	
-	enum Basis {DiscretCosines, LegendrePolynomials, HermitePolynomials} basistype; // Type of basis to use for fitting 
-	bool random; // should small perturbation be used to compute the histogram
-	
-	bool skip0; // skip background value 
-	double threshold; // threshold value for skipping the background
-	
-	int iter; // max number of optimisation iterations 
-	float optTreshold; // target value for optimisation (in the LS sense)
-	bool biasOutput; // output is the bias field
-	
-	
-	vistalProcessBiasRemovalPrivate();
+        dtkAbstractData *input;
+        dtkAbstractData *output;
+
+        double cutoff; // per axis frequency cut off
+        int bins; // Number of bins for histogram computation
+        double regularization; // Regularization parameter
+
+        enum Basis {DiscretCosines, LegendrePolynomials, HermitePolynomials} basistype; // Type of basis to use for fitting
+        bool random; // should small perturbation be used to compute the histogram
+
+        bool skip0; // skip background value
+        double threshold; // threshold value for skipping the background
+
+        int iter; // max number of optimisation iterations
+        float optTreshold; // target value for optimisation (in the LS sense)
+        bool biasOutput; // output is the bias field
+
+
+        vistalProcessBiasRemovalPrivate();
 };
 
 // Default parameters
@@ -96,12 +96,12 @@ vistalProcessBiasRemoval::vistalProcessBiasRemoval() : dtkAbstractProcess(), d(n
 }
 
 vistalProcessBiasRemoval::~vistalProcessBiasRemoval()
-{                
-	delete d->input;
-	d->input = NULL;
-	
-	delete d->output;
-	d->output = NULL;	
+{
+        delete d->input;
+        d->input = NULL;
+
+        delete d->output;
+        d->output = NULL;
 }
 
 bool vistalProcessBiasRemoval::registered(void)
@@ -110,15 +110,15 @@ bool vistalProcessBiasRemoval::registered(void)
 }
 
 QString vistalProcessBiasRemoval::description(void) const
-{  
+{
     return "vistalProcessBiasRemoval";
 }
 
 void vistalProcessBiasRemoval::setInput(dtkAbstractData *data)
-{   
-	qDebug() << "Setting input" << data;
-	if (!data) return;	
-	d->input = data->convert("vistalDataImageFloat3");	
+{
+        qDebug() << "Setting input" << data;
+        if (!data) return;
+        d->input = data->convert("vistalDataImageFloat3");
 }
 
 
@@ -126,314 +126,315 @@ void vistalProcessBiasRemoval::setInput(dtkAbstractData *data)
 void vistalProcessBiasRemoval::setParameter(double  data, int channel)
 {
     switch (channel){
-		case 0: d->cutoff = data; return;
-		case 1: d->bins = data;  return;
-		case 2: d->regularization= data; return;
-		case 3: d->basistype = (vistalProcessBiasRemovalPrivate::Basis)data; return;
-		case 4: d->random = data; return;
-		case 5: d->skip0 = data; return;
-		case 6: d->threshold = data; return;
-		case 7: d->iter= data; return;
-		case 8: d->optTreshold = data; return;
-		case 9: d->biasOutput = data; return;
-		default :
-			return;
-	}
+                case 0: d->cutoff = data; return;
+                case 1: d->bins = data;  return;
+                case 2: d->regularization= data; return;
+                case 3: d->basistype = (vistalProcessBiasRemovalPrivate::Basis)data; return;
+                case 4: d->random = data; return;
+                case 5: d->skip0 = data; return;
+                case 6: d->threshold = data; return;
+                case 7: d->iter= data; return;
+                case 8: d->optTreshold = data; return;
+                case 9: d->biasOutput = data; return;
+                default :
+                        return;
+        }
 }
 
 
 int vistalProcessBiasRemoval::update (void)
-{        
-	// Filtering is checked here	
-		
-	if (!d || !d->input || !dynamic_cast<vistal::Image3D<float>*> ((vistal::Image3D<float>*)d->input->data()))
-	{
-		emit failure();
-		return -1;
-	}
-	
-	// Perform the filtering
-	
-	vistal::Image3D<float>& image = *(vistal::Image3D<float>*)d->input->data();
-	emit started("Bias Filtering");
-	
-	
-	if (d->threshold > 0)
-	{
-		// Setting a threshold implies skipping 0 value
-		for (vistal::Image3D<float>::iterator it = image.begin(); it != image.end(); ++it) if ( *it < d->threshold ) *it = 0;		
-		d->skip0 = true;
+{
+        // Filtering is checked here
+
+        if (!d || !d->input || !dynamic_cast<vistal::Image3D<float>*> ((vistal::Image3D<float>*)d->input->data()))
+        {
+                emit failure();
+                return -1;
+        }
+
+        // Perform the filtering
+
+        vistal::Image3D<float> image = *(vistal::Image3D<float>*)d->input->data();
+        emit started("Bias Filtering");
+
+
+        if (d->threshold > 0)
+        {
+                // Setting a threshold implies skipping 0 value
+                for (vistal::Image3D<float>::iterator it = image.begin(); it != image.end(); ++it) if ( *it < d->threshold ) *it = 0;
+                d->skip0 = true;
     }
-	
-	skip0 = d->skip0;
-	
-	Vect3Di order((image.nbx*image.dx) / d->cutoff,
-				  (image.nby*image.dy) / d->cutoff,
-				  (image.nbz*image.dz) / d->cutoff);	
-	static const int S = order.x()*order.y()*order.z();
-	
-	
-	enum Basis::BasisType Btype = Basis::DiscretCosines;
-	
-	switch (d->basistype)
+
+        skip0 = d->skip0;
+
+        Vect3Di order((image.nbx*image.dx) / d->cutoff,
+                                  (image.nby*image.dy) / d->cutoff,
+                                  (image.nbz*image.dz) / d->cutoff);
+        static const int S = order.x()*order.y()*order.z();
+
+
+        enum Basis::BasisType Btype = Basis::DiscretCosines;
+
+        switch (d->basistype)
     {
-		case vistalProcessBiasRemovalPrivate::LegendrePolynomials: Btype = Basis::LegendrePolynomials; break;
-		case vistalProcessBiasRemovalPrivate::DiscretCosines: Btype = Basis::DiscretCosines; break;
-		case vistalProcessBiasRemovalPrivate::HermitePolynomials: Btype = Basis::HermitePolynomials; break;
+                case vistalProcessBiasRemovalPrivate::LegendrePolynomials: Btype = Basis::LegendrePolynomials; break;
+                case vistalProcessBiasRemovalPrivate::DiscretCosines: Btype = Basis::DiscretCosines; break;
+                case vistalProcessBiasRemovalPrivate::HermitePolynomials: Btype = Basis::HermitePolynomials; break;
     }
-	
-	Basis basis(Vect3Di(image.nbx,image.nby, image.nbz), order, Btype);
-	
-	std::cout << "Image dimensions " << basis.dimension << std::endl
-	<< "Basis order      " << basis.order << std::endl;
-	
-	//	Alpha1 = (float *)mxCalloc(m1*m0*m1*m0, sizeof(float));
-	//	Beta1  = (float *)mxCalloc(m1*m0, sizeof(float));
-	
-	// Need to construct the reconstruction
-	ublas::matrix<MatrixDataType> IC0(S-1,S-1);
-	{ // Let just don't care about speed here, but use the "newmat lib" to perform the proper regularization computation
-		
-		// Initialisation, using the regularization parameter
-		DiagonalMatrix IC0t(S);
-		ColumnVector kx(order.x());
-		for (int i = 1; i <= order.x(); ++i)  kx(i) = pow((i-1)*M_PI/image.dx/image.nbx*10, 2);
-		ColumnVector ky(order.y());
-		for (int i = 1; i <= order.y(); ++i)  ky(i) = pow((i-1)*M_PI/image.dy/image.nby*10, 2);
-		ColumnVector kz(order.z());
-		for (int i = 1; i <= order.z(); ++i)  kz(i) = pow((i-1)*M_PI/image.dz/image.nbz*10, 2);
-		
-		//  for (int i = 1; i < S; ++i)  IC0(i,i) = 1;
-		
-	IC0t =  (( KP(pow(kz, 4), KP(pow(ky, 0), pow(kx, 0))) +
-				  KP(pow(kz, 0),KP(pow(ky, 4),pow(kx, 0))) +
-				KP(pow(kz, 0),KP(pow(ky, 0),pow(kx, 4))) +
-				  KP(pow(kz, 3),KP(pow(ky, 1),pow(kx, 0)))*4. +
-				  KP(pow(kz, 3),KP(pow(ky, 0),pow(kx, 1)))*4. +
-				  KP(pow(kz, 1),KP(pow(ky, 3),pow(kx, 0)))*4. +
-				  KP(pow(kz, 0),KP(pow(ky, 3),pow(kx, 1)))*4. +
-				  KP(pow(kz, 1),KP(pow(ky, 0),pow(kx, 3)))*4. +
-				  KP(pow(kz, 0),KP(pow(ky, 1),pow(kx, 3)))*4. +
-				  KP(pow(kz, 2),KP(pow(ky, 2),pow(kx, 0)))*6. +
-				  KP(pow(kz, 2),KP(pow(ky, 0),pow(kx, 2)))*6. +
-				  KP(pow(kz, 0),KP(pow(ky, 2),pow(kx, 2)))*6. +
-				  KP(pow(kz, 2),KP(pow(ky, 1),pow(kx, 1)))*12. +
-				  KP(pow(kz, 1),KP(pow(ky, 2),pow(kx, 1)))*12. +
-				  KP(pow(kz, 1),KP(pow(ky, 1),pow(kx, 2)))*12. ) * d->regularization).as_diagonal();
-		
-		for (int i = 2; i < S-1; ++i)  IC0(i-2,i-2) = IC0t(i,i);
-		//  std::ofstream reg("reg.txt"); reg << IC0 << std::endl;  
-		//  IC0.assign(args.getreg()*identity_matrix<MatrixDataType>(S-1));
-	}
-	
-	//FloatHistogram<float> histo(image, args.getbins());
-	float max = 0;
-	for (vistal::Image3D<float>::iterator it = image.begin(); it != image.end(); ++it) if (max < *it) max = *it;
-	
-	max *= 1.1;
-	
-	spm::Histo histo(d->bins, max);
-	
-	double t1[order.x()], ll;
-	ublas::matrix<MatrixDataType> t2(order.x(), order.y());
-	ublas::matrix<MatrixDataType> wt0(image.nbx, image.nby), wt1(image.nbx, image.nby);
-	
-	
-	float olpp = 0, lpp = std::numeric_limits<float>::max();
-	
-	int iter = 0;
-	
-	float offset  = 0;
-	
-	do {
-		ublas::matrix<MatrixDataType> Alpha(S,S);
-		ublas::vector<MatrixDataType> Beta(order.x()*order.y()*order.z());
-		
-		ll = 0.0;
-		
-		wt0.assign(ublas::zero_matrix<MatrixDataType>(image.nbx, image.nby)); 
-		wt1.assign(ublas::zero_matrix<MatrixDataType>(image.nbx, image.nby)); 
-		
-		
-		Alpha.assign(ublas::zero_matrix<MatrixDataType>(S,S)); 
-		
-		Beta.assign(ublas::zero_vector<MatrixDataType>(Beta.size()));
-		
-		if (d->random)
-			histo.updateWNoise(basis, image);
-		else
-			histo.update(basis, image);
-		
-		olpp = lpp;
-		
-		for (int j2=0;j2<image.nbz; j2++)
-		{
-			//      get_slice(vol,j2,dat);
-			for (int i0=0; i0<order.x(); ++i0)
-				for (int i1 = 0; i1 <order.y(); i1++)
-				{
-					t2(i0,i1) = 0.0;
-					for (int i2 = 0; i2 < order.z(); i2++)
-						t2(i0,i1) += basis.B2(j2,i2) * basis.T(i0, i1, i2);
-					
-					//t2[i0] += B2[j2+n2*i2]*f[i0+m0*m1*i2];
-				}
-			for (int j1=0; j1<image.nby; j1++)
-			{
-				for (int i0=0; i0 < order.x(); i0++)
-				{
-					t1[i0] = 0.0;
-					for (int i1 = 0; i1 < order.y(); i1++)
-						t1[i0] += basis.B1(j1, i1) * t2(i0, i1);
-				}
-				
-				for (int j0=0; j0<image.nbx; j0++)
-				{
-					double sc = 0.0;
-					for(int i0 = 0; i0 < order.x(); i0++)
-						sc += basis.B0(j0, i0)*t1[i0];
-					
-					histo.weights(image(j0,j1,j2),
-								  exp(sc), 
-								  wt0(j0,j1), 
-								  wt1(j0,j1), 
-								  ll);
-				}
-			}
-			
-			kronutil(basis, j2, wt0, wt1, Alpha, Beta);
-		}
-		
-		
-		// Need to work a bit on Alpha & Beta
-		
-		ublas::vector<MatrixDataType> T(S-1);
-		float n = histo.psh();
-		
-		//    std::cout << "------------------" << std::endl <<  ll << " " << n << std::endl;
-		
-		for (int k = 0, p = 0; k < basis.T.nbz; k++)
-			for (int j = 0; j < basis.T.nby; j++)
-				for (int i = 0; i < basis.T.nbx; i++)
-					if (!(i == 0 && j == 0 && k == 0))
-						T(p++) = basis.T(i,j,k);
-		
-		// skip the first coefficient !
-		//   T = T.rows(2, T.nrows());
-		
-		// Alpha = Alpha.submatrix(2, Alpha.nrows(), 2, Alpha.ncols()) / n;
-		//  Beta = Beta.rows(2, Beta.nrows()) / n;
-		ublas::matrix_range<ublas::matrix<MatrixDataType> > Alphar (Alpha, ublas::range (1, Alpha.size1()), ublas::range (1, Alpha.size2() ));
-		
-		ublas::vector_range<ublas::vector<MatrixDataType> > Betar(Beta, ublas::range(1, Beta.size()));
-		
-		//std::ofstream f("Alpha"); f << std::scientific << Alpha;
-		
-		Alphar /= n;
-		Betar /= n;
-		
-		ll /= n;//ll / n;
-		
-		float lp = offset + 0.5 * ublas::inner_prod(T,ublas::prod(IC0,T));
-		
-		lpp  = lp + ll;
-		
-		//    std::cout << lp << " " << ll << " " << lpp << std::endl;
-		
-		//	  CroutMatrix X = (Alpha+IC0);
-		//T =  X.i() * (Alpha * T - Beta);
-		//	  T = (Alpha+IC0).i() * (Alpha * T - Beta);
-		
-		// If Gesv;
-		ublas::matrix<MatrixDataType, ublas::column_major> t(S-1,1); 
-		ublas::column(t, 0) = ublas::prod(Alphar, T)-Betar;
-		
-		// else	
-		//ublas::vector<MatrixDataType> t = ublas::prod(Alphar, T)-Betar;
-		
-		//	  Alphar = Alphar + IC0;
-		//	  T = 
-		//	 T = (Alpha+IC0).i() * (prod(Alpha, T) - Beta);
-		
-		// let's just try to solve this using the lu factorisation
-		
-		// If Gesv
-		ublas::matrix<MatrixDataType, ublas::column_major> Alphal = Alphar+IC0; 
-		
-		lapack::gesv(Alphal, t);
-		//	  T = ublas::column(t,0);
-		//else
-		
-		//	  ublas::permutation_matrix<std::size_t> pm(Alphar.size1());
-		//	  
-		//	  ublas::lu_factorize(Alphar,pm);
-		//	  
-		//	  ublas::matrix<MatrixDataType> A_inv(Alphar.size1(), Alphar.size2());
-		//	  
-		//	  A_inv.assign(ublas::identity_matrix<MatrixDataType>(Alphar.size1()));
-		//	  
-		//	  ublas::lu_substitute(Alphar, pm, A_inv);
-		
-		// compute T = A^-1* (Alpha * (T-Beta))
-		
-		//  T = ublas::prod(A_inv, t);
-		
-		
-		//std::ofstream f("Alpha"); f << std::scientific << t;
-		
-		
-		// Project T back to our basis expression
-		for (int k = 0, p = 0; k < basis.T.nbz; k++)
-			for (int j = 0; j < basis.T.nby; j++)
-				for (int i = 0; i < basis.T.nbx; i++)
-					if (!(i == 0 && j == 0 && k == 0))
-						basis.T(i,j,k) = t(p++,0);
-		
-		basis.T(0,0,0) = 0;
-		
-		//	  gis::saveVolume("CoeffBlas", basis.T, 0);
-		
-		//     {
-		//       Image3D<float> f = basis.correct(image);
-		//       gis::saveVolume("/tmp/bias", f, 0);
-		//       //      gis::saveVolume("/tmp/basis", basis.T, iter++);
-		//     }
-		
-		//std::cout << "Iteration " << std::setw(3) << iter+1 << " " << fabs(olpp - lpp) <<  std::endl;
-		emit progressed(iter/d->iter);
-		
-	} while ( (olpp-lpp) > d->optTreshold && ++iter < d->iter);	
-	
-	
-	if (d->biasOutput)
-	{
-		vistal::Image3D<float>* corrected = new vistal::Image3D<float>;
-		*corrected = basis.bias(image);
-		d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3");
-		d->output->setData(corrected);
-		
-	} 
-	else
-	{
-		vistal::Image3D<float>* corrected = new vistal::Image3D<float>;
-		*corrected = basis.correct(image);
-		d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3");
-		d->output->setData(corrected);
-		
-	}
-	
-	emit success();
-	emit finished();
-	
-	
-	
-	return EXIT_SUCCESS;
-	
+
+        Basis basis(Vect3Di(image.nbx,image.nby, image.nbz), order, Btype);
+
+        std::cout << "Image dimensions " << basis.dimension << std::endl
+        << "Basis order      " << basis.order << std::endl;
+
+        //	Alpha1 = (float *)mxCalloc(m1*m0*m1*m0, sizeof(float));
+        //	Beta1  = (float *)mxCalloc(m1*m0, sizeof(float));
+
+        // Need to construct the reconstruction
+        ublas::matrix<MatrixDataType> IC0(S-1,S-1);
+        { // Let just don't care about speed here, but use the "newmat lib" to perform the proper regularization computation
+
+                // Initialisation, using the regularization parameter
+                DiagonalMatrix IC0t(S);
+                ColumnVector kx(order.x());
+                for (int i = 1; i <= order.x(); ++i)  kx(i) = pow((i-1)*M_PI/image.dx/image.nbx*10, 2);
+                ColumnVector ky(order.y());
+                for (int i = 1; i <= order.y(); ++i)  ky(i) = pow((i-1)*M_PI/image.dy/image.nby*10, 2);
+                ColumnVector kz(order.z());
+                for (int i = 1; i <= order.z(); ++i)  kz(i) = pow((i-1)*M_PI/image.dz/image.nbz*10, 2);
+
+                //  for (int i = 1; i < S; ++i)  IC0(i,i) = 1;
+
+        IC0t =  (( KP(pow(kz, 4), KP(pow(ky, 0), pow(kx, 0))) +
+                                  KP(pow(kz, 0),KP(pow(ky, 4),pow(kx, 0))) +
+                                KP(pow(kz, 0),KP(pow(ky, 0),pow(kx, 4))) +
+                                  KP(pow(kz, 3),KP(pow(ky, 1),pow(kx, 0)))*4. +
+                                  KP(pow(kz, 3),KP(pow(ky, 0),pow(kx, 1)))*4. +
+                                  KP(pow(kz, 1),KP(pow(ky, 3),pow(kx, 0)))*4. +
+                                  KP(pow(kz, 0),KP(pow(ky, 3),pow(kx, 1)))*4. +
+                                  KP(pow(kz, 1),KP(pow(ky, 0),pow(kx, 3)))*4. +
+                                  KP(pow(kz, 0),KP(pow(ky, 1),pow(kx, 3)))*4. +
+                                  KP(pow(kz, 2),KP(pow(ky, 2),pow(kx, 0)))*6. +
+                                  KP(pow(kz, 2),KP(pow(ky, 0),pow(kx, 2)))*6. +
+                                  KP(pow(kz, 0),KP(pow(ky, 2),pow(kx, 2)))*6. +
+                                  KP(pow(kz, 2),KP(pow(ky, 1),pow(kx, 1)))*12. +
+                                  KP(pow(kz, 1),KP(pow(ky, 2),pow(kx, 1)))*12. +
+                                  KP(pow(kz, 1),KP(pow(ky, 1),pow(kx, 2)))*12. ) * d->regularization).as_diagonal();
+
+                for (int i = 2; i < S-1; ++i)  IC0(i-2,i-2) = IC0t(i,i);
+                //  std::ofstream reg("reg.txt"); reg << IC0 << std::endl;
+                //  IC0.assign(args.getreg()*identity_matrix<MatrixDataType>(S-1));
+        }
+
+        //FloatHistogram<float> histo(image, args.getbins());
+        float max = 0;
+        for (vistal::Image3D<float>::iterator it = image.begin(); it != image.end(); ++it) if (max < *it) max = *it;
+
+        max *= 1.1;
+
+        spm::Histo histo(d->bins, max);
+
+        double t1[order.x()], ll;
+        ublas::matrix<MatrixDataType> t2(order.x(), order.y());
+        ublas::matrix<MatrixDataType> wt0(image.nbx, image.nby), wt1(image.nbx, image.nby);
+
+
+        float olpp = 0, lpp = std::numeric_limits<float>::max();
+
+        int iter = 0;
+
+        float offset  = 0;
+
+        do {
+                ublas::matrix<MatrixDataType> Alpha(S,S);
+                ublas::vector<MatrixDataType> Beta(order.x()*order.y()*order.z());
+
+                ll = 0.0;
+
+                wt0.assign(ublas::zero_matrix<MatrixDataType>(image.nbx, image.nby));
+                wt1.assign(ublas::zero_matrix<MatrixDataType>(image.nbx, image.nby));
+
+
+                Alpha.assign(ublas::zero_matrix<MatrixDataType>(S,S));
+
+                Beta.assign(ublas::zero_vector<MatrixDataType>(Beta.size()));
+
+                if (d->random)
+                        histo.updateWNoise(basis, image);
+                else
+                        histo.update(basis, image);
+
+                olpp = lpp;
+
+                for (int j2=0;j2<image.nbz; j2++)
+                {
+                        //      get_slice(vol,j2,dat);
+                        for (int i0=0; i0<order.x(); ++i0)
+                                for (int i1 = 0; i1 <order.y(); i1++)
+                                {
+                                        t2(i0,i1) = 0.0;
+                                        for (int i2 = 0; i2 < order.z(); i2++)
+                                                t2(i0,i1) += basis.B2(j2,i2) * basis.T(i0, i1, i2);
+
+                                        //t2[i0] += B2[j2+n2*i2]*f[i0+m0*m1*i2];
+                                }
+                        for (int j1=0; j1<image.nby; j1++)
+                        {
+                                for (int i0=0; i0 < order.x(); i0++)
+                                {
+                                        t1[i0] = 0.0;
+                                        for (int i1 = 0; i1 < order.y(); i1++)
+                                                t1[i0] += basis.B1(j1, i1) * t2(i0, i1);
+                                }
+
+                                for (int j0=0; j0<image.nbx; j0++)
+                                {
+                                        double sc = 0.0;
+                                        for(int i0 = 0; i0 < order.x(); i0++)
+                                                sc += basis.B0(j0, i0)*t1[i0];
+
+                                        histo.weights(image(j0,j1,j2),
+                                                                  exp(sc),
+                                                                  wt0(j0,j1),
+                                                                  wt1(j0,j1),
+                                                                  ll);
+                                }
+                        }
+
+                        kronutil(basis, j2, wt0, wt1, Alpha, Beta);
+                }
+
+
+                // Need to work a bit on Alpha & Beta
+
+                ublas::vector<MatrixDataType> T(S-1);
+                float n = histo.psh();
+
+                //    std::cout << "------------------" << std::endl <<  ll << " " << n << std::endl;
+
+                for (int k = 0, p = 0; k < basis.T.nbz; k++)
+                        for (int j = 0; j < basis.T.nby; j++)
+                                for (int i = 0; i < basis.T.nbx; i++)
+                                        if (!(i == 0 && j == 0 && k == 0))
+                                                T(p++) = basis.T(i,j,k);
+
+                // skip the first coefficient !
+                //   T = T.rows(2, T.nrows());
+
+                // Alpha = Alpha.submatrix(2, Alpha.nrows(), 2, Alpha.ncols()) / n;
+                //  Beta = Beta.rows(2, Beta.nrows()) / n;
+                ublas::matrix_range<ublas::matrix<MatrixDataType> > Alphar (Alpha, ublas::range (1, Alpha.size1()), ublas::range (1, Alpha.size2() ));
+
+                ublas::vector_range<ublas::vector<MatrixDataType> > Betar(Beta, ublas::range(1, Beta.size()));
+
+                //std::ofstream f("Alpha"); f << std::scientific << Alpha;
+
+                Alphar /= n;
+                Betar /= n;
+
+                ll /= n;//ll / n;
+
+                float lp = offset + 0.5 * ublas::inner_prod(T,ublas::prod(IC0,T));
+
+                lpp  = lp + ll;
+
+                //    std::cout << lp << " " << ll << " " << lpp << std::endl;
+
+                //	  CroutMatrix X = (Alpha+IC0);
+                //T =  X.i() * (Alpha * T - Beta);
+                //	  T = (Alpha+IC0).i() * (Alpha * T - Beta);
+
+                // If Gesv;
+                ublas::matrix<MatrixDataType, ublas::column_major> t(S-1,1);
+                ublas::column(t, 0) = ublas::prod(Alphar, T)-Betar;
+
+                // else
+                //ublas::vector<MatrixDataType> t = ublas::prod(Alphar, T)-Betar;
+
+                //	  Alphar = Alphar + IC0;
+                //	  T =
+                //	 T = (Alpha+IC0).i() * (prod(Alpha, T) - Beta);
+
+                // let's just try to solve this using the lu factorisation
+
+                // If Gesv
+                ublas::matrix<MatrixDataType, ublas::column_major> Alphal = Alphar+IC0;
+
+                lapack::gesv(Alphal, t);
+                //	  T = ublas::column(t,0);
+                //else
+
+                //	  ublas::permutation_matrix<std::size_t> pm(Alphar.size1());
+                //
+                //	  ublas::lu_factorize(Alphar,pm);
+                //
+                //	  ublas::matrix<MatrixDataType> A_inv(Alphar.size1(), Alphar.size2());
+                //
+                //	  A_inv.assign(ublas::identity_matrix<MatrixDataType>(Alphar.size1()));
+                //
+                //	  ublas::lu_substitute(Alphar, pm, A_inv);
+
+                // compute T = A^-1* (Alpha * (T-Beta))
+
+                //  T = ublas::prod(A_inv, t);
+
+
+                //std::ofstream f("Alpha"); f << std::scientific << t;
+
+
+                // Project T back to our basis expression
+                for (int k = 0, p = 0; k < basis.T.nbz; k++)
+                        for (int j = 0; j < basis.T.nby; j++)
+                                for (int i = 0; i < basis.T.nbx; i++)
+                                        if (!(i == 0 && j == 0 && k == 0))
+                                                basis.T(i,j,k) = t(p++,0);
+
+                basis.T(0,0,0) = 0;
+
+                //	  gis::saveVolume("CoeffBlas", basis.T, 0);
+
+                //     {
+                //       Image3D<float> f = basis.correct(image);
+                //       gis::saveVolume("/tmp/bias", f, 0);
+                //       //      gis::saveVolume("/tmp/basis", basis.T, iter++);
+                //     }
+
+                //std::cout << "Iteration " << std::setw(3) << iter+1 << " " << fabs(olpp - lpp) <<  std::endl;
+                emit progressed((int)rint(100.*(iter/d->iter)));
+
+        } while ( (olpp-lpp) > d->optTreshold && ++iter < d->iter);
+
+        qDebug() << d->biasOutput;
+        if (d->biasOutput)
+        {
+
+                vistal::Image3D<float>* corrected = new vistal::Image3D<float>;
+                *corrected = basis.bias(*(vistal::Image3D<float>*)d->input->data());
+                d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3");
+                d->output->setData(corrected);
+
+        }
+        else
+        {
+                vistal::Image3D<float>* corrected = new vistal::Image3D<float>;
+                *corrected = basis.correct(*(vistal::Image3D<float>*)d->input->data());
+                d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3");
+                d->output->setData(corrected);
+
+        }
+
+        emit success();
+        emit finished();
+
+
+
+        return EXIT_SUCCESS;
+
 }
 
 dtkAbstractData * vistalProcessBiasRemoval::output(void)
-{	
-	return (d->output);
+{
+        return (d->output);
 }
 
 

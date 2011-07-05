@@ -55,6 +55,7 @@ vistalProcessBiasRemovalToolBox::vistalProcessBiasRemovalToolBox(QWidget *parent
 
     QLabel *binsLbl = new QLabel("Number of Bins :");
     d->bins = new QSpinBox();
+    d->bins->setRange(1, 2048);
     d->bins->setValue(1024);
 
     QHBoxLayout *binsBox = new QHBoxLayout();
@@ -77,7 +78,7 @@ vistalProcessBiasRemovalToolBox::vistalProcessBiasRemovalToolBox(QWidget *parent
 
     QHBoxLayout *basBox = new QHBoxLayout();
     basBox->addWidget(basLbl);
-    basBox->addWidget(d->regularization);
+    basBox->addWidget(d->basistype);
 
     d->random = new QCheckBox("Noisy input");
     d->random->setChecked(true);
@@ -113,8 +114,8 @@ vistalProcessBiasRemovalToolBox::vistalProcessBiasRemovalToolBox(QWidget *parent
     optThBox->addWidget(optThLbl);
     optThBox->addWidget(d->optThresh);
 
-    d->skip0 = new QCheckBox("Bias field");
-    d->skip0->setChecked(false);
+    d->biasOutput = new QCheckBox("Bias field");
+    d->biasOutput->setChecked(false);
 
     QVBoxLayout *parametersLayout = new QVBoxLayout();
     parametersLayout->addLayout(cutoffBox);
@@ -129,8 +130,8 @@ vistalProcessBiasRemovalToolBox::vistalProcessBiasRemovalToolBox(QWidget *parent
 
     parametersLayout->addWidget(d->biasOutput);
 
-    QGroupBox *groupParameters = new QGroupBox("Mandatory");
-    groupParameters->setLayout(parametersLayout);
+//    QGroupBox *groupParameters = new QGroupBox("Mandatory");
+//    groupParameters->setLayout(parametersLayout);
 
     // Options:
 
@@ -141,15 +142,16 @@ vistalProcessBiasRemovalToolBox::vistalProcessBiasRemovalToolBox(QWidget *parent
     // Principal layout:
 
     QVBoxLayout *layprinc = new QVBoxLayout();
-    layprinc->addWidget(groupParameters);
+//    layprinc->addWidget(groupParameters);
 //    layprinc->addWidget(groupOptions);
+    layprinc->addLayout(parametersLayout);
     layprinc->addWidget(runButton);
 
     QWidget *widget = new QWidget(this);
     widget->setLayout(layprinc);
 
     // Main toolbox:
-    this->setTitle("Bias Filtering settings");
+    this->setTitle("Intensity Non Uniformity Settings");
     this->addWidget(widget);
 
     connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
@@ -191,16 +193,16 @@ void vistalProcessBiasRemovalToolBox::run(void)
 
     d->process->setInput(this->parent()->data());
 
-    d->process->setParameter(d->cutoff->value(), 0);
+    d->process->setParameter((double)d->cutoff->value(), 0);
     d->process->setParameter((double)d->bins->value(), 1);
-    d->process->setParameter(d->regularization->value(),2);
-    d->process->setParameter(d->basistype->currentIndex(), 3);
-    d->process->setParameter(d->random->checkState(),4);
-    d->process->setParameter(d->skip0->checkState(),5);
-    d->process->setParameter(d->threshold->value(), 6);
+    d->process->setParameter((double)d->regularization->value(),2);
+    d->process->setParameter((double)d->basistype->currentIndex(), 3);
+    d->process->setParameter((double)d->random->isChecked(),4);
+    d->process->setParameter((double)d->skip0->isChecked(),5);
+    d->process->setParameter((double)d->threshold->value(), 6);
     d->process->setParameter((double)d->iter->value(), 7);
-    d->process->setParameter(d->optThresh->value(), 8);
-    d->process->setParameter(d->biasOutput->checkState(), 9);
+    d->process->setParameter((double)d->optThresh->value(), 8);
+    d->process->setParameter((double)d->biasOutput->isChecked(), 9);
 
 
     if(d->process->update()==0)
