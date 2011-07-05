@@ -105,7 +105,7 @@ vistalToVistalUShort3Converter.cpp
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES_MOC} 
+  ${${PROJECT_NAME}_SOURCES_MOC}
   ${${PROJECT_NAME}_SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
@@ -115,6 +115,21 @@ target_link_libraries(${PROJECT_NAME}
   dtkCore)
 
 dtk_build_doc(vistalDataImageConverterPlugin)
+
+
+# Testing app
+
+add_executable(${PROJECT_NAME}Testing
+  vistalDataImageConverterTestingApp.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}Testing
+ ${QT_LIBRARIES}
+  ${MSTOOLS_LIB}
+  ${VISTAL_LIBS}
+  dtkCore
+  )
+
 
 ## #################################################################
 ## Install rules

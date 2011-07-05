@@ -17,7 +17,40 @@
 #include "Arguments.hh"
 
 
+template <class D1, class D2>
+bool compareCast(vistal::Image3D<D1>& im1, vistal::Image3D<D2>& im2)
+{
+    // Image should be cast comparable
+    typename vistal::Image3D<D1>::iterator it1 = im1.begin();
+    typename vistal::Image3D<D2>::iterator it2 = im2.begin();
 
+
+    for (; it1 != im1.end(); ++it1, ++it2)
+        if ((D2)*it1 != *it2) return false;
+
+    return true;
+}
+
+
+#define CAST_COMPARE(FromType, ToType, FromStr, ToStr)\
+{ vistal::Image3D<FromType> *im1 = new 	vistal::Image3D<FromType>(8, 8, 4, 0);\
+    qDebug() << "Testing conversion from " # FromType << "to " # ToType;\
+    FromType val = 0;\
+for (vistal::Image3D<FromType>::iterator it = im1->begin(); it != im1->end(); ++it)\
+    *it = val++;\
+dtkAbstractData *inputImage = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImage"#FromStr));\
+inputImage->setData(im1);\
+dtkAbstractData *converted = inputImage->convert("vistalDataImage"#ToStr);\
+if (!converted)\
+{\
+    qDebug() << "Conversion failed";\
+    return DTK_FAILURE;\
+}\
+if (!compareCast(*im1, *((vistal::Image3D<ToType>*)converted->data())))        {\
+    qDebug() << "Comparison failed";\
+    return DTK_FAILURE;\
+}\
+}
 
 int main(int argc, char **argv)
 {
@@ -27,128 +60,36 @@ int main(int argc, char **argv)
         application.setOrganizationName("INRIA");
         application.setOrganizationDomain("FR");
 
-        LSArguments arg(argc, (const char**)argv);
-
-        if (!arg.parsed) return -1;
-        if (arg.gethelp()) { arg.usage(argv[0]); return -2; }
-
-
-
         dtkPluginManager::instance()->initialize();
 
+        // Build an image
+        CAST_COMPARE(unsigned char, unsigned char, UChar3, UChar3);
 
-        QString t1 = arg.gett1().c_str();
-        QString pd = arg.getpd().c_str();
+        CAST_COMPARE(unsigned char, short, UChar3, Short3);
+        CAST_COMPARE(unsigned char, unsigned short, UChar3, UShort3);
 
-        QString t2 = arg.gett2().c_str();
+        CAST_COMPARE(unsigned char, int, UChar3, Int3);
+        CAST_COMPARE(unsigned char, unsigned int, UChar3, UInt3);
 
-        QString flair = arg.getflair().c_str();
+        CAST_COMPARE(unsigned char, float, UChar3, Float3);
+        CAST_COMPARE(unsigned char, double, UChar3, Double3);
 
+        CAST_COMPARE(unsigned short, unsigned short, UShort3, UShort3);
 
-        if (t1 == "")
-                std::cerr << "Expecting T1 input" << std::endl;
-        if (pd == "")
-                std::cerr << "Expecting PD input" << std::endl;
-        if (t2 == "" && flair == "")
-                std::cerr << "Expecting T2 or FLAIR input image" << std::endl;
+        CAST_COMPARE(unsigned short, int, UShort3, Int3);
+        CAST_COMPARE(unsigned short, unsigned int, UShort3, UInt3);
 
-        if (t1== "" || pd == "" && (flair == "" || t2 == ""))
-                abort();
+        CAST_COMPARE(unsigned short, float, UShort3, Float3);
+        CAST_COMPARE(unsigned short, double, UShort3, Double3);
 
-        vistal::Image3D<unsigned char> *im1 = new 	vistal::Image3D<unsigned char>;
-        loadImage(arg.gett1(), *im1, 0);
+        CAST_COMPARE(unsigned int, unsigned int, UInt3, UInt3);
 
-        dtkAbstractData *inputImage = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-        inputImage->setData(im1);
-
-        vistal::Image3D<unsigned char>* im2 = new 	vistal::Image3D<unsigned char>;
-        loadImage(arg.getpd(), *im2, 0);
-
-        dtkAbstractData *PD = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-        PD->setData(im2);
+        CAST_COMPARE(unsigned int, float, UInt3, Float3);
+        CAST_COMPARE(unsigned int, double, UInt3, Double3);
 
 
-        vistal::Image3D<unsigned char> *im3 = new 	vistal::Image3D<unsigned char>;
-        if (t2 == "" && flair != "")
-                loadImage(arg.getflair(), *im3, 0);
-        else
-                loadImage(arg.gett2(), *im3, 0);
+        //
 
-        dtkAbstractData *Third = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-        Third->setData(im3);
-
-        vistal::Image3D<unsigned char>* msk = new 	vistal::Image3D<unsigned char>;
-        loadImage(arg.getmask(), *msk, 0);
-
-        dtkAbstractData *mask = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-        mask->setData(msk);
-
-        dtkAbstractProcess *process = dynamic_cast <dtkAbstractProcess *>(dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentationGCEM"));
-        if (!process) {
-                qDebug() << "I am not able to find myself!!! ouiiiiiiiiiiinnnnnnnnnn !!!!!!!!";
-                return -1;
-        }
-
-
-        /* Set Options  */
-
-        process->setParameter((double)arg.getinitMethod(), 0);
-        process->setParameter((double)arg.getrejectionRatio(), 1);
-        process->setParameter((double)arg.getEMAlgorithm(), 2);
-        process->setParameter((double)arg.getminDistance(), 3 );
-        process->setParameter((double)arg.getemIter(), 4);
-        process->setParameter((double)arg.getstrem(), 5);
-        process->setParameter((double)arg.getmahalanobisThreshold(), 6);
-        process->setParameter((double)arg.getrulesThreshold(), 7);
-        process->setParameter((double)arg.getminsize(), 8);
-        process->setParameter((double)arg.getwmneighbor(), 9);
-
-        process->setParameter((double)arg.getrulesMin(), 10);
-        process->setParameter((double)arg.getrulesMax(), 11);
-        process->setParameter((double)arg.getalphap(), 12);
-
-
-
-/* Set algorithm input images
- */
-
-        process->setInput(inputImage,0);
-
-        process->setInput(PD,1);
-
-        process->setInput(Third,2);
-
-        process->setInput(mask,3);
-
-        process->update();
-
-        if (!process->output())
-        {
-                qDebug() << "Warning output not available";
-
-        }
-        else {
-
-
-        vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )process->output()->data());
-
-        vistal::gis::saveVolume(arg.getoutput().c_str(), *ima, 0);
-        dtkAbstractData *outputImage = process->output();
-        outputImage->enableWriter("vistalDataImageWriter");
-        outputImage->write(arg.getoutput().c_str());
-        }
-
-
-
-
-        dtkPluginManager::instance()->uninitialize();
-
-
-        delete inputImage;
-        delete PD;
-        delete Third;
-        delete mask;
-
-
+        qDebug() << "Testing finished, everything is fine then";
         return DTK_SUCCEED;
 }
