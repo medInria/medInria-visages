@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 2.8.1)
 
-project(vistalProcessSegmentationSTREMPlugin)
+project(vistalProcessSegmentationGCEMPlugin)
 
 ## #################################################################
 ## Setup version numbering
@@ -57,15 +57,15 @@ SET(MSTOOLS_LIB /Users/nwiestda/Work/Neurinfo/mstools/build/lib/libmstools.a)
 ## #################################################################
 
 set(${PROJECT_NAME}_HEADERS_MOC
-  vistalProcessSegmentationSTREMPlugin.h
-  vistalProcessSegmentationSTREM.h)
+  vistalProcessSegmentationGCEMPlugin.h
+  vistalProcessSegmentationGCEM.h)
 
-set(${PROJECT_NAME}_HEADERS
+set(${PROJECT_NAME}_HEADERS sgc.h
   ${${PROJECT_NAME}_HEADERS_MOC})
 
 set(${PROJECT_NAME}_SOURCES
-  vistalProcessSegmentationSTREMPlugin.cpp
-  vistalProcessSegmentationSTREM.cpp)
+  vistalProcessSegmentationGCEMPlugin.cpp
+  vistalProcessSegmentationGCEM.cpp)
 
 ## #################################################################
 ## Build rules
@@ -74,7 +74,7 @@ set(${PROJECT_NAME}_SOURCES
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES_MOC} 
+  ${${PROJECT_NAME}_SOURCES_MOC}
   ${${PROJECT_NAME}_SOURCES}
   ${${PROJECT_NAME}_HEADERS})
 
@@ -85,13 +85,13 @@ target_link_libraries(${PROJECT_NAME}
   dtkCore
   medCore)
 
-dtk_build_doc(vistalProcessSegmentationSTREMPlugin)
+dtk_build_doc(vistalProcessSegmentationGCEMPlugin)
 
 
 include_directories(${MSTOOLS_INC})
 
 add_executable(${PROJECT_NAME}Testing
-  vistalProcessSegmentationSTREMTestingApp.cpp
+  vistalProcessSegmentationGCEMTestingApp.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}Testing
