@@ -4,7 +4,7 @@
 
 #include <dtkCore/dtkAbstractData.h>
 #include <dtkCore/dtkAbstractDataFactory.h>
-#include "VistalConverters.hh"
+#include "VistalConverters.h"
 //casting and intensity mapping
 #include "itkCastImageFilter.h"
 

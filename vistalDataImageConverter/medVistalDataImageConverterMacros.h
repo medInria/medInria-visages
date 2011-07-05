@@ -1,7 +1,7 @@
 #ifndef _med_VistalDataImageConverterMacros_h_
 #define _med_VistalDataImageConverterMacros_h_
 
-#include "VistalConverters.hh"
+#include "VistalConverters.h"
 // The function taking medinria internal vistal names and converts to desired name
 
 #include "boost/function.hpp"

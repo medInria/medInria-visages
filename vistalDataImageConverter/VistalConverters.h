@@ -6,8 +6,8 @@
  
  */
 
-#ifndef   	VistalConverters_hh
-# define   	VistalConverters_hh
+#ifndef   	VistalConverters_h
+#define   	VistalConverters_h
 
 
 #include "Histogram.hh"
