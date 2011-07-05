@@ -205,8 +205,8 @@ vistalProcessBiasRemovalToolBox::~vistalProcessBiasRemovalToolBox(void)
 
 bool vistalProcessBiasRemovalToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("NLmeansDenoising",
-                                                                           createVistalProcessDenoisingToolBox);
+    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("BiasRemovalFilter",
+                                                                           createVistalProcessBiasRemovalToolBox);
 }
 
 

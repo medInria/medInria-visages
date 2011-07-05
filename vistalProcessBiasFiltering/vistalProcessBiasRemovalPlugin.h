@@ -19,7 +19,7 @@ class VISTALPROCESSDENOISINGPLUGIN_EXPORT vistalProcessBiasRemovalPlugin : publi
 
 public:
      vistalProcessBiasRemovalPlugin(QObject *parent = 0);
-    vistalProcessBiasRemovalPlugin(void);
+    ~vistalProcessBiasRemovalPlugin();
 	
 	virtual bool initialize(void);
     virtual bool uninitialize(void);

@@ -25,6 +25,8 @@ public:
 
     static bool registered(void);
 
+
+	
 public slots:
 
     void setInput(dtkAbstractData *data);

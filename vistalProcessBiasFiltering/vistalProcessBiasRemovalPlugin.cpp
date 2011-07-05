@@ -27,7 +27,7 @@ vistalProcessBiasRemovalPlugin::vistalProcessBiasRemovalPlugin(QObject *parent) 
 
 }
 
-vistalProcessBiasRemovalPlugin::~vistalProcessBiasRemovalPlugin(void)
+vistalProcessBiasRemovalPlugin::~vistalProcessBiasRemovalPlugin()
 {
     delete d;
 
