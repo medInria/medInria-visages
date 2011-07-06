@@ -33,25 +33,25 @@ class LSArguments: public GenericArguments
 
         OPTIONAL(4, std::string, flair, "flair", "flair-image", "FLAIR image", "/Users/nwiestda/Data/USPIO-6/01011/M0/unbias_3DFLAIRs007a001", InputArgument, "Image3D");
 
-        ENUM(5, initMethod, "I", "init-method", "Method for initialisation", (StraInit)(HierarchicalPD)(HierarchicalFLAIR), StraInit);
+        ENUM(5, initMethod, "I", "init-method", "Method for initialisation", (StraInit)(HierarchicalPD)(HierarchicalFLAIR), HierarchicalFLAIR);
 
-        OPTIONAL(6, float, rejectionRatio, "rej", "rejectionRatio", "Robust estimation rejection Ratio", .2, InputArgument, "Image3D");
+        OPTIONAL(6, double, rejectionRatio, "rej", "rejectionRatio", "Robust estimation rejection Ratio", ".2", InputArgument, "Image3D");
 
         ENUM(7, EMAlgorithm, "EM", "EM-Algorithm", "EM Algorithm", (GaussianEM)(GaussianCeleuxREM)(GaussianREM), GaussianREM);
 
-        OPTIONAL(8, float, minDistance, "minD", "minDistance", "Minimum distance in EM (stoping criteria)", 1e-4, InputArgument, "");
+        OPTIONAL(8, double, minDistance, "minD", "minDistance", "Minimum distance in EM (stoping criteria)", "1e-4", InputArgument, "");
 
-        OPTIONAL(9, int, emIter, "eit", "emIter", "Iterations of the EM Algorithm", 1e-4, InputArgument, "");
+        OPTIONAL(9, int, emIter, "eit", "emIter", "Iterations of the EM Algorithm", "1e-4", InputArgument, "");
 
         FLAG(10, strem, "st", "Strem", "Start the first iteration with STREM?", false);
 
-        //OPTIONAL(11, float, emIter, "eit", "emIter", "Iterations of the EM Algorithm", 10, InputArgument, "");
+        //OPTIONAL(11, float, emIter, "eit", "emIter", "Iterations of the EM Algorithm", "10", InputArgument, "");
 
 
-        OPTIONAL(11, float, mahalanobisThreshold, "mTh", "mahalanobisThreshold", "Iterations of the EM Algorithm", .4, InputArgument, "");
-        OPTIONAL(12, float, rulesThreshold, "rTh", "rulesThreshold", "Iterations of the EM Algorithm", 3., InputArgument, "");
-        OPTIONAL(13, float, minsize, "msize", "minsize", "Iterations of the EM Algorithm", 6, InputArgument, "");
-        OPTIONAL(14, float, wmneighbor, "wm", "wmneighbor", "Iterations of the EM Algorithm", 0.05, InputArgument, "");
+        OPTIONAL(11, double, mahalanobisThreshold, "mTh", "mahalanobisThreshold", "Threshold in the Mahalanobis distance", ".4", InputArgument, "");
+        OPTIONAL(12, double, rulesThreshold, "rTh", "rulesThreshold", "Threshold to apply rules (in times of SD)", "3.", InputArgument, "");
+        OPTIONAL(13, double, minsize, "msize", "minsize", "minimum lesion size", "6", InputArgument, "");
+        OPTIONAL(14, double, wmneighbor, "wm", "wmneighbor", "neighborhing ratio", "0.05", InputArgument, "");
 
         OPTIONAL(15, std::string, output, "out", "output-image", "output image", "", OutputArgument, "Image3D");
         OPTIONAL(16, std::string, mask, "m", "brain-mask", "brain mask (CSF+WM+GM+Lesions)", "/Users/nwiestda/Data/USPIO-6/01011/M0/BrainMaskCon", InputArgument, "Image3D");
@@ -136,16 +136,10 @@ int main(int argc, char **argv)
                 return -1;
         }
 
-
-
-
         process->setParameter((double)arg.getinitMethod(), 0);
         process->setParameter((double)arg.getrejectionRatio(), 1);
-        qDebug()  << "Rej Ratio" << arg.getrejectionRatio();
-
         process->setParameter((double)arg.getEMAlgorithm(), 2);
         process->setParameter((double)arg.getminDistance(), 3 );
-        qDebug() << "Min dist" << arg.getminDistance();
         process->setParameter((double)arg.getemIter(), 4);
         process->setParameter((double)arg.getstrem(), 5);
         process->setParameter((double)arg.getmahalanobisThreshold(), 6);
