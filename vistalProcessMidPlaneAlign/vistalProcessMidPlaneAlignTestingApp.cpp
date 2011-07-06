@@ -26,7 +26,6 @@ class LSArguments: public GenericArguments
     OPTIONAL(4, float, rhobeg, "R", "rho-beg", "Initial Search Radius", 5, InputArgument, "");
     OPTIONAL(5, float, rhoend, "r", "rho-end", "Final radius", 1e-3, InputArgument, "");
 
-    //	FLAG(11, nonlinear, "n", "non-linear", "Perform non linear estimation (if available)", false);
     FLAG(6, help, "h", "help", "Call this help", false);
 
     CONSTRUCTORS(LSArguments, 6);

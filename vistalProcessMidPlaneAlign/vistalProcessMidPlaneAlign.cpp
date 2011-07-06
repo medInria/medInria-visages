@@ -108,17 +108,12 @@ int vistalProcessMidPlaneAlign::update(void)
 
     std::string multiresolution("222111");
 
-
     computeWorldOrientationMatrix(image, RepIrm);
     computeWorldOrientationMatrix(image, RepIrmf);
 
-
     Image3D<ImageDataType> Decimatedf(image);
 
-   // double av = 2*CostFunction::Parameters+1;
     double av = ((CostFunction::Parameters+1)*(CostFunction::Parameters+2))/2;
-    //    if (arg.getpower() > CostFunction::Parameters)
-    //        av = arg.getpower();
 
     long int npt = (int) av;
     double w[(npt+13)*(npt+CostFunction::Parameters)+3*CostFunction::Parameters*(CostFunction::Parameters+3)/2];
