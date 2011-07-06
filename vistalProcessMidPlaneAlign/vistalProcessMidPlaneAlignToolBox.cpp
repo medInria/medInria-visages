@@ -53,7 +53,7 @@ vistalProcessMidPlaneAlignToolBox::vistalProcessMidPlaneAlignToolBox(QWidget *pa
       rbL->addWidget(rbLbl);
       rbL->addWidget(d->rhob);
 
-      QLabel* reLbl = new QLabel("Initial Search Radius:");
+      QLabel* reLbl = new QLabel("Final Radius:");
       d->rhoe = new QDoubleSpinBox;
       d->rhoe->setRange(0, 1);
       d->rhoe->setValue(5e-2);
@@ -131,16 +131,16 @@ void vistalProcessMidPlaneAlignToolBox::run(void)
     d->process->setParameter((double)d->rhob->value(),1);
     d->process->setParameter((double)d->rhoe->value(),2);
 
-    medRunnableProcess *runProcess = new medRunnableProcess;
-    runProcess->setProcess (d->process);
+//    medRunnableProcess *runProcess = new medRunnableProcess;
+//    runProcess->setProcess (d->process);
 
-    d->progression_stack->addJobItem(runProcess, "Progress:");
+//    d->progression_stack->addJobItem(runProcess, "Progress:");
 
-    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
-    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
-
-    medJobManager::instance()->registerJobItem(runProcess);
-    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
+//    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
+//    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
+    d->process->run();
+//    medJobManager::instance()->registerJobItem(runProcess);
+//    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 
 }
 

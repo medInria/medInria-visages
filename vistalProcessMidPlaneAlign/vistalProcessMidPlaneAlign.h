@@ -22,6 +22,13 @@ public:
     virtual QString description(void) const;
 
     static bool registered(void);
+
+
+signals:
+    void success(void);
+    void failure(void);
+
+
 public slots:
 
     void setInput(dtkAbstractData *data);

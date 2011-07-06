@@ -65,7 +65,7 @@ QString vistalProcessMidPlaneAlign::description(void) const
 void vistalProcessMidPlaneAlign::setInput(dtkAbstractData *data)
 {
     if (!data) return;
-
+    qDebug() << "Setting input" << data;
     d->input = data->convert("vistalDataImageFloat3");
 }
 
@@ -82,6 +82,9 @@ void vistalProcessMidPlaneAlign::setParameter(double  data, int channel)
 int vistalProcessMidPlaneAlign::update(void)
 {
     using namespace vistal;
+    qDebug() << "Starting process";
+
+
     if (!d || !d->input || !dynamic_cast<vistal::Image3D<float>*>((vistal::Image3D<float>*)d->input->data()))
         return -1;
 
@@ -151,6 +154,7 @@ int vistalProcessMidPlaneAlign::update(void)
         multiresolution = multiresolution.substr(3,multiresolution.size());
     }
 
+
     Matrix A(4,4); A = 0;
 
     if (CostFunction::Transformation::Realign)
@@ -162,11 +166,16 @@ int vistalProcessMidPlaneAlign::update(void)
 
     computeNormalizationOrientationMatrix(image, RepIrmf);
     computeNormalizationOrientationMatrix(image, RepIrm);
+    qDebug() << "Applying transfo";
 
     ApplyTransform<CostFunction::Transformation>(image, *tmp, RepIrm, RepIrmf, p, 3 /* Cubic Spline interp*/);
 
+    qDebug() << "Done";
+
     d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3");
     d->output->setData(tmp);
+
+    emit success();
 
     return DTK_SUCCEED;
 }
