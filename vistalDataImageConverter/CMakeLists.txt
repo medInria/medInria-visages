@@ -59,6 +59,14 @@ set(${PROJECT_NAME}_HEADERS_MOC
   itkDataImageToVistalDataImageInt3Converter.h
   itkDataImageToVistalDataImageFloat3Converter.h
   itkDataImageToVistalDataImageDouble3Converter.h
+vistalToVistalChar3Converter.h
+vistalToVistalDouble3Converter.h
+vistalToVistalFloat3Converter.h
+vistalToVistalInt3Converter.h
+vistalToVistalShort3Converter.h
+vistalToVistalUChar3Converter.h
+vistalToVistalUInt3Converter.h
+vistalToVistalUShort3Converter.h
 )
 
 set(${PROJECT_NAME}_SOURCES
@@ -79,6 +87,15 @@ set(${PROJECT_NAME}_SOURCES
   itkDataImageToVistalDataImageInt3Converter.cpp
   itkDataImageToVistalDataImageFloat3Converter.cpp
   itkDataImageToVistalDataImageDouble3Converter.cpp
+vistalToVistalChar3Converter.cpp
+vistalToVistalDouble3Converter.cpp
+vistalToVistalFloat3Converter.cpp
+vistalToVistalInt3Converter.cpp
+vistalToVistalShort3Converter.cpp
+vistalToVistalUChar3Converter.cpp
+vistalToVistalUInt3Converter.cpp
+vistalToVistalUShort3Converter.cpp
+  VistalConverters.cpp
 )
 
 ## #################################################################
@@ -88,7 +105,7 @@ set(${PROJECT_NAME}_SOURCES
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES_MOC} 
+  ${${PROJECT_NAME}_SOURCES_MOC}
   ${${PROJECT_NAME}_SOURCES})
 
 target_link_libraries(${PROJECT_NAME}
@@ -98,6 +115,21 @@ target_link_libraries(${PROJECT_NAME}
   dtkCore)
 
 dtk_build_doc(vistalDataImageConverterPlugin)
+
+
+# Testing app
+
+add_executable(${PROJECT_NAME}Testing
+  vistalDataImageConverterTestingApp.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}Testing
+ ${QT_LIBRARIES}
+  ${MSTOOLS_LIB}
+  ${VISTAL_LIBS}
+  dtkCore
+  )
+
 
 ## #################################################################
 ## Install rules

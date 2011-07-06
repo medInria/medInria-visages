@@ -5,7 +5,6 @@
 
 #include "vistalDataImageConverterPluginExport.h"
 
-class vistalDataImageToItkDataImageUChar3ConverterPrivate;
 
 class VISTALDATAIMAGECONVERTERPLUGIN_EXPORT vistalDataImageToItkDataImageUChar3Converter : public dtkAbstractDataConverter
 {
@@ -23,9 +22,6 @@ public:
 
 public slots:
     dtkAbstractData *convert(void);
-
-private:
-    vistalDataImageToItkDataImageUChar3ConverterPrivate *d;
 };
 
 dtkAbstractDataConverter *createVistalDataImageToItkDataImageUChar3Converter(void);

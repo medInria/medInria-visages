@@ -20,6 +20,15 @@
 #include "itkDataImageToVistalDataImageFloat3Converter.h"
 #include "itkDataImageToVistalDataImageDouble3Converter.h"
 
+#include "vistalToVistalUChar3Converter.h"
+#include "vistalToVistalChar3Converter.h"
+#include "vistalToVistalUShort3Converter.h"
+#include "vistalToVistalShort3Converter.h"
+#include "vistalToVistalUInt3Converter.h"
+#include "vistalToVistalInt3Converter.h"
+#include "vistalToVistalFloat3Converter.h"
+#include "vistalToVistalDouble3Converter.h"
+
 #include "vistalDataImageConverterPlugin.h"
 
 #include <dtkCore/dtkLog.h>
@@ -86,7 +95,25 @@ vistalDataImageConverterPlugin::initialize(void)
 		dtkWarning() << "Unable to register itkDataImageToVistalDataImageFloat3Converter type";
 	else if (!itkDataImageToVistalDataImageDouble3Converter::registered())
 		dtkWarning() << "Unable to register itkDataImageToVistalDataImageDouble3Converter type";
-
+	else if (!VistalToVistalUChar3Converter::registered())
+		dtkWarning() << "Unable to register VistalToVistalUChar3Converter type";
+	else if (!VistalToVistalChar3Converter::registered())
+		dtkWarning() << "Unable to register VistalToVistalChar3Converter type";
+	else if (!VistalToVistalUShort3Converter::registered())
+		dtkWarning() << "Unable to register VistalToVistalUShort3Converter type";
+	else if (!VistalToVistalShort3Converter::registered())
+		dtkWarning() << "Unable to register VistalToVistalShort3Converter type";
+	else if (!VistalToVistalUInt3Converter::registered())
+		dtkWarning() << "Unable to register VistalToVistalUInt3Converter type";
+	else if (!VistalToVistalInt3Converter::registered())
+		dtkWarning() << "Unable to register VistalToVistalInt3Converter type";
+	else if (!VistalToVistalFloat3Converter::registered())
+		dtkWarning() << "Unable to register VistalToVistalFloat3Converter type";
+	else if (!VistalToVistalDouble3Converter::registered())
+		dtkWarning() << "Unable to register VistalToVistalDouble3Converter type";
+	
+	
+	
 	return true;
 }
 
@@ -132,7 +159,15 @@ vistalDataImageConverterPlugin::types(void) const
 						<< "itkDataImageToVistalDataImageUInt3Converter" 
 						<< "itkDataImageToVistalDataImageInt3Converter" 
 						<< "itkDataImageToVistalDataImageFloat3Converter" 
-						<< "itkDataImageToVistalDataImageDouble3Converter"; 
+						<< "itkDataImageToVistalDataImageDouble3Converter"
+	<< "VistalToVistalUChar3Converter" 
+	<< "VistalToVistalChar3Converter" 
+	<< "VistalToVistalUShort3Converter" 
+	<< "VistalToVistalShort3Converter" 
+	<< "VistalToVistalUInt3Converter" 
+	<< "VistalToVistalInt3Converter" 
+	<< "VistalToVistalFloat3Converter" 
+	<< "VistalToVistalDouble3Converter"; 
 }
 
 Q_EXPORT_PLUGIN2(vistalDataImageConverterPlugin, vistalDataImageConverterPlugin)
