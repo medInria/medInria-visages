@@ -133,7 +133,9 @@ int vistalProcessMidPlaneAlign::update(void)
 
         // Construct cost Object with subsampled images
         computeWorldOrientationMatrix(Decimatedf, RepIrmf);
-        CostFunction cost(image, Decimatedf, RepIrm, RepIrmf);
+        computeWorldOrientationMatrix(Decimatedf, RepIrm);
+
+        CostFunction cost(Decimatedf, Decimatedf, RepIrm, RepIrmf);
         NewuoaOptimizerStatic<CostFunction> newuoa(cost);
 
         qDebug() << "-----------NEWUOA Optimization-----------" << CostFunction::Transformation::name();
