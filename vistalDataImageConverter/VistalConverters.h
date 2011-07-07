@@ -99,7 +99,7 @@ namespace vistal
                                         typename Image3D<DataType2>::iterator it2 = res.begin();
                                         bool rescale =  (max-min > std::numeric_limits<DataType2>::max()-(std::numeric_limits<DataType2>::is_integer ?
                                                                                                         std::numeric_limits<DataType2>::min() : -std::numeric_limits<DataType2>::max()));
-                                        if (fabs(max-min)<1) rescale = true;
+                                        if (std::numeric_limits<DataType2>::is_integer && fabs(max-min)<1) rescale = true;
 
                                         while (it1 != iend)
                                         {
