@@ -6,7 +6,6 @@
 #include <dtkCore/dtkPluginManager.h>
 
 #include <QtCore>
-#include <QtGui>
 #include <QtDebug>
 
 #include <iostream>
@@ -68,7 +67,7 @@ class LSArguments: public GenericArguments
 
 int main(int argc, char **argv)
 {
-        QApplication application(argc, argv);
+        QCoreApplication application(argc, argv);
         application.setApplicationName("vistalProcessSegmentationSTREMTesting");
         application.setApplicationVersion("0.0.1");
         application.setOrganizationName("INRIA");
@@ -171,9 +170,9 @@ int main(int argc, char **argv)
         vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )process->output()->data());
 
         vistal::gis::saveVolume(arg.getoutput().c_str(), *ima, 0);
-        dtkAbstractData *outputImage = process->output();
-        outputImage->enableWriter("vistalDataImageWriter");
-        outputImage->write(arg.getoutput().c_str());
+//        dtkAbstractData *outputImage = process->output();
+//        outputImage->enableWriter("vistalDataImageWriter");
+//        outputImage->write(arg.getoutput().c_str());
         }
 
 
