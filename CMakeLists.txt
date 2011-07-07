@@ -1,5 +1,5 @@
-### CMakeLists.txt --- 
-## 
+### CMakeLists.txt ---
+##
 ## Author: Julien Wintz
 ## Copyright (C) 2008 - Julien Wintz, Inria.
 ## Created: Mon Sep 21 14:48:02 2009 (+0200)
@@ -8,13 +8,13 @@
 ##           By: Julien Wintz
 ##     Update #: 25
 ######################################################################
-## 
-### Commentary: 
-## 
+##
+### Commentary:
+##
 ######################################################################
-## 
+##
 ### Change log:
-## 
+##
 ######################################################################
 
 cmake_minimum_required(VERSION 2.8.1)
@@ -32,7 +32,7 @@ version number.")
 set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build
 version number.")
 set(${PROJECT_NAME}_VERSION
-	  "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
+          "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
 
 mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
@@ -57,48 +57,63 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 set(DEPENDS_ON_DTK 1)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
+include(pack)
+
 option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageReader plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWriter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
+option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "OFF")
+option(MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN     "Build qtdcmDataSource plugin" "OFF")
+option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN     "Build vistalProcessSegmentationSTREM plugin" "ON")
+
 
 
 option(BUILD_DOCUMENTATION "Build documentation")
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
-    subdirs(vistalDataImage)
+    add_subdirectory(vistalDataImage)
 endif()
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN)
-    subdirs(vistalDataImageReader)
+    add_subdirectory(vistalDataImageReader)
 endif()
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN)
-    subdirs(vistalDataImageWriter)
+    add_subdirectory(vistalDataImageWriter)
 endif()
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
-    subdirs(vistalDataImageConverter)
+    add_subdirectory(vistalDataImageConverter)
+endif()
+
+
+if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
+    set(MEDINRIA_REQUIRES_ITK TRUE)
+endif()
+
+if (MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN)
+    add_subdirectory(qtshanoirDataSource)
+endif()
+
+if (MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN)
+    add_subdirectory(qtdcmDataSource)
+endif()
+
+if (MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN)
+    add_subdirectory(vistalProcessDenoisingNLMeans)
 endif()
 
 if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN)
-
     subdirs(vistalProcessSegmentationSTREM)
 endif()
 
 
-
-if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)    
-    set(MEDINRIA_REQUIRES_ITK TRUE)
-endif()
-
 if(BUILD_DOCUMENTATION)
   add_subdirectory(doc)
 endif(BUILD_DOCUMENTATION)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
-include(pack)
 
 ## #################################################################
 ## Build settings
