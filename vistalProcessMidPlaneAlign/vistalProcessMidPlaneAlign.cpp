@@ -67,7 +67,7 @@ void vistalProcessMidPlaneAlign::setInput(dtkAbstractData *data)
 {
     if (!data) return;
     qDebug() << "Setting input" << data;
-    d->input = data->convert("vistalDataImageFloat3");
+    d->input = data->convert("vistalDataImageDouble3");
 }
 
 void vistalProcessMidPlaneAlign::setParameter(double  data, int channel)
@@ -86,13 +86,13 @@ int vistalProcessMidPlaneAlign::update(void)
     qDebug() << "Starting process";
 
 
-    if (!d || !d->input || !dynamic_cast<vistal::Image3D<float>*>((vistal::Image3D<float>*)d->input->data()))
+    if (!d || !d->input || !dynamic_cast<vistal::Image3D<double>*>((vistal::Image3D<double>*)d->input->data()))
         return -1;
 
-    Image3D<float>& image = *dynamic_cast<vistal::Image3D<float>*>((vistal::Image3D<float>*)d->input->data());
+    Image3D<double>& image = *dynamic_cast<vistal::Image3D<double>*>((vistal::Image3D<double>*)d->input->data());
 
     // Force the type in the image to float
-    typedef float ImageDataType;
+    typedef double ImageDataType;
     // Just use the Symmetry Plane transformation
     typedef Registration::TransformationTrait<Registration::SymmetricPlane> Transfo;
     //Just use the Mutual Information Cost Function
@@ -174,7 +174,7 @@ int vistalProcessMidPlaneAlign::update(void)
     Inv = A.i();
 
 
-    for (vistal::Image3D<float>::iterator it = tmp->begin(); it != tmp->end(); ++it)
+    for (vistal::Image3D<double>::iterator it = tmp->begin(); it != tmp->end(); ++it)
     {
         Vect3Df pos = it.Position();
         const float id = Inv(1,1)*pos.x() + Inv(1,2)*pos.y() + Inv(1,3)*pos.z() + Inv(1,4);
@@ -186,7 +186,7 @@ int vistalProcessMidPlaneAlign::update(void)
 
     qDebug() << "Done";
 
-    d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageFloat3");
+    d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageDouble3");
     d->output->setData(tmp);
 
     emit success();
