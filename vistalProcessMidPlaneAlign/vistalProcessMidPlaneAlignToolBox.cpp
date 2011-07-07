@@ -131,16 +131,16 @@ void vistalProcessMidPlaneAlignToolBox::run(void)
     d->process->setParameter((double)d->rhob->value(),1);
     d->process->setParameter((double)d->rhoe->value(),2);
 
-//    medRunnableProcess *runProcess = new medRunnableProcess;
-//    runProcess->setProcess (d->process);
+    medRunnableProcess *runProcess = new medRunnableProcess;
+    runProcess->setProcess (d->process);
 
-//    d->progression_stack->addJobItem(runProcess, "Progress:");
+    d->progression_stack->addJobItem(runProcess, "Progress:");
 
-//    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
-//    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
-    d->process->run();
-//    medJobManager::instance()->registerJobItem(runProcess);
-//    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
+    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
+    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
+//    d->process->run();
+    medJobManager::instance()->registerJobItem(runProcess);
+    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 
 }
 

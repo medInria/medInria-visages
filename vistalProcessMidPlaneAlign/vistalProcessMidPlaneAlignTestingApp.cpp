@@ -6,7 +6,6 @@
 #include <dtkCore/dtkPluginManager.h>
 
 #include <QtCore>
-#include <QtGui>
 #include <QtDebug>
 
 #include <iostream>
@@ -36,7 +35,7 @@ class LSArguments: public GenericArguments
 
 int main(int argc, char **argv)
 {
-    QApplication application(argc, argv);
+    QCoreApplication application(argc, argv);
     application.setApplicationName("vistalProcessMidPlaneRealignTesting");
     application.setApplicationVersion("0.0.1");
     application.setOrganizationName("INRIA");

@@ -52,11 +52,12 @@ find_package(ITK REQUIRED)
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalProcessMidPlaneAlignPlugin.h
   vistalProcessMidPlaneAlign.h
-  vistalProcessMidPlaneAlignToolBox.h)
+  vistalProcessMidPlaneAlignToolBox.h
+    )
 
 
 set(${PROJECT_NAME}_HEADERS
-  ${${PROJECT_NAME}_HEADERS_MOC})
+  ${${PROJECT_NAME}_HEADERS_MOC}   SplineImage.h)
 
 set(${PROJECT_NAME}_SOURCES
   vistalProcessMidPlaneAlignPlugin.cpp

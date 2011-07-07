@@ -20,6 +20,7 @@
 #include "WorldOrientation.hh"
 #include "MutualInformation.hh"
 #include "OptimizerNewuoa.hh"
+#include "SplineImage.h"
 
 // /////////////////////////////////////////////////////////////////
 // vistalProcessMidPlaneAlignPrivate
@@ -163,7 +164,25 @@ int vistalProcessMidPlaneAlign::update(void)
     computeNormalizationOrientationMatrix(image, RepIrm);
     qDebug() << "Applying transfo";
 
-    ApplyTransform<CostFunction::Transformation>(image, *tmp, RepIrm, RepIrmf, p, 3 /* Cubic Spline interp*/);
+    //        ApplyTransform<CostFunction::Transformation>(image, *tmp, RepIrm, RepIrmf, p, 3 /* Cubic Spline interp*/);
+
+    SPlineImage3D<3, Mirror, ClampBoth, true> smov(image);
+
+
+    A =  RepIrm.i() * A * RepIrmf;
+    Matrix Inv(4,4);
+    Inv = A.i();
+
+
+    for (vistal::Image3D<float>::iterator it = tmp->begin(); it != tmp->end(); ++it)
+    {
+        Vect3Df pos = it.Position();
+        const float id = Inv(1,1)*pos.x() + Inv(1,2)*pos.y() + Inv(1,3)*pos.z() + Inv(1,4);
+        const float jd = Inv(2,1)*pos.x() + Inv(2,2)*pos.y() + Inv(2,3)*pos.z() + Inv(2,4);
+        const float kd = Inv(3,1)*pos.x() + Inv(3,2)*pos.y() + Inv(3,3)*pos.z() + Inv(3,4);
+
+        *it = smov(id,jd,kd);
+    }
 
     qDebug() << "Done";
 
