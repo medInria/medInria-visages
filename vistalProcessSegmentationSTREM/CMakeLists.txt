@@ -48,8 +48,8 @@ include(${medinria_USE_FILE})
 # mstools
 #    find_package(MSTools REQUIRED)
 
-SET(MSTOOLS_SOURCE_DIR  ""  STRING "Path to MS tools source" )
-SET(MSTOOLS_LIB_DIR  ""   STRING "Path to MS tools lib" )
+FIND_PATH(MSTOOLS_SOURCE_DIR   DOC "Path to MS tools source dir")
+FIND_PATH(MSTOOLS_LIB_DIR   DOC "Path to MS tools build")
 
 
 SET(MSTOOLS_INC ${MSTOOLS_SOURCE_DIR}/Libraries/Classification/
@@ -58,6 +58,10 @@ SET(MSTOOLS_INC ${MSTOOLS_SOURCE_DIR}/Libraries/Classification/
     ${MSTOOLS_SOURCE_DIR}/Libraries/nico/)
 
 SET(MSTOOLS_LIB ${MSTOOLS_LIB_DIR})
+
+include_directories(${MSTOOLS_INC})
+
+LINK_DIRECTORIES(${MSTOOLS_LIB_DIR})
 
 
 ## #################################################################
@@ -90,7 +94,6 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  ${MSTOOLS_LIB}
   ${VISTAL_LIBS}
   mstools
   dtkCore
@@ -100,8 +103,6 @@ target_link_libraries(${PROJECT_NAME}
 dtk_build_doc(vistalProcessSegmentationSTREMPlugin)
 
 
-include_directories(${MSTOOLS_INC})
-link_directories(${MSTOOLS_LIB})
 
 
 add_executable(${PROJECT_NAME}App
@@ -110,7 +111,6 @@ add_executable(${PROJECT_NAME}App
 
 target_link_libraries(${PROJECT_NAME}App
  ${QT_LIBRARIES}
-  ${MSTOOLS_LIB}
   ${VISTAL_LIBS}
   dtkCore
   medCore)
