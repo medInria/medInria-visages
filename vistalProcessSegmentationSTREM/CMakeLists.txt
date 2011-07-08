@@ -58,6 +58,7 @@ SET(MSTOOLS_LIB /Users/nwiestda/Work/Neurinfo/mstools/build/lib/libmstools.a)
 
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalProcessSegmentationSTREMPlugin.h
+  vistalProcessSegmentationSTREMToolBox.h
   vistalProcessSegmentationSTREM.h)
 
 set(${PROJECT_NAME}_HEADERS
@@ -65,6 +66,7 @@ set(${PROJECT_NAME}_HEADERS
 
 set(${PROJECT_NAME}_SOURCES
   vistalProcessSegmentationSTREMPlugin.cpp
+  vistalProcessSegmentationSTREMToolBox.cpp
   vistalProcessSegmentationSTREM.cpp)
 
 ## #################################################################
@@ -74,7 +76,7 @@ set(${PROJECT_NAME}_SOURCES
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES_MOC} 
+  ${${PROJECT_NAME}_SOURCES_MOC}
   ${${PROJECT_NAME}_SOURCES}
   ${${PROJECT_NAME}_HEADERS})
 
