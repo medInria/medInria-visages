@@ -26,16 +26,50 @@
 class vistalProcessSegmentationSTREMToolBoxPrivate
 {
 public:
+    vistalProcessSegmentationSTREMToolBoxPrivate();
 
     medDropSite *dropSiteT1;
     medDropSite *dropSitePD;
     medDropSite *dropSiteT2;
     medDropSite *dropSiteMask;
 
-    dtkAbstractData* dataT1;
-    dtkAbstractData* dataPD;
-    dtkAbstractData* dataT2;
-    dtkAbstractData* dataMask;
+    QComboBox* InitMethod;
+
+    QDoubleSpinBox* rejRatio;
+    QComboBox* emAlgo;
+    QDoubleSpinBox* minDistance;
+    QSpinBox* emIter;
+
+    QCheckBox* strem;
+
+    QDoubleSpinBox* mahalanobisDist;
+    QDoubleSpinBox* rulesThreshold;
+    QDoubleSpinBox* minSize;
+    QDoubleSpinBox* wmneighb;
+
+    /*
+        ENUM(5, initMethod, "I", "init-method", "Method for initialisation", (StraInit)(HierarchicalPD)(HierarchicalFLAIR), HierarchicalFLAIR);
+
+        OPTIONAL(6, double, rejectionRatio, "rej", "rejectionRatio", "Robust estimation rejection Ratio", ".2", InputArgument, "Image3D");
+
+        ENUM(7, EMAlgorithm, "EM", "EM-Algorithm", "EM Algorithm", (GaussianEM)(GaussianCeleuxREM)(GaussianREM), GaussianREM);
+
+        OPTIONAL(8, double, minDistance, "minD", "minDistance", "Minimum distance in EM (stoping criteria)", "1e-4", InputArgument, "");
+
+        OPTIONAL(9, int, emIter, "eit", "emIter", "Iterations of the EM Algorithm", "1e-4", InputArgument, "");
+
+        FLAG(10, strem, "st", "Strem", "Start the first iteration with STREM?", false);
+
+        //OPTIONAL(11, float, emIter, "eit", "emIter", "Iterations of the EM Algorithm", "10", InputArgument, "");
+
+
+        OPTIONAL(11, double, mahalanobisThreshold, "mTh", "mahalanobisThreshold", "Threshold in the Mahalanobis distance", ".4", InputArgument, "");
+        OPTIONAL(12, double, rulesThreshold, "rTh", "rulesThreshold", "Threshold to apply rules (in times of SD)", "3.", InputArgument, "");
+        OPTIONAL(13, double, minsize, "msize", "minsize", "minimum lesion size", "6", InputArgument, "");
+        OPTIONAL(14, double, wmneighbor, "wm", "wmneighbor", "neighborhing ratio", "0.05", InputArgument, "");
+
+      */
+
 
 
     QPushButton *runButton;
@@ -45,11 +79,28 @@ public:
     dtkAbstractProcess* process;
     medProgressionStack * progression_stack;
 
+    /* Pointer to the data to be processed*/
+    dtkAbstractData* dataT1;
+    dtkAbstractData* dataPD;
+    dtkAbstractData* dataT2;
+    dtkAbstractData* dataMask;
+
+
 };
+
+
+vistalProcessSegmentationSTREMToolBoxPrivate::vistalProcessSegmentationSTREMToolBoxPrivate():
+
+    runButton(0), startLock(0),
+    process(0), progression_stack(0),
+    dataT1(0), dataPD(0), dataT2(0), dataMask(0)
+{
+}
+
 
 vistalProcessSegmentationSTREMToolBox::vistalProcessSegmentationSTREMToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessSegmentationSTREMToolBoxPrivate)
 {
-
+    /* Image Input */
     d->dropSiteT1 = new medDropSite;
     d->dropSitePD = new medDropSite;
     d->dropSiteT2 = new medDropSite;
@@ -68,38 +119,148 @@ vistalProcessSegmentationSTREMToolBox::vistalProcessSegmentationSTREMToolBox(QWi
     imgL->addWidget(new QLabel("Brain Mask"), 2,1);
     imgL->addWidget(d->dropSiteMask, 3,1);
 
+    QGroupBox* groupInput = new QGroupBox("Images Input");
+    groupInput->setLayout(imgL);
 
-      // Run button:
+    /* Algorithm Option */
+    d->InitMethod = new QComboBox();
+    d->InitMethod->addItems(QStringList() << "StraInit" << "HierarchicalPD" << "HierarchicalFLAIR");
+    QHBoxLayout* iniL = new QHBoxLayout();
+    iniL->addWidget(new QLabel("Initialisation Method"));
+    iniL->addWidget(d->InitMethod);
 
-      d->runButton = new QPushButton(tr("Run"));
+    d->rejRatio  = new QDoubleSpinBox;
+    d->rejRatio->setRange(0, 1);
+    d->rejRatio->setDecimals(4);
+    d->rejRatio->setValue(.2);
 
-      // Principal layout:
-
-      QWidget *widget = new QWidget;
-      d->progression_stack = new medProgressionStack(widget);
-
-      QVBoxLayout *layprinc = new QVBoxLayout();
-      layprinc->addLayout(imgL);
-      layprinc->addWidget(d->runButton);
-//      layprinc->addWidget(d->progression_stack);
-
-      widget->setLayout(layprinc);
-
-      // Main toolbox:
-      this->setTitle("Segmentation settings");
-      this->addWidget(widget);
+    QHBoxLayout *rejL = new QHBoxLayout;
+    rejL->addWidget(new QLabel("Rejection Ratio"));
+    rejL->addWidget(d->rejRatio);
 
 
-      d->runButton->setDisabled(true); // Need to add all the data prior to start
+    d->emAlgo = new QComboBox();
+    d->emAlgo->addItems(QStringList() << "GaussianEM" << "Gaussian \"Celeux\" Robust EM" << "Gaussian Robust EM");
+    d->emAlgo->setCurrentIndex(2);
 
-      // Connect the created dropsite
-      connect(d->dropSiteT1, SIGNAL(objectDropped()), this, SLOT(onT1ImageDropped()));
+    QHBoxLayout* emAlL = new QHBoxLayout;
+    emAlL->addWidget(new QLabel("EM Approach"));
+    emAlL->addWidget(d->emAlgo);
 
-      connect(d->dropSiteT2, SIGNAL(objectDropped()), this, SLOT(onT2orFLAIRImageDropped()));
-      connect(d->dropSitePD, SIGNAL(objectDropped()), this, SLOT(onPDImageDropped()));
-      connect(d->dropSiteMask, SIGNAL(objectDropped()), this, SLOT(onMaskImageDropped()));
+    d->minDistance = new QDoubleSpinBox;
+    d->minDistance->setRange(0, 1);
+    d->minDistance->setDecimals(7);
+    d->minDistance->setValue(1e-4);
 
-      connect(d->runButton, SIGNAL(clicked()), this, SLOT(run()));
+    QHBoxLayout* mdL = new QHBoxLayout;
+    mdL->addWidget(new QLabel("Convergence Dist."));
+    mdL->addWidget(d->minDistance);
+
+    d->emIter = new QSpinBox;
+    d->emIter->setRange(0, 1000);
+    d->emIter->setValue(100);
+
+    QHBoxLayout* emIL = new QHBoxLayout;
+    emIL->addWidget(new QLabel("Iterations in EM:"));
+    emIL->addWidget(d->emIter);
+
+    d->strem = new QCheckBox;
+    d->strem->setText("First iteration with STREM?");
+    d->strem->setChecked(false);
+
+    QVBoxLayout* optAlg = new QVBoxLayout;
+    optAlg->addLayout(iniL);
+    optAlg->addLayout(rejL);
+    optAlg->addLayout(emAlL);
+    optAlg->addLayout(mdL);
+    optAlg->addLayout(emIL);
+    optAlg->addWidget(d->strem);
+
+
+    QGroupBox* Algo = new QGroupBox("EM Options");
+    Algo->setLayout(optAlg);
+
+
+    /* Lesion Options */
+    d->mahalanobisDist = new QDoubleSpinBox;
+    d->mahalanobisDist->setRange(0,4);
+    d->mahalanobisDist->setDecimals(4);
+    d->mahalanobisDist->setValue(.4);
+
+    QHBoxLayout* mahaL = new QHBoxLayout;
+    mahaL->addWidget(new QLabel("mahalanobis Distance:"));
+    mahaL->addWidget(d->mahalanobisDist);
+
+    d->rulesThreshold = new QDoubleSpinBox;
+    d->rulesThreshold->setRange(0, 10);
+    d->rulesThreshold->setDecimals(4);
+    d->rulesThreshold->setValue(3);
+
+
+    QHBoxLayout* rtL = new QHBoxLayout;
+    rtL->addWidget(new QLabel("rules Threshold:"));
+    rtL->addWidget(d->rulesThreshold);
+
+    d->minSize = new QDoubleSpinBox;
+
+    d->minSize->setRange(0,100);
+    d->minSize->setDecimals(2);
+    d->minSize->setValue(6);
+
+    QHBoxLayout* msL = new QHBoxLayout;
+    msL->addWidget(new QLabel("min Lesion size:"));
+    msL->addWidget(d->minSize);
+
+    d->wmneighb = new QDoubleSpinBox;
+    d->wmneighb->setRange(0, 1);
+    d->wmneighb->setDecimals(4);
+    d->wmneighb->setValue(.05);
+    QHBoxLayout* wmnL = new QHBoxLayout;
+    wmnL->addWidget(new QLabel("WM neighbors:"));
+    wmnL->addWidget(d->wmneighb);
+
+    QVBoxLayout* lesL = new QVBoxLayout;
+    lesL->addLayout(mahaL);
+    lesL->addLayout(rtL);
+    lesL->addLayout(msL);
+    lesL->addLayout(wmnL);
+
+    QGroupBox* les = new QGroupBox("MS Lesions Options");
+    les->setLayout(lesL);
+
+
+    // Run button:
+    d->runButton = new QPushButton(tr("Run"));
+
+    // Principal layout:
+
+    QWidget *widget = new QWidget;
+    d->progression_stack = new medProgressionStack(widget);
+
+    QVBoxLayout *layprinc = new QVBoxLayout();
+    layprinc->addWidget(groupInput); // Image input
+    layprinc->addWidget(Algo); // Algorithm option input
+    layprinc->addWidget(les); // lesion seg input
+    layprinc->addWidget(d->runButton);
+    layprinc->addWidget(d->progression_stack);
+
+    widget->setLayout(layprinc);
+
+    // Main toolbox:
+    this->setTitle("Segmentation settings");
+    this->addWidget(widget);
+
+
+    d->runButton->setDisabled(true); // Need to add all the data prior to start
+
+    // Connect the created dropsite
+    connect(d->dropSiteT1, SIGNAL(objectDropped()), this, SLOT(onT1ImageDropped()));
+
+    connect(d->dropSiteT2, SIGNAL(objectDropped()), this, SLOT(onT2orFLAIRImageDropped()));
+    connect(d->dropSitePD, SIGNAL(objectDropped()), this, SLOT(onPDImageDropped()));
+    connect(d->dropSiteMask, SIGNAL(objectDropped()), this, SLOT(onMaskImageDropped()));
+
+    connect(d->runButton, SIGNAL(clicked()), this, SLOT(run()));
 }
 
 vistalProcessSegmentationSTREMToolBox::~vistalProcessSegmentationSTREMToolBox(void)
@@ -111,17 +272,17 @@ vistalProcessSegmentationSTREMToolBox::~vistalProcessSegmentationSTREMToolBox(vo
 
 bool vistalProcessSegmentationSTREMToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("Three Classes EM Segmentation with outliers detection",
-                                                                           createVistalProcessSegmentationSTREMToolBox);
+    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("Rob. EM Segm. with outliers detection",
+                                                                         createVistalProcessSegmentationSTREMToolBox);
 }
 
 
 dtkAbstractData* vistalProcessSegmentationSTREMToolBox::processOutput(void)
 {
-        if(!d->process)
-            return NULL;
+    if(!d->process)
+        return NULL;
 
-        return d->process->output();
+    return d->process->output();
 }
 
 
@@ -132,16 +293,28 @@ void vistalProcessSegmentationSTREMToolBox::run(void)
 
     d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentationSTREM");
 
-    if(!this->parent()->data())
-        return;
+//    if(!this->parent()->data())
+//        return;
 
     d->process->setInput(d->dataT1, 0);
+    d->process->setInput(d->dataPD, 1);
+    d->process->setInput(d->dataT2, 2);
+    d->process->setInput(d->dataMask, 3);
 
-//    d->process->setParameter((double)d->maxf->value(),0);
-//    d->process->setParameter((double)d->rhob->value(),1);
-//    d->process->setParameter((double)d->rhoe->value(),2);
+    d->process->setParameter((double)d->InitMethod->currentIndex(), 0);
+    d->process->setParameter((double)d->rejRatio ->value(), 1);
+    d->process->setParameter((double)d->emAlgo->currentIndex(), 2);
 
-/*    medRunnableProcess *runProcess = new medRunnableProcess;
+    d->process->setParameter((double)d->minDistance->value(), 3);
+    d->process->setParameter((double)d->emIter->value(), 4);
+    d->process->setParameter((double)d->strem->isChecked(), 5);
+
+    d->process->setParameter((double)d->mahalanobisDist->value(), 6);
+    d->process->setParameter((double)d->rulesThreshold ->value(), 7);
+    d->process->setParameter((double)d->minSize->value(), 8);
+    d->process->setParameter((double)d->wmneighb->value(), 9);
+
+    medRunnableProcess *runProcess = new medRunnableProcess;
     runProcess->setProcess (d->process);
 
     d->progression_stack->addJobItem(runProcess, "Progress:");
@@ -151,84 +324,84 @@ void vistalProcessSegmentationSTREMToolBox::run(void)
 //    d->process->run();
     medJobManager::instance()->registerJobItem(runProcess);
     QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
-*/
 }
 
 void vistalProcessSegmentationSTREMToolBox::onT1ImageDropped()
 {
-  medDataIndex index = d->dropSiteT1->index();
+    medDataIndex index = d->dropSiteT1->index();
 
-  if (!index.isValid())
-    return;
+    if (!index.isValid())
+        return;
 
-  d->dataT1 = medDataManager::instance()->data (index).data();
+    d->dataT1 = medDataManager::instance()->data (index).data();
 
-  if (!d->dataT1)
-    return;
+    if (!d->dataT1)
+        return;
 
-  d->startLock |= 1;
-  if (d->startLock & 15)
-      d->runButton->setEnabled(true);
+    d->startLock |= 1;
+    if (d->startLock & 15)
+        d->runButton->setEnabled(true);
 
-        //emit dataSelected(d->data);
+    //emit dataSelected(d->data);
 }
 
 
 void vistalProcessSegmentationSTREMToolBox::onPDImageDropped()
 {
-  medDataIndex index = d->dropSitePD->index();
+    medDataIndex index = d->dropSitePD->index();
 
-  if (!index.isValid())
-    return;
+    if (!index.isValid())
+        return;
 
-  d->dataPD = medDataManager::instance()->data (index).data();
+    d->dataPD = medDataManager::instance()->data (index).data();
 
-  if (!d->dataPD)
-    return;
+    if (!d->dataPD)
+        return;
 
-  d->startLock |= 2;
-  if (d->startLock & 15)
-      d->runButton->setEnabled(true);
+    d->startLock |= 2;
+    if (d->startLock & 15)
+        d->runButton->setEnabled(true);
 
 
-        //emit dataSelected(d->data);
+    //emit dataSelected(d->data);
 }
 
 void vistalProcessSegmentationSTREMToolBox::onT2orFLAIRImageDropped()
 {
-  medDataIndex index = d->dropSiteT2->index();
+    medDataIndex index = d->dropSiteT2->index();
 
-  if (!index.isValid())
-    return;
+    if (!index.isValid())
+        return;
 
-  d->dataT2 = medDataManager::instance()->data (index).data();
+    d->dataT2 = medDataManager::instance()->data (index).data();
 
-  if (!d->dataT2)
-    return;
-  d->startLock |= 4;
-  if (d->startLock & 15)
-      d->runButton->setEnabled(true);
 
-        //emit dataSelected(d->data);
+    if (!d->dataT2)
+        return;
+    d->startLock |= 4;
+    if (d->startLock & 15)
+        d->runButton->setEnabled(true);
+
+    //emit dataSelected(d->data);
 }
 
 void vistalProcessSegmentationSTREMToolBox::onMaskImageDropped()
 {
-  medDataIndex index = d->dropSiteMask->index();
+    medDataIndex index = d->dropSiteMask->index();
 
-  if (!index.isValid())
-    return;
+    if (!index.isValid())
+        return;
 
-  d->dataMask = medDataManager::instance()->data (index).data();
+    d->dataMask = medDataManager::instance()->data (index).data();
 
-  if (!d->dataMask)
-    return;
+    if (!d->dataMask)
+        return;
 
-  d->startLock |= 6;
+    d->startLock |= 6;
 
-  if (d->startLock & 15)
-      d->runButton->setEnabled(true);
-        //emit dataSelected(d->data);
+    if (d->startLock & 15)
+        d->runButton->setEnabled(true);
+    //emit dataSelected(d->data);
 }
 
 

@@ -48,9 +48,17 @@ include(${medinria_USE_FILE})
 # mstools
 #    find_package(MSTools REQUIRED)
 
+SET(MSTOOLS_SOURCE_DIR  ""  STRING "Path to MS tools source" )
+SET(MSTOOLS_LIB_DIR  ""   STRING "Path to MS tools lib" )
 
-SET(MSTOOLS_INC /Users/nwiestda/Work/Neurinfo/mstools/trunk/Sources/Libraries/Common /Users/nwiestda/Work/Neurinfo/mstools/trunk/Sources/Libraries/Classification)
-SET(MSTOOLS_LIB /Users/nwiestda/Work/Neurinfo/mstools/build/lib/libmstools.a)
+
+SET(MSTOOLS_INC ${MSTOOLS_SOURCE_DIR}/Libraries/Classification/
+    ${MSTOOLS_SOURCE_DIR}/Libraries/Common/
+    ${MSTOOLS_SOURCE_DIR}/Libraries/MeanShift/
+    ${MSTOOLS_SOURCE_DIR}/Libraries/nico/)
+
+SET(MSTOOLS_LIB ${MSTOOLS_LIB_DIR})
+
 
 ## #################################################################
 ## Input
@@ -84,6 +92,7 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${MSTOOLS_LIB}
   ${VISTAL_LIBS}
+  mstools
   dtkCore
   medCore
   medGui)
@@ -92,6 +101,8 @@ dtk_build_doc(vistalProcessSegmentationSTREMPlugin)
 
 
 include_directories(${MSTOOLS_INC})
+link_directories(${MSTOOLS_LIB})
+
 
 add_executable(${PROJECT_NAME}App
   vistalProcessSegmentationSTREMTestingApp.cpp
