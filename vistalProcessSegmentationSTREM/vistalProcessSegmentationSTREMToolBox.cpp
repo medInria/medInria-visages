@@ -19,6 +19,7 @@
 #include <medGui/medToolBoxFilteringCustom.h>
 #include <medGui/medProgressionStack.h>
 #include <medGui/medDropSite.h>
+#include <medCore/medDataManager.h>
 
 #include <QtGui>
 
@@ -26,13 +27,20 @@ class vistalProcessSegmentationSTREMToolBoxPrivate
 {
 public:
 
-    /*
-      #include <medGui/medDropSite.h>
-      */
+    medDropSite *dropSiteT1;
+    medDropSite *dropSitePD;
+    medDropSite *dropSiteT2;
+    medDropSite *dropSiteMask;
 
-    QDoubleSpinBox *rhob;
-    QDoubleSpinBox *rhoe;
-    QSpinBox *maxf;
+    dtkAbstractData* dataT1;
+    dtkAbstractData* dataPD;
+    dtkAbstractData* dataT2;
+    dtkAbstractData* dataMask;
+
+
+    QPushButton *runButton;
+
+    int startLock;
 
     dtkAbstractProcess* process;
     medProgressionStack * progression_stack;
@@ -41,42 +49,29 @@ public:
 
 vistalProcessSegmentationSTREMToolBox::vistalProcessSegmentationSTREMToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessSegmentationSTREMToolBoxPrivate)
 {
-      // Parameters:
 
-      QLabel *mxLbl = new QLabel("Max Function Call :");
-      d->maxf = new QSpinBox();
-      d->maxf->setRange(10,10000);
-      d->maxf->setValue(500);
-      QHBoxLayout* maxfunL = new QHBoxLayout;
-      maxfunL->addWidget(mxLbl);
-      maxfunL->addWidget(d->maxf);
+    d->dropSiteT1 = new medDropSite;
+    d->dropSitePD = new medDropSite;
+    d->dropSiteT2 = new medDropSite;
+    d->dropSiteMask = new medDropSite;
 
-      QLabel* rbLbl = new QLabel("Initial Search Radius:");
-      d->rhob = new QDoubleSpinBox;
-      d->rhob->setRange(0, 1000);
-      d->rhob->setValue(5);
-      QHBoxLayout* rbL = new QHBoxLayout;
-      rbL->addWidget(rbLbl);
-      rbL->addWidget(d->rhob);
+    QGridLayout* imgL = new QGridLayout;
+    imgL->addWidget(new QLabel("T1w Image"), 0,0);
+    imgL->addWidget(d->dropSiteT1, 1,0);
 
-      QLabel* reLbl = new QLabel("Final Radius:");
-      d->rhoe = new QDoubleSpinBox;
-      d->rhoe->setRange(0, 1);
-      d->rhoe->setValue(5e-2);
-      d->rhoe->setDecimals(5);
+    imgL->addWidget(new QLabel("PDw Image"), 0, 1);
+    imgL->addWidget(d->dropSitePD, 1,1);
 
-      QHBoxLayout* reL = new QHBoxLayout;
-      reL->addWidget(reLbl);
-      reL->addWidget(d->rhoe);
+    imgL->addWidget(new QLabel("T2 or FLAIR"), 2, 0);
+    imgL->addWidget(d->dropSiteT2, 3,0);
 
-      QVBoxLayout *parametersLayout = new QVBoxLayout;
-      parametersLayout->addLayout(maxfunL);
-      parametersLayout->addLayout(rbL);
-      parametersLayout->addLayout(reL);
+    imgL->addWidget(new QLabel("Brain Mask"), 2,1);
+    imgL->addWidget(d->dropSiteMask, 3,1);
+
 
       // Run button:
 
-      QPushButton *runButton = new QPushButton(tr("Run"));
+      d->runButton = new QPushButton(tr("Run"));
 
       // Principal layout:
 
@@ -84,18 +79,27 @@ vistalProcessSegmentationSTREMToolBox::vistalProcessSegmentationSTREMToolBox(QWi
       d->progression_stack = new medProgressionStack(widget);
 
       QVBoxLayout *layprinc = new QVBoxLayout();
-      layprinc->addLayout(parametersLayout);
-      layprinc->addWidget(runButton);
-      layprinc->addWidget(d->progression_stack);
+      layprinc->addLayout(imgL);
+      layprinc->addWidget(d->runButton);
+//      layprinc->addWidget(d->progression_stack);
 
       widget->setLayout(layprinc);
 
       // Main toolbox:
-      this->setTitle("Symmetry Plane settings");
+      this->setTitle("Segmentation settings");
       this->addWidget(widget);
 
-      connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
+      d->runButton->setDisabled(true); // Need to add all the data prior to start
+
+      // Connect the created dropsite
+      connect(d->dropSiteT1, SIGNAL(objectDropped()), this, SLOT(onT1ImageDropped()));
+
+      connect(d->dropSiteT2, SIGNAL(objectDropped()), this, SLOT(onT2orFLAIRImageDropped()));
+      connect(d->dropSitePD, SIGNAL(objectDropped()), this, SLOT(onPDImageDropped()));
+      connect(d->dropSiteMask, SIGNAL(objectDropped()), this, SLOT(onMaskImageDropped()));
+
+      connect(d->runButton, SIGNAL(clicked()), this, SLOT(run()));
 }
 
 vistalProcessSegmentationSTREMToolBox::~vistalProcessSegmentationSTREMToolBox(void)
@@ -131,13 +135,13 @@ void vistalProcessSegmentationSTREMToolBox::run(void)
     if(!this->parent()->data())
         return;
 
-    d->process->setInput(this->parent()->data());
+    d->process->setInput(d->dataT1, 0);
 
-    d->process->setParameter((double)d->maxf->value(),0);
-    d->process->setParameter((double)d->rhob->value(),1);
-    d->process->setParameter((double)d->rhoe->value(),2);
+//    d->process->setParameter((double)d->maxf->value(),0);
+//    d->process->setParameter((double)d->rhob->value(),1);
+//    d->process->setParameter((double)d->rhoe->value(),2);
 
-    medRunnableProcess *runProcess = new medRunnableProcess;
+/*    medRunnableProcess *runProcess = new medRunnableProcess;
     runProcess->setProcess (d->process);
 
     d->progression_stack->addJobItem(runProcess, "Progress:");
@@ -147,23 +151,86 @@ void vistalProcessSegmentationSTREMToolBox::run(void)
 //    d->process->run();
     medJobManager::instance()->registerJobItem(runProcess);
     QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
-
+*/
 }
 
-void vistalProcessSegmentationSTREMToolBox::onObjectDropped(void)
+void vistalProcessSegmentationSTREMToolBox::onT1ImageDropped()
 {
-  medDataIndex index = d->dropSite->index();
+  medDataIndex index = d->dropSiteT1->index();
 
   if (!index.isValid())
     return;
 
-  d->data = medDataManager::instance()->data (index).data();
+  d->dataT1 = medDataManager::instance()->data (index).data();
 
-  if (!d->data)
+  if (!d->dataT1)
     return;
 
-        emit dataSelected(d->data);
+  d->startLock |= 1;
+  if (d->startLock & 15)
+      d->runButton->setEnabled(true);
+
+        //emit dataSelected(d->data);
 }
+
+
+void vistalProcessSegmentationSTREMToolBox::onPDImageDropped()
+{
+  medDataIndex index = d->dropSitePD->index();
+
+  if (!index.isValid())
+    return;
+
+  d->dataPD = medDataManager::instance()->data (index).data();
+
+  if (!d->dataPD)
+    return;
+
+  d->startLock |= 2;
+  if (d->startLock & 15)
+      d->runButton->setEnabled(true);
+
+
+        //emit dataSelected(d->data);
+}
+
+void vistalProcessSegmentationSTREMToolBox::onT2orFLAIRImageDropped()
+{
+  medDataIndex index = d->dropSiteT2->index();
+
+  if (!index.isValid())
+    return;
+
+  d->dataT2 = medDataManager::instance()->data (index).data();
+
+  if (!d->dataT2)
+    return;
+  d->startLock |= 4;
+  if (d->startLock & 15)
+      d->runButton->setEnabled(true);
+
+        //emit dataSelected(d->data);
+}
+
+void vistalProcessSegmentationSTREMToolBox::onMaskImageDropped()
+{
+  medDataIndex index = d->dropSiteMask->index();
+
+  if (!index.isValid())
+    return;
+
+  d->dataMask = medDataManager::instance()->data (index).data();
+
+  if (!d->dataMask)
+    return;
+
+  d->startLock |= 6;
+
+  if (d->startLock & 15)
+      d->runButton->setEnabled(true);
+        //emit dataSelected(d->data);
+}
+
 
 
 medToolBoxFilteringCustom *createVistalProcessSegmentationSTREMToolBox(QWidget *parent)

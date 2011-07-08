@@ -85,18 +85,19 @@ target_link_libraries(${PROJECT_NAME}
   ${MSTOOLS_LIB}
   ${VISTAL_LIBS}
   dtkCore
-  medCore)
+  medCore
+  medGui)
 
 dtk_build_doc(vistalProcessSegmentationSTREMPlugin)
 
 
 include_directories(${MSTOOLS_INC})
 
-add_executable(${PROJECT_NAME}Testing
+add_executable(${PROJECT_NAME}App
   vistalProcessSegmentationSTREMTestingApp.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}Testing
+target_link_libraries(${PROJECT_NAME}App
  ${QT_LIBRARIES}
   ${MSTOOLS_LIB}
   ${VISTAL_LIBS}

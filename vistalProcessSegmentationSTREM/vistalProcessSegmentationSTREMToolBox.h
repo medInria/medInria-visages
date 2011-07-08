@@ -23,7 +23,13 @@ signals:
     void failure(void);
 
 public slots:
-    void onObjectDrop(void);
+
+    void onT1ImageDropped(void);
+    void onPDImageDropped(void);
+    void onT2orFLAIRImageDropped(void);
+
+    void onMaskImageDropped(void);
+
     void run(void);
 
 private:
