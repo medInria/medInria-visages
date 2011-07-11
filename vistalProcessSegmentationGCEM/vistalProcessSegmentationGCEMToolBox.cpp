@@ -247,7 +247,7 @@ vistalProcessSegmentationGCEMToolBox::vistalProcessSegmentationGCEMToolBox(QWidg
     d->alphap->setRange(0, 1000);
     d->alphap->setValue(10);
     QHBoxLayout* alL = new QHBoxLayout;
-    alL->addWidget(new QLabel("Graphcut &alpha; Threshold"));
+    alL->addWidget(new QLabel("Graphcut Threshold"));
     alL->addWidget(d->alphap);
 
     QVBoxLayout* lesL = new QVBoxLayout;
