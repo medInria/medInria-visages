@@ -85,7 +85,8 @@ target_link_libraries(${PROJECT_NAME}
   ${MSTOOLS_LIB}
   ${VISTAL_LIBS}
   dtkCore
-  medCore)
+  medCore
+  medGui)
 
 dtk_build_doc(vistalProcessSegmentationGCEMPlugin)
 
