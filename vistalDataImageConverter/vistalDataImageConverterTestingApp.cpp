@@ -86,9 +86,10 @@ int main(int argc, char **argv)
 
         CAST_COMPARE(unsigned int, float, UInt3, Float3);
         CAST_COMPARE(unsigned int, double, UInt3, Double3);
-
-
         //
+
+
+
 
         qDebug() << "Testing finished, everything is fine then";
         return DTK_SUCCEED;
