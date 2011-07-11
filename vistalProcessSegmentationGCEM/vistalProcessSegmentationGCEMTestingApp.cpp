@@ -1,8 +1,15 @@
+
 #include <dtkCore/dtkAbstractData.h>
+
 #include <dtkCore/dtkAbstractDataFactory.h>
+#include <dtkCore/dtkAbstractDataReader.h>
+#include <dtkCore/dtkAbstractDataWriter.h>
+
 #include <dtkCore/dtkAbstractProcess.h>
 #include <dtkCore/dtkAbstractProcessFactory.h>
+
 #include <dtkCore/dtkGlobal.h>
+
 #include <dtkCore/dtkPluginManager.h>
 
 #include <QtCore>
@@ -11,21 +18,18 @@
 
 #include <iostream>
 
-#include "Image3D.hh"
-#include "loadImg.hh"
-
 #include "Arguments.hh"
 
 
 class LSArguments: public GenericArguments
 {
         //	MANDATORY(1,std::string, i1, "", "", "Reference Image (4D volume)", InputArgument, "Image4D");
-        OPTIONAL(1, std::string, t1, "t", "t1-image", "T1 Weighted Image", "/Users/nwiestda/Data/USPIO-6/01011/M0/unbias_3DMPRAGEs005a001", InputArgument, "Image3D");
-        OPTIONAL(2, std::string, pd, "pd", "pd-image", "Proton Density Weighted image", "/Users/nwiestda/Data/USPIO-6/01011/M0/DP_3D", InputArgument, "Image3D");
+        OPTIONAL(1, std::string, t1, "t", "t1-image", "T1 Weighted Image", "/Users/nwiestda/Data/USPIO-6/01011/M0/unbias_3DMPRAGEs005a001.nii.gz", InputArgument, "Image3D");
+        OPTIONAL(2, std::string, pd, "pd", "pd-image", "Proton Density Weighted image", "/Users/nwiestda/Data/USPIO-6/01011/M0/DP_3D.nii.gz", InputArgument, "Image3D");
 
         OPTIONAL(3, std::string, t2, "t2", "t2-image", "T2 Weighted image", "", InputArgument, "Image3D");
 
-        OPTIONAL(4, std::string, flair, "flair", "flair-image", "FLAIR image", "/Users/nwiestda/Data/USPIO-6/01011/M0/unbias_3DFLAIRs007a001", InputArgument, "Image3D");
+        OPTIONAL(4, std::string, flair, "flair", "flair-image", "FLAIR image", "/Users/nwiestda/Data/USPIO-6/01011/M0/unbias_3DFLAIRs007a001.nii.gz", InputArgument, "Image3D");
 
         ENUM(5, initMethod, "I", "init-method", "Method for initialisation", (StraInit)(HierarchicalPD)(HierarchicalFLAIR), StraInit);
 
@@ -47,8 +51,8 @@ class LSArguments: public GenericArguments
         OPTIONAL(13, float, minsize, "msize", "minsize", "Iterations of the EM Algorithm", 6, InputArgument, "");
         OPTIONAL(14, float, wmneighbor, "wm", "wmneighbor", "Iterations of the EM Algorithm", 0.05, InputArgument, "");
 
-        OPTIONAL(15, std::string, output, "out", "output-image", "output image", "", OutputArgument, "Image3D");
-        OPTIONAL(16, std::string, mask, "m", "brain-mask", "brain mask (CSF+WM+GM+Lesions)", "/Users/nwiestda/Data/USPIO-6/01011/M0/BrainMaskCon", InputArgument, "Image3D");
+        OPTIONAL(15, std::string, output, "out", "output-image", "output image", "/tmp/GCEM.nii.gz", OutputArgument, "Image3D");
+        OPTIONAL(16, std::string, mask, "m", "brain-mask", "brain mask (CSF+WM+GM+Lesions)", "/Users/nwiestda/Data/USPIO-6/01011/M0/BrainMaskCon.nii.gz", InputArgument, "Image3D");
 
         OPTIONAL(17, float, rulesMin, "rmin", "rulesMin", " Rules Min Threshold (in SD times)", 2, InputArgument, "Image3D");
         OPTIONAL(18, float, rulesMax, "rmax", "rulesMax", " Rules Max Threshold (in SD times)", 3, InputArgument, "Image3D");
@@ -60,6 +64,83 @@ class LSArguments: public GenericArguments
 
         CONSTRUCTORS(LSArguments, 20);
 };
+
+
+
+dtkAbstractDataReader* getSuitableReader( QString filename )
+{
+    QList<QString> readers = dtkAbstractDataFactory::instance()->readers();
+
+    // cycle through readers to see if the last used reader can handle the file
+    for (int i=0; i<readers.size(); i++) {
+        dtkAbstractDataReader* dataReader = dtkAbstractDataFactory::instance()->reader(readers[i]);
+//        qDebug() << dataReader->description();
+        if (dataReader->canRead( filename ))
+            return dataReader;
+        else
+            delete dataReader;
+    }
+
+    qWarning() << "No suitable reader found!";
+    return NULL;
+}
+
+dtkAbstractDataWriter* getSuitableWriter( QString filename, dtkAbstractData* dtkdata )
+{
+    if (!dtkdata)
+        return NULL;
+
+    QList<QString> writers = dtkAbstractDataFactory::instance()->writers();
+
+    for (int i=0; i<writers.size(); i++) {
+        dtkAbstractDataWriter *dataWriter = dtkAbstractDataFactory::instance()->writer(writers[i]);
+
+        if ( dataWriter->handled().contains(dtkdata->description()) &&
+             dataWriter->canWrite( filename ) ) {
+            return dataWriter;
+        }
+        else
+            delete dataWriter;
+    }
+
+    return NULL;
+}
+
+
+
+dtkAbstractData* load(QString t1)
+{
+    dtkAbstractData *inputImage;
+    dtkAbstractDataReader* dataReader = getSuitableReader(t1);
+    if (dataReader){
+        dataReader->readInformation( t1 );
+        inputImage = dataReader->data();
+        delete dataReader;
+    }
+    else {
+        qWarning() << "No suitable reader found for file: " << t1 << " unable to import!";
+        exit(-1);
+    }
+
+    if (!inputImage) {
+        qWarning() << "Reader was unable to read: " << t1;
+        exit(-1);
+    }
+    return inputImage;
+}
+
+void Write(QString file, dtkAbstractData* imData)
+{
+    dtkAbstractDataWriter *dataWriter = getSuitableWriter(file, imData);
+    if( dataWriter) {
+        dataWriter->setData (imData);
+        if (!dataWriter->write( file))
+            qDebug() << "Could not save data file: " + file;
+
+        delete dataWriter;
+    }
+
+}
 
 
 
@@ -81,52 +162,35 @@ int main(int argc, char **argv)
 
         dtkPluginManager::instance()->initialize();
 
-
         QString t1 = arg.gett1().c_str();
-        QString pd = arg.getpd().c_str();
+          QString pd = arg.getpd().c_str();
 
-        QString t2 = arg.gett2().c_str();
+          QString t2 = arg.gett2().c_str();
 
-        QString flair = arg.getflair().c_str();
-
-
-        if (t1 == "")
-                std::cerr << "Expecting T1 input" << std::endl;
-        if (pd == "")
-                std::cerr << "Expecting PD input" << std::endl;
-        if (t2 == "" && flair == "")
-                std::cerr << "Expecting T2 or FLAIR input image" << std::endl;
-
-        if (t1== "" || pd == "" && (flair == "" || t2 == ""))
-                abort();
-
-        vistal::Image3D<unsigned char> *im1 = new 	vistal::Image3D<unsigned char>;
-        loadImage(arg.gett1(), *im1, 0);
-
-        dtkAbstractData *inputImage = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-        inputImage->setData(im1);
-
-        vistal::Image3D<unsigned char>* im2 = new 	vistal::Image3D<unsigned char>;
-        loadImage(arg.getpd(), *im2, 0);
-
-        dtkAbstractData *PD = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-        PD->setData(im2);
+          QString flair = arg.getflair().c_str();
 
 
-        vistal::Image3D<unsigned char> *im3 = new 	vistal::Image3D<unsigned char>;
-        if (t2 == "" && flair != "")
-                loadImage(arg.getflair(), *im3, 0);
-        else
-                loadImage(arg.gett2(), *im3, 0);
+          if (t1 == "")
+              std::cerr << "Expecting T1 input" << std::endl;
+          if (pd == "")
+              std::cerr << "Expecting PD input" << std::endl;
+          if (t2 == "" && flair == "")
+              std::cerr << "Expecting T2 or FLAIR input image" << std::endl;
 
-        dtkAbstractData *Third = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-        Third->setData(im3);
+          if (t1== "" || pd == "" && (flair == "" || t2 == ""))
+              abort();
 
-        vistal::Image3D<unsigned char>* msk = new 	vistal::Image3D<unsigned char>;
-        loadImage(arg.getmask(), *msk, 0);
+          dtkAbstractData *inputImage = load(arg.gett1().c_str());
+          dtkAbstractData *PD = load(arg.getpd().c_str());
 
-        dtkAbstractData *mask = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-        mask->setData(msk);
+
+          dtkAbstractData *Third =0;
+          if (t2 == "" && flair != "")
+              Third = load(flair);
+          else
+              Third = load(t2);
+
+          dtkAbstractData *mask = load(arg.getmask().c_str());
 
         dtkAbstractProcess *process = dynamic_cast <dtkAbstractProcess *>(dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentationGCEM"));
         if (!process) {
@@ -168,32 +232,16 @@ int main(int argc, char **argv)
         process->update();
 
         if (!process->output())
-        {
-                qDebug() << "Warning output not available";
-
-        }
-        else {
-
-
-        vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )process->output()->data());
-
-        vistal::gis::saveVolume(arg.getoutput().c_str(), *ima, 0);
-        dtkAbstractData *outputImage = process->output();
-        outputImage->enableWriter("vistalDataImageWriter");
-        outputImage->write(arg.getoutput().c_str());
-        }
-
+           {
+               qDebug() << "Warning output not available";
+           }
+           else {
+               Write(arg.getoutput().c_str(), process->output());
+           }
 
 
 
         dtkPluginManager::instance()->uninitialize();
-
-
-        delete inputImage;
-        delete PD;
-        delete Third;
-        delete mask;
-
 
         return DTK_SUCCEED;
 }

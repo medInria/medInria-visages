@@ -59,7 +59,7 @@ SET(MSTOOLS_LIB ${MS_BASE}/mstools-build/lib/libmstools.a)
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalProcessSegmentationGCEMPlugin.h
   vistalProcessSegmentationGCEMToolBox.h
-  vistalProcessSegmentationGCEM.h)
+  vistalProcessSegmentationGCEM.h )
 
 set(${PROJECT_NAME}_HEADERS sgc.h
   ${${PROJECT_NAME}_HEADERS_MOC})
@@ -76,8 +76,8 @@ set(${PROJECT_NAME}_SOURCES
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES_MOC}
   ${${PROJECT_NAME}_SOURCES}
+  ${${PROJECT_NAME}_SOURCES_MOC}
   ${${PROJECT_NAME}_HEADERS})
 
 target_link_libraries(${PROJECT_NAME}
