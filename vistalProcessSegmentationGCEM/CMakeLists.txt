@@ -48,9 +48,9 @@ include(${medinria_USE_FILE})
 # mstools
 #    find_package(MSTools REQUIRED)
 
-
-SET(MSTOOLS_INC /Users/nwiestda/Work/Neurinfo/mstools/trunk/Sources/Libraries/Common /Users/nwiestda/Work/Neurinfo/mstools/trunk/Sources/Libraries/Classification)
-SET(MSTOOLS_LIB /Users/nwiestda/Work/Neurinfo/mstools/build/lib/libmstools.a)
+SET(MS_BASE /Users/nwiestda/Work/Leaving/)
+SET(MSTOOLS_INC ${MS_BASE}/mstools/Libraries/Common ${MS_BASE}/mstools/Libraries/Classification)
+SET(MSTOOLS_LIB ${MS_BASE}/mstools-build/lib/libmstools.a)
 
 ## #################################################################
 ## Input
@@ -58,6 +58,7 @@ SET(MSTOOLS_LIB /Users/nwiestda/Work/Neurinfo/mstools/build/lib/libmstools.a)
 
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalProcessSegmentationGCEMPlugin.h
+  vistalProcessSegmentationGCEMToolBox.h
   vistalProcessSegmentationGCEM.h)
 
 set(${PROJECT_NAME}_HEADERS sgc.h
@@ -65,6 +66,7 @@ set(${PROJECT_NAME}_HEADERS sgc.h
 
 set(${PROJECT_NAME}_SOURCES
   vistalProcessSegmentationGCEMPlugin.cpp
+  vistalProcessSegmentationGCEMToolBox.cpp
   vistalProcessSegmentationGCEM.cpp)
 
 ## #################################################################
@@ -90,11 +92,11 @@ dtk_build_doc(vistalProcessSegmentationGCEMPlugin)
 
 include_directories(${MSTOOLS_INC})
 
-add_executable(${PROJECT_NAME}Testing
+add_executable(${PROJECT_NAME}App
   vistalProcessSegmentationGCEMTestingApp.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}Testing
+target_link_libraries(${PROJECT_NAME}App
  ${QT_LIBRARIES}
   ${MSTOOLS_LIB}
   ${VISTAL_LIBS}

@@ -3,6 +3,7 @@
 // /////////////////////////////////////////////////////////////////
 
 #include "vistalProcessSegmentationGCEM.h"
+#include "vistalProcessSegmentationGCEMToolBox.h"
 #include "vistalProcessSegmentationGCEMPlugin.h"
 
 #include <dtkCore/dtkLog.h>
@@ -11,7 +12,7 @@
 // vistalProcessSegmentationPluginPrivate
 // /////////////////////////////////////////////////////////////////
 
-class vistalProcessSegmentationGCEMPluginPrivate 
+class vistalProcessSegmentationGCEMPluginPrivate
 {
 public:
     // Class variables go here.
@@ -36,7 +37,10 @@ vistalProcessSegmentationGCEMPlugin::~vistalProcessSegmentationGCEMPlugin(void)
 bool vistalProcessSegmentationGCEMPlugin::initialize(void)
 {
     if(!vistalProcessSegmentationGCEM::registered())
-	dtkWarning() << "Unable to register vistalProcessSegmentationGCEM type";
+        dtkWarning() << "Unable to register vistalProcessSegmentationGCEM type";
+
+    if(!vistalProcessSegmentationGCEMToolBox::registered())
+        dtkWarning() << "Unable to register vistalProcessSegmentationGCEM tool box";
 
     return true;
 }
