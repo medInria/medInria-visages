@@ -42,6 +42,10 @@ public slots:
 
     dtkAbstractData *output(void);
 
+signals:
+    void progressed(int step);
+    void progressed(const QString& message);
+
 private:
     vistalProcessSegmentationGCEMPrivate *d;
 };

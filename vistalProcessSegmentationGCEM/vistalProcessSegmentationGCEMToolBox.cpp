@@ -89,10 +89,10 @@ public:
     medProgressionStack * progression_stack;
 
     /* Pointer to the data to be processed*/
-    dtkAbstractData* dataT1;
-    dtkAbstractData* dataPD;
-    dtkAbstractData* dataT2;
-    dtkAbstractData* dataMask;
+    QSharedPointer< dtkAbstractData > dataT1;
+    QSharedPointer< dtkAbstractData > dataPD;
+    QSharedPointer< dtkAbstractData > dataT2;
+    QSharedPointer< dtkAbstractData > dataMask;
 
 
 };
@@ -329,10 +329,10 @@ void vistalProcessSegmentationGCEMToolBox::run(void)
     //    if(!this->parent()->data())
     //        return;
 
-    d->process->setInput(d->dataT1, 0);
-    d->process->setInput(d->dataPD, 1);
-    d->process->setInput(d->dataT2, 2);
-    d->process->setInput(d->dataMask, 3);
+    d->process->setInput(d->dataT1.data(), 0);
+    d->process->setInput(d->dataPD.data(), 1);
+    d->process->setInput(d->dataT2.data(), 2);
+    d->process->setInput(d->dataMask.data(), 3);
 
     d->process->setParameter((double)d->InitMethod->currentIndex(), 0);
     d->process->setParameter((double)d->rejRatio ->value(), 1);
@@ -366,7 +366,7 @@ void vistalProcessSegmentationGCEMToolBox::onT1ImageDropped()
     if (!index.isValid())
         return;
 
-    d->dataT1 = medDataManager::instance()->data (index).data();
+    d->dataT1 = medDataManager::instance()->data (index);
 
     if (!d->dataT1)
         return;
@@ -386,7 +386,7 @@ void vistalProcessSegmentationGCEMToolBox::onPDImageDropped()
     if (!index.isValid())
         return;
 
-    d->dataPD = medDataManager::instance()->data (index).data();
+    d->dataPD = medDataManager::instance()->data (index);
 
     if (!d->dataPD)
         return;
@@ -406,7 +406,7 @@ void vistalProcessSegmentationGCEMToolBox::onT2orFLAIRImageDropped()
     if (!index.isValid())
         return;
 
-    d->dataT2 = medDataManager::instance()->data (index).data();
+    d->dataT2 = medDataManager::instance()->data (index);
 
 
     if (!d->dataT2)
@@ -425,7 +425,7 @@ void vistalProcessSegmentationGCEMToolBox::onMaskImageDropped()
     if (!index.isValid())
         return;
 
-    d->dataMask = medDataManager::instance()->data (index).data();
+    d->dataMask = medDataManager::instance()->data (index);
 
     if (!d->dataMask)
         return;
