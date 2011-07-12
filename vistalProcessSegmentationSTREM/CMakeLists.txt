@@ -48,8 +48,8 @@ include(${medinria_USE_FILE})
 # mstools
 #    find_package(MSTools REQUIRED)
 
-FIND_PATH(MSTOOLS_SOURCE_DIR   DOC "Path to MS tools source dir")
-FIND_PATH(MSTOOLS_LIB_DIR   DOC "Path to MS tools build")
+FIND_PATH(MSTOOLS_SOURCE_DIR "/usr/include" DOC "Path to MS tools source dir")
+FIND_PATH(MSTOOLS_LIB_DIR "/usr/lib" DOC "Path to MS tools build")
 
 
 SET(MSTOOLS_INC ${MSTOOLS_SOURCE_DIR}/Libraries/Classification/

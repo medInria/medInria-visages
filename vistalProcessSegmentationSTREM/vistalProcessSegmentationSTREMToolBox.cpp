@@ -21,6 +21,8 @@
 #include <medGui/medDropSite.h>
 #include <medCore/medDataManager.h>
 
+#include <dtkCore/dtkSmartPointer.h>
+
 #include <QtGui>
 
 class vistalProcessSegmentationSTREMToolBoxPrivate
@@ -80,10 +82,10 @@ public:
     medProgressionStack * progression_stack;
 
     /* Pointer to the data to be processed*/
-    dtkAbstractData* dataT1;
-    dtkAbstractData* dataPD;
-    dtkAbstractData* dataT2;
-    dtkAbstractData* dataMask;
+    QSharedPointer <dtkAbstractData> dataT1;
+    QSharedPointer <dtkAbstractData> dataPD;
+    QSharedPointer <dtkAbstractData> dataT2;
+    QSharedPointer <dtkAbstractData> dataMask;
 
 
 };
@@ -295,11 +297,11 @@ void vistalProcessSegmentationSTREMToolBox::run(void)
 
 //    if(!this->parent()->data())
 //        return;
-
-    d->process->setInput(d->dataT1, 0);
-    d->process->setInput(d->dataPD, 1);
-    d->process->setInput(d->dataT2, 2);
-    d->process->setInput(d->dataMask, 3);
+    
+    d->process->setInput(d->dataT1.data(), 0);
+    d->process->setInput(d->dataPD.data(), 1);
+    d->process->setInput(d->dataT2.data(), 2);
+    d->process->setInput(d->dataMask.data(), 3);
 
     d->process->setParameter((double)d->InitMethod->currentIndex(), 0);
     d->process->setParameter((double)d->rejRatio ->value(), 1);
@@ -330,13 +332,17 @@ void vistalProcessSegmentationSTREMToolBox::onT1ImageDropped()
 {
     medDataIndex index = d->dropSiteT1->index();
 
+    qDebug() << "Loading index " << index;
+    
     if (!index.isValid())
         return;
 
-    d->dataT1 = medDataManager::instance()->data (index).data();
-
+    d->dataT1 = medDataManager::instance()->data (index);
+    
     if (!d->dataT1)
         return;
+    
+    qDebug() << d->dataT1;
 
     d->startLock |= 1;
     if (d->startLock & 15)
@@ -353,7 +359,7 @@ void vistalProcessSegmentationSTREMToolBox::onPDImageDropped()
     if (!index.isValid())
         return;
 
-    d->dataPD = medDataManager::instance()->data (index).data();
+    d->dataPD = medDataManager::instance()->data (index);
 
     if (!d->dataPD)
         return;
@@ -373,7 +379,7 @@ void vistalProcessSegmentationSTREMToolBox::onT2orFLAIRImageDropped()
     if (!index.isValid())
         return;
 
-    d->dataT2 = medDataManager::instance()->data (index).data();
+    d->dataT2 = medDataManager::instance()->data (index);
 
 
     if (!d->dataT2)
@@ -392,7 +398,7 @@ void vistalProcessSegmentationSTREMToolBox::onMaskImageDropped()
     if (!index.isValid())
         return;
 
-    d->dataMask = medDataManager::instance()->data (index).data();
+    d->dataMask = medDataManager::instance()->data (index);
 
     if (!d->dataMask)
         return;

@@ -82,6 +82,8 @@ TryVistalConvertDetails(suffix, TypeIn, Double3, double);\
 
                         // Bunch of function to distribute over types going from short type to larger one,
                         // Avoiding the rescaling of input to the output, does just a copy of data in the new type
+                    
+                    imageOut = 0;
 
 
                         TryVistalConvertDetailsCopy(Char3, char, Short3, short);
@@ -144,7 +146,7 @@ TryVistalConvertDetails(suffix, TypeIn, Double3, double);\
 #define TryVistalConvertFromITKDetailsCopy(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut &&typeIn == "itkDataImage"#suffix) \
 { \
-itk::Image<TypeIn, 3>::Pointer image = dynamic_cast<itk::Image<TypeIn, 3> *>( (itk::Image<TypeIn, 3> *)imageIn->data() );\
+itk::Image<TypeIn, 3>::Pointer image = dynamic_cast<itk::Image<TypeIn, 3> *>( (itk::Object *)imageIn->data() );\
 if (!image) return; \
 itkImage3D<TypeIn> vistalConverter(image); \
 vistal::Image3D<TypeIn> conv = vistalConverter.GetImage3D(); \
@@ -163,8 +165,8 @@ return; \
 #define TryVistalConvertFromITKDetails(suffix, TypeIn, suffixOut, TypeOut) \
 if (typeOut == ""#suffixOut &&typeIn == "itkDataImage"#suffix) \
 { \
-        itk::Image<TypeIn, 3>::Pointer image = dynamic_cast<itk::Image<TypeIn, 3> *>((itk::Image<TypeIn, 3> *) imageIn->data() );\
-        if (!image) return; \
+        itk::Image<TypeIn, 3>::Pointer image = dynamic_cast<itk::Image<TypeIn, 3> *>((itk::Object *) imageIn->data() );\
+        if (!image) { qDebug() << "Error getting itk image" << imageIn->data() << ""#TypeIn << "to" << ""#TypeOut; return; } \
         itkImage3D<TypeIn>  vistalConverter(image); \
         vistal::Image3D<TypeIn> conv = vistalConverter.GetImage3D(); \
         vistal::converters::Parameters parameters; /* conversion parameters */ \
@@ -199,6 +201,8 @@ TryVistalConvertFromITKDetails(suffix, TypeIn, Double3, double);\
                 {
                         // Bunch of function to distribute over types going from short type to larger one,
                         // Avoiding the rescaling of input to the output, does just a copy of data in the new type
+                    
+                    imageOut = 0;
 
                         TryVistalConvertFromITKDetailsCopy(Char3, char, Short3, short);
                         TryVistalConvertFromITKDetailsCopy(Char3, char, Int3, int);
@@ -312,6 +316,8 @@ TryVistalVistalConvertDetails(suffix, TypeIn, Double3, double);\
                         //qDebug() << "Vistal Converter " << typeIn << " to " << typeOut;
                         // Bunch of function to distribute over types going from short type to larger one,
                         // Avoiding the rescaling of input to the output, does just a copy of data in the new type
+                    
+                    imageOut = 0;
 
                         TryVistalVistalConvertDetailsCopy(Char3, char, Short3, short);
                         TryVistalVistalConvertDetailsCopy(Char3, char, Int3, int);

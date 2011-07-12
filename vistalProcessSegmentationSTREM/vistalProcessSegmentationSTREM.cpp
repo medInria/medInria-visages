@@ -132,10 +132,11 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
     if (d->input.size() != 3)
     {
         //		qDebug() << "Setting the size of temporary input";
-        vistal::Image3D<unsigned char> ima;
-        d->input.push_back(ima);
-        d->input.push_back(ima);
-        d->input.push_back(ima);
+     //   vistal::Image3D<unsigned char> ima;
+//        d->input.push_back(ima);
+//        d->input.push_back(ima);
+//        d->input.push_back(ima);
+        d->input.resize(3);
     }
 
     dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
@@ -145,7 +146,9 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
         qDebug() << "DataType conversion error";
         return;
     }
-    //	qDebug() << "channel:" << channel << "datapointers:"<< data << dU8;
+    
+    //qDebug() << "channel:" << channel << "datapointers:"<< data;
+    //qDebug() << dU8;
 
     if (channel >= 0 && channel < 3)
     {

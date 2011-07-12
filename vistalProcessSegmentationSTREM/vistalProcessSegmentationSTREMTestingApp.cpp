@@ -71,7 +71,10 @@ dtkAbstractDataReader* getSuitableReader( QString filename )
         dtkAbstractDataReader* dataReader = dtkAbstractDataFactory::instance()->reader(readers[i]);
 //        qDebug() << dataReader->description();
         if (dataReader->canRead( filename ))
+        {
+            qDebug() << dataReader->description();
             return dataReader;
+        }
         else
             delete dataReader;
     }
@@ -109,6 +112,7 @@ dtkAbstractData* load(QString t1)
     dtkAbstractDataReader* dataReader = getSuitableReader(t1);
     if (dataReader){
         dataReader->readInformation( t1 );
+        dataReader->read( t1 );
         inputImage = dataReader->data();
         delete dataReader;
     }
@@ -121,6 +125,9 @@ dtkAbstractData* load(QString t1)
         qWarning() << "Reader was unable to read: " << t1;
         exit(-1);
     }
+    
+    qDebug() << t1 << inputImage << inputImage->data();
+    
     return inputImage;
 }
 
