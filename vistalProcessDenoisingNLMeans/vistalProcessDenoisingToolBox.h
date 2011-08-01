@@ -2,7 +2,7 @@
 #ifndef VISTALPROCESSDENOISINGTOOLBOX_H
 #define VISTALPROCESSDENOISINGTOOLBOX_H
 
-#include <medGui/medToolBoxFilteringCustom.h>
+#include <medGui/toolboxes/medToolBoxFilteringCustom.h>
 
 class vistalProcessDenoisingToolBoxPrivate;
 
