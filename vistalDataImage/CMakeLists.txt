@@ -33,6 +33,9 @@ find_package(dtk REQUIRED)
 include(${dtk_USE_FILE})
 include(dtkPlugin)
 
+find_package(medinria REQUIRED)
+include(${medinria_USE_FILE})
+
 find_package(Vistal REQUIRED)
 find_package(ITK REQUIRED)
 include(${VISTAL_USE_FILE})
@@ -44,24 +47,24 @@ include(${VISTAL_USE_FILE})
 set(${PROJECT_NAME}_HEADERS_MOC
   vistalDataImagePlugin.h
   vistalDataImageUChar3.h
-	vistalDataImageChar3.h
-	vistalDataImageUShort3.h
-	vistalDataImageShort3.h
-	vistalDataImageUInt3.h
-	vistalDataImageInt3.h
-	vistalDataImageDouble3.h
-	vistalDataImageFloat3.h	)
+  vistalDataImageChar3.h
+  vistalDataImageUShort3.h
+  vistalDataImageShort3.h
+  vistalDataImageUInt3.h
+  vistalDataImageInt3.h
+  vistalDataImageDouble3.h
+  vistalDataImageFloat3.h	)
 
 set(${PROJECT_NAME}_SOURCES
   vistalDataImagePlugin.cpp
   vistalDataImageUChar3.cpp
-	vistalDataImageChar3.cpp
-	vistalDataImageUShort3.cpp
-	vistalDataImageShort3.cpp
-	vistalDataImageUInt3.cpp
-	vistalDataImageInt3.cpp
-	vistalDataImageDouble3.cpp
-	vistalDataImageFloat3.cpp )
+  vistalDataImageChar3.cpp
+  vistalDataImageUShort3.cpp
+  vistalDataImageShort3.cpp
+  vistalDataImageUInt3.cpp
+  vistalDataImageInt3.cpp
+  vistalDataImageDouble3.cpp
+  vistalDataImageFloat3.cpp )
 
 ## #################################################################
 ## Build rules
@@ -77,6 +80,7 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
   ${ITK_LIBRARIES}
+  medCore
   dtkCore)
 
 dtk_build_doc(vistalDataImagePlugin)
