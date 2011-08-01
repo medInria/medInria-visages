@@ -3,6 +3,8 @@
 #include <QtShanoirSearchWidget.h>
 #include <QtShanoir.h>
 
+
+
 #include <medCore/medAbstractDataSource.h>
 #include <medCore/medAbstractDataSourceFactory.h>
 #include <QtGui>

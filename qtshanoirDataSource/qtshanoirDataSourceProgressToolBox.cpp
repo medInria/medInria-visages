@@ -5,6 +5,7 @@
 
 #include <medCore/medAbstractDataSource.h>
 #include <medCore/medAbstractDataSourceFactory.h>
+
 #include <QtGui>
 
 class qtshanoirDataSourceProgressToolBoxPrivate
