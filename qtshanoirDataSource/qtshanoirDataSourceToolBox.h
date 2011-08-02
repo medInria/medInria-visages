@@ -1,7 +1,7 @@
 #ifndef QTSHANOIRDATASOURCETOOLBOX_H
 #define QTSHANOIRDATASOURCETOOLBOX_H
 
-#include <medGui/medToolBox.h>
+#include <medGui/toolboxes/medToolBox.h>
 
 class qtshanoirDataSourceToolBoxPrivate;
 

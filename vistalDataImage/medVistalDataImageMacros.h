@@ -74,7 +74,7 @@ template<typename DataType>
 		QImage defaultThumbnail; \
 		type range_min, range_max; \
 	}; \
-	vistalDataImage##suffix::vistalDataImage##suffix(void) : dtkAbstractDataImage(), d(new vistalDataImage##suffix##Private) \
+	vistalDataImage##suffix::vistalDataImage##suffix(void) : medAbstractDataImage(), d(new vistalDataImage##suffix##Private) \
 	{ \
 		d->image = 0; \
 		d->range_min = 0; \
