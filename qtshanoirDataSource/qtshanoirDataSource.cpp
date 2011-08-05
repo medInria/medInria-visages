@@ -118,8 +118,6 @@ void qtshanoirDataSource::onImportData()
 
 void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
 {
-  //emit dataReceived(fileName);
-  
   QFileInfo fileInfo(fileName);
   
   dtkAbstractData* data = 0;
@@ -128,7 +126,6 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
 
   if (dataReader)
   {
-    qDebug() << dataReader->description();
     dataReader->read(fileInfo.filePath());
     //dataReader->read();
     data = dataReader->data();
@@ -155,10 +152,18 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
   
   fileXML.close();
   
-  data->addMetaData(tr("StudyDescription"),realXMLRoot.firstChildElement("study").firstChild().nodeValue());
-  data->addMetaData(tr("PatientName"),realXMLRoot.firstChildElement("subject").firstChildElement("name").firstChild().nodeValue());
-  data->addMetaData(tr("SeriesDescription"),realXMLRoot.firstChildElement("name").firstChild().nodeValue());
-  
+  QString tmpInfo = realXMLRoot.firstChildElement("study").firstChild().nodeValue();
+  tmpInfo.replace(QDir::separator(),"_");
+  data->addMetaData(tr("StudyDescription"),tmpInfo);
+
+  tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("name").firstChild().nodeValue();
+  tmpInfo.replace(QDir::separator(),"_");
+  data->addMetaData(tr("PatientName"),tmpInfo);
+
+  tmpInfo = realXMLRoot.firstChildElement("name").firstChild().nodeValue();
+  tmpInfo.replace(QDir::separator(),"_");
+  data->addMetaData(tr("SeriesDescription"),tmpInfo);
+
   emit dataReceived(data);
 }
 
