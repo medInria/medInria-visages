@@ -7,7 +7,7 @@
 #include "qtshanoirDataSourceProgressToolBox.h"
 
 #include <medCore/medAbstractDataSourceFactory.h>
-#include <medGui/medToolBox.h>
+#include <medToolBox.h>
 
 #include <QtShanoir.h>
 #include <QtShanoirTreeWidget.h>

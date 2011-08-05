@@ -8,7 +8,7 @@
 #include <medSql/medDatabaseController.h>
 #include <medCore/medJobManager.h>
 #include <medCore/medAbstractDataSourceFactory.h>
-#include <medGui/medToolBox.h>
+#include <medToolBox.h>
 
 #include <QtDcm.h>
 #include <QtDcmPreferencesWidget.h>
