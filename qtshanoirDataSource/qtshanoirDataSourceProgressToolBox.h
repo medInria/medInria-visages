@@ -1,7 +1,7 @@
 #ifndef QTSHANOIRDATASOURCEPROGRESSTOOLBOX_H
 #define QTSHANOIRDATASOURCEPROGRESSTOOLBOX_H
 
-#include <medGui/toolboxes/medToolBox.h>
+#include <medGui/medToolBox.h>
 
 class qtshanoirDataSourceProgressToolBoxPrivate;
 

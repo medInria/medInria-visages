@@ -4,8 +4,11 @@
 
 #include "qtdcmDataSource.h"
 
+#include <medSql/medDatabaseImporter.h>
+#include <medSql/medDatabaseController.h>
+#include <medCore/medJobManager.h>
 #include <medCore/medAbstractDataSourceFactory.h>
-#include <medGui/toolboxes/medToolBox.h>
+#include <medGui/medToolBox.h>
 
 #include <QtDcm.h>
 #include <QtDcmPreferencesWidget.h>
@@ -98,6 +101,8 @@ void qtdcmDataSource::initWidgets ( void )
     if ( !d->mainWidget )
     {
         d->mainWidget = new QtDcm();
+        d->mainWidget->getManager()->useConverter(false);
+        QObject::connect(d->mainWidget->getManager(), SIGNAL(serieMoved(QString)), this, SLOT(onSerieMoved(QString)));
 
         if ( !d->rightWidget )
         {
@@ -108,6 +113,13 @@ void qtdcmDataSource::initWidgets ( void )
 //     QtShanoir::instance()->attachTreeWidget(d->mainWidget);
 //     QtShanoir::instance()->init();
 }
+
+void qtdcmDataSource::onSerieMoved ( QString directory )
+{
+    emit dataToImportReceived(directory);
+}
+
+
 
 // /////////////////////////////////////////////////////////////////
 // Type instantiation
