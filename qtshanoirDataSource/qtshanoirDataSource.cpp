@@ -129,7 +129,6 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
     dataReader->read(fileInfo.filePath());
     //dataReader->read();
     data = dataReader->data();
-    delete dataReader;
   }
   else
   {
