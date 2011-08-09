@@ -40,7 +40,6 @@ public slots:
   
 private:
   qtshanoirDataSourcePrivate *d;
-  dtkAbstractDataReader* getSuitableReader(QStringList filename);
   void initWidgets(void);
 };
 

@@ -8,6 +8,7 @@
 
 #include <medCore/medAbstractDataSourceFactory.h>
 #include <medToolBox.h>
+#include <medMetaDataHelper.h>
 
 #include <QtShanoir.h>
 #include <QtShanoirTreeWidget.h>
@@ -16,6 +17,7 @@
 #include <dtkCore/dtkAbstractDataReader.h>
 #include <dtkCore/dtkAbstractDataFactory.h>
 #include <dtkCore/dtkAbstractData.h>
+#include <dtkCore/dtkSmartPointer.h>
 
 
 // /////////////////////////////////////////////////////////////////
@@ -120,17 +122,23 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
 {
   QFileInfo fileInfo(fileName);
   
-  dtkAbstractData* data = 0;
+  dtkSmartPointer <dtkAbstractData> dtkdata;
   
-  dtkAbstractDataReader* dataReader = this->getSuitableReader(QStringList(fileInfo.filePath()));
+  QList<QString> readers = dtkAbstractDataFactory::instance()->readers();
 
-  if (dataReader)
-  {
-    dataReader->read(fileInfo.filePath());
-    //dataReader->read();
-    data = dataReader->data();
+  // cycle through readers to see if the last used reader can handle the file
+  for (int i=0; i<readers.size(); i++) {
+      dtkSmartPointer<dtkAbstractDataReader> dataReader;
+      dataReader = dtkAbstractDataFactory::instance()->readerSmartPointer(readers[i]);
+      if (dataReader->canRead( fileInfo.filePath() )) {
+          dataReader->read( fileInfo.filePath() );
+          dtkdata = dataReader->data();
+
+          break;
+      }
   }
-  else
+
+  if (!dtkdata)
   {
     qWarning() << "No suitable reader found for file: " << fileInfo.filePath() << " unable to import Shanoir data!";
     emit dataReceivingFailed(fileInfo.filePath());
@@ -153,43 +161,17 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
   
   QString tmpInfo = realXMLRoot.firstChildElement("study").firstChild().nodeValue();
   tmpInfo.replace(QDir::separator(),"_");
-  data->addMetaData(tr("StudyDescription"),tmpInfo);
+  dtkdata->addMetaData(medMetaDataHelper::KEY_StudyDescription(),tmpInfo);
 
   tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("name").firstChild().nodeValue();
   tmpInfo.replace(QDir::separator(),"_");
-  data->addMetaData(tr("PatientName"),tmpInfo);
+  dtkdata->addMetaData(medMetaDataHelper::KEY_PatientName(),tmpInfo);
 
   tmpInfo = realXMLRoot.firstChildElement("name").firstChild().nodeValue();
   tmpInfo.replace(QDir::separator(),"_");
-  data->addMetaData(tr("SeriesDescription"),tmpInfo);
+  dtkdata->addMetaData(medMetaDataHelper::KEY_SeriesDescription(),tmpInfo);
 
-  emit dataReceived(data);
-}
-
-dtkAbstractDataReader* qtshanoirDataSource::getSuitableReader(QStringList filename)
-{
-  QList<QString> readers = dtkAbstractDataFactory::instance()->readers();
-  
-  // cycle through readers to see if the last used reader can handle the file
-  for (int i=0; i<readers.size(); i++) {
-    dtkAbstractDataReader* dataReader = dtkAbstractDataFactory::instance()->reader(readers[i]);
-    if (d->lastSuccessfulReaderDescription == dataReader->description() && dataReader->canRead( filename ))
-      return dataReader;
-    else
-      delete dataReader;
-  }
-  
-  for (int i=0; i<readers.size(); i++) {
-    dtkAbstractDataReader* dataReader = dtkAbstractDataFactory::instance()->reader(readers[i]);
-    if (dataReader->canRead( filename )){
-      d->lastSuccessfulReaderDescription = dataReader->description();
-      return dataReader;
-    }
-    else
-      delete dataReader;
-  }
-
-  return NULL;
+  emit dataReceived(dtkdata);
 }
 
 void qtshanoirDataSource::find()
