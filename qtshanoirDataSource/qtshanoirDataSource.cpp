@@ -171,6 +171,20 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
   tmpInfo.replace(QDir::separator(),"_");
   dtkdata->addMetaData(medMetaDataHelper::KEY_SeriesDescription(),tmpInfo);
 
+  tmpInfo = realXMLRoot.firstChildElement("mrDatasetAcquisition").firstChildElement("mrProtocol").firstChildElement("protocolName").firstChild().nodeValue();
+  dtkdata->addMetaData(medMetaDataHelper::KEY_Protocol(),tmpInfo);
+
+  // Fixed for now
+  dtkdata->addMetaData(medMetaDataHelper::KEY_Modality(),"MR");
+
+  tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("birthDate").firstChild().nodeValue();
+  tmpInfo.resize(10);
+  dtkdata->addMetaData(medMetaDataHelper::KEY_BirthDate(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
+
+  tmpInfo = realXMLRoot.firstChildElement("datasetCreationDate").firstChild().nodeValue();
+  tmpInfo.resize(10);
+  dtkdata->addMetaData(medMetaDataHelper::KEY_AcquisitionDate(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
+
   emit dataReceived(dtkdata);
 }
 
