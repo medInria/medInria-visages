@@ -8,7 +8,7 @@
 
 #include <medCore/medAbstractDataSourceFactory.h>
 #include <medToolBox.h>
-#include <medMetaDataHelper.h>
+#include <medMetaDataKeys.h>
 
 #include <QtShanoir.h>
 #include <QtShanoirTreeWidget.h>
@@ -161,29 +161,29 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
   
   QString tmpInfo = realXMLRoot.firstChildElement("study").firstChild().nodeValue();
   tmpInfo.replace(QDir::separator(),"_");
-  dtkdata->addMetaData(medMetaDataHelper::KEY_StudyDescription(),tmpInfo);
+  dtkdata->addMetaData(medMetaDataKeys::StudyDescription.key(),tmpInfo);
 
   tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("name").firstChild().nodeValue();
   tmpInfo.replace(QDir::separator(),"_");
-  dtkdata->addMetaData(medMetaDataHelper::KEY_PatientName(),tmpInfo);
+  dtkdata->addMetaData(medMetaDataKeys::PatientName.key(),tmpInfo);
 
   tmpInfo = realXMLRoot.firstChildElement("name").firstChild().nodeValue();
   tmpInfo.replace(QDir::separator(),"_");
-  dtkdata->addMetaData(medMetaDataHelper::KEY_SeriesDescription(),tmpInfo);
+  dtkdata->addMetaData(medMetaDataKeys::SeriesDescription.key(),tmpInfo);
 
   tmpInfo = realXMLRoot.firstChildElement("mrDatasetAcquisition").firstChildElement("mrProtocol").firstChildElement("protocolName").firstChild().nodeValue();
-  dtkdata->addMetaData(medMetaDataHelper::KEY_Protocol(),tmpInfo);
+  dtkdata->addMetaData(medMetaDataKeys::Protocol.key(),tmpInfo);
 
   // Fixed for now
-  dtkdata->addMetaData(medMetaDataHelper::KEY_Modality(),"MR");
+  dtkdata->addMetaData(medMetaDataKeys::Modality.key(),"MR");
 
   tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("birthDate").firstChild().nodeValue();
   tmpInfo.resize(10);
-  dtkdata->addMetaData(medMetaDataHelper::KEY_BirthDate(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
+  dtkdata->addMetaData(medMetaDataKeys::BirthDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
 
   tmpInfo = realXMLRoot.firstChildElement("datasetCreationDate").firstChild().nodeValue();
   tmpInfo.resize(10);
-  dtkdata->addMetaData(medMetaDataHelper::KEY_AcquisitionDate(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
+  dtkdata->addMetaData(medMetaDataKeys::AcquisitionDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
 
   emit dataReceived(dtkdata);
 }
