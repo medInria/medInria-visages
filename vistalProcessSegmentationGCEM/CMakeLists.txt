@@ -48,9 +48,20 @@ include(${medinria_USE_FILE})
 # mstools
 #    find_package(MSTools REQUIRED)
 
-SET(MS_BASE /Users/nwiestda/Work/Leaving/)
-SET(MSTOOLS_INC ${MS_BASE}/mstools/Libraries/Common ${MS_BASE}/mstools/Libraries/Classification)
-SET(MSTOOLS_LIB ${MS_BASE}/mstools-build/lib/libmstools.a)
+FIND_PATH(MSTOOLS_SOURCE_DIR "/usr/include" DOC "Path to MS tools source dir")
+FIND_PATH(MSTOOLS_LIB_DIR "/usr/lib" DOC "Path to MS tools build")
+
+
+SET(MSTOOLS_INC ${MSTOOLS_SOURCE_DIR}/Libraries/Classification/
+    ${MSTOOLS_SOURCE_DIR}/Libraries/Common/
+    ${MSTOOLS_SOURCE_DIR}/Libraries/MeanShift/
+    ${MSTOOLS_SOURCE_DIR}/Libraries/nico/)
+
+SET(MSTOOLS_LIB ${MSTOOLS_LIB_DIR})
+
+include_directories(${MSTOOLS_INC})
+
+LINK_DIRECTORIES(${MSTOOLS_LIB_DIR})
 
 ## #################################################################
 ## Input
@@ -82,7 +93,7 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-  ${MSTOOLS_LIB}
+  mstools
   ${VISTAL_LIBS}
   dtkCore
   medCore
@@ -99,7 +110,7 @@ add_executable(${PROJECT_NAME}App
 
 target_link_libraries(${PROJECT_NAME}App
  ${QT_LIBRARIES}
-  ${MSTOOLS_LIB}
+  mstools
   ${VISTAL_LIBS}
   dtkCore
   medCore)
