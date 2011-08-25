@@ -1,5 +1,5 @@
-### CMakeLists.txt --- 
-## 
+### CMakeLists.txt ---
+##
 ## Author: Julien Wintz
 ## Copyright (C) 2008 - Julien Wintz, Inria.
 ## Created: Mon Sep 21 14:48:02 2009 (+0200)
@@ -8,13 +8,13 @@
 ##           By: Julien Wintz
 ##     Update #: 25
 ######################################################################
-## 
-### Commentary: 
-## 
+##
+### Commentary:
+##
 ######################################################################
-## 
+##
 ### Change log:
-## 
+##
 ######################################################################
 
 cmake_minimum_required(VERSION 2.8.1)
@@ -32,7 +32,7 @@ version number.")
 set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build
 version number.")
 set(${PROJECT_NAME}_VERSION
-	  "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
+          "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
 
 mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
@@ -65,6 +65,10 @@ option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource 
 option(MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN     "Build qtdcmDataSource plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasFiltering plugin" "ON")
+
+option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProcessSegmentationGCEM plugin" "ON")
+
+
 option(BUILD_DOCUMENTATION "Build documentation")
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
@@ -83,7 +87,7 @@ if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
     add_subdirectory(vistalDataImageConverter)
 endif()
 
-if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)    
+if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
     set(MEDINRIA_REQUIRES_ITK TRUE)
 endif()
 
@@ -104,6 +108,10 @@ if (MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN)
 endif()
 
 
+
+if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN)
+        subdirs(vistalProcessSegmentationGCEM)
+endif()
 
 if(BUILD_DOCUMENTATION)
   add_subdirectory(doc)
