@@ -64,6 +64,7 @@ option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImage
 option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "OFF")
 option(MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN     "Build qtdcmDataSource plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
+option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasFiltering plugin" "ON")
 option(BUILD_DOCUMENTATION "Build documentation")
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
@@ -97,6 +98,12 @@ endif()
 if (MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN)
     add_subdirectory(vistalProcessDenoisingNLMeans)
 endif()
+
+if (MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN)
+    subdirs(vistalProcessBiasFiltering)
+endif()
+
+
 
 if(BUILD_DOCUMENTATION)
   add_subdirectory(doc)
