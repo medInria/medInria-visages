@@ -66,7 +66,7 @@ option(MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN     "Build qtdcmDataSource plugin" 
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasFiltering plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProcessSegmentationGCEM plugin" "OFF")
-
+option(MEDINRIA_BUILD_VISTALPROCESSMIDPLANE_ALIGN_PLUGIN     "Build Mid Plane realign plugin" "ON")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 
@@ -109,6 +109,12 @@ endif()
 if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN)
         subdirs(vistalProcessSegmentationGCEM)
 endif()
+
+
+if (MEDINRIA_BUILD_VISTALPROCESSMIDPLANE_ALIGN_PLUGIN)
+    add_subdirectory(vistalProcessMidPlaneAlign)
+endif()
+
 
 if(BUILD_DOCUMENTATION)
   add_subdirectory(doc)
