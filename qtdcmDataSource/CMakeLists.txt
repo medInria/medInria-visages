@@ -47,6 +47,8 @@ include(dtkPlugin)
 
 set(${PROJECT_NAME}_HEADERS_MOC
   qtdcmDataSourcePlugin.h
+  qtdcmDataSourcePreviewToolBox.h
+  qtdcmDataSourceImportToolBox.h
   qtdcmDataSource.h)
 
 set(${PROJECT_NAME}_HEADERS
@@ -54,6 +56,8 @@ set(${PROJECT_NAME}_HEADERS
 
 set(${PROJECT_NAME}_SOURCES
   qtdcmDataSourcePlugin.cpp
+  qtdcmDataSourcePreviewToolBox.cpp
+  qtdcmDataSourceImportToolBox.cpp
   qtdcmDataSource.cpp)
 
 ## #################################################################

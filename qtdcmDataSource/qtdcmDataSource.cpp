@@ -19,6 +19,9 @@
 #include <dtkCore/dtkAbstractDataFactory.h>
 #include <dtkCore/dtkAbstractData.h>
 
+#include <qtdcmDataSourcePreviewToolBox.h>
+#include <qtdcmDataSourceImportToolBox.h>
+
 // /////////////////////////////////////////////////////////////////
 // qtdcmDataSourcePrivate
 // /////////////////////////////////////////////////////////////////
@@ -28,6 +31,10 @@ class qtdcmDataSourcePrivate
 public:
     QtDcm * mainWidget;
     QtDcmPreferencesWidget * rightWidget;
+    qtdcmDataSourcePreviewToolBox * previewToolBox;
+    qtdcmDataSourceImportToolBox * importToolBox;
+    
+    QList <medToolBox *> additional_toolboxes;
 
     ~qtdcmDataSourcePrivate();
 };
@@ -47,6 +54,12 @@ qtdcmDataSource::qtdcmDataSource ( void ) : medAbstractDataSource(), d ( new qtd
     d->mainWidget = NULL;
     d->rightWidget = NULL;
 
+    d->previewToolBox = new qtdcmDataSourcePreviewToolBox;
+    d->importToolBox = new qtdcmDataSourceImportToolBox;
+
+    d->additional_toolboxes.clear();
+    d->additional_toolboxes.push_back ( d->previewToolBox );
+    d->additional_toolboxes.push_back ( d->importToolBox );
 }
 
 qtdcmDataSource::~qtdcmDataSource ( void )
@@ -90,7 +103,7 @@ QString qtdcmDataSource::tabName()
 
 QList<medToolBox*> qtdcmDataSource::getToolboxes()
 {
-    return QList<medToolBox *> ();
+    return d->additional_toolboxes;
 }
 
 void qtdcmDataSource::initWidgets ( void )
@@ -101,22 +114,34 @@ void qtdcmDataSource::initWidgets ( void )
     if ( !d->mainWidget )
     {
         d->mainWidget = new QtDcm();
-        d->mainWidget->getManager()->useConverter(false);
-        QObject::connect(d->mainWidget->getManager(), SIGNAL(serieMoved(QString)), this, SLOT(onSerieMoved(QString)));
+        d->mainWidget->getManager()->setPreviewWidget(d->previewToolBox->getPreviewWidget());
+        d->mainWidget->getManager()->setImportWidget(d->importToolBox->getImportWidget());
+        d->mainWidget->getManager()->useConverter ( false );
+        QObject::connect ( d->mainWidget->getManager(), SIGNAL ( serieMoved ( QString ) ), this, SLOT ( onSerieMoved ( QString ) ) );
 
         if ( !d->rightWidget )
         {
             d->rightWidget = new QtDcmPreferencesWidget();
-            d->rightWidget->setPreferences(d->mainWidget->getManager()->getPreferences());
+            d->rightWidget->treeWidget->setStyleSheet ( "alternate-background-color: #505050;\
+                                                      border-top-width: 0px;\
+                                                      border-left-width: 0px;\
+                                                      border-right-width: 0px;\
+                                                      border-bottom-width: 0px;\
+                                                      padding-top: 0px;\
+                                                      padding-left: 0px;\
+                                                      padding-right: 0px;\
+                                                      padding-bottom: 0px;\
+                                                      font-size: 10px;\
+                                                      color: #b2b8b2;\
+                                                      background: #313131;" );
+            d->rightWidget->setPreferences ( d->mainWidget->getManager()->getPreferences() );
         }
     }
-//     QtShanoir::instance()->attachTreeWidget(d->mainWidget);
-//     QtShanoir::instance()->init();
 }
 
 void qtdcmDataSource::onSerieMoved ( QString directory )
 {
-    emit dataToImportReceived(directory);
+    emit dataToImportReceived ( directory );
 }
 
 
