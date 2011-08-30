@@ -21,6 +21,7 @@
 
 #include <qtdcmDataSourcePreviewToolBox.h>
 #include <qtdcmDataSourceImportToolBox.h>
+#include <qtdcmDataSourceSerieInfoToolBox.h>
 
 // /////////////////////////////////////////////////////////////////
 // qtdcmDataSourcePrivate
@@ -33,6 +34,7 @@ public:
     QtDcmPreferencesWidget * rightWidget;
     qtdcmDataSourcePreviewToolBox * previewToolBox;
     qtdcmDataSourceImportToolBox * importToolBox;
+    qtdcmDataSourceSerieInfoToolBox * serieInfoToolBox;
     
     QList <medToolBox *> additional_toolboxes;
 
@@ -56,9 +58,11 @@ qtdcmDataSource::qtdcmDataSource ( void ) : medAbstractDataSource(), d ( new qtd
 
     d->previewToolBox = new qtdcmDataSourcePreviewToolBox;
     d->importToolBox = new qtdcmDataSourceImportToolBox;
+    d->serieInfoToolBox = new qtdcmDataSourceSerieInfoToolBox;
 
     d->additional_toolboxes.clear();
     d->additional_toolboxes.push_back ( d->previewToolBox );
+    d->additional_toolboxes.push_back ( d->serieInfoToolBox );
     d->additional_toolboxes.push_back ( d->importToolBox );
 }
 
@@ -116,6 +120,7 @@ void qtdcmDataSource::initWidgets ( void )
         d->mainWidget = new QtDcm();
         d->mainWidget->getManager()->setPreviewWidget(d->previewToolBox->getPreviewWidget());
         d->mainWidget->getManager()->setImportWidget(d->importToolBox->getImportWidget());
+        d->mainWidget->getManager()->setSerieInfoWidget(d->serieInfoToolBox->getSerieInfoWidget());
         d->mainWidget->getManager()->useConverter ( false );
         QObject::connect ( d->mainWidget->getManager(), SIGNAL ( serieMoved ( QString ) ), this, SLOT ( onSerieMoved ( QString ) ) );
 
