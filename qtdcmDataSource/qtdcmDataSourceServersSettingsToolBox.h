@@ -15,7 +15,7 @@ public:
     QtDcmServersDicomSettingsWidget * getServersDicomSettingsWidget();
     
 public slots:
-  void saveServersSettings();
+  void onSaveServersSettings();
     
 private:
   qtdcmDataSourceServersSettingsToolBoxPrivate * d;

@@ -56,12 +56,12 @@ qtdcmDataSourceServersSettingsToolBox::qtdcmDataSourceServersSettingsToolBox ( Q
     this->setTitle ( "Dicom servers settings" );
 }
 
-void qtdcmDataSourceServersSettingsToolBox::saveServersSettings()
-{
-  d->serversSettingsWidget->updatePreferences();
-}
-
 QtDcmServersDicomSettingsWidget* qtdcmDataSourceServersSettingsToolBox::getServersDicomSettingsWidget()
 {
   return d->serversSettingsWidget;
+}
+
+void qtdcmDataSourceServersSettingsToolBox::onSaveServersSettings()
+{
+  d->serversSettingsWidget->updatePreferences();
 }
