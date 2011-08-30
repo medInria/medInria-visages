@@ -30,6 +30,7 @@ public:
     QList<medToolBox*> getToolboxes();
 
 public slots:
+    void onSaveLocalSettings();
     void onSerieMoved(QString directory);
 
 private:

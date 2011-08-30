@@ -11,7 +11,8 @@
 #include <medToolBox.h>
 
 #include <QtDcm.h>
-#include <QtDcmPreferencesWidget.h>
+#include <QtDcmLocalDicomSettingsWidget.h>
+#include <QtDcmServersDicomSettingsWidget.h>
 #include <QtDcmManager.h>
 #include <QtDcmPreferences.h>
 
@@ -22,6 +23,7 @@
 #include <qtdcmDataSourcePreviewToolBox.h>
 #include <qtdcmDataSourceImportToolBox.h>
 #include <qtdcmDataSourceSerieInfoToolBox.h>
+#include <qtdcmDataSourceServersSettingsToolBox.h>
 
 // /////////////////////////////////////////////////////////////////
 // qtdcmDataSourcePrivate
@@ -31,11 +33,14 @@ class qtdcmDataSourcePrivate
 {
 public:
     QtDcm * mainWidget;
-    QtDcmPreferencesWidget * rightWidget;
+    QWidget * rightWidget;
+    QtDcmLocalDicomSettingsWidget * localDicomSettingsWidget;
+    QtDcmServersDicomSettingsWidget * serversDicomSettingsWidget;
     qtdcmDataSourcePreviewToolBox * previewToolBox;
     qtdcmDataSourceImportToolBox * importToolBox;
     qtdcmDataSourceSerieInfoToolBox * serieInfoToolBox;
-    
+    qtdcmDataSourceServersSettingsToolBox * serversSettingsToolBox;
+
     QList <medToolBox *> additional_toolboxes;
 
     ~qtdcmDataSourcePrivate();
@@ -56,11 +61,35 @@ qtdcmDataSource::qtdcmDataSource ( void ) : medAbstractDataSource(), d ( new qtd
     d->mainWidget = NULL;
     d->rightWidget = NULL;
 
+    // Create gui for the right Widget;
+    d->localDicomSettingsWidget = new QtDcmLocalDicomSettingsWidget;
+
+    QPushButton * localSettingsButton = new QPushButton ( this );
+    localSettingsButton->setText ( "Save settings" );
+    localSettingsButton->setFocusPolicy ( Qt::NoFocus );
+    localSettingsButton->setMaximumWidth ( 100 );
+    QObject::connect ( localSettingsButton, SIGNAL ( clicked() ), this, SLOT ( onSaveLocalSettings() ) );
+
+    QHBoxLayout * buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(localSettingsButton);
+    buttonLayout->addStretch();
+
+    QVBoxLayout * layout = new QVBoxLayout;
+    layout->addWidget ( d->localDicomSettingsWidget );
+    layout->addLayout(buttonLayout);
+    layout->addStretch();
+
+    d->rightWidget = new QWidget ( this );
+    d->rightWidget->setLayout ( layout );
+
     d->previewToolBox = new qtdcmDataSourcePreviewToolBox;
     d->importToolBox = new qtdcmDataSourceImportToolBox;
     d->serieInfoToolBox = new qtdcmDataSourceSerieInfoToolBox;
+    d->serversSettingsToolBox = new qtdcmDataSourceServersSettingsToolBox;
 
     d->additional_toolboxes.clear();
+    d->additional_toolboxes.push_back ( d->serversSettingsToolBox );
     d->additional_toolboxes.push_back ( d->previewToolBox );
     d->additional_toolboxes.push_back ( d->serieInfoToolBox );
     d->additional_toolboxes.push_back ( d->importToolBox );
@@ -118,29 +147,32 @@ void qtdcmDataSource::initWidgets ( void )
     if ( !d->mainWidget )
     {
         d->mainWidget = new QtDcm();
-        d->mainWidget->getManager()->setPreviewWidget(d->previewToolBox->getPreviewWidget());
-        d->mainWidget->getManager()->setImportWidget(d->importToolBox->getImportWidget());
-        d->mainWidget->getManager()->setSerieInfoWidget(d->serieInfoToolBox->getSerieInfoWidget());
+        d->mainWidget->getManager()->setPreviewWidget ( d->previewToolBox->getPreviewWidget() );
+        d->mainWidget->getManager()->setImportWidget ( d->importToolBox->getImportWidget() );
+        d->mainWidget->getManager()->setSerieInfoWidget ( d->serieInfoToolBox->getSerieInfoWidget() );
         d->mainWidget->getManager()->useConverter ( false );
         QObject::connect ( d->mainWidget->getManager(), SIGNAL ( serieMoved ( QString ) ), this, SLOT ( onSerieMoved ( QString ) ) );
 
-        if ( !d->rightWidget )
-        {
-            d->rightWidget = new QtDcmPreferencesWidget();
-            d->rightWidget->treeWidget->setStyleSheet ( "alternate-background-color: #505050;\
-                                                      border-top-width: 0px;\
-                                                      border-left-width: 0px;\
-                                                      border-right-width: 0px;\
-                                                      border-bottom-width: 0px;\
-                                                      padding-top: 0px;\
-                                                      padding-left: 0px;\
-                                                      padding-right: 0px;\
-                                                      padding-bottom: 0px;\
-                                                      font-size: 10px;\
-                                                      color: #b2b8b2;\
-                                                      background: #313131;" );
-            d->rightWidget->setPreferences ( d->mainWidget->getManager()->getPreferences() );
-        }
+        d->localDicomSettingsWidget->setPreferences ( d->mainWidget->getManager()->getPreferences() );
+        d->serversSettingsToolBox->getServersDicomSettingsWidget()->setPreferences(d->mainWidget->getManager()->getPreferences());
+
+//         if ( !d->rightWidget )
+//         {
+//             d->rightWidget = new QtDcmLocalDicomSettingsWidget();
+//             d->rightWidget->treeWidget->setStyleSheet ( "alternate-background-color: #505050;\
+//                                                       border-top-width: 0px;\
+//                                                       border-left-width: 0px;\
+//                                                       border-right-width: 0px;\
+//                                                       border-bottom-width: 0px;\
+//                                                       padding-top: 0px;\
+//                                                       padding-left: 0px;\
+//                                                       padding-right: 0px;\
+//                                                       padding-bottom: 0px;\
+//                                                       font-size: 10px;\
+//                                                       color: #b2b8b2;\
+//                                                       background: #313131;" );
+//             d->rightWidget->setPreferences ( d->mainWidget->getManager()->getPreferences() );
+//         }
     }
 }
 
@@ -149,6 +181,11 @@ void qtdcmDataSource::onSerieMoved ( QString directory )
     emit dataToImportReceived ( directory );
 }
 
+void qtdcmDataSource::onSaveLocalSettings()
+{
+    if ( d->localDicomSettingsWidget )
+        d->localDicomSettingsWidget->updatePreferences();
+}
 
 
 // /////////////////////////////////////////////////////////////////

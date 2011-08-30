@@ -50,6 +50,7 @@ set(${PROJECT_NAME}_HEADERS_MOC
   qtdcmDataSourcePreviewToolBox.h
   qtdcmDataSourceImportToolBox.h
   qtdcmDataSourceSerieInfoToolBox.h
+  qtdcmDataSourceServersSettingsToolBox.h
   qtdcmDataSource.h)
 
 set(${PROJECT_NAME}_HEADERS
@@ -60,6 +61,7 @@ set(${PROJECT_NAME}_SOURCES
   qtdcmDataSourcePreviewToolBox.cpp
   qtdcmDataSourceImportToolBox.cpp
   qtdcmDataSourceSerieInfoToolBox.cpp
+  qtdcmDataSourceServersSettingsToolBox.cpp
   qtdcmDataSource.cpp)
 
 ## #################################################################
