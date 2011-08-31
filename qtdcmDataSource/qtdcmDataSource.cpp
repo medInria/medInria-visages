@@ -64,7 +64,7 @@ qtdcmDataSource::qtdcmDataSource ( void ) : medAbstractDataSource(), d ( new qtd
     // Create gui for the right Widget;
     d->localDicomSettingsWidget = new QtDcmLocalDicomSettingsWidget;
 
-    QPushButton * localSettingsButton = new QPushButton ( this );
+    QPushButton * localSettingsButton = new QPushButton;
     localSettingsButton->setText ( "Save settings" );
     localSettingsButton->setFocusPolicy ( Qt::NoFocus );
     localSettingsButton->setMaximumWidth ( 100 );
@@ -80,7 +80,7 @@ qtdcmDataSource::qtdcmDataSource ( void ) : medAbstractDataSource(), d ( new qtd
     layout->addLayout(buttonLayout);
     layout->addStretch();
 
-    d->rightWidget = new QWidget ( this );
+    d->rightWidget = new QWidget;
     d->rightWidget->setLayout ( layout );
 
     d->previewToolBox = new qtdcmDataSourcePreviewToolBox;
