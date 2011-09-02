@@ -39,6 +39,6 @@ private:
     void initWidgets(void);
 };
 
-medAbstractDataSource *createQtdcmDataSource ( void );
+medAbstractDataSource *createQtdcmDataSource ( QWidget* );
 
 #endif

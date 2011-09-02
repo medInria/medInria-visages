@@ -43,7 +43,7 @@ private:
   void initWidgets(void);
 };
 
-medAbstractDataSource *createQtshanoirDataSource(void);
+medAbstractDataSource *createQtshanoirDataSource(QWidget*);
 
 #endif
 
