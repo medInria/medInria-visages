@@ -175,7 +175,7 @@ void qtdcmDataSource::onSaveLocalSettings()
 // Type instantiation
 // /////////////////////////////////////////////////////////////////
 
-medAbstractDataSource *createQtdcmDataSource ( void )
+medAbstractDataSource *createQtdcmDataSource ( QWidget * )
 {
     return new qtdcmDataSource;
 }

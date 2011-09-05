@@ -202,7 +202,7 @@ QList<medToolBox*> qtshanoirDataSource::getToolboxes()
 // Type instanciation
 // /////////////////////////////////////////////////////////////////
 
-medAbstractDataSource *createQtshanoirDataSource(void)
+medAbstractDataSource *createQtshanoirDataSource( QWidget * )
 {
   return new qtshanoirDataSource;
 }
