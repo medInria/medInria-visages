@@ -148,6 +148,7 @@ void qtdcmDataSource::initWidgets ( void )
     if ( !d->mainWidget )
     {
         d->mainWidget = new QtDcm();
+        QtDcmPreferences::instance()->setIniFile("medinria");
         QtDcmManager::instance()->setQtDcmWidget(d->mainWidget);
         QtDcmManager::instance()->setPreviewWidget ( d->previewToolBox->getPreviewWidget() );
         QtDcmManager::instance()->setImportWidget ( d->importToolBox->getImportWidget() );
@@ -155,8 +156,8 @@ void qtdcmDataSource::initWidgets ( void )
         QtDcmManager::instance()->useConverter ( false );
         QObject::connect ( QtDcmManager::instance(), SIGNAL ( serieMoved ( QString ) ), this, SLOT ( onSerieMoved ( QString ) ) );
 
-        d->localDicomSettingsWidget->setPreferences ( QtDcmManager::instance()->getPreferences() );
-        d->serversSettingsToolBox->getServersDicomSettingsWidget()->setPreferences(QtDcmManager::instance()->getPreferences());
+        d->localDicomSettingsWidget->setPreferences ( QtDcmPreferences::instance() );
+        d->serversSettingsToolBox->getServersDicomSettingsWidget()->setPreferences(QtDcmPreferences::instance());
     }
 }
 
