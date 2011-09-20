@@ -148,14 +148,15 @@ void qtdcmDataSource::initWidgets ( void )
     if ( !d->mainWidget )
     {
         d->mainWidget = new QtDcm();
-        d->mainWidget->getManager()->setPreviewWidget ( d->previewToolBox->getPreviewWidget() );
-        d->mainWidget->getManager()->setImportWidget ( d->importToolBox->getImportWidget() );
-        d->mainWidget->getManager()->setSerieInfoWidget ( d->serieInfoToolBox->getSerieInfoWidget() );
-        d->mainWidget->getManager()->useConverter ( false );
-        QObject::connect ( d->mainWidget->getManager(), SIGNAL ( serieMoved ( QString ) ), this, SLOT ( onSerieMoved ( QString ) ) );
+        QtDcmManager::instance()->setQtDcmWidget(d->mainWidget);
+        QtDcmManager::instance()->setPreviewWidget ( d->previewToolBox->getPreviewWidget() );
+        QtDcmManager::instance()->setImportWidget ( d->importToolBox->getImportWidget() );
+        QtDcmManager::instance()->setSerieInfoWidget ( d->serieInfoToolBox->getSerieInfoWidget() );
+        QtDcmManager::instance()->useConverter ( false );
+        QObject::connect ( QtDcmManager::instance(), SIGNAL ( serieMoved ( QString ) ), this, SLOT ( onSerieMoved ( QString ) ) );
 
-        d->localDicomSettingsWidget->setPreferences ( d->mainWidget->getManager()->getPreferences() );
-        d->serversSettingsToolBox->getServersDicomSettingsWidget()->setPreferences(d->mainWidget->getManager()->getPreferences());
+        d->localDicomSettingsWidget->setPreferences ( QtDcmManager::instance()->getPreferences() );
+        d->serversSettingsToolBox->getServersDicomSettingsWidget()->setPreferences(QtDcmManager::instance()->getPreferences());
     }
 }
 
