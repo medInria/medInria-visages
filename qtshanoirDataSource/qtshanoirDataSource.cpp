@@ -137,7 +137,7 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
           break;
       }
   }
-
+    
   if (!dtkdata)
   {
     qWarning() << "No suitable reader found for file: " << fileInfo.filePath() << " unable to import Shanoir data!";
@@ -163,15 +163,21 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
   tmpInfo.replace(QDir::separator(),"_");
   dtkdata->addMetaData(medMetaDataKeys::StudyDescription.key(),tmpInfo);
 
+    qDebug() << tmpInfo;
+    
   tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("name").firstChild().nodeValue();
   tmpInfo.replace(QDir::separator(),"_");
   dtkdata->addMetaData(medMetaDataKeys::PatientName.key(),tmpInfo);
 
-  tmpInfo = realXMLRoot.firstChildElement("name").firstChild().nodeValue();
+    qDebug() << tmpInfo;
+
+    tmpInfo = realXMLRoot.firstChildElement("name").firstChild().nodeValue();
   tmpInfo.replace(QDir::separator(),"_");
   dtkdata->addMetaData(medMetaDataKeys::SeriesDescription.key(),tmpInfo);
 
-  tmpInfo = realXMLRoot.firstChildElement("mrDatasetAcquisition").firstChildElement("mrProtocol").firstChildElement("protocolName").firstChild().nodeValue();
+    qDebug() << tmpInfo;
+
+    tmpInfo = realXMLRoot.firstChildElement("mrDatasetAcquisition").firstChildElement("mrProtocol").firstChildElement("protocolName").firstChild().nodeValue();
   dtkdata->addMetaData(medMetaDataKeys::Protocol.key(),tmpInfo);
 
   // Fixed for now
@@ -181,11 +187,15 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
   tmpInfo.resize(10);
   dtkdata->addMetaData(medMetaDataKeys::BirthDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
 
-  tmpInfo = realXMLRoot.firstChildElement("datasetCreationDate").firstChild().nodeValue();
+    qDebug() << tmpInfo;
+
+    tmpInfo = realXMLRoot.firstChildElement("datasetCreationDate").firstChild().nodeValue();
   tmpInfo.resize(10);
   dtkdata->addMetaData(medMetaDataKeys::AcquisitionDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
 
-  emit dataReceived(dtkdata);
+    qDebug() << tmpInfo;
+
+    emit dataReceived(dtkdata);
 }
 
 void qtshanoirDataSource::find()
