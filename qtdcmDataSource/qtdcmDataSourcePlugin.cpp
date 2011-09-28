@@ -7,6 +7,8 @@
 
 #include <dtkCore/dtkLog.h>
 
+#include <qtdcmDataSourceDefinitions.h>
+
 // /////////////////////////////////////////////////////////////////
 // qtdcmDataSourcePluginPrivate
 // /////////////////////////////////////////////////////////////////
@@ -53,8 +55,34 @@ QString qtdcmDataSourcePlugin::name ( void ) const
 
 QString qtdcmDataSourcePlugin::description ( void ) const
 {
-    return "Yet another dicom datasource plugin";
+    return "This plugin add Dicom functionnality to the medinria browser area";
 }
+
+QStringList qtdcmDataSourcePlugin::authors ( void ) const
+{
+  return QStringList() << "Alexandre Abadie <Alexandre.Abadie@inria.fr>";
+}
+
+QString qtdcmDataSourcePlugin::contact ( void ) const
+{
+  return "Alexandre Abadie <Alexandre.Abadie@inria.fr>";
+}
+
+QStringList qtdcmDataSourcePlugin::contributors ( void ) const
+{
+  return QStringList() << "Olivier Commowick <Olivier.Commowick@inria.fr>";
+}
+
+QStringList qtdcmDataSourcePlugin::dependencies ( void ) const
+{
+  return QStringList() << "QtDcm v2.0";
+}
+
+QString qtdcmDataSourcePlugin::version ( void ) const
+{
+  return PLUGIN_VERSION;
+}
+
 
 QStringList qtdcmDataSourcePlugin::tags ( void ) const
 {

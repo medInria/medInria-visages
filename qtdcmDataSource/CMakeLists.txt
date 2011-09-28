@@ -68,6 +68,11 @@ set(${PROJECT_NAME}_SOURCES
 ## Build rules
 ## #################################################################
 
+configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/qtdcmDataSourceDefinitions.h.in
+      ${CMAKE_CURRENT_BINARY_DIR}/qtdcmDataSourceDefinitions.h
+)
+
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 include_directories(${QTDCM_INCLUDE_DIR} ${QTDCM_DIR})
