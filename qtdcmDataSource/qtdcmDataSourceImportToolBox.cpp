@@ -22,7 +22,7 @@ qtdcmDataSourceImportToolBox::qtdcmDataSourceImportToolBox ( QWidget* parent ) :
     medPluginManager* pm = medPluginManager::instance();
     dtkPlugin* plugin = pm->plugin ( "qtdcmDataSourcePlugin" );
     setAboutPluginButton ( plugin );
-    enableAboutPluginButton ( true );
+    setAboutPluginVisibility( true );
 }
 
 QtDcmImportWidget* qtdcmDataSourceImportToolBox::getImportWidget()
