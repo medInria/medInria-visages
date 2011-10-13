@@ -213,7 +213,9 @@ vistalProcessDenoisingToolBox::~vistalProcessDenoisingToolBox(void)
 
 bool vistalProcessDenoisingToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("NL Means Denoising",
+    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("nlmeansDenoising",
+                                                                         "NL Means Denoising",
+                                                                         "Applies a Non Local Means Denoising",
                                                                            createVistalProcessDenoisingToolBox);
 }
 
