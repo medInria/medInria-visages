@@ -25,6 +25,11 @@ public:
 
     virtual QString name(void) const;
     virtual QString description(void) const;
+    virtual QString version(void) const;
+    virtual QString contact(void) const;
+    virtual QStringList authors(void) const;
+    virtual QStringList contributors(void) const;
+    virtual QStringList dependencies(void) const;
 
     virtual QStringList tags(void) const;
     virtual QStringList types(void) const;

@@ -8,6 +8,8 @@
 
 #include <dtkCore/dtkLog.h>
 
+#include <qtshanoirDataSourceDefinitions.h>
+
 // /////////////////////////////////////////////////////////////////
 // qtshanoirDataSourcePluginPrivate
 // /////////////////////////////////////////////////////////////////
@@ -55,6 +57,33 @@ QString qtshanoirDataSourcePlugin::name(void) const
 QString qtshanoirDataSourcePlugin::description(void) const
 {
   return "Shanoir data source plugin";
+}
+
+QStringList qtshanoirDataSourcePlugin::authors ( void ) const
+{
+    return QStringList() << "Olivier Commowick <Olivier.Commowick@inria.fr>";
+}
+
+QString qtshanoirDataSourcePlugin::contact ( void ) const
+{
+    return "Olivier.Commowick@inria.fr";
+}
+
+QStringList qtshanoirDataSourcePlugin::contributors ( void ) const
+{
+    return QStringList() << "Alexandre Abadie <Alexandre.Abadie@inria.fr>"
+                         << QString::fromUtf8("Clément Philipot <clement.philipot@inria.fr>")
+                         << "Guillaume Renard <Guillaume.Renard@inria.fr>";
+}
+
+QStringList qtshanoirDataSourcePlugin::dependencies ( void ) const
+{
+    return QStringList() << "QtShanoir v1.0";
+}
+
+QString qtshanoirDataSourcePlugin::version ( void ) const
+{
+    return PLUGIN_VERSION;
 }
 
 QStringList qtshanoirDataSourcePlugin::tags(void) const

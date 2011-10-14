@@ -65,6 +65,11 @@ set(${PROJECT_NAME}_SOURCES
 ## Build rules
 ## #################################################################
 
+configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/qtshanoirDataSourceDefinitions.h.in
+      ${CMAKE_CURRENT_BINARY_DIR}/qtshanoirDataSourceDefinitions.h
+)
+
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 include_directories(${QTSHANOIR_INCLUDE_DIR} ${QTSHANOIR_DIR} ${QTSHANOIR_DIR})

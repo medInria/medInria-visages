@@ -3,7 +3,7 @@
 #include <QtShanoirSearchWidget.h>
 #include <QtShanoir.h>
 
-
+#include <medPluginManager.h>
 
 #include <medCore/medAbstractDataSource.h>
 #include <medCore/medAbstractDataSourceFactory.h>
@@ -42,6 +42,12 @@ qtshanoirDataSourceToolBox::qtshanoirDataSourceToolBox(QWidget *parent) : medToo
 	
 	this->addWidget(widget);
 	this->setTitle("Queries");
+
+  // Add about plugin
+  medPluginManager* pm = medPluginManager::instance();
+  dtkPlugin* plugin = pm->plugin ( "qtshanoirDataSourcePlugin" );
+  setAboutPluginButton ( plugin );
+  setAboutPluginVisibility( true );
 }
 
 qtshanoirDataSourceToolBox::~qtshanoirDataSourceToolBox(void)
