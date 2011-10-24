@@ -50,6 +50,12 @@ vistalDataImageWriter::description(void) const
     return "vistalDataImageWriter";
 }
 
+QString
+vistalDataImageWriter::identifier(void) const
+{
+    return "vistalDataImageWriter";
+}
+
 QStringList
 vistalDataImageWriter::handled() const
 {

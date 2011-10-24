@@ -93,11 +93,15 @@ template<typename DataType>
 	{ \
 		return dtkAbstractDataFactory::instance()->registerDataType("vistalDataImage"#suffix, createVistalDataImage##suffix); \
 	} \
-	QString vistalDataImage##suffix::description(void) const \
-	{ \
-		return "vistalDataImage"#suffix; \
-	} \
-	QImage & vistalDataImage##suffix::thumbnail(void) const \
+    QString vistalDataImage##suffix::identifier(void) const \
+    { \
+        return "vistalDataImage"#suffix; \
+    } \
+    QString vistalDataImage##suffix::description(void) const \
+    { \
+        return "vistalDataImage"#suffix; \
+    } \
+    QImage & vistalDataImage##suffix::thumbnail(void) const \
 	{ \
 	     if (d->thumbnails.isEmpty()){\
 	              getThumbnail(d->image, d->defaultThumbnail);\

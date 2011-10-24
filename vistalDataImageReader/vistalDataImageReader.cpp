@@ -42,6 +42,12 @@ vistalDataImageReader::registered(void)
 }
 
 QString
+vistalDataImageReader::identifier(void) const
+{
+    return "vistalDataImageReader";
+}
+
+QString
 vistalDataImageReader::description(void) const
 {
     return "vistalDataImageReader";
