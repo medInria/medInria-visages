@@ -15,6 +15,7 @@ public:
     virtual ~itkDataImageToVistalDataImageShort3Converter(void);
 
     virtual QString description(void) const;
+    virtual QString identifier(void) const;
     virtual QStringList fromTypes(void) const;
     virtual QString toType(void) const;
 

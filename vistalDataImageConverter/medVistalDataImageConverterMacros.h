@@ -27,9 +27,13 @@ return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("vi
 																					<< "vistalDataImageFloat3" <<  "vistalDataImageDouble3",\
 																	"itkDataImage"#suffix, createVistalDataImageToItkDataImage##suffix##Converter); \
 } \
+QString vistalDataImageToItkDataImage##suffix##Converter::identifier(void) const \
+{ \
+        return QString("vistalDataImageToItkDataImage") + QString(""#suffix) + QString("Converter"); \
+} \
 QString vistalDataImageToItkDataImage##suffix##Converter::description(void) const \
 { \
-	return QString("vistalDataImageToItkDataImage") + QString(""#suffix) + QString("Converter"); \
+        return QString("vistalDataImageToItkDataImage") + QString(""#suffix) + QString("Converter"); \
 } \
 QStringList vistalDataImageToItkDataImage##suffix##Converter::fromTypes(void) const \
 { \
@@ -48,7 +52,7 @@ dtkAbstractData *vistalDataImageToItkDataImage##suffix##Converter::convert(void)
 	if (!data) \
 		return NULL; \
 	dtkAbstractData * output;\
-	vistal::medinria::convertToItk(data->description(), ""#suffix, data, output);\
+	vistal::medinria::convertToItk(data->identifier(), ""#suffix, data, output);\
 	return output; \
 } \
 dtkAbstractDataConverter *createVistalDataImageToItkDataImage##suffix##Converter(void) \
@@ -73,9 +77,13 @@ return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("it
 																					<< "itkDataImageFloat3" <<  "itkDataImageDouble3" ,\
 																	"vistalDataImage"#suffix, createItkDataImageToVistalDataImage##suffix##Converter); \
 } \
+QString itkDataImageToVistalDataImage##suffix##Converter::identifier(void) const \
+{ \
+        return QString("itkDataImageToVistalDataImage") + QString(""#suffix) + QString("Converter"); \
+} \
 QString itkDataImageToVistalDataImage##suffix##Converter::description(void) const \
 { \
-	return QString("itkDataImageToVistalDataImage") + QString(""#suffix) + QString("Converter"); \
+        return QString("itkDataImageToVistalDataImage") + QString(""#suffix) + QString("Converter"); \
 } \
 QStringList itkDataImageToVistalDataImage##suffix##Converter::fromTypes(void) const \
 { \
@@ -94,7 +102,7 @@ dtkAbstractData *itkDataImageToVistalDataImage##suffix##Converter::convert(void)
 	if (!data) \
 		return NULL; \
 	dtkAbstractData * output;\
-	vistal::medinria::convertFromItk(data->description(), ""#suffix, data, output);\
+	vistal::medinria::convertFromItk(data->identifier(), ""#suffix, data, output);\
 	return output; \
 } \
 dtkAbstractDataConverter *createItkDataImageToVistalDataImage##suffix##Converter(void) \
@@ -121,6 +129,10 @@ return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("Vi
 																					<< "vistalDataImageFloat3" <<  "vistalDataImageDouble3",\
 																					"vistalDataImage"#suffix, createVistalToVistal##suffix##Converter); \
 } \
+QString VistalToVistal##suffix##Converter::identifier(void) const \
+{ \
+return QString("VistalToVistal") + QString(""#suffix) + QString("Converter"); \
+} \
 QString VistalToVistal##suffix##Converter::description(void) const \
 { \
 return QString("VistalToVistal") + QString(""#suffix) + QString("Converter"); \
@@ -143,8 +155,8 @@ dtkAbstractData *data = this->data(); \
 dtkAbstractData *output; \
 if (!data) \
 return NULL; \
-if (data->description() == "vistalDataImage"#suffix) { output = data; return output; } \
-vistal::medinria::convert(data->description(), ""#suffix, data, output);\
+if (data->identifier() == "vistalDataImage"#suffix) { output = data; return output; } \
+vistal::medinria::convert(data->identifier(), ""#suffix, data, output);\
 return output; \
 } \
 dtkAbstractDataConverter *createVistalToVistal##suffix##Converter(void) \
