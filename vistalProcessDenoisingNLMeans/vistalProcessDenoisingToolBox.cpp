@@ -231,15 +231,15 @@ dtkAbstractData* vistalProcessDenoisingToolBox::processOutput(void)
 
 void vistalProcessDenoisingToolBox::run(void)
 {
-    if(!this->parent())
+    if(!this->parentToolBox())
         return;
 
     d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessDenoisingNLMEANS");
 
-    if(!this->parent()->data())
+    if(!this->parentToolBox()->data())
         return;
 
-    d->process->setInput(this->parent()->data());
+    d->process->setInput(this->parentToolBox()->data());
 
     d->process->setParameter(d->sigma->text().toDouble(),0);
     d->process->setParameter(d->beta->text().toDouble(),1);
