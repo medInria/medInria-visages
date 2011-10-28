@@ -87,17 +87,16 @@ QString vistalProcessDenoising::description(void) const
 }
 
 void vistalProcessDenoising::setInput(dtkAbstractData *data)
-{    
+{
     if (!data)  
-    {
         return;
-    }
     
-    d->originDescription = data->description();
+    d->originDescription = data->identifier();
+
     d->input = data->convert("vistalDataImageDouble3");
 
 	if (!d->input)
-	  return;  
+	  return;
 }
 
 
@@ -159,10 +158,10 @@ void vistalProcessDenoising::setParameter(double  data, int channel)
 int vistalProcessDenoising::update (void)
 {        
     if (d->input == NULL)
-	{
-	    qDebug() << "in update method : d->input == NULL";	  
+    {
+            qDebug() << "in update method : d->input is NULL";
             return -1;
-	}
+    }
 
     vistal::NLMeansDenoising<double> *nlmeans = new vistal::NLMeansDenoising<double>;
     if(nlmeans == NULL)
@@ -195,7 +194,10 @@ int vistalProcessDenoising::update (void)
     temporaryOutput->setData(result);
 
     if(temporaryOutput->data() == NULL)
+    {
+        qDebug() << "temporary output is NULL !";
         return -1;
+    }
 
     delete nlmeans;
     
