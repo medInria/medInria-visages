@@ -269,6 +269,8 @@ void vistalProcessDenoisingToolBox::run(void)
 
     d->progression_stack->addJobItem(runProcess, "Progress:");
 
+    d->progression_stack->disableCancel(runProcess);
+
     connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
     connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
 
