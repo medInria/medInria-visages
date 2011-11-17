@@ -17,6 +17,7 @@
 #include <medToolBoxFiltering.h>
 #include <medToolBoxFilteringCustom.h>
 #include <medProgressionStack.h>
+#include <medPluginManager.h>
 
 #include <QtGui>
 
@@ -87,8 +88,9 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
 
       QLabel *weightingMethodLabel = new QLabel("Weighting method :");
       d->weightingMethod = new QRadioButton("Pearson divergence");
-      d->weightingMethod->setChecked(true);
+      d->weightingMethod->setChecked(false);
       QRadioButton *classicExp = new QRadioButton("classic exponentional");
+      classicExp->setChecked(true);
 
       QButtonGroup *weightingMethodGroup = new QButtonGroup(this);
       weightingMethodGroup->addButton(d->weightingMethod);
@@ -202,6 +204,12 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
 
       connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
+    
+    // Add about plugin
+    medPluginManager* pm = medPluginManager::instance();
+    dtkPlugin* plugin = pm->plugin ( "vistalProcessDenoisingNLMEANSPlugin" );
+    setAboutPluginButton ( plugin );
+    setAboutPluginVisibility( true );
 }
 
 vistalProcessDenoisingToolBox::~vistalProcessDenoisingToolBox(void)
