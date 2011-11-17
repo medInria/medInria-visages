@@ -21,6 +21,7 @@ public:
              vistalProcessDenoising(void);
     virtual ~vistalProcessDenoising(void);
 
+    virtual QString identifier(void) const;
     virtual QString description(void) const;
 
     static bool registered(void);
