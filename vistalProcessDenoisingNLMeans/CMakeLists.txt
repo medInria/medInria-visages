@@ -70,7 +70,8 @@ target_link_libraries(${PROJECT_NAME}
   ${VISTAL_LIBS}
   dtkCore
   medCore
-  medGui)
+  medGui
+  boost_thread)
 
 dtk_build_doc(vistalProcessDenoisingPlugin)
 
