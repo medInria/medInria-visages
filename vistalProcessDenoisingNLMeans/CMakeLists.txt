@@ -59,6 +59,11 @@ set(${PROJECT_NAME}_SOURCES
 ## Build rules
 ## #################################################################
 
+configure_file(
+      ${CMAKE_CURRENT_SOURCE_DIR}/vistalProcessDenoisingNLMeansDefinitions.h.in
+      ${CMAKE_CURRENT_BINARY_DIR}/vistalProcessDenoisingNLMeansDefinitions.h
+)
+
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 add_library(${PROJECT_NAME} SHARED
@@ -68,6 +73,7 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
+  ${BOOST_LIBRARIES}
   dtkCore
   medCore
   medGui

@@ -81,9 +81,14 @@ bool vistalProcessDenoising::registered(void)
     return dtkAbstractProcessFactory::instance()->registerProcessType("vistalProcessDenoisingNLMEANS", createVistalProcessDenoising);
 }
 
-QString vistalProcessDenoising::description(void) const
+QString vistalProcessDenoising::identifier(void) const
 {  
     return "vistalProcessDenoisingNLMEANS";
+}
+
+QString vistalProcessDenoising::description(void) const
+{  
+    return "NL-Means Denoising";
 }
 
 void vistalProcessDenoising::setInput(dtkAbstractData *data)

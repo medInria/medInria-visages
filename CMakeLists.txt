@@ -123,6 +123,10 @@ if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN)
     subdirs(vistalProcessSegmentationSTREM)
 endif()
 
+if (APPLE)
+  configure_file(${PROJECT_SOURCE_DIR}/packageScripts/mac_vistal_package_maker.sh.in
+                 ${PROJECT_BINARY_DIR}/mac_vistal_package_maker.sh)
+endif()
 
 if(BUILD_DOCUMENTATION)
   add_subdirectory(doc)

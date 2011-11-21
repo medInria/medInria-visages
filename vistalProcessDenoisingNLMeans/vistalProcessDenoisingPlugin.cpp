@@ -6,6 +6,8 @@
 #include "vistalProcessDenoisingPlugin.h"
 #include "vistalProcessDenoisingToolBox.h"
 
+#include <vistalProcessDenoisingNLMeansDefinitions.h>
+
 #include <dtkCore/dtkLog.h>
 
 // /////////////////////////////////////////////////////////////////
@@ -57,7 +59,32 @@ QString vistalProcessDenoisingPlugin::name(void) const
 
 QString vistalProcessDenoisingPlugin::description(void) const
 {
-    return "NLMeans Denoising Plugin";
+    return "This plugin provides the NL-Means denoising filter as proposed by Coupe et al.";
+}
+
+QStringList vistalProcessDenoisingPlugin::authors ( void ) const
+{
+    return QStringList() << "Clement Philipot <Clement.Philipot@inria.fr>";
+}
+
+QString vistalProcessDenoisingPlugin::contact ( void ) const
+{
+    return "Clement Philipot <Clement.Philipot@inria.fr>";
+}
+
+QStringList vistalProcessDenoisingPlugin::contributors ( void ) const
+{
+    return QStringList() << "";
+}
+
+QStringList vistalProcessDenoisingPlugin::dependencies ( void ) const
+{
+    return QStringList() << "VISTAL";
+}
+
+QString vistalProcessDenoisingPlugin::version ( void ) const
+{
+    return PLUGIN_VERSION;
 }
 
 QStringList vistalProcessDenoisingPlugin::tags(void) const
