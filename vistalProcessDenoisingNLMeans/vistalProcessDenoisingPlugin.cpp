@@ -59,7 +59,7 @@ QString vistalProcessDenoisingPlugin::name(void) const
 
 QString vistalProcessDenoisingPlugin::description(void) const
 {
-    return "This plugin provides the NL-Means denoising filter as proposed by Coupe et al.: <a href=\"http://dx.doi.org/10.1109/TMI.2007.906087\">http://dx.doi.org/10.1109/TMI.2007.906087</a>. It is also implementing ultrasound image denoising as proposed in <a href=\"http://dx.doi.org/10.1109/TIP.2009.2024064\">http://dx.doi.org/10.1109/TIP.2009.2024064</a>.";
+    return "This plugin provides the NL-Means denoising filter as proposed by Coupe et al.: <a href=\"http://dx.doi.org/10.1109/TMI.2007.906087\">http://dx.doi.org/10.1109/TMI.2007.906087</a>.";
 }
 
 QStringList vistalProcessDenoisingPlugin::authors ( void ) const
