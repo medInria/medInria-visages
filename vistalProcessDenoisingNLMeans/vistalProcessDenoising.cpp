@@ -7,6 +7,8 @@
 #include <dtkCore/dtkAbstractProcessFactory.h>
 #include <dtkCore/dtkAbstractDataFactory.h>
 
+#include <medMetaDataKeys.h>
+
 #include "NLMeans_class.hh"
 #include <cstdlib>
 
@@ -212,7 +214,12 @@ int vistalProcessDenoising::update (void)
         temporaryOutput->addProperty(list, d->input->propertyValues(list));
 
     d->output = temporaryOutput->convert(d->originDescription);
+    
+    QString newSeriesDescription = d->output->metadata(medMetaDataKeys::SeriesDescription.key());
+    newSeriesDescription += " NL-Means denoised";
 
+    d->output->setMetaData(medMetaDataKeys::SeriesDescription.key(),newSeriesDescription);
+    
     return EXIT_SUCCESS;
 }
 
