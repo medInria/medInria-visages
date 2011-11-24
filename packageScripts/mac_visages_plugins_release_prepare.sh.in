@@ -1,0 +1,90 @@
+#!/bin/bash
+
+\rm -fr @CMAKE_INSTALL_PREFIX@/PackageRootDir
+mkdir -p @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/{Frameworks,PlugIns}
+
+# Starting VISTAL stuff
+mkdir -p @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/Frameworks/Vistal
+
+cp @CMAKE_INSTALL_PREFIX@/plugins/libvistal* @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/PlugIns/
+
+for f in @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/PlugIns/libvistal*.dylib
+do
+	# ITK, DTK and MED stuff (already installed)
+	for libname in `otool -L $f | grep -i -e 'med|dtk|itk' | awk '{print $1;}'`
+	do
+		install_name_tool -change $libname @executable_path/../Frameworks/`basename $libname` $f
+	done
+	
+	#Qt stuff (already installed)
+	for libname in `otool -L $f | grep .framework | awk '{print $1;}'`
+	do
+		install_name_tool -change $libname @executable_path/../Frameworks/$libname $f
+	done
+	
+	# Vistal stuff
+	for libname in `otool -L $f | grep @Vistal_DIR@ | awk '{print $1;}'`
+	do
+		baselibname=`basename $libname`
+		cp $libname @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/Frameworks/Vistal/
+		install_name_tool -change $libname @executable_path/../Frameworks/Vistal/$baselibname $f
+	done
+done
+
+for f in @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/Frameworks/Vistal/*.dylib
+do
+	for libname in `otool -L $f | grep @Vistal_DIR@ | awk '{print $1;}'`
+	do
+		baselibname=`basename $libname`
+		if [ ! -e $baselibname ]; then
+			cp $libname @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/Frameworks/Vistal/
+		fi
+		
+		install_name_tool -change $libname @executable_path/../Frameworks/Vistal/$baselibname $f
+	done
+done
+
+# Starting QtDcm stuff
+
+mkdir -p @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/Frameworks/Dcm
+
+cp @CMAKE_INSTALL_PREFIX@/plugins/libqtdcm* @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/PlugIns/
+
+for f in @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/PlugIns/libqtdcm*.dylib
+do
+	# ITK, DTK and MED stuff (already installed)
+	for libname in `otool -L $f | grep -i -e 'med|dtk|itk' | awk '{print $1;}'`
+	do
+		install_name_tool -change $libname @executable_path/../Frameworks/`basename $libname` $f
+	done
+	
+	#Qt stuff (already installed)
+	for libname in `otool -L $f | grep .framework | awk '{print $1;}'`
+	do
+		install_name_tool -change $libname @executable_path/../Frameworks/$libname $f
+	done
+	
+	# QtDcm lib
+	for libname in `otool -L $f | grep @QTDCM_DIR@ | awk '{print $1;}'`
+	do
+		baselibname=`basename $libname`
+		cp $libname @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/Frameworks/Dcm/
+		install_name_tool -change $libname @executable_path/../Frameworks/Vistal/$baselibname $f
+	done
+done
+
+for f in @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/Frameworks/Dcm/*.dylib
+do
+	# ITK stuff (already installed)
+	for libname in `otool -L $f | grep -i -e 'itk' | awk '{print $1;}'`
+	do
+		install_name_tool -change $libname @executable_path/../Frameworks/`basename $libname` $f
+	done
+	
+	#Qt stuff (already installed)
+	for libname in `otool -L $f | grep .framework | awk '{print $1;}'`
+	do
+		install_name_tool -change $libname @executable_path/../Frameworks/$libname $f
+	done
+done
+
