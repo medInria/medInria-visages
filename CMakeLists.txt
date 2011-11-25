@@ -67,9 +67,11 @@ option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImage
 option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "OFF")
 option(MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN     "Build qtdcmDataSource plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
-option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN     "Build vistalProcessSegmentationSTREM plugin" "ON")
-
-
+option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN     "Build vistalProcessSegmentationSTREM plugin" "OFF")
+option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProcessSegmentationGCEM plugin" "OFF")
+option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
+option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
+option(MEDINRIA_BUILD_VISTALPROCESSMIDPLANE_ALIGN_PLUGIN     "Build vistalProcessMidPlaneAlign plugin" "OFF")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 
