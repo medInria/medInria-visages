@@ -40,6 +40,8 @@ find_package(Vistal REQUIRED)
 find_package(ITK REQUIRED)
 include(${VISTAL_USE_FILE})
 
+include_directories(${BOOST_INCLUDE_DIR})
+
 ## #################################################################
 ## Input
 ## #################################################################

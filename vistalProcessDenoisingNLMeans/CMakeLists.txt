@@ -40,6 +40,7 @@ include(${VISTAL_USE_FILE})
 find_package(medinria REQUIRED)
 include(${medinria_USE_FILE})
 
+include_directories(${BOOST_INCLUDE_DIR})
 
 ## #################################################################
 ## Input
@@ -76,8 +77,7 @@ target_link_libraries(${PROJECT_NAME}
   ${BOOST_LIBRARIES}
   dtkCore
   medCore
-  medGui
-  boost_thread)
+  medGui)
 
 dtk_build_doc(vistalProcessDenoisingPlugin)
 

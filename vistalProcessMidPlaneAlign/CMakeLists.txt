@@ -44,6 +44,7 @@ include(${medinria_USE_FILE})
 # itk
 find_package(ITK REQUIRED)
 
+include_directories(${BOOST_INCLUDE_DIR})
 
 ## #################################################################
 ## Input

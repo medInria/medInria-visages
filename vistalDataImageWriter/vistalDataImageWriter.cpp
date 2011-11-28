@@ -69,7 +69,7 @@ vistalDataImageWriter::canWrite(const QString & path)
     //  qDebug() << "Can write?: " << QFile(path).isWritable();
     //    return true;
 
-    return ((QFileInfo(path).suffix() == "dim") or (QFileInfo(path).suffix() == "ima"));
+    return ((QFileInfo(path).suffix() == "dim") || (QFileInfo(path).suffix() == "ima"));
 }
 
 bool
