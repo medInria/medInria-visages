@@ -24,12 +24,10 @@
 class vistalProcessDenoisingToolBoxPrivate
 {
 public:
-        QRadioButton *slope;
         QLineEdit *sigma;
         QLineEdit *beta;
         QLineEdit *neighborhoodSize;
         QLineEdit *volumeOfSearch;
-        QRadioButton *weightingMethod;
         QRadioButton *neighborhoodType;
 
         QCheckBox *blockApproach;
@@ -47,16 +45,6 @@ public:
 vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessDenoisingToolBoxPrivate)
 {
       // Parameters:
-
-      QLabel *slopeLabel = new QLabel("Slope :");
-      d->slope = new QRadioButton("adaptive");
-      d->slope->setChecked(true);
-      QRadioButton *constantSlope = new QRadioButton("constant");
-
-      QButtonGroup *slopeButtonGroup = new QButtonGroup(this);
-      slopeButtonGroup->addButton(d->slope);
-      slopeButtonGroup->addButton(constantSlope);
-      slopeButtonGroup->setExclusive(true);
 
       QLabel *sigmaLabel = new QLabel("Sigma : ");
       d->sigma = new QLineEdit("0");
@@ -86,31 +74,17 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       volOfSrch->addWidget(volumeOfSearchLabel);
       volOfSrch->addWidget(d->volumeOfSearch);
 
-      QLabel *weightingMethodLabel = new QLabel("Weighting method :");
-      d->weightingMethod = new QRadioButton("Pearson divergence");
-      d->weightingMethod->setChecked(false);
-      QRadioButton *classicExp = new QRadioButton("classic exponentional");
-      classicExp->setChecked(true);
-
-      QButtonGroup *weightingMethodGroup = new QButtonGroup(this);
-      weightingMethodGroup->addButton(d->weightingMethod);
-      weightingMethodGroup->addButton(classicExp);
-      weightingMethodGroup->setExclusive(true);
-
       QLabel *neighborhoodLabel = new QLabel("Neighborhood type: ");
       d->neighborhoodType = new QRadioButton("isotropic");
       d->neighborhoodType->setChecked(true);
-      QRadioButton *cubic = new QRadioButton("cubic");
+      QRadioButton *anisotropic = new QRadioButton("anisotropic");
 
       QButtonGroup *neighborhoodGroup = new QButtonGroup(this);
       neighborhoodGroup->addButton(d->neighborhoodType);
-      neighborhoodGroup->addButton(cubic);
+      neighborhoodGroup->addButton(anisotropic);
       neighborhoodGroup->setExclusive(true);
 
       QVBoxLayout *parametersLayout = new QVBoxLayout();
-      parametersLayout->addWidget(slopeLabel);
-      parametersLayout->addWidget(d->slope);
-      parametersLayout->addWidget(constantSlope);
       parametersLayout->addWidget(sigmaLabel);
       parametersLayout->addLayout(sigmaBox);
       parametersLayout->addWidget(betaLabel);
@@ -119,12 +93,9 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       parametersLayout->addLayout(nghborhd);
       parametersLayout->addWidget(volumeOfSearchLabel);
       parametersLayout->addLayout(volOfSrch);
-      parametersLayout->addWidget(weightingMethodLabel);
-      parametersLayout->addWidget(d->weightingMethod);
-      parametersLayout->addWidget(classicExp);
       parametersLayout->addWidget(neighborhoodLabel);
       parametersLayout->addWidget(d->neighborhoodType);
-      parametersLayout->addWidget(cubic);
+      parametersLayout->addWidget(anisotropic);
 
       QGroupBox *groupParameters = new QGroupBox("Mandatory");
       groupParameters->setLayout(parametersLayout);
@@ -251,7 +222,7 @@ void vistalProcessDenoisingToolBox::run(void)
 
     d->process->setParameter(d->sigma->text().toDouble(),0);
     d->process->setParameter(d->beta->text().toDouble(),1);
-    d->process->setParameter((float)(d->slope->isChecked()),2);
+    d->process->setParameter((float)(0.0),2);
     d->process->setParameter((float)(d->neighborhoodType->isChecked()),3);
     d->process->setParameter(d->neighborhoodSize->text().toDouble(),4);
     d->process->setParameter(d->volumeOfSearch->text().toDouble(),5);
@@ -259,7 +230,7 @@ void vistalProcessDenoisingToolBox::run(void)
     d->process->setParameter((float)(d->testOnVar->checkState() == Qt::Checked),7);
     d->process->setParameter(d->minimumMeanRatio->text().toDouble(),8);
     d->process->setParameter(d->minimumVarianceRatio->text().toDouble(),9);
-    d->process->setParameter((float)(d->weightingMethod->isChecked() == Qt::Checked),10);
+    d->process->setParameter((float)(0.0),10);
     d->process->setParameter((float)(d->blockApproach->checkState() == Qt::Checked),11);
     d->process->setParameter(d->distanceBetweenBlocks->text().toDouble(),12);
     d->process->setParameter(d->n_thread->text().toDouble(),13);
