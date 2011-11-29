@@ -32,6 +32,14 @@ do
 		install_name_tool -change $libname @executable_path/../Frameworks/`basename $libname` $f
 	done
 	
+	for libname in `otool -L $f | sed "1d" | grep boost | cut -d " " -f 1`
+	do
+		if [ ! -e Frameworks/$libname ]; then
+			\cp -np @BOOST_LIBRARY_DIR@/$libname Frameworks/
+		fi
+		install_name_tool -change $libname @executable_path/../Frameworks/$libname $f
+	done
+	
 	#Qt stuff (should hopefully be there already)
 	for j in $( otool -L $f | sed "1d" | grep -E @QT_LIBRARY_DIR@ | cut -d " " -f 1 ); do
 		#Depending on Qt SDK, paths may be relative or not
