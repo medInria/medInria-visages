@@ -68,7 +68,7 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       nghborhd->addWidget(d->neighborhoodSize);
 
       QLabel *volumeOfSearchLabel = new QLabel("Volume Of Search :");
-      d->volumeOfSearch = new QLineEdit("5");
+      d->volumeOfSearch = new QLineEdit("3");
 
       QHBoxLayout *volOfSrch = new QHBoxLayout();
       volOfSrch->addWidget(volumeOfSearchLabel);
