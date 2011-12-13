@@ -27,12 +27,12 @@
 class qtshanoirDataSourcePrivate
 {
 public:
-  QtShanoirTreeWidget *mainWidget;
+    QtShanoirTreeWidget *mainWidget;
 	QtShanoirSettingsWidget *rightWidget;
-  
-  QString lastSuccessfulReaderDescription;
-  
-  QList <medToolBox *> additional_toolboxes;
+    
+    QString lastSuccessfulReaderDescription;
+    
+    QList <medToolBox *> additional_toolboxes;
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -43,15 +43,17 @@ qtshanoirDataSource::qtshanoirDataSource(void) : medAbstractDataSource(), d(new 
 {
 	d->mainWidget = NULL;
 	d->rightWidget = NULL;
-
-  d->additional_toolboxes.clear();
-  
-  d->additional_toolboxes.push_back(new qtshanoirDataSourceToolBox);
-  
-  connect(d->additional_toolboxes.back(),SIGNAL(importButtonPressed()),this,SLOT(onImportData()));
-  connect(d->additional_toolboxes.back(),SIGNAL(findButtonPressed()),this,SLOT(find()));
-
-  d->additional_toolboxes.push_back(new qtshanoirDataSourceProgressToolBox);
+    
+    d->additional_toolboxes.clear();
+    
+    d->additional_toolboxes.push_back(new qtshanoirDataSourceToolBox);
+    
+    connect(d->additional_toolboxes.back(),SIGNAL(importButtonPressed()),this,SLOT(onImportData()));
+    connect(d->additional_toolboxes.back(),SIGNAL(findButtonPressed()),this,SLOT(find()));
+    
+	connect(QtShanoir::instance(),SIGNAL(downloadFinished(QString,QString)),this,SLOT(onDownloadFinished(QString,QString)));
+    
+    d->additional_toolboxes.push_back(new qtshanoirDataSourceProgressToolBox);
 }
 
 QWidget *qtshanoirDataSource::mainViewWidget()
@@ -75,10 +77,10 @@ QWidget *qtshanoirDataSource::sourceSelectorWidget()
 void qtshanoirDataSource::initWidgets(void)
 {
 	if(d->mainWidget && d->rightWidget)
-	  return;
-  
+        return;
+    
 	if(!d->mainWidget)
-    d->mainWidget = new QtShanoirTreeWidget();
+        d->mainWidget = new QtShanoirTreeWidget();
 	
 	if(!d->rightWidget)
 		d->rightWidget = new QtShanoirSettingsWidget();
@@ -95,12 +97,12 @@ qtshanoirDataSource::~qtshanoirDataSource(void)
 
 bool qtshanoirDataSource::registered(void)
 {
-  return medAbstractDataSourceFactory::instance()->registerDataSource("qtshanoirDataSource", createQtshanoirDataSource);
+    return medAbstractDataSourceFactory::instance()->registerDataSource("qtshanoirDataSource", createQtshanoirDataSource);
 }
 
 QString qtshanoirDataSource::description(void) const
 {
-  return "qtshanoirDataSource";
+    return "qtshanoirDataSource";
 }
 
 QString qtshanoirDataSource::tabName()
@@ -111,90 +113,88 @@ QString qtshanoirDataSource::tabName()
 void qtshanoirDataSource::onImportData()
 {
 	QString tmpDirName = QDir::tempPath();	
-	
-	connect(QtShanoir::instance(),SIGNAL(downloadFinished(QString,QString)),this,SLOT(onDownloadFinished(QString,QString)));
-	
-  QtShanoir::instance()->setDownloadMetadata(Qt::Checked);
+    
+    QtShanoir::instance()->setDownloadMetadata(Qt::Checked);
 	QtShanoir::instance()->downloadToDir(tmpDirName);
 }
 
 void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
 {
-  QFileInfo fileInfo(fileName);
-  
-  dtkSmartPointer <dtkAbstractData> dtkdata;
-  
-  QList<QString> readers = dtkAbstractDataFactory::instance()->readers();
-
-  // cycle through readers to see if the last used reader can handle the file
-  for (int i=0; i<readers.size(); i++) {
-      dtkSmartPointer<dtkAbstractDataReader> dataReader;
-      dataReader = dtkAbstractDataFactory::instance()->readerSmartPointer(readers[i]);
-      if (dataReader->canRead( fileInfo.filePath() )) {
-          dataReader->read( fileInfo.filePath() );
-          dtkdata = dataReader->data();
-
-          break;
-      }
-  }
+    QFileInfo fileInfo(fileName);
     
-  if (!dtkdata)
-  {
-    qWarning() << "No suitable reader found for file: " << fileInfo.filePath() << " unable to import Shanoir data!";
-    emit dataReceivingFailed(fileInfo.filePath());
-    return;
-  }
-  
-  // Now populate basic data attributes
-  QDomDocument xmlData;
-  
-  QFile fileXML(xmlName);
-  fileXML.open(QFile::ReadOnly);
-  
-  xmlData.setContent(&fileXML);
-  xmlData.appendChild(xmlData.firstChild().firstChildElement("SOAP-ENV:Body").firstChild());
-  xmlData.removeChild(xmlData.firstChild());
-
-  QDomNode realXMLRoot = xmlData.firstChild().firstChild();
-  
-  fileXML.close();
-  
-  QString tmpInfo = realXMLRoot.firstChildElement("study").firstChild().nodeValue();
-  tmpInfo.replace(QDir::separator(),"_");
-  dtkdata->addMetaData(medMetaDataKeys::StudyDescription.key(),tmpInfo);
-
+    dtkSmartPointer <dtkAbstractData> dtkdata;
+    
+    QList<QString> readers = dtkAbstractDataFactory::instance()->readers();
+    
+    // cycle through readers to see if the last used reader can handle the file
+    for (int i=0; i<readers.size(); i++) {
+        dtkSmartPointer<dtkAbstractDataReader> dataReader;
+        dataReader = dtkAbstractDataFactory::instance()->readerSmartPointer(readers[i]);
+        if (dataReader->canRead( fileInfo.filePath() )) {
+            dataReader->read( fileInfo.filePath() );
+            dtkdata = dataReader->data();
+            
+            break;
+        }
+    }
+    
+    if (!dtkdata)
+    {
+        qWarning() << "No suitable reader found for file: " << fileInfo.filePath() << " unable to import Shanoir data!";
+        emit dataReceivingFailed(fileInfo.filePath());
+        return;
+    }
+    
+    // Now populate basic data attributes
+    QDomDocument xmlData;
+    
+    QFile fileXML(xmlName);
+    fileXML.open(QFile::ReadOnly);
+    
+    xmlData.setContent(&fileXML);
+    xmlData.appendChild(xmlData.firstChild().firstChildElement("SOAP-ENV:Body").firstChild());
+    xmlData.removeChild(xmlData.firstChild());
+    
+    QDomNode realXMLRoot = xmlData.firstChild().firstChild();
+    
+    fileXML.close();
+    
+    QString tmpInfo = realXMLRoot.firstChildElement("study").firstChild().nodeValue();
+    tmpInfo.replace(QDir::separator(),"_");
+    dtkdata->addMetaData(medMetaDataKeys::StudyDescription.key(),tmpInfo);
+    
     qDebug() << tmpInfo;
     
-  tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("name").firstChild().nodeValue();
-  tmpInfo.replace(QDir::separator(),"_");
-  dtkdata->addMetaData(medMetaDataKeys::PatientName.key(),tmpInfo);
-
+    tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("name").firstChild().nodeValue();
+    tmpInfo.replace(QDir::separator(),"_");
+    dtkdata->addMetaData(medMetaDataKeys::PatientName.key(),tmpInfo);
+    
     qDebug() << tmpInfo;
-
+    
     tmpInfo = realXMLRoot.firstChildElement("name").firstChild().nodeValue();
-  tmpInfo.replace(QDir::separator(),"_");
-  dtkdata->addMetaData(medMetaDataKeys::SeriesDescription.key(),tmpInfo);
-
+    tmpInfo.replace(QDir::separator(),"_");
+    dtkdata->addMetaData(medMetaDataKeys::SeriesDescription.key(),tmpInfo);
+    
     qDebug() << tmpInfo;
-
+    
     tmpInfo = realXMLRoot.firstChildElement("mrDatasetAcquisition").firstChildElement("mrProtocol").firstChildElement("protocolName").firstChild().nodeValue();
-  dtkdata->addMetaData(medMetaDataKeys::Protocol.key(),tmpInfo);
-
-  // Fixed for now
-  dtkdata->addMetaData(medMetaDataKeys::Modality.key(),"MR");
-
-  tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("birthDate").firstChild().nodeValue();
-  tmpInfo.resize(10);
-  dtkdata->addMetaData(medMetaDataKeys::BirthDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
-
+    dtkdata->addMetaData(medMetaDataKeys::Protocol.key(),tmpInfo);
+    
+    // Fixed for now
+    dtkdata->addMetaData(medMetaDataKeys::Modality.key(),"MR");
+    
+    tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("birthDate").firstChild().nodeValue();
+    tmpInfo.resize(10);
+    dtkdata->addMetaData(medMetaDataKeys::BirthDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
+    
     qDebug() << tmpInfo;
-
+    
     tmpInfo = realXMLRoot.firstChildElement("datasetCreationDate").firstChild().nodeValue();
-  tmpInfo.resize(10);
-  dtkdata->addMetaData(medMetaDataKeys::AcquisitionDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
-
+    tmpInfo.resize(10);
+    dtkdata->addMetaData(medMetaDataKeys::AcquisitionDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
+    
     qDebug() << tmpInfo;
-
+    
     emit dataReceived(dtkdata);
 }
 
@@ -205,7 +205,7 @@ void qtshanoirDataSource::find()
 
 QList<medToolBox*> qtshanoirDataSource::getToolboxes()
 {  
-  return d->additional_toolboxes;
+    return d->additional_toolboxes;
 }
 
 // /////////////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ QList<medToolBox*> qtshanoirDataSource::getToolboxes()
 
 medAbstractDataSource *createQtshanoirDataSource( QWidget * )
 {
-  return new qtshanoirDataSource;
+    return new qtshanoirDataSource;
 }
 
 
