@@ -72,6 +72,12 @@ vistalDataImageWriter::canWrite(const QString & path)
     return ((QFileInfo(path).suffix() == "dim") or (QFileInfo(path).suffix() == "ima"));
 }
 
+QStringList 
+vistalDataImageWriter::supportedFileExtensions( void ) const
+{
+    return QStringList() << ".dim" << ".ima";
+}
+
 bool
 vistalDataImageWriter::write(const QString & path)
 {

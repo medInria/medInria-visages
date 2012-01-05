@@ -28,6 +28,9 @@ public:
     virtual QStringList
     handled(void) const;
     
+    /** Override base class */
+    QStringList supportedFileExtensions(void) const;
+
     public slots:
     bool
     write(const QString & path);
