@@ -131,13 +131,15 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
         dtkSmartPointer<dtkAbstractDataReader> dataReader;
         dataReader = dtkAbstractDataFactory::instance()->readerSmartPointer(readers[i]);
         if (dataReader->canRead( fileInfo.filePath() )) {
-            dataReader->read( fileInfo.filePath() );
-            dtkdata = dataReader->data();
-            
-            break;
+            if (dataReader->read( fileInfo.filePath() ))
+            {
+                dtkdata = dataReader->data();
+		if (dtkdata)
+                    break;
+            }
         }
     }
-    
+
     if (!dtkdata)
     {
         qWarning() << "No suitable reader found for file: " << fileInfo.filePath() << " unable to import Shanoir data!";
