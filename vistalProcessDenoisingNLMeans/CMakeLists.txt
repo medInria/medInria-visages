@@ -32,14 +32,13 @@ find_package(dtk REQUIRED)
 include(${dtk_USE_FILE})
 include(dtkPlugin)
 
-# vistal
+# vistal (pulls in boost as well)
 find_package(Vistal REQUIRED)
 include(${VISTAL_USE_FILE})
 
 # medinria
 find_package(medinria REQUIRED)
 include(${medinria_USE_FILE})
-
 
 ## #################################################################
 ## Input
@@ -73,11 +72,11 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
-  ${BOOST_LIBRARIES}
+  ${Boost_THREAD_LIBRARY} # or more: ${Boost_LIBRARIES}
   dtkCore
   medCore
   medGui
-  boost_thread)
+  )
 
 dtk_build_doc(vistalProcessDenoisingPlugin)
 
