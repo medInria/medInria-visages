@@ -35,7 +35,7 @@ do
 	for libname in `otool -L $f | sed "1d" | grep boost | cut -d " " -f 1`
 	do
 		if [ ! -e Frameworks/$libname ]; then
-			\cp -np @BOOST_LIBRARY_DIR@/$libname Frameworks/
+			\cp -np @Boost_LIBRARY_DIRS@/$libname Frameworks/
 		fi
 		install_name_tool -change $libname @executable_path/../Frameworks/$libname $f
 	done
