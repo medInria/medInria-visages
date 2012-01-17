@@ -40,6 +40,8 @@ include(${VISTAL_USE_FILE})
 find_package(medinria REQUIRED)
 include(${medinria_USE_FILE})
 
+include_directories(${Boost_INCLUDE_DIR})
+
 ## #################################################################
 ## Input
 ## #################################################################

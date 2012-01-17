@@ -6,7 +6,7 @@
 #define VISTALPROCESSDENOISINGPLUGINEXPORT_H
 
 #ifdef WIN32
-    #ifdef vistalProcessDenoisingPlugin_EXPORTS
+    #ifdef vistalProcessDenoisingNLMeansPlugin_EXPORTS
         #define VISTALPROCESSDENOISINGPLUGIN_EXPORT __declspec(dllexport) 
     #else
         #define VISTALPROCESSDENOISINGPLUGIN_EXPORT __declspec(dllimport) 
