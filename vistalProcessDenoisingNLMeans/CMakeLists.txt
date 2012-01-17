@@ -75,6 +75,7 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
   ${Boost_THREAD_LIBRARY} # or more: ${Boost_LIBRARIES}
+  ${Boost_DATE_TIME_LIBRARY} 
   dtkCore
   medCore
   medGui
