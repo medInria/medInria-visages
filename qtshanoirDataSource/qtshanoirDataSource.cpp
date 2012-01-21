@@ -134,7 +134,7 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
             if (dataReader->read( fileInfo.filePath() ))
             {
                 dtkdata = dataReader->data();
-		if (dtkdata)
+                if (dtkdata)
                     break;
             }
         }
@@ -197,6 +197,7 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
     
     qDebug() << tmpInfo;
     
+    dtkdata->retain();
     emit dataReceived(dtkdata);
 }
 
