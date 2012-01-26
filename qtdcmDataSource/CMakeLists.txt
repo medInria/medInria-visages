@@ -30,6 +30,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 find_package(dtk REQUIRED)
 
+find_package(ITK REQUIRED)
+if(ITK_FOUND)
+	include(${ITK_USE_FILE})
+endif(ITK_FOUND)
+
 find_package(medinria REQUIRED)
 include(${medinria_USE_FILE})
 
@@ -82,12 +87,27 @@ add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_SOURCES}
   ${${PROJECT_NAME}_HEADERS})
 
-target_link_libraries(${PROJECT_NAME}
+if(WIN32)
+  target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
+  ${ITK_LIBRARIES}
   ${QTDCM_LIBS}
+  ${DCMTK_LIBRARIES}
+  dtkCore
+  medCore
+  medGui
+  netapi32
+  )
+else(WIN32)
+  target_link_libraries(${PROJECT_NAME}
+  ${QT_LIBRARIES}
+  ${ITK_LIBRARIES}
+  ${QTDCM_LIBS}
+  ${DCMTK_LIBRARIES}
   dtkCore
   medCore
   medGui)
+endif(WIN32)
 
 dtk_build_doc(qtdcmDataSourcePlugin)
 

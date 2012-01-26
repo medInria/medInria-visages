@@ -36,6 +36,8 @@ include(dtkPlugin)
 find_package(Vistal REQUIRED)
 include(${VISTAL_USE_FILE})
 
+include_directories(${BOOST_INCLUDE_DIR})
+
 ## #################################################################
 ## Input
 ## #################################################################

@@ -40,6 +40,8 @@ include(${VISTAL_USE_FILE})
 find_package(medinria REQUIRED)
 include(${medinria_USE_FILE})
 
+include_directories(${Boost_INCLUDE_DIR})
+
 ## #################################################################
 ## Input
 ## #################################################################
@@ -73,6 +75,7 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
   ${Boost_THREAD_LIBRARY} # or more: ${Boost_LIBRARIES}
+  ${Boost_DATE_TIME_LIBRARY} 
   dtkCore
   medCore
   medGui
