@@ -67,6 +67,7 @@ qtdcmDataSource::qtdcmDataSource ( void ) : medAbstractDataSource(), d ( new qtd
     QPushButton * localSettingsButton = new QPushButton;
     localSettingsButton->setText ( "Save settings" );
     localSettingsButton->setFocusPolicy ( Qt::NoFocus );
+    localSettingsButton->setToolTip(tr("Save local Dicom settings"));
     localSettingsButton->setMaximumWidth ( 100 );
     QObject::connect ( localSettingsButton, SIGNAL ( clicked() ), this, SLOT ( onSaveLocalSettings() ) );
 
