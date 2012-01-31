@@ -110,7 +110,7 @@ bool qtdcmDataSource::registered ( void )
 
 QString qtdcmDataSource::description ( void ) const
 {
-    return "qtdcmDataSource";
+    return "Browse DICOM workstation";
 }
 
 QWidget *qtdcmDataSource::mainViewWidget()
