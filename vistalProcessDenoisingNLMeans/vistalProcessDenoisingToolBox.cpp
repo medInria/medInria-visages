@@ -154,6 +154,7 @@ vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : 
       // Run button:
 
       QPushButton *runButton = new QPushButton(tr("Run"));
+	  runButton->setToolTip(tr("Launch non local means denoising"));
 
       // Principal layout:
 
