@@ -1,7 +1,7 @@
-/*! \mainpage medinria-plugins Reference Documentation
+/*! \mainpage medInria-plugins Reference Documentation
 
-  medinria-plugins contains the extended functionalities for medinria, a medical images application and framework designed at INRIA.
+  medInria-plugins contains the extended functionalities for medInria, a medical images application and framework designed at INRIA.
 
-  \subpage medinria-plugins-modules
+  \subpage medInria-plugins-modules
 
  */

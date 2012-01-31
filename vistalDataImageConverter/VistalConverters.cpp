@@ -11,7 +11,7 @@
 
 namespace vistal
 {
-        namespace medinria
+        namespace medInria
         {
 
                 // MACRO to convert from vistal image with type TypeIn to itk image of type TypeOut

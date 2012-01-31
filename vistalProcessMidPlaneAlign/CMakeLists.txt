@@ -37,9 +37,9 @@ include(dtkPlugin)
 find_package(Vistal REQUIRED)
 include(${VISTAL_USE_FILE})
 
-# medinria
-find_package(medinria REQUIRED)
-include(${medinria_USE_FILE})
+# medInria
+find_package(medInria REQUIRED)
+include(${medInria_USE_FILE})
 
 # itk
 find_package(ITK REQUIRED)

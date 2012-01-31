@@ -39,7 +39,6 @@ include(${VISTAL_USE_FILE})
 # medInria
 find_package(medInria REQUIRED)
 include(${medInria_USE_FILE})
-
 include_directories(${Boost_INCLUDE_DIR})
 
 ## #################################################################

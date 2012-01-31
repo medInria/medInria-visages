@@ -136,7 +136,7 @@ namespace vistal
 
         }
 
-                namespace medinria
+                namespace medInria
                 {
                         // Function to convert a dtkAbstractData pointer containing a vistal image of type typeIn to a dtkAbstractData itk image of type typeOut
                         void convertToItk(QString typeIn, QString typeOut, dtkAbstractData* imageIn, dtkAbstractData*& imageOut);

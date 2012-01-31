@@ -2,7 +2,7 @@
 #define _med_VistalDataImageConverterMacros_h_
 
 #include "VistalConverters.h"
-// The function taking medinria internal vistal names and converts to desired name
+// The function taking medInria internal vistal names and converts to desired name
 
 #include "boost/function.hpp"
 
@@ -52,7 +52,7 @@ dtkAbstractData *vistalDataImageToItkDataImage##suffix##Converter::convert(void)
 	if (!data) \
 		return NULL; \
 	dtkAbstractData * output;\
-	vistal::medinria::convertToItk(data->identifier(), ""#suffix, data, output);\
+	vistal::medInria::convertToItk(data->identifier(), ""#suffix, data, output);\
 	return output; \
 } \
 dtkAbstractDataConverter *createVistalDataImageToItkDataImage##suffix##Converter(void) \
@@ -102,7 +102,7 @@ dtkAbstractData *itkDataImageToVistalDataImage##suffix##Converter::convert(void)
 	if (!data) \
 		return NULL; \
 	dtkAbstractData * output;\
-	vistal::medinria::convertFromItk(data->identifier(), ""#suffix, data, output);\
+	vistal::medInria::convertFromItk(data->identifier(), ""#suffix, data, output);\
 	return output; \
 } \
 dtkAbstractDataConverter *createItkDataImageToVistalDataImage##suffix##Converter(void) \
@@ -156,7 +156,7 @@ dtkAbstractData *output; \
 if (!data) \
 return NULL; \
 if (data->identifier() == "vistalDataImage"#suffix) { output = data; return output; } \
-vistal::medinria::convert(data->identifier(), ""#suffix, data, output);\
+vistal::medInria::convert(data->identifier(), ""#suffix, data, output);\
 return output; \
 } \
 dtkAbstractDataConverter *createVistalToVistal##suffix##Converter(void) \

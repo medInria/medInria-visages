@@ -29,7 +29,7 @@ bvProcessBrainSegmentation::bvProcessBrainSegmentation(void) :
 {
     d->input = 0;
     d->output = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
-//    d->settings = QSettings("inria", "medinria");
+//    d->settings = QSettings("inria", "medInria");
 //    d->settings->beginGroup("bvBrainSegmentation");
 //    d->settings->setValue("biasCorrectionCmd","");
 //    d->settings->setValue("histoAnalysisCmd","");

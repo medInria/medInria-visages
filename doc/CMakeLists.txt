@@ -27,8 +27,8 @@ IF( DOXYGEN_FOUND )
       @ONLY
       )
     CONFIGURE_FILE(
-      ${CMAKE_CURRENT_SOURCE_DIR}/qhc/medinria-plugins.qhcp.in 
-      ${CMAKE_CURRENT_BINARY_DIR}/medinria-plugins.qhcp IMMEDIATE @ONLY)
+      ${CMAKE_CURRENT_SOURCE_DIR}/qhc/medInria-plugins.qhcp.in 
+      ${CMAKE_CURRENT_BINARY_DIR}/medInria-plugins.qhcp IMMEDIATE @ONLY)
  
 
     SET(doc_output "${CMAKE_CURRENT_BINARY_DIR}/doc/html/index.html")
@@ -41,12 +41,12 @@ IF( DOXYGEN_FOUND )
       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/img      ${CMAKE_CURRENT_BINARY_DIR}/html/img
 
       COMMAND ${CMAKE_COMMAND} -P "${CMAKE_CURRENT_BINARY_DIR}/generate_doc.cmake"
-      COMMAND ${QT_BINARY_DIR}/qhelpgenerator html/index.qhp -o medinria-plugins.qch
-      COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} medinria-plugins.qhcp -o medinria-plugins.qhc
+      COMMAND ${QT_BINARY_DIR}/qhelpgenerator html/index.qhp -o medInria-plugins.qch
+      COMMAND ${QT_QCOLLECTIONGENERATOR_EXECUTABLE} medInria-plugins.qhcp -o medInria-plugins.qhc
 
       DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/generate_doc.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.txt"
-              "${CMAKE_CURRENT_BINARY_DIR}/medinria-plugins.qhcp"
+              "${CMAKE_CURRENT_BINARY_DIR}/medInria-plugins.qhcp"
       )
 
     ADD_CUSTOM_TARGET(doc ${all_arg} DEPENDS ${doc_output})

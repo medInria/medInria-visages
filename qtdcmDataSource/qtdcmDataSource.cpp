@@ -149,7 +149,7 @@ void qtdcmDataSource::initWidgets ( void )
     if ( !d->mainWidget )
     {
         d->mainWidget = new QtDcm();
-        QtDcmPreferences::instance()->setIniFile("medinria");
+        QtDcmPreferences::instance()->setIniFile("medInria");
         QtDcmManager::instance()->setQtDcmWidget(d->mainWidget);
         QtDcmManager::instance()->setPreviewWidget ( d->previewToolBox->getPreviewWidget() );
         QtDcmManager::instance()->setImportWidget ( d->importToolBox->getImportWidget() );
