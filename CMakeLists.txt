@@ -19,7 +19,7 @@
 
 cmake_minimum_required(VERSION 2.8.1)
 
-project(medinria-visages-plugins)
+project(medInria-visages-plugins)
 
 ## #################################################################
 ## Setup version numbering
