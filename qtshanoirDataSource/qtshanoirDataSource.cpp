@@ -102,7 +102,7 @@ bool qtshanoirDataSource::registered(void)
 
 QString qtshanoirDataSource::description(void) const
 {
-    return "qtshanoirDataSource";
+    return "Browse Shanoir server";
 }
 
 QString qtshanoirDataSource::tabName()

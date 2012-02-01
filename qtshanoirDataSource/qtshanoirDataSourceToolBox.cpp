@@ -24,8 +24,10 @@ qtshanoirDataSourceToolBox::qtshanoirDataSourceToolBox(QWidget *parent) : medToo
 	
 	QPushButton * findButton = new QPushButton("Find", this);
 	findButton->setIcon(QIcon(":/icons/zoom.png"));
+	findButton->setToolTip(tr("Launch search"));
 	QPushButton * downloadButton = new QPushButton("Import", this);
 	downloadButton->setIcon(QIcon(":/icons/download.png"));
+	downloadButton->setToolTip(tr("Import the selected data"));
   	
 	QObject::connect(findButton, SIGNAL(clicked()), this, SIGNAL(findButtonPressed()));
 	QObject::connect(downloadButton, SIGNAL(clicked()), this, SIGNAL(importButtonPressed()));
