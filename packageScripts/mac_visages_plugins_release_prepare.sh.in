@@ -1,9 +1,9 @@
 #!/bin/bash
 
 \rm -fr @CMAKE_INSTALL_PREFIX@/PackageRootDir
-mkdir -p @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents/{Frameworks,PlugIns}
+mkdir -p @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medInria.app/Contents/{Frameworks,PlugIns}
 
-cd @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medinria.app/Contents
+cd @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medInria.app/Contents
 
 mkdir -p Frameworks/Vistal Frameworks/Dcm Frameworks/DCMTK Frameworks/Shanoir
 
@@ -12,12 +12,12 @@ cp @CMAKE_INSTALL_PREFIX@/plugins/libqtdcm* PlugIns/
 cp @CMAKE_INSTALL_PREFIX@/plugins/libqtshanoir* PlugIns/
 
 for i in $( otool -L PlugIns/*.dylib 2> /dev/null \
-| sort -u | grep -i -E '@medinria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1 ); do
+| sort -u | grep -i -E '@medInria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1 ); do
 	cp -np $i Frameworks/ 2> /dev/null;
 done
 
 for i in $( otool -L Frameworks/* 2> /dev/null \
-| sort -u | grep -i -E '@medinria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1 ); do
+| sort -u | grep -i -E '@medInria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1 ); do
 	cp -np $i Frameworks 2> /dev/null;
 done
 
@@ -27,7 +27,7 @@ do
 	install_name_tool -id @executable_path/../$f $f
 	
 	# ITK, VTK stuff
-	for libname in `otool -L $f | sed "1d" | grep -i -E '@medinria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1`
+	for libname in `otool -L $f | sed "1d" | grep -i -E '@medInria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1`
 	do
 		install_name_tool -change $libname @executable_path/../Frameworks/`basename $libname` $f
 	done
@@ -67,6 +67,16 @@ do
 		baselibname=`basename $libname`
 		cp $libname Frameworks/Dcm/
 		install_name_tool -change $libname @executable_path/../Frameworks/Dcm/$baselibname $f
+	done
+
+    for libname in `otool -L $f | sed "1d" | grep dcmtk | cut -d " " -f 1`
+    do
+    	baselibname=`basename $libname`
+    	if [ ! -e Frameworks/DCMTK/$baselibname ]; then
+			cp $libname Frameworks/DCMTK/
+		fi
+		
+		install_name_tool -change $libname @executable_path/../Frameworks/DCMTK/$baselibname $f
 	done
 done
 
@@ -179,7 +189,7 @@ do
 	do
 		install_name_tool -id @executable_path/../$f $f
 
-		for libname in `otool -L $f | sed "1d" | grep -i -E '@medinria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1`
+		for libname in `otool -L $f | sed "1d" | grep -i -E '@medInria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1`
 		do
 			baselibname=`basename $libname`
 		
