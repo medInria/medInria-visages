@@ -14,7 +14,7 @@
 
 
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 // /////////////////////////////////////////////////////////////////
 // vistalDataImagePluginPrivate
@@ -47,28 +47,28 @@ bool
 vistalDataImagePlugin::initialize(void)
 {
 	if (!vistalDataImageUChar3::registered())
-		dtkWarning() << "Unable to register vistalDataImageUChar3 type";
+		dtkWarn() << "Unable to register vistalDataImageUChar3 type";
 	
 	if (!vistalDataImageChar3::registered())
-		dtkWarning() << "Unable to register vistalDataImageChar3 type";
+		dtkWarn() << "Unable to register vistalDataImageChar3 type";
 
 	if (!vistalDataImageUShort3::registered())
-		dtkWarning() << "Unable to register vistalDataImageUShort3 type";
+		dtkWarn() << "Unable to register vistalDataImageUShort3 type";
 	
 	if (!vistalDataImageShort3::registered())
-		dtkWarning() << "Unable to register vistalDataImageShort3 type";
+		dtkWarn() << "Unable to register vistalDataImageShort3 type";
 
 	if (!vistalDataImageUInt3::registered())
-		dtkWarning() << "Unable to register vistalDataImageUInt3 type";
+		dtkWarn() << "Unable to register vistalDataImageUInt3 type";
 
 	if (!vistalDataImageInt3::registered())
-		dtkWarning() << "Unable to register vistalDataImageInt3 type";
+		dtkWarn() << "Unable to register vistalDataImageInt3 type";
 	
 	if (!vistalDataImageFloat3::registered())
-		dtkWarning() << "Unable to register vistalDataImageFloat3 type";
+		dtkWarn() << "Unable to register vistalDataImageFloat3 type";
 
 	if (!vistalDataImageDouble3::registered())
-		dtkWarning() << "Unable to register vistalDataImageDouble3 type";
+		dtkWarn() << "Unable to register vistalDataImageDouble3 type";
 
 
 	return true;

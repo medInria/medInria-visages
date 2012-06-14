@@ -8,7 +8,7 @@
 
 #include <vistalProcessDenoisingNLMeansDefinitions.h>
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 // /////////////////////////////////////////////////////////////////
 // vistalProcessDenoisingPluginPrivate
@@ -39,10 +39,10 @@ vistalProcessDenoisingPlugin::~vistalProcessDenoisingPlugin(void)
 bool vistalProcessDenoisingPlugin::initialize(void)
 {
     if(!vistalProcessDenoising::registered())
-	dtkWarning() << "Unable to register vistalProcessDenoising type";
+	dtkWarn() << "Unable to register vistalProcessDenoising type";
     
     if(!vistalProcessDenoisingToolBox::registered())
-	dtkWarning() << "Unable to register vistalProcessDenoising toolbox";
+	dtkWarn() << "Unable to register vistalProcessDenoising toolbox";
 
     return true;
 }

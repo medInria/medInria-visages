@@ -6,7 +6,7 @@
 #include "qtshanoirDataSourcePlugin.h"
 #include "qtshanoirDataSourceToolBox.h"
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 #include <qtshanoirDataSourceDefinitions.h>
 
@@ -39,7 +39,7 @@ qtshanoirDataSourcePlugin::~qtshanoirDataSourcePlugin(void)
 bool qtshanoirDataSourcePlugin::initialize(void)
 {
   if(!qtshanoirDataSource::registered())
-    dtkWarning() << "Unable to register qtshanoirDataSource type";
+    dtkWarn() << "Unable to register qtshanoirDataSource type";
   
   return true;
 }

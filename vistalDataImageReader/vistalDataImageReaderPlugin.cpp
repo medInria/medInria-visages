@@ -5,7 +5,7 @@
 #include "vistalDataImageReader.h"
 #include "vistalDataImageReaderPlugin.h"
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 // /////////////////////////////////////////////////////////////////
 // vistalDataImageReaderPluginPrivate
@@ -36,7 +36,7 @@ vistalDataImageReaderPlugin::~vistalDataImageReaderPlugin(void)
 bool vistalDataImageReaderPlugin::initialize(void)
 {
     if(!vistalDataImageReader::registered())
-	dtkWarning() << "Unable to register vistalDataImageReader type";
+	dtkWarn() << "Unable to register vistalDataImageReader type";
 
     return true;
 }

@@ -83,7 +83,8 @@ target_link_libraries(${PROJECT_NAME}
   ${VISTAL_LIBS}
   ${ITK_LIBRARIES}
   medCore
-  dtkCore)
+  dtkCore
+  dtkLog)
 
 dtk_build_doc(vistalDataImagePlugin)
 

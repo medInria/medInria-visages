@@ -5,7 +5,7 @@
 #include "qtdcmDataSource.h"
 #include "qtdcmDataSourcePlugin.h"
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 #include <qtdcmDataSourceDefinitions.h>
 
@@ -38,7 +38,7 @@ qtdcmDataSourcePlugin::~qtdcmDataSourcePlugin ( void )
 bool qtdcmDataSourcePlugin::initialize ( void )
 {
     if ( !qtdcmDataSource::registered() )
-        dtkWarning() << "Unable to register qtdcmDataSource type";
+        dtkWarn() << "Unable to register qtdcmDataSource type";
 
     return true;
 }

@@ -94,6 +94,7 @@ if(WIN32)
   ${QTDCM_LIBS}
   ${DCMTK_LIBRARIES}
   dtkCore
+  dtkLog
   medCore
   medGui
   netapi32
@@ -105,6 +106,7 @@ else(WIN32)
   ${QTDCM_LIBS}
   ${DCMTK_LIBRARIES}
   dtkCore
+  dtkLog
   medCore
   medGui)
 endif(WIN32)

@@ -83,6 +83,7 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${QTSHANOIR_LIBS}
   dtkCore
+  dtkLog
   medCore
   medGui)
 

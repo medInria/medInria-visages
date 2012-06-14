@@ -64,6 +64,7 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
   dtkCore
+  dtkLog
 )
 
 dtk_build_doc(vistalDataImageReaderPlugin)

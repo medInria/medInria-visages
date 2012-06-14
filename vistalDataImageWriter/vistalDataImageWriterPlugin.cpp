@@ -5,7 +5,7 @@
 #include "vistalDataImageWriter.h"
 #include "vistalDataImageWriterPlugin.h"
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 // /////////////////////////////////////////////////////////////////
 // vistalDataImageWriterPluginPrivate
@@ -36,7 +36,7 @@ vistalDataImageWriterPlugin::~vistalDataImageWriterPlugin(void)
 bool vistalDataImageWriterPlugin::initialize(void)
 {
     if(!vistalDataImageWriter::registered())
-	dtkWarning() << "Unable to register vistalDataImageWriter type";
+	dtkWarn() << "Unable to register vistalDataImageWriter type";
 
     return true;
 }

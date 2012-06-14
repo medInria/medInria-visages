@@ -62,8 +62,9 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
-	${VISTAL_LIBS}
-  dtkCore)
+  ${VISTAL_LIBS}
+  dtkCore
+  dtkLog)
 
 dtk_build_doc(vistalDataImageWriterPlugin)
 
