@@ -193,10 +193,11 @@ vistalProcessDenoisingToolBox::~vistalProcessDenoisingToolBox(void)
 
 bool vistalProcessDenoisingToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("nlmeansDenoising",
-                                                                         "NL Means Denoising",
-                                                                         "Applies a Non Local Means Denoising",
-                                                                           createVistalProcessDenoisingToolBox);
+    return medToolBoxFactory::instance()->registerToolBox
+                            <vistalProcessDenoisingToolBox>("nlmeansDenoising",
+                                                            "NL Means Denoising",
+                                                            "Applies a Non Local Means Denoising",
+                                                            QStringList()<<"filtering");
 }
 
 
@@ -254,9 +255,4 @@ void vistalProcessDenoisingToolBox::run(void)
 //    else
 //        emit failure();
 
-}
-
-medToolBoxFilteringCustom *createVistalProcessDenoisingToolBox(QWidget *parent)
-{
-    return new vistalProcessDenoisingToolBox(parent);
 }

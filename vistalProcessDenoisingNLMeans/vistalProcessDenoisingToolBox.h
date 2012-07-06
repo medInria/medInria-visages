@@ -30,7 +30,5 @@ private:
     vistalProcessDenoisingToolBoxPrivate *d;
 };
 
-medToolBoxFilteringCustom *createVistalProcessDenoisingToolBox(QWidget *parent);
-
 #endif
 

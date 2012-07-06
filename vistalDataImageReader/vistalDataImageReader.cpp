@@ -82,7 +82,7 @@ vistalDataImageReader::canRead(const QStringList & paths)
 
 }
 
-void
+bool
 vistalDataImageReader::readInformation(const QString & path)
 {
 
@@ -110,22 +110,24 @@ vistalDataImageReader::readInformation(const QString & path)
 
         if (data)
             this->setData(data);
-
     }
 
     if (data) {
         data->addMetaData("FilePath", QStringList() << path);
 
+        return true;
     }
 
+    return false;
 }
 
-void
+bool
 vistalDataImageReader::readInformation(const QStringList & paths)
 {
     if (!paths.count())
-        return;
-    this->readInformation(paths[0].toAscii().constData());
+        return false;
+    
+    return this->readInformation(paths[0].toAscii().constData());
 }
 
 bool
