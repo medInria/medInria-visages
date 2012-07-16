@@ -6,6 +6,7 @@
 
 #include <dtkCore/dtkAbstractProcessFactory.h>
 #include <dtkCore/dtkAbstractDataFactory.h>
+#include <dtkCore/dtkSmartPointer.h>
 
 #include <medMetaDataKeys.h>
 
@@ -19,8 +20,8 @@
 class vistalProcessDenoisingPrivate
 {
 public:
-        dtkAbstractData *input;	
-        dtkAbstractData *output;
+        dtkSmartPointer<dtkAbstractData> input;
+        dtkSmartPointer<dtkAbstractData> output;
 
         QString originDescription;
 
@@ -38,9 +39,6 @@ public:
         int block;
         int b_space;
 	unsigned int N_thread;
-        //char* temp;
-	
-        // TO DO : temp directory for slice preview
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -49,8 +47,6 @@ public:
 
 vistalProcessDenoising::vistalProcessDenoising(void) : dtkAbstractProcess(), d(new vistalProcessDenoisingPrivate)
 {
-	d->input = NULL;
-	d->output = NULL;  
     d->seuil = 0;
     d->beta = 1;
     d->seuil_adapt = 0;
@@ -64,18 +60,14 @@ vistalProcessDenoising::vistalProcessDenoising(void) : dtkAbstractProcess(), d(n
     d->weight_method = 0;
     d->block = 1;
     d->b_space = 2;
-	d->N_thread = 1;
+    d->N_thread = 1;
     d->originDescription = "";
-    //temp = NULL;
 }
 
 vistalProcessDenoising::~vistalProcessDenoising(void)
 {                
-    delete d->input;
-	d->input = NULL;
-	
-    delete d->output;
-	d->output = NULL;	
+    delete d;
+    d = NULL;
 }
 
 bool vistalProcessDenoising::registered(void)
@@ -164,7 +156,7 @@ void vistalProcessDenoising::setParameter(double  data, int channel)
 
 int vistalProcessDenoising::update (void)
 {        
-    if (d->input == NULL)
+    if (!d->input)
     {
             qDebug() << "in update method : d->input is NULL";
             return -1;
