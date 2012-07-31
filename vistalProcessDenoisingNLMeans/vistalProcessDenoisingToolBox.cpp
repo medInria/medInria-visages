@@ -9,6 +9,7 @@
 #include <dtkCore/dtkAbstractViewFactory.h>
 #include <dtkCore/dtkAbstractView.h>
 #include <dtkCore/dtkAbstractViewInteractor.h>
+#include <dtkCore/dtkSmartPointer.h>
 
 #include <medCore/medRunnableProcess.h>
 #include <medCore/medJobManager.h>
@@ -38,7 +39,7 @@ public:
         QLineEdit *minimumVarianceRatio;
         QLineEdit *n_thread;
 
-        dtkAbstractProcess *process;
+        dtkSmartPointer<dtkAbstractProcess> process;
         medProgressionStack * progression_stack;
 };
 
@@ -215,7 +216,7 @@ void vistalProcessDenoisingToolBox::run(void)
     if(!this->parentToolBox())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessDenoisingNLMEANS");
+    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("vistalProcessDenoisingNLMEANS");
 
     if(!this->parentToolBox()->data())
         return;
