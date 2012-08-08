@@ -5,6 +5,7 @@
 #include <medPluginManager.h>
 #include <medDropSite.h>
 #include <medMultipleImageSelectionWidget.h>
+#include <medDatabaseModel.h>
 
 
 #include <QtGui>
@@ -20,6 +21,8 @@ public:
     QDoubleSpinBox *alpha;
     QDoubleSpinBox *beta;
     QDoubleSpinBox *sigma;
+
+    QList<medDataIndex> selectedIndexes;
 };
 
 
@@ -80,11 +83,15 @@ vistalProcessGraphCutSegToolBox::vistalProcessGraphCutSegToolBox(QWidget *parent
 }
 
 
-int vistalProcessGraphCutSegToolBox::onMultipleImageSelectionClicked()
+vistalProcessGraphCutSegToolBox::~vistalProcessGraphCutSegToolBox()
 {
-    QList<medDataIndex> previouslySelectedIndexes;
+    delete d;
+    d = NULL;
+}
 
-    d->inputImageSelection = new medMultipleImageSelectionWidget(previouslySelectedIndexes, this);
+void vistalProcessGraphCutSegToolBox::onMultipleImageSelectionClicked()
+{
+    d->inputImageSelection = new medMultipleImageSelectionWidget(d->selectedIndexes, this);
 
     bool justBringStudies = true;
 
@@ -96,14 +103,8 @@ int vistalProcessGraphCutSegToolBox::onMultipleImageSelectionClicked()
 
     d->inputImageSelection->setModel(proxy);
 
-    return d->inputImageSelection->exec();
-}
-
-
-
-
-
-
+    if(!d->inputImageSelection->exec())
+        d->selectedIndexes = d->inputImageSelection->getSelectedIndexes();
 }
 
 
@@ -114,4 +115,12 @@ bool vistalProcessGraphCutSegToolBox::registered(void)
                                                             "Graph cut segmentation",
                                                             "Applies a graph cut segementation",
                                                             QStringList()<<"segmentation");
+}
+
+void vistalProcessGraphCutSegToolBox::run()
+{
+    if (!this->segmentationToolBox())
+        return;
+
+
 }
