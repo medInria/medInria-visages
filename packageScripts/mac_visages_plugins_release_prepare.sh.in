@@ -43,9 +43,9 @@ do
 	#Qt stuff (should hopefully be there already)
 	for j in $( otool -L $f | sed "1d" | grep -E .framework | grep -i -E 'Qt|phonon' | cut -d " " -f 1 ); do
 		#Depending on Qt SDK, paths may be relative or not
-		#tmpVal=`echo $j | rev | cut -d "/" -f 1-4 | rev`
+		tmpVal=`echo $j | rev | cut -d "/" -f 1-4 | rev`
 		if [ "`echo $j | grep executable_path`" == "" ]; then
-			install_name_tool -change $j @executable_path/../Frameworks/$j $f
+			install_name_tool -change $j @executable_path/../Frameworks/$tmpVal $f
 		fi
 	done
 done
@@ -122,9 +122,9 @@ do
 	#Qt stuff (should hopefully be there already)
 	for j in $( otool -L $f | sed "1d" | grep -E .framework | grep -i -E 'Qt|phonon' | cut -d " " -f 1 ); do
 		#Depending on Qt SDK, paths may be relative or not
-		#tmpVal=`echo $j | rev | cut -d "/" -f 1-4 | rev`
+		tmpVal=`echo $j | rev | cut -d "/" -f 1-4 | rev`
 		if [ "`echo $j | grep executable_path`" == "" ]; then
-			install_name_tool -change $j @executable_path/../Frameworks/$j $f
+			install_name_tool -change $j @executable_path/../Frameworks/$tmpVal $f
 		fi
     done
     
@@ -164,9 +164,9 @@ do
 		#Qt stuff (should hopefully be there already)
 		for j in $( otool -L $f | sed "1d" | grep -E .framework | grep -i -E 'Qt|phonon' | cut -d " " -f 1 ); do
 			#Depending on Qt SDK, paths may be relative or not
-			#tmpVal=`echo $j | rev | cut -d "/" -f 1-4 | rev`
+			tmpVal=`echo $j | rev | cut -d "/" -f 1-4 | rev`
 			if [ "`echo $j | grep executable_path`" == "" ]; then
-				install_name_tool -change $j @executable_path/../Frameworks/$j $f
+				install_name_tool -change $j @executable_path/../Frameworks/$tmpVal $f
 			fi
     	done
     
@@ -205,9 +205,9 @@ do
 		#Qt stuff (should hopefully be there already)
 		for j in $( otool -L $f | sed "1d" | grep -E .framework | grep -i -E 'Qt|phonon' | cut -d " " -f 1 ); do
 			#Depending on Qt SDK, paths may be relative or not
-			#tmpVal=`echo $j | rev | cut -d "/" -f 1-4 | rev`
+			tmpVal=`echo $j | rev | cut -d "/" -f 1-4 | rev`
 			if [ "`echo $j | grep executable_path`" == "" ]; then
-				install_name_tool -change $j @executable_path/../Frameworks/$j $f
+				install_name_tool -change $j @executable_path/../Frameworks/$tmpVal $f
 			fi
     	done
 	done
