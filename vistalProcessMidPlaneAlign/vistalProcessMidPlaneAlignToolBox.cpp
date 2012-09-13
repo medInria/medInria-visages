@@ -9,6 +9,7 @@
 #include <dtkCore/dtkAbstractViewFactory.h>
 #include <dtkCore/dtkAbstractView.h>
 #include <dtkCore/dtkAbstractViewInteractor.h>
+#include <dtkCore/dtkSmartPointer.h>
 
 #include <medCore/medRunnableProcess.h>
 #include <medCore/medJobManager.h>
@@ -28,7 +29,7 @@ public:
     QDoubleSpinBox *rhoe;
     QSpinBox *maxf;
 
-    dtkAbstractProcess* process;
+    dtkSmartPointer <dtkAbstractProcess> process;
     medProgressionStack * progression_stack;
 
 };
@@ -101,8 +102,10 @@ vistalProcessMidPlaneAlignToolBox::~vistalProcessMidPlaneAlignToolBox(void)
 
 bool vistalProcessMidPlaneAlignToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("Mid-Sagittal Plane realign",
-                                                                           createVistalProcessMidPlaneAlignToolBox);
+    return medToolBoxFactory::instance()->registerToolBox <vistalProcessMidPlaneAlignToolBox>("MidSagittalPlaneFilter",
+                                                                                              "Mid sagittal plane",
+                                                                                              "Computes an image's mid-sagittal plane",
+                                                                                              QStringList()<<"filtering");
 }
 
 
@@ -120,12 +123,12 @@ void vistalProcessMidPlaneAlignToolBox::run(void)
     if(!this->parent())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessMidPlaneAlign");
+    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("vistalProcessMidPlaneAlign");
 
-    if(!this->parent()->data())
+    if(!this->parentToolBox()->data())
         return;
 
-    d->process->setInput(this->parent()->data());
+    d->process->setInput(this->parentToolBox()->data());
 
     d->process->setParameter((double)d->maxf->value(),0);
     d->process->setParameter((double)d->rhob->value(),1);

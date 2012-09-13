@@ -7,7 +7,7 @@
 
 #include "vistalProcessMidPlaneAlignToolBox.h"
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 // /////////////////////////////////////////////////////////////////
 // vistalProcessMidPlaneAlignPluginPrivate
@@ -38,10 +38,10 @@ vistalProcessMidPlaneAlignPlugin::~vistalProcessMidPlaneAlignPlugin(void)
 bool vistalProcessMidPlaneAlignPlugin::initialize(void)
 {
     if(!vistalProcessMidPlaneAlign::registered())
-        dtkWarning() << "Unable to register vistalProcessMidPlaneAlign type";
+        dtkWarn() << "Unable to register vistalProcessMidPlaneAlign type";
 
     if(!vistalProcessMidPlaneAlignToolBox::registered())
-        dtkWarning() << "Unable to register vistalProcessMidPlaneAlign toolbox";
+        dtkWarn() << "Unable to register vistalProcessMidPlaneAlign toolbox";
 
 
     return true;

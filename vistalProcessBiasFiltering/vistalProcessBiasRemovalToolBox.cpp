@@ -9,6 +9,7 @@
 #include <dtkCore/dtkAbstractViewFactory.h>
 #include <dtkCore/dtkAbstractView.h>
 #include <dtkCore/dtkAbstractViewInteractor.h>
+#include <dtkCore/dtkSmartPointer.h>
 
 #include <medAbstractDataImage.h>
 #include <medToolBoxFactory.h>
@@ -36,7 +37,7 @@ public:
     QCheckBox *biasOutput;
 
 
-    dtkAbstractProcess *process;
+    dtkSmartPointer <dtkAbstractProcess> process;
 };
 
 vistalProcessBiasRemovalToolBox::vistalProcessBiasRemovalToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessBiasRemovalToolBoxPrivate)
@@ -167,8 +168,11 @@ vistalProcessBiasRemovalToolBox::~vistalProcessBiasRemovalToolBox(void)
 
 bool vistalProcessBiasRemovalToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("BiasRemovalFilter",
-                                                                         createVistalProcessBiasRemovalToolBox);
+    return medToolBoxFactory::instance()->registerToolBox
+                            <vistalProcessBiasRemovalToolBox>("BiasRemovalFilter",
+                                                              "Bias removal",
+                                                              "Applies bias removal filter",
+                                                              QStringList()<<"filtering");
 }
 
 
@@ -186,12 +190,12 @@ void vistalProcessBiasRemovalToolBox::run(void)
     if(!this->parent())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessBiasRemoval");
+    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("vistalProcessBiasRemoval");
 
-    if(!this->parent()->data())
+    if(!this->parentToolBox()->data())
         return;
 
-    d->process->setInput(this->parent()->data());
+    d->process->setInput(this->parentToolBox()->data());
 
     d->process->setParameter((double)d->cutoff->value(), 0);
     d->process->setParameter((double)d->bins->value(), 1);

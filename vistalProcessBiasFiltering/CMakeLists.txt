@@ -64,6 +64,12 @@ set(${PROJECT_NAME}_SOURCES
 ## Build rules
 ## #################################################################
 
+SET(BLAS_LIBRARIES "")
+
+IF (APPLE)
+  SET(BLAS_LIBRARIES "BLAS;LAPACK")
+ENDIF()
+
 qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 
 add_library(${PROJECT_NAME} SHARED
@@ -74,10 +80,11 @@ target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
   dtkCore
+  dtkLog
   medCore
   medGui
-  BLAS LAPACK
-	)
+  ${BLAS_LIBRARIES}
+)
 
 dtk_build_doc(vistalProcessBiasRemovalPlugin)
 
@@ -89,6 +96,7 @@ target_link_libraries(${PROJECT_NAME}Testing
   ${QT_LIBRARIES}
   ${VISTAL_LIBS}
   dtkCore
+  dtkLog
   medCore
   medGui
 )

@@ -6,7 +6,7 @@
 #include "vistalProcessBiasRemovalPlugin.h"
 #include "vistalProcessBiasRemovalToolBox.h"
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 // /////////////////////////////////////////////////////////////////
 // vistalProcessBiasRemovalPluginPrivate
@@ -37,10 +37,10 @@ vistalProcessBiasRemovalPlugin::~vistalProcessBiasRemovalPlugin()
 bool vistalProcessBiasRemovalPlugin::initialize(void)
 {
     if(!vistalProcessBiasRemoval::registered())
-	dtkWarning() << "Unable to register vistalProcessBiasRemoval type";
+	dtkWarn() << "Unable to register vistalProcessBiasRemoval type";
     
     if(!vistalProcessBiasRemovalToolBox::registered())
-	dtkWarning() << "Unable to register vistalProcessBiasRemoval toolbox";
+	dtkWarn() << "Unable to register vistalProcessBiasRemoval toolbox";
 
     return true;
 }

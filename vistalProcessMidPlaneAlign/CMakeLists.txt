@@ -81,6 +81,7 @@ target_link_libraries(${PROJECT_NAME}
   ${VISTAL_LIBS}
   ${ITK_LIBRARIES}
   dtkCore
+  dtkLog
   medCore
   medGui)
 
