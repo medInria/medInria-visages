@@ -21,11 +21,7 @@ class VISTALPROCESSGRAPHCUTSEGPLUGIN_EXPORT vistalProcessGraphCutSeg : public dt
 
 public:
              vistalProcessGraphCutSeg(void);
-             vistalProcessGraphCutSeg(const vistalProcessGraphCutSeg& other);
     virtual ~vistalProcessGraphCutSeg(void);
-
-public:
-    vistalProcessGraphCutSeg& operator = (const vistalProcessGraphCutSeg& other);
 
 public:
     virtual QString description(void) const;
@@ -33,8 +29,16 @@ public:
 
     static bool registered(void);
 
+public slots:
+    void setInput(dtkAbstractData *data, int channel); // mask, images
+    void setParameter(double  data, int channel); // parameters (number of input images, alpha, beta, sigma)
+    int update(void);
+    dtkAbstractData *output(void);
+
 private:
-    DTK_DECLARE_PRIVATE(vistalProcessGraphCutSeg);
+
+    vistalProcessGraphCutSegPrivate *d;
+    template <typename PixelType> void createSeparatedMasks ();
 };
 
 dtkAbstractProcess *createVistalProcessGraphCutSeg(void);

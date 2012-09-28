@@ -1,12 +1,16 @@
 #include "vistalProcessGraphCutSegToolBox.h"
+#include "vistalProcessGraphCutSeg.h"
+
+#include <dtkCore/dtkSmartPointer.h>
+#include <dtkCore/dtkAbstractData.h>
 
 #include <medToolBoxFactory.h>
+#include <medToolBoxSegmentation.h>
 #include <medToolBoxSegmentationCustom.h>
 #include <medPluginManager.h>
 #include <medDropSite.h>
 #include <medMultipleImageSelectionWidget.h>
 #include <medDatabaseModel.h>
-
 
 #include <QtGui>
 
@@ -22,11 +26,14 @@ public:
     QDoubleSpinBox *beta;
     QDoubleSpinBox *sigma;
 
-    QList<medDataIndex> selectedIndexes;
+    dtkSmartPointer<dtkAbstractData> maskData;
+    dtkSmartPointer<vistalProcessGraphCutSeg> process;
+    QList<dtkAbstractData *> imageDataList;
+    dtkSmartPointer<dtkAbstractData> outputData;
 };
 
 
-vistalProcessGraphCutSegToolBox::vistalProcessGraphCutSegToolBox(QWidget *parent) : medToolBoxSegmentationCustom, d(new vistalProcessGraphCutSegToolBoxPrivate)
+vistalProcessGraphCutSegToolBox::vistalProcessGraphCutSegToolBox(QWidget *parent) : medToolBoxSegmentationCustom(parent), d(new vistalProcessGraphCutSegToolBoxPrivate)
 {
     //Mask :
     QLabel * maskLabel = new QLabel("Drop mask");
@@ -68,6 +75,7 @@ vistalProcessGraphCutSegToolBox::vistalProcessGraphCutSegToolBox(QWidget *parent
     toolboxLayout->addWidget(d->run);
 
     // connects
+    connect(d->maskDropSite, SIGNAL(onObjectDropped(medDataIndex&)),this,SLOT(onMaskDropped(medDataIndex&)));
     connect(inputSelectionButton,SIGNAL(clicked),this,SLOT(onMultipleImageSelectionClicked()));
     connect(d->runButton, SIGNAL(clicked()), this, SLOT(run()));
 
@@ -103,9 +111,24 @@ void vistalProcessGraphCutSegToolBox::onMultipleImageSelectionClicked()
 
     d->inputImageSelection->setModel(proxy);
 
-    if(!d->inputImageSelection->exec())
-        d->selectedIndexes = d->inputImageSelection->getSelectedIndexes();
+    if(!d->inputImageSelection->exec()){
+
+        d->imageDataList.clear();
+
+        foreach(medDataIndex index,  d->inputImageSelection->getSelectedIndexes()){
+                d->imageDataList.append(dynamic_cast<dtkAbstractData *> ( (dtkAbstractData *) medDataManager::instance()->data(index)->data()) );
+        }
+    }
 }
+
+void vistalProcessGraphCutSegToolBox::onMaskDropped(medDataIndex& index)
+{
+    if (!index.isValid())
+            return;
+
+    d->maskData = medDataManager::instance()->data(index);
+}
+
 
 
 bool vistalProcessGraphCutSegToolBox::registered(void)
@@ -113,14 +136,28 @@ bool vistalProcessGraphCutSegToolBox::registered(void)
     return medToolBoxFactory::instance()->registerToolBox
                             <vistalProcessGraphCutSegToolBox>("graphcutSegmentation",
                                                             "Graph cut segmentation",
-                                                            "Applies a graph cut segementation",
+                                                            "Applies a graph cut segmentation",
                                                             QStringList()<<"segmentation");
 }
 
 void vistalProcessGraphCutSegToolBox::run()
 {
-    if (!this->segmentationToolBox())
+    if (!this->segmentationToolBox() && d->imageDataList.size() && (!d->maskData))
         return;
 
+    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("vistalProcessGraphCutSeg");
 
+    d->process->setParameter(d->imageDataList.size(),0); //first parameter : number of images
+    d->process->setParameter(d->alpha->value(),1);
+    d->process->setParameter(d->beta->value(),2);
+    d->process->setParameter(d->sigma->value(),3);
+
+    d->process->setInput( d->maskData,0); //setInput : mask then images
+
+    for(int image_nb = 1 ; image_nb <= d->imageDataList.size() ; image_nb ++)
+        d->process->setInput( d->maskData, image_nb);
+
+    this->segmentationToolBox()->run( d->process );
+
+    d->outputData = d->process->output();
 }

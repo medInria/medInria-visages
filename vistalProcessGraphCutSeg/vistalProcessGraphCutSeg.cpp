@@ -4,64 +4,55 @@
 
 #include "vistalProcessGraphCutSeg.h"
 
+#include "itkImage.h"
+#include "itkImageRegionIterator.h"
+
 #include <dtkCore/dtkAbstractProcessFactory.h>
-#include <dtkCore/dtkAbstractProcess_p.h>
+#include <dtkCore/dtkSmartPointer.h>
+
+#include "GraphCut_class.hh"
 
 // /////////////////////////////////////////////////////////////////
-// vistalProcessGraphCutSegPrivate interface
+// vistalProcessGraphCutSegPrivate
 // /////////////////////////////////////////////////////////////////
 
-class vistalProcessGraphCutSegPrivate : public dtkAbstractProcessPrivate
+class vistalProcessGraphCutSegPrivate
 {
-public:
-    vistalProcessGraphCutSegPrivate(vistalProcessGraphCutSeg *q = 0) : dtkAbstractProcessPrivate(q) {}
-    vistalProcessGraphCutSegPrivate(const vistalProcessGraphCutSegPrivate& other) : dtkAbstractProcessPrivate(other) {} // Complete copy ctror with your local members.
 
 public:
-    ~vistalProcessGraphCutSegPrivate(void) {}
 
-public:
-    // private members are put here, eg
-    // int index;
+    int image_count;
+
+    QList<dtkAbstractData *> images;
+    dtkSmartPointer<dtkAbstractData> mask;
+
+    dtkSmartPointer<dtkAbstractData> mask_inside;
+    dtkSmartPointer<dtkAbstractData> mask_outside;
+
+    double alpha;
+    double beta;
+    double sigma;
 };
 
 ////////////////////////////////////////////////////
-// vistalProcessGraphCutSeg protected constructors
+// vistalProcessGraphCutSeg
 ////////////////////////////////////////////////////
 
-DTK_IMPLEMENT_PRIVATE(vistalProcessGraphCutSeg, dtkAbstractProcess);
-
-// /////////////////////////////////////////////////////////////////
-// vistalProcessGraphCutSeg implementation
-// /////////////////////////////////////////////////////////////////
-
-vistalProcessGraphCutSeg::vistalProcessGraphCutSeg(void) : dtkAbstractProcess(*new vistalProcessGraphCutSegPrivate(this), 0)
+vistalProcessGraphCutSeg::vistalProcessGraphCutSeg(void) : dtkAbstractProcess(), d(new vistalProcessGraphCutSegPrivate)
 {
+    d->image_count = 0;
 
-}
-
-vistalProcessGraphCutSeg::vistalProcessGraphCutSeg(const vistalProcessGraphCutSeg& other) : dtkAbstractProcess(*new vistalProcessGraphCutSegPrivate(*other.d_func()), other)
-{
-
+    d->alpha = 1;
+    d->beta = 0;
+    d->sigma = 0.6;
 }
 
 vistalProcessGraphCutSeg::~vistalProcessGraphCutSeg(void)
 {
-
+    delete d;
+    d = NULL;
 }
 
-vistalProcessGraphCutSeg& vistalProcessGraphCutSeg::operator = (const vistalProcessGraphCutSeg& other)
-{
-    dtkAbstractProcess::operator=(other);
-
-    // Complete here with respect to your local d-pointer as follows:
-    //
-    // DTK_D(vistalProcessGraphCutSeg);
-    //
-    // d->index = other.d_func()->index;
-
-    return *this;
-}
 
 bool vistalProcessGraphCutSeg::registered(void)
 {
@@ -70,13 +61,172 @@ bool vistalProcessGraphCutSeg::registered(void)
 
 QString vistalProcessGraphCutSeg::description(void) const
 {
-    return "vistalProcessGraphCutSeg";
+    return "GraphCut Segmentation Process";
 }
 
 QString vistalProcessGraphCutSeg::identifier(void) const
 {
     return "vistalProcessGraphCutSeg";
 }
+
+void vistalProcessGraphCutSeg::setInput(dtkAbstractData *data, int channel)
+{
+        if(!d->image_count)
+            return;
+
+        switch (channel){
+
+            case 0:
+                d->mask = data->convert("vistalDataImageChar3");
+                if (!d->mask)
+                    qDebug() << "DEBUG : vistalProcessGraphCutSeg::setInput(.) mask input conversion failed";
+                    return;
+
+                break;
+            case 1:
+                dtkSmartPointer<dtkAbstractData> image = data->convert("vistalDataImageFloat3");
+                if(!image)
+                    qDebug() << "DEBUG : vistalProcessGraphCutSeg::setInput(.) image input conversion failed";
+                    return;
+                d->images.append(data);
+                break;
+        }
+}
+
+void vistalProcessGraphCutSeg::setParameter(double data, int channel)
+{
+    switch (channel){
+
+        case 0:
+            d->image_count = (int) data;
+            break;
+        case 1:
+            d->alpha = data;
+            break;
+        case 2:
+            d->beta = data;
+            break;
+        case 3:
+            d->sigma = data;
+            break;
+        default:
+            return;
+    }
+}
+
+int vistalProcessGraphCutSeg::update(void)
+{
+    if(!d->mask && (d->image_count != d->images.size() ))
+        return -1;
+
+    createSeparatedMask <char> ();
+    createSeparatedMask <unsigned char> ();
+    createSeparatedMask <short> ();
+    createSeparatedMask <unsigned short> ();
+    createSeparatedMask <int> ();
+    createSeparatedMask <unsigned int> ();
+    createSeparatedMask <long> ();
+    createSeparatedMask <unsigned long> ();
+    createSeparatedMask <float> ();
+    createSeparatedMask <double> ();
+
+    d->input = data->convert("vistalDataImageDouble3");
+
+        if (!d->input)
+          return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+template <typename PixelType>
+    void vistalProcessGraphCutSeg::createSeparatedMask (void)
+    {
+        typedef itk::Image< PixelType, 3 > ImageType;
+
+        ImageType *tmpPtr = dynamic_cast<ImageType *> ((itk::Object*)(d->mask->data()));
+
+        if(!tmpPtr)
+            return;
+
+        typedef itk::Image< unsigned char, 3 > OutputMaskType;
+
+        OutputMaskType::Pointer maskInsideData = OutputMaskType::New();
+
+        maskInsideData->Initialize();
+        maskInsideData->SetRegions(tmpPtr->GetLargestPossibleRegion() );
+        maskInsideData->SetOrigin( tmpPtr->GetOrigin() );
+        maskInsideData->SetSpacing( tmpPtr->GetSpacing() );
+        maskInsideData->SetDirection( tmpPtr->GetDirection() );
+        maskInsideData->Allocate();
+
+        OutputMaskType::Pointer maskOutsideData = OutputMaskType::New();
+
+        maskOutsideData->Initialize();
+        maskOutsideData->SetRegions(tmpPtr->GetLargestPossibleRegion() );
+        maskOutsideData->SetOrigin( tmpPtr->GetOrigin() );
+        maskOutsideData->SetSpacing( tmpPtr->GetSpacing() );
+        maskOutsideData->SetDirection( tmpPtr->GetDirection() );
+        maskOutsideData->Allocate();
+
+        typedef itk::ImageRegionIterator<ImageType> MaskIteratorType;
+
+        typedef itk::ImageRegionIterator<OutputMaskType> OutputMaskIteratorType;
+
+        MaskIteratorType maskIterator(tmpPtr,tmpPtr->GetLargestPossibleRegion());
+
+        OutputMaskIteratorType insideMaskIterator(maskInsideData, maskInsideData->GetLargestPossibleRegion());
+
+        OutputMaskIteratorType outsideMaskIterator(maskOutsideData, maskOutsideData->GetLargestPossibleRegion());
+
+        while(!maskIterator.IsAtEnd()){
+
+            insideMaskIterator.Set(0);
+            outsideMaskIterator.Set(0);
+
+            if(maskIterator.Get() == 1)
+                insideMaskIterator.Set(1);
+
+            else if (maskIterator.Get() == 2)
+                outsideMaskIterator.Set(1);
+
+            ++maskIterator;
+            ++insideMaskIterator;
+            ++outsideMaskIterator;
+        }
+
+        /*
+        if(!d->mask_inside)
+            d->mask_inside = dtkAbstractDataFactory::instance()->createSmartPointer("vistalDataImageChar3");
+
+        if(!d->mask_outside)
+            d->mask_outside = dtkAbstractDataFactory::instance()->createSmartPointer("vistalDataImageChar3");
+        */
+
+        dtkSmartPointer<dtkAbstractData> tempMaskInside = dtkAbstractDataFactory::instance()->createSmartPointer("itkDataImageUChar3");
+
+        dtkSmartPointer<dtkAbstractData> tempMaskOutside = dtkAbstractDataFactory::instance()->createSmartPointer("itkDataImageUChar3");
+
+        tempMaskInside->setData(maskInsideData);
+
+        tempMaskOutside->setData(maskOutsideData);
+
+        d->mask_inside = tempMaskInside->convert("vistalDataImageChar3");
+
+        d->mask_outside = tempMaskOutside->convert("vistalDataImageChar3");
+    }
 
 // /////////////////////////////////////////////////////////////////
 // Type instantiation
