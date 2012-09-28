@@ -130,10 +130,20 @@ int vistalProcessGraphCutSeg::update(void)
     createSeparatedMask <float> ();
     createSeparatedMask <double> ();
 
-    d->input = data->convert("vistalDataImageDouble3");
+    if (!d->input){
+        qDebug() << "DEBUG : method update() : d->input is NULL";
+        return -1;
+    }
 
-        if (!d->input)
-          return;
+    vistal::GraphCuts<double> *graphcuts = new vistal::GraphCuts<double>;
+
+    if(graphcuts == NULL)
+        return -1;
+
+    for(int i = 0 ; i < d->images.size() ; i++)
+    {
+        graphcuts->setInput(static_cast<vistal::Image3D<float> * > (d->images[i]->data()));
+    }
 
 
 
@@ -141,8 +151,7 @@ int vistalProcessGraphCutSeg::update(void)
 
 
 
-
-
+    delete graphcuts;
 
 
 
