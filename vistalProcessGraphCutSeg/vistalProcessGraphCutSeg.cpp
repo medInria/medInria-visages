@@ -4,11 +4,13 @@
 
 #include "vistalProcessGraphCutSeg.h"
 
-#include "itkImage.h"
-#include "itkImageRegionIterator.h"
+#include <itkImage.h>
+#include <itkImageRegionIterator.h>
 
 #include <dtkCore/dtkAbstractProcessFactory.h>
 #include <dtkCore/dtkSmartPointer.h>
+#include <dtkCore/dtkAbstractData.h>
+#include <dtkCore/dtkAbstractDataFactory.h>
 
 #include "GraphCut_class.hh"
 
@@ -25,6 +27,7 @@ public:
 
     QList<dtkAbstractData *> images;
     dtkSmartPointer<dtkAbstractData> mask;
+    dtkSmartPointer<dtkAbstractData> output;
 
     dtkSmartPointer<dtkAbstractData> mask_inside;
     dtkSmartPointer<dtkAbstractData> mask_outside;
@@ -119,23 +122,23 @@ int vistalProcessGraphCutSeg::update(void)
     if(!d->mask && (d->image_count != d->images.size() ))
         return -1;
 
-    createSeparatedMask <char> ();
-    createSeparatedMask <unsigned char> ();
-    createSeparatedMask <short> ();
-    createSeparatedMask <unsigned short> ();
-    createSeparatedMask <int> ();
-    createSeparatedMask <unsigned int> ();
-    createSeparatedMask <long> ();
-    createSeparatedMask <unsigned long> ();
-    createSeparatedMask <float> ();
-    createSeparatedMask <double> ();
+    createSeparatedMasks <char> ();
+    createSeparatedMasks <unsigned char> ();
+    createSeparatedMasks <short> ();
+    createSeparatedMasks <unsigned short> ();
+    createSeparatedMasks <int> ();
+    createSeparatedMasks <unsigned int> ();
+    createSeparatedMasks <long> ();
+    createSeparatedMasks <unsigned long> ();
+    createSeparatedMasks <float> ();
+    createSeparatedMasks <double> ();
 
-    if (!d->input){
-        qDebug() << "DEBUG : method update() : d->input is NULL";
+    if (!d->images[0]){
+        qDebug() << "DEBUG : method update() : d->images[0] is NULL";
         return -1;
     }
 
-    vistal::GraphCuts<double> *graphcuts = new vistal::GraphCuts<double>;
+    vistal::GraphCuts *graphcuts = new vistal::GraphCuts;
 
     if(graphcuts == NULL)
         return -1;
@@ -144,24 +147,21 @@ int vistalProcessGraphCutSeg::update(void)
     {
         graphcuts->setInput(static_cast<vistal::Image3D<float> * > (d->images[i]->data()));
     }
-
-
-
-
-
-
+    
+    // Do real stuff here
 
     delete graphcuts;
+    
+    return 0;
+}
 
-
-
-
-
-
+dtkAbstractData * vistalProcessGraphCutSeg::output(void)
+{	
+	return d->output;
 }
 
 template <typename PixelType>
-    void vistalProcessGraphCutSeg::createSeparatedMask (void)
+    void vistalProcessGraphCutSeg::createSeparatedMasks (void)
     {
         typedef itk::Image< PixelType, 3 > ImageType;
 

@@ -34,12 +34,16 @@ include(${dtk_USE_FILE})
 include(dtkPlugin)
 
 # vistal (pulls in boost as well)
-#find_package(Vistal REQUIRED)
-#include(${VISTAL_USE_FILE})
+find_package(Vistal REQUIRED)
+include(${VISTAL_USE_FILE})
 
 # medInria
 find_package(medInria REQUIRED)
 include(${medInria_USE_FILE})
+
+# ITK
+find_package(ITK REQUIRED)
+include(${ITK_USE_FILE})
 
 ## #################################################################
 ## Input
@@ -78,7 +82,10 @@ target_link_libraries(${PROJECT_NAME}
   dtkCore
   dtkLog
   medCore
-  medGui)
+  medGui
+  medSql
+  ITKCommon
+  graphcut)
 
 dtk_build_doc(vistalProcessGraphCutSegPlugin)
 

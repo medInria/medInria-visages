@@ -80,6 +80,7 @@ option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessB
 option(MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN     "Build animaSymmetryPlane plugin" "OFF")
 option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "OFF")
 option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-PyramidalBMRegistration plugin" "OFF")
+option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN     "Build vistalProcessGraphCutSeg plugin" "OFF")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 
@@ -121,6 +122,10 @@ endif()
 
 if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN)
     subdirs(vistalProcessSegmentationSTREM)
+endif()
+
+if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN)
+        subdirs(vistalProcessGraphCutSeg)
 endif()
 
 if (MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN)

@@ -2,6 +2,7 @@
 #define VISTALPROCESSGRAPHCUTSEGTOOLBOX_H
 
 #include <medToolBoxSegmentationCustom.h>
+#include <medDataIndex.h>
 
 class vistalProcessGraphCutSegToolBoxPrivate;
 

@@ -3,6 +3,7 @@
 
 #include <dtkCore/dtkSmartPointer.h>
 #include <dtkCore/dtkAbstractData.h>
+#include <dtkCore/dtkAbstractProcessFactory.h>
 
 #include <medToolBoxFactory.h>
 #include <medToolBoxSegmentation.h>
@@ -10,7 +11,9 @@
 #include <medPluginManager.h>
 #include <medDropSite.h>
 #include <medMultipleImageSelectionWidget.h>
+#include <medDataManager.h>
 #include <medDatabaseModel.h>
+#include <medDatabaseProxyModel.h>
 
 #include <QtGui>
 
@@ -68,11 +71,11 @@ vistalProcessGraphCutSegToolBox::vistalProcessGraphCutSegToolBox(QWidget *parent
     // layout, this->Widget ...
     QVBoxLayout *toolboxLayout = new QVBoxLayout();
     toolboxLayout->addLayout(maskBoxLayout);
-    toolboxLayout->addWidget(imagesBoxLayout);
+    toolboxLayout->addLayout(imagesBoxLayout);
     toolboxLayout->addWidget(d->alpha);
     toolboxLayout->addWidget(d->beta);
     toolboxLayout->addWidget(d->sigma);
-    toolboxLayout->addWidget(d->run);
+    toolboxLayout->addWidget(d->runButton);
 
     // connects
     connect(d->maskDropSite, SIGNAL(onObjectDropped(medDataIndex&)),this,SLOT(onMaskDropped(medDataIndex&)));
@@ -99,7 +102,7 @@ vistalProcessGraphCutSegToolBox::~vistalProcessGraphCutSegToolBox()
 
 void vistalProcessGraphCutSegToolBox::onMultipleImageSelectionClicked()
 {
-    d->inputImageSelection = new medMultipleImageSelectionWidget(d->selectedIndexes, this);
+    d->inputImageSelection = new medMultipleImageSelectionWidget(QList<medDataIndex>(), this);
 
     bool justBringStudies = true;
 
@@ -136,7 +139,7 @@ bool vistalProcessGraphCutSegToolBox::registered(void)
     return medToolBoxFactory::instance()->registerToolBox
                             <vistalProcessGraphCutSegToolBox>("graphcutSegmentation",
                                                             "Graph cut segmentation",
-                                                            "Applies a graph cut segmentation",
+                                                            "Computes a graph cut segmentation",
                                                             QStringList()<<"segmentation");
 }
 

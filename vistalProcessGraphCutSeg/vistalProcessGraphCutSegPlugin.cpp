@@ -3,6 +3,7 @@
 // /////////////////////////////////////////////////////////////////
 
 #include "vistalProcessGraphCutSeg.h"
+#include "vistalProcessGraphCutSegToolBox.h"
 #include "vistalProcessGraphCutSegPlugin.h"
 
 #include <dtkCore/dtkPlugin_p.h>
