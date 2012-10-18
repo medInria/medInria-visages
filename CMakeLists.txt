@@ -72,7 +72,7 @@ option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProc
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSMIDPLANE_ALIGN_PLUGIN     "Build vistalProcessMidPlaneAlign plugin" "OFF")
-option(MEDINRIA_BUILD_ANIMANONLOCALMEANS_FILTER_PLUGIN     "Build animaNonLocalMeans filter plugin" "OFF")
+option(MEDINRIA_BUILD_ANIMA-NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "OFF")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 
@@ -126,7 +126,7 @@ if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN)
     subdirs(vistalProcessSegmentationSTREM)
 endif()
 
-if (MEDINRIA_BUILD_ANIMANONLOCALMEANS_FILTER_PLUGIN)
+if (MEDINRIA_BUILD_ANIMA-NONLOCALMEANSFILTER_PLUGIN)
     subdirs(animaNonLocalMeansFilter)
 endif()
 

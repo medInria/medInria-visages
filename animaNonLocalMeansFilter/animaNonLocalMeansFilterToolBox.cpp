@@ -3,8 +3,8 @@
 // /////////////////////////////////////////////////////////////////
 
 
-#include "medtkNLMeansDiffusion.h"
-#include "medtkNLMeansDiffusionToolBox.h"
+#include "animaNonLocalMeansFilter.h"
+#include "animaNonLocalMeansFilterToolBox.h"
 
 #include <QtGui>
 
@@ -25,7 +25,7 @@
 #include <medToolBoxFiltering.h>
 #include <medProgressionStack.h>
 
-class medtkNLMeansDiffusionToolBoxPrivate
+class animaNonLocalMeansFilterToolBoxPrivate
 {
 public:
     QSpinBox *patchHalfSize;
@@ -36,8 +36,9 @@ public:
     QDoubleSpinBox *meanMinThreshold;
     QDoubleSpinBox *varMinThreshold;
     QSpinBox *nbThread;
-    QComboBox *mode;
     QComboBox *weightedMerthod;
+    QRadioButton *notTemporalImage;
+    QButtonGroup *temporalImageGroup;
 
 
     dtkSmartPointer <dtkAbstractProcess> process;
@@ -45,7 +46,7 @@ public:
 
 };
 
-medtkNLMeansDiffusionToolBox::medtkNLMeansDiffusionToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new medtkNLMeansDiffusionToolBoxPrivate)
+animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new animaNonLocalMeansFilterToolBoxPrivate)
 {
 
     // Parameters:
@@ -87,18 +88,22 @@ medtkNLMeansDiffusionToolBox::medtkNLMeansDiffusionToolBox(QWidget *parent) : me
     d->nbThread->setValue(4);
     parametersLayout->addRow(tr("Number of Thread : "), d->nbThread);
 
-    d->mode = new QComboBox();
-    QStringList modes;
-    modes << "SINGLE" << "MULTI";
-    d->mode->addItems(modes);
-    parametersLayout->addRow(tr("Mode : "), d->mode);
-
     d->weightedMerthod = new QComboBox();
     QStringList weightedMerthods;
     weightedMerthods << "EXP" << "RICIAN";
     d->weightedMerthod->addItems(weightedMerthods);
     parametersLayout->addRow(tr("Weighted Methode : "), d->weightedMerthod);
 
+    d->temporalImageGroup = new QButtonGroup();
+    QRadioButton *notTemporalImage = new QRadioButton(tr("No"));
+    QRadioButton *temporalImage = new QRadioButton(tr("Yes"));
+    d->temporalImageGroup->addButton(notTemporalImage);
+    d->temporalImageGroup->addButton(temporalImage);
+
+    QVBoxLayout *temporalLayout = new QVBoxLayout();
+    temporalLayout->addWidget(notTemporalImage);
+    temporalLayout->addWidget(temporalImage);
+    parametersLayout->addRow(tr("Image has a temporal dimension : "), temporalLayout);
 
 
     QGroupBox *groupParameters = new QGroupBox("Mandatory");
@@ -122,30 +127,30 @@ medtkNLMeansDiffusionToolBox::medtkNLMeansDiffusionToolBox(QWidget *parent) : me
     widget->setLayout(mainLayout);
     this->addWidget(widget);
 
-    this->setTitle("medtkNLMeansDiffusion");
+    this->setTitle("animaNonLocalMeansFilter");
 
     connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
 
 }
 
-medtkNLMeansDiffusionToolBox::~medtkNLMeansDiffusionToolBox(void)
+animaNonLocalMeansFilterToolBox::~animaNonLocalMeansFilterToolBox(void)
 {
     delete d;
 
     d = NULL;
 }
 
-bool medtkNLMeansDiffusionToolBox::registered(void)
+bool animaNonLocalMeansFilterToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->
-    registerToolBox<medtkNLMeansDiffusionToolBox>("medtkNLMeansDiffusionToolBox",
-                               tr("NL means Diffusion Denoising"),
-                               tr("Applies a Non Local Means Diffusion Denoising"),
+    registerToolBox<animaNonLocalMeansFilterToolBox>("animaNonLocalMeansFilterToolBox",
+                               tr("Non local means denoising filter"),
+                               tr("Applies a non local means denoising filter"),
                                QStringList()<< "filtering");
 }
 
-dtkAbstractData* medtkNLMeansDiffusionToolBox::processOutput(void)
+dtkAbstractData* animaNonLocalMeansFilterToolBox::processOutput(void)
 {
     if(!d->process)
         return NULL;
@@ -153,12 +158,12 @@ dtkAbstractData* medtkNLMeansDiffusionToolBox::processOutput(void)
     return d->process->output();
 }
 
-void medtkNLMeansDiffusionToolBox::run(void)
+void animaNonLocalMeansFilterToolBox::run(void)
 {
     if(!this->parentToolBox())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("medtkNLMeansDiffusion");
+    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("animaNonLocalMeansFilter");
 
     if(!this->parentToolBox()->data())
         return;
@@ -177,10 +182,8 @@ void medtkNLMeansDiffusionToolBox::run(void)
     d->process->setParameter(d->meanMinThreshold->value(), 5);
     d->process->setParameter(d->varMinThreshold->value(), 6);
     d->process->setParameter(double(d->nbThread->value()), 7);
-    d->process->setParameter(double(d->mode->currentIndex()), 8);
-    d->process->setParameter(double(d->weightedMerthod->currentIndex()), 9);
-
-
+    d->process->setParameter(double(d->weightedMerthod->currentIndex()), 8);
+    d->process->setParameter(double(d->temporalImageGroup->checkedId()), 9);
     d->progression_stack->addJobItem(runProcess, "Progress:");
 
     d->progression_stack->disableCancel(runProcess);
