@@ -21,7 +21,7 @@ public:
 
 private slots:
     void onMultipleImageSelectionClicked();
-    void onMaskDropped(medDataIndex& index);
+    void onMaskDropped(const medDataIndex& index);
     void run();
 
 private:

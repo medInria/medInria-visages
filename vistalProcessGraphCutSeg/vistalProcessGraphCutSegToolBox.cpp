@@ -31,7 +31,7 @@ public:
 
     dtkSmartPointer<dtkAbstractData> maskData;
     dtkSmartPointer<vistalProcessGraphCutSeg> process;
-    QList<dtkAbstractData *> imageDataList;
+    QList< dtkSmartPointer<dtkAbstractData> > imageDataList;
     dtkSmartPointer<dtkAbstractData> outputData;
 };
 
@@ -78,11 +78,12 @@ vistalProcessGraphCutSegToolBox::vistalProcessGraphCutSegToolBox(QWidget *parent
     toolboxLayout->addWidget(d->runButton);
 
     // connects
-    connect(d->maskDropSite, SIGNAL(onObjectDropped(medDataIndex&)),this,SLOT(onMaskDropped(medDataIndex&)));
-    connect(inputSelectionButton,SIGNAL(clicked),this,SLOT(onMultipleImageSelectionClicked()));
+    connect(d->maskDropSite, SIGNAL(objectDropped(const medDataIndex &)),this,SLOT(onMaskDropped(const medDataIndex &)));
+    connect(inputSelectionButton,SIGNAL(clicked()),this,SLOT(onMultipleImageSelectionClicked()));
     connect(d->runButton, SIGNAL(clicked()), this, SLOT(run()));
 
     QWidget *widget = new QWidget(this);
+    widget->setLayout(toolboxLayout);
     this->setTitle("Graph Cuts : settings");
     this->addWidget(widget);
 
@@ -114,17 +115,17 @@ void vistalProcessGraphCutSegToolBox::onMultipleImageSelectionClicked()
 
     d->inputImageSelection->setModel(proxy);
 
-    if(!d->inputImageSelection->exec()){
+    if(d->inputImageSelection->exec()){
 
         d->imageDataList.clear();
 
         foreach(medDataIndex index,  d->inputImageSelection->getSelectedIndexes()){
-                d->imageDataList.append(dynamic_cast<dtkAbstractData *> ( (dtkAbstractData *) medDataManager::instance()->data(index)->data()) );
+                d->imageDataList.append(medDataManager::instance()->data(index));
         }
     }
 }
 
-void vistalProcessGraphCutSegToolBox::onMaskDropped(medDataIndex& index)
+void vistalProcessGraphCutSegToolBox::onMaskDropped(const medDataIndex& index)
 {
     if (!index.isValid())
             return;
@@ -157,8 +158,9 @@ void vistalProcessGraphCutSegToolBox::run()
 
     d->process->setInput( d->maskData,0); //setInput : mask then images
 
-    for(int image_nb = 1 ; image_nb <= d->imageDataList.size() ; image_nb ++)
-        d->process->setInput( d->maskData, image_nb);
+    qDebug() << d->imageDataList.size();
+    for(int image_nb = 0 ; image_nb < d->imageDataList.size() ; image_nb ++)
+        d->process->setInput(d->imageDataList[image_nb], 1);
 
     this->segmentationToolBox()->run( d->process );
 

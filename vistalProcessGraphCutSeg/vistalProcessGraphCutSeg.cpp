@@ -80,18 +80,14 @@ void vistalProcessGraphCutSeg::setInput(dtkAbstractData *data, int channel)
         switch (channel){
 
             case 0:
-                d->mask = data->convert("vistalDataImageChar3");
+                d->mask = data;
                 if (!d->mask)
                     qDebug() << "DEBUG : vistalProcessGraphCutSeg::setInput(.) mask input conversion failed";
                     return;
 
                 break;
             case 1:
-                dtkSmartPointer<dtkAbstractData> image = data->convert("vistalDataImageFloat3");
-                if(!image)
-                    qDebug() << "DEBUG : vistalProcessGraphCutSeg::setInput(.) image input conversion failed";
-                    return;
-                d->images.append(data);
+                d->images.append(data->convert("vistalDataImageFloat3"));
                 break;
         }
 }
@@ -119,9 +115,12 @@ void vistalProcessGraphCutSeg::setParameter(double data, int channel)
 
 int vistalProcessGraphCutSeg::update(void)
 {
-    if(!d->mask && (d->image_count != d->images.size() ))
+    if((!d->mask) || (d->image_count != d->images.size() ))
+    {
+        qDebug() << "No mask or not the right number of images" << d->image_count << d->images.size();
         return -1;
-
+    }
+    
     createSeparatedMasks <char> ();
     createSeparatedMasks <unsigned char> ();
     createSeparatedMasks <short> ();
@@ -149,6 +148,26 @@ int vistalProcessGraphCutSeg::update(void)
     }
     
     // Do real stuff here
+    
+    qDebug() << ((static_cast<vistal::Image3D<unsigned char> * > (d->mask_inside->data())) == NULL);
+    qDebug() << ((static_cast<vistal::Image3D<unsigned char> * > (d->mask_outside->data())) == NULL);
+    
+    graphcuts->setTarget(static_cast<vistal::Image3D<unsigned char> * > (d->mask_inside->data()));
+    graphcuts->setSink(static_cast<vistal::Image3D<unsigned char> * > (d->mask_outside->data()));
+    
+    graphcuts->setTLinkMode(vistal::Tlinks::Density);
+    graphcuts->useSpectralGradient(false);
+    
+    graphcuts->setAlpha(d->alpha);
+    graphcuts->setBeta(d->beta);
+    graphcuts->setSigma(d->sigma);
+    
+    graphcuts->run();
+    
+    vistal::Image3D<unsigned char> *output = new vistal::Image3D<unsigned char> (*(graphcuts->getOutput()));
+    
+    d->output = dtkAbstractDataFactory::instance()->createSmartPointer("vistalDataImageUChar3");
+    d->output->setData(output);
 
     delete graphcuts;
     
@@ -232,9 +251,9 @@ template <typename PixelType>
 
         tempMaskOutside->setData(maskOutsideData);
 
-        d->mask_inside = tempMaskInside->convert("vistalDataImageChar3");
+        d->mask_inside = tempMaskInside->convert("vistalDataImageUChar3");
 
-        d->mask_outside = tempMaskOutside->convert("vistalDataImageChar3");
+        d->mask_outside = tempMaskOutside->convert("vistalDataImageUChar3");
     }
 
 // /////////////////////////////////////////////////////////////////
