@@ -28,6 +28,10 @@
 class animaNonLocalMeansFilterToolBoxPrivate
 {
 public:
+
+    QLabel *dataTypeValue;
+    QLabel *dataDimensionValue;
+
     QSpinBox *patchHalfSize;
     QSpinBox *searchNeighborhood;
     QSpinBox *searchStepSize;
@@ -37,7 +41,7 @@ public:
     QDoubleSpinBox *varMinThreshold;
     QSpinBox *nbThread;
     QComboBox *weightedMerthod;
-    QRadioButton *notTemporalImage;
+    QRadioButton *temporalImage;
     QButtonGroup *temporalImageGroup;
 
 
@@ -55,17 +59,18 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
 
     d->patchHalfSize = new QSpinBox();
     d->patchHalfSize->setValue(3);
-    d->patchHalfSize->setRange(0, 100);
+    d->patchHalfSize->setRange(1, 10);
     parametersLayout->addRow(tr("Patch half size : "), d->patchHalfSize);
 
     d->searchNeighborhood = new QSpinBox();
     d->searchNeighborhood->setValue(6);
-    d->searchNeighborhood->setRange(0, 100);
+    d->searchNeighborhood->setRange(1, 20);
+    d->searchNeighborhood->setMinimum(1);
     parametersLayout->addRow(tr("Patch search neighborhood size : "), d->searchNeighborhood);
 
     d->searchStepSize = new QSpinBox();
     d->searchStepSize->setValue(3);
-    d->searchStepSize->setRange(0, 100);
+    d->searchStepSize->setRange(1, 10);
     parametersLayout->addRow(tr("Patch search step size : "), d->searchStepSize);
 
     d->weightThreshold = new QDoubleSpinBox();
@@ -86,6 +91,7 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
 
     d->nbThread = new QSpinBox();
     d->nbThread->setValue(4);
+    d->nbThread->setRange(1, 20);
     parametersLayout->addRow(tr("Number of Thread : "), d->nbThread);
 
     d->weightedMerthod = new QComboBox();
@@ -96,13 +102,18 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
 
     d->temporalImageGroup = new QButtonGroup();
     QRadioButton *notTemporalImage = new QRadioButton(tr("No"));
-    QRadioButton *temporalImage = new QRadioButton(tr("Yes"));
+    d->temporalImage = new QRadioButton(tr("Yes"));
+
     d->temporalImageGroup->addButton(notTemporalImage);
-    d->temporalImageGroup->addButton(temporalImage);
+    d->temporalImageGroup->setId(notTemporalImage, 0);
+    notTemporalImage->setChecked(true);
+
+    d->temporalImageGroup->addButton(d->temporalImage);
+    d->temporalImageGroup->setId(d->temporalImage, 1);
 
     QVBoxLayout *temporalLayout = new QVBoxLayout();
     temporalLayout->addWidget(notTemporalImage);
-    temporalLayout->addWidget(temporalImage);
+    temporalLayout->addWidget(d->temporalImage);
     parametersLayout->addRow(tr("Image has a temporal dimension : "), temporalLayout);
 
 
@@ -118,8 +129,22 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
     QPushButton *runButton = new QPushButton(tr("Run"), this);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
+
+    QLabel * dataTypeLabel = new QLabel (tr("Data type : "));
+    d->dataTypeValue = new QLabel(tr("Unknow"));
+    QHBoxLayout * dataTypeLayout = new QHBoxLayout;
+    dataTypeLayout->addWidget (dataTypeLabel);
+    dataTypeLayout->addWidget (d->dataTypeValue);
+
+    QLabel * dataDimensionLabel = new QLabel (tr("Data dimension : "));
+    d->dataDimensionValue = new QLabel(tr("Unknow"));
+    QHBoxLayout * dataDimensionLayout = new QHBoxLayout;
+    dataDimensionLayout->addWidget (dataDimensionLabel);
+    dataDimensionLayout->addWidget (d->dataDimensionValue);
+
+    mainLayout->addLayout(dataTypeLayout);
+    mainLayout->addLayout(dataDimensionLayout);
     mainLayout->addWidget(groupParameters);
-    //mainLayout->addWidget(groupOptions);
     mainLayout->addWidget(runButton);
     mainLayout->addLayout(progressStackLayout);
 
@@ -197,6 +222,85 @@ void animaNonLocalMeansFilterToolBox::run(void)
 
     medJobManager::instance()->registerJobItem(runProcess);
     QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
+}
+
+void animaNonLocalMeansFilterToolBox::update ( dtkAbstractView* view )
+{
+    if ( !view )
+    {
+        clear();
+    }
+    else
+    {
+        if ( !this->parentToolBox()->data() )
+        {
+            return;
+        }
+
+        QString identifier = this->parentToolBox()->data()->identifier();
+
+        unsigned int nbDimension =(*(identifier.end() - 1)).digitValue();
+        d->dataDimensionValue->setText(QString::number(nbDimension));
+        if (nbDimension == 4)
+        {
+            d->temporalImage->setChecked(true);
+        }
+        else if (nbDimension != 2 || nbDimension != 3 )
+        {
+            qWarning() << "Error : pixel type not yet implemented ("
+            << identifier
+            << ")";
+        }
+
+        identifier.truncate(identifier.size() - 1);
+
+        if ( identifier == "itkDataImageChar" )
+        {
+            d->dataTypeValue->setText ( "Char" );
+        }
+        else if ( identifier == "itkDataImageUChar" )
+        {
+            d->dataTypeValue->setText ( "Unsigned char" );
+        }
+        else if ( identifier == "itkDataImageShort" )
+        {
+            d->dataTypeValue->setText ( "Short" );
+        }
+        else if ( identifier == "itkDataImageUShort" )
+        {
+            d->dataTypeValue->setText ( "Unsigned short" );
+        }
+        else if ( identifier == "itkDataImageInt" )
+        {
+            d->dataTypeValue->setText ( "Int" );
+        }
+        else if ( identifier == "itkDataImageUInt" )
+        {
+            d->dataTypeValue->setText ( "Unsigned int" );
+        }
+        else if ( identifier == "itkDataImageLong" )
+        {
+            d->dataTypeValue->setText ( "Long" );
+        }
+        else if ( identifier == "itkDataImageULong" )
+        {
+            d->dataTypeValue->setText ( "Unsigned long" );
+        }
+        else if ( identifier == "itkDataImageFloat" )
+        {
+            d->dataTypeValue->setText ( "Float" );
+        }
+        else if ( identifier == "itkDataImageDouble" )
+        {
+            d->dataTypeValue->setText ( "Double" );
+        }
+        else
+        {
+            qWarning() << "Error : pixel type not yet implemented ("
+            << identifier
+            << ")";
+        }
+    }
 }
 
 

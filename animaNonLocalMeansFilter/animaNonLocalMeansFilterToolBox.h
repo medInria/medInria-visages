@@ -28,6 +28,7 @@ signals:
 
     public slots:
     void run(void);
+    void update(dtkAbstractView *view);
 
 private:
     animaNonLocalMeansFilterToolBoxPrivate *d;

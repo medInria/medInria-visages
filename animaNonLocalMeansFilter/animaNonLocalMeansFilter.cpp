@@ -11,6 +11,8 @@
 #include <dtkCore/dtkAbstractData.h>
 #include <dtkCore/dtkAbstractProcess.h>
 
+#include <medMetaDataKeys.h>
+
 #include <itkImageFileWriter.h>
 #include <itkNonLocalMeansImageFilter.h>
 #include <itkNonLocalMeansTemporalImageFilter.h>
@@ -83,7 +85,7 @@ void animaNonLocalMeansFilter::setInput ( dtkAbstractData *data )
     if ( !data )
         return;
 
-    QString identifier = "itkDataImageFloat3";
+    QString identifier = data->identifier();
 
     d->output = dtkAbstractDataFactory::instance()->createSmartPointer ( identifier );
 
@@ -138,90 +140,184 @@ int animaNonLocalMeansFilter::update ( void )
         return -1;
     }
 
+    //get the number of dimension of the image from the dtk identifier
     QString id = QString (d->input->identifier());
-
-    qDebug() << d->input->identifier();
-
-    QString::iterator last_charac = id.end() - 1;
-    if (*last_charac != '3')
-    {
-        qDebug() <<"input is not of dimension 3";
-        return -1;
-    }
+    unsigned int nbDimension =(*(id.end() - 1)).digitValue();
 
     itk::CStyleCommand::Pointer callback = itk::CStyleCommand::New();
     callback->SetClientData((void*) d);
     callback->SetCallback(animaNonLocalMeansFilterPrivate::eventCallback);
 
-    if (1)
+
+    //Set output description metadata
+    QString newSeriesDescription = d->input->metadata( medMetaDataKeys::SeriesDescription.key() );
+    newSeriesDescription += "_NLMean_denoising";
+    d->output->addMetaData ( medMetaDataKeys::SeriesDescription.key(), newSeriesDescription );
+
+    if (!d->temporalImage)
     {
-        typedef itk::NonLocalMeansImageFilter <itk::Image<float, 3> > FilterType;
-        FilterType::Pointer filter = FilterType::New();
-
-        typedef itk::Image <float, 3> FilteredImageType;
-
-        dtkSmartPointer <dtkAbstractData> convertedData = dtkAbstractDataFactory::instance()->create ("itkDataImageFloat3");
-        foreach ( QString metaData, d->input->metaDataList() )
-            if (!convertedData->hasMetaData(metaData))
-                convertedData->addMetaData ( metaData, d->input->metaDataValues ( metaData ) );
-
-        foreach ( QString property, d->input->propertyList() )
-            convertedData->addProperty ( property, d->input->propertyValues ( property ) );
-
-
-        if (id =="itkDataImageDouble3")
+        switch (nbDimension)
         {
-            typedef itk::Image< double, 3 > InputImageType;
-            typedef itk::CastImageFilter< InputImageType, FilteredImageType > CastFilterType;
-
-            CastFilterType::Pointer  caster = CastFilterType::New();
-            caster->SetInput((const InputImageType*)d->input->data());
-            qDebug()<<"starting cast";
-            caster->Update();
-            convertedData->setData(caster->GetOutput());
-        }
-
-        filter->SetPatchHalfSize(d->patchHalfSize);
-        qDebug()<<"patchHalfSize  : "<<d->patchHalfSize;
-        filter->SetSearchStepSize(d->searchStepSize);
-        qDebug()<<"searchStepSize : "<<d->searchStepSize;
-        filter->SetSearchNeighborhood(d->searchNeighborhood);
-        qDebug()<<"searchNeighborhood  : "<<d->searchNeighborhood;
-        filter->SetWeightThreshold(d->weightThreshold);
-        qDebug()<<"weightThreshold  : "<<d->weightThreshold;
-        filter->SetBetaParameter(d->betaParameter);
-        qDebug()<<"betaParameter  : "<<d->betaParameter;
-        filter->SetMeanMinThreshold(d->meanMinThreshold);
-        qDebug()<<"meanMinThreshold  : "<<d->meanMinThreshold;
-        filter->SetVarMinThreshold(d->varMinThreshold);
-        qDebug()<<"varMinThreshold  : "<<d->varMinThreshold;
-        filter->SetNumberOfThreads(d->nbThread);
-        qDebug()<<"nbThread : "<<d->nbThread;
-
-        if (d->weightedMethod == 0)
+        case 2:
         {
-            filter->SetWeightMethod(FilterType::EXP);
-            qDebug()<<"weightedMethod : EXP";
+            typedef itk::Image <float, 2> FilteredImageType;
+            typedef itk::NonLocalMeansImageFilter <FilteredImageType>  FilterType;
+            FilterType::Pointer filter = FilterType::New();
+
+            filter->SetPatchHalfSize(d->patchHalfSize);
+            filter->SetSearchStepSize(d->searchStepSize);
+            filter->SetSearchNeighborhood(d->searchNeighborhood);
+            filter->SetWeightThreshold(d->weightThreshold);
+            filter->SetBetaParameter(d->betaParameter);
+            filter->SetMeanMinThreshold(d->meanMinThreshold);
+            filter->SetVarMinThreshold(d->varMinThreshold);
+            filter->SetNumberOfThreads(d->nbThread);
+
+            if (!d->weightedMethod)
+                filter->SetWeightMethod(FilterType::EXP);
+            else
+                filter->SetWeightMethod(FilterType::RICIAN);
+
+            filter->SetInput((const FilteredImageType*)d->input->data());
+            filter->AddObserver(itk::ProgressEvent(), callback );
+            filter->Update();
+            d->output->setData(filter->GetOutput());
+            break;
         }
-        else if (d->weightedMethod== 1)
+        case 3:
         {
-            filter->SetWeightMethod(FilterType::RICIAN);
-            qDebug()<<"weightedMethod : RICIAN";
+            typedef itk::Image <float, 3> FilteredImageType;
+            typedef itk::NonLocalMeansImageFilter <FilteredImageType>  FilterType;
+            FilterType::Pointer filter = FilterType::New();
+
+            filter->SetPatchHalfSize(d->patchHalfSize);
+            filter->SetSearchStepSize(d->searchStepSize);
+            filter->SetSearchNeighborhood(d->searchNeighborhood);
+            filter->SetWeightThreshold(d->weightThreshold);
+            filter->SetBetaParameter(d->betaParameter);
+            filter->SetMeanMinThreshold(d->meanMinThreshold);
+            filter->SetVarMinThreshold(d->varMinThreshold);
+            filter->SetNumberOfThreads(d->nbThread);
+
+            if (!d->weightedMethod)
+                filter->SetWeightMethod(FilterType::EXP);
+            else
+                filter->SetWeightMethod(FilterType::RICIAN);
+
+            filter->SetInput((const FilteredImageType*)d->input->data());
+            filter->AddObserver(itk::ProgressEvent(), callback );
+            filter->Update();
+            d->output->setData(filter->GetOutput());
+            break;
         }
-        else return -1;
+        case 4:
+        {
+            //TODO: this is not thread safe (sublclass from dtkAbstractProcess and emit signal ?)
+            /*QMessageBox msgBox;
+            msgBox.setText(tr("Input has more than 3 dimension, you probably should set the temporal option to \"Yes\"."));
+            msgBox.setInformativeText(tr("Do you want to continue anyway?"));
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::No);
+            int ret = msgBox.exec();
 
-        filter->SetInput(dynamic_cast<FilteredImageType *> ((itk::Object*)(convertedData->data())));
+            if (ret == QMessageBox::No)
+                return 0;*/
 
-        filter->AddObserver(itk::ProgressEvent(), callback );
+            typedef itk::Image <float, 4> FilteredImageType;
+            typedef itk::NonLocalMeansImageFilter <FilteredImageType>  FilterType;
+            FilterType::Pointer filter = FilterType::New();
 
-        qDebug()<<"starting update";
-        filter->Update();
-        d->output->setData(filter->GetOutput());
+            filter->SetPatchHalfSize(d->patchHalfSize);
+            filter->SetSearchStepSize(d->searchStepSize);
+            filter->SetSearchNeighborhood(d->searchNeighborhood);
+            filter->SetWeightThreshold(d->weightThreshold);
+            filter->SetBetaParameter(d->betaParameter);
+            filter->SetMeanMinThreshold(d->meanMinThreshold);
+            filter->SetVarMinThreshold(d->varMinThreshold);
+            filter->SetNumberOfThreads(d->nbThread);
+
+            if (!d->weightedMethod)
+                filter->SetWeightMethod(FilterType::EXP);
+            else
+                filter->SetWeightMethod(FilterType::RICIAN);
+
+            filter->SetInput((const FilteredImageType*)d->input->data());
+            filter->AddObserver(itk::ProgressEvent(), callback );
+            filter->Update();
+            d->output->setData(filter->GetOutput());
+            break;
+        }
+        }
     }
-    else qDebug()<<"temporal Image";
+    else
+    {
+        switch (nbDimension)
+        {
+        case 2:
+        {
 
+            //TODO: this is not thread safe (sublclass from dtkAbstractProcess and emit signal ?)
+            /*QMessageBox msgBox;
+            msgBox.setText(tr("Input has less than 3 dimension, you shoul set the temporal option to \"No\"."));
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.setDefaultButton(QMessageBox::Ok);
+            msgBox.exec();*/
+            return 0;
+        }
+        case 3:
+        {
+            typedef itk::Image <float, 3> FilteredImageType;
+            typedef itk::NonLocalMeansTemporalImageFilter <FilteredImageType>  FilterType;
+            FilterType::Pointer filter = FilterType::New();
 
+            filter->SetPatchHalfSize(d->patchHalfSize);
+            filter->SetSearchStepSize(d->searchStepSize);
+            filter->SetSearchNeighborhood(d->searchNeighborhood);
+            filter->SetWeightThreshold(d->weightThreshold);
+            filter->SetBetaParameter(d->betaParameter);
+            filter->SetMeanMinThreshold(d->meanMinThreshold);
+            filter->SetVarMinThreshold(d->varMinThreshold);
+            filter->SetNumberOfThreads(d->nbThread);
 
+            if (!d->weightedMethod)
+                filter->SetWeightMethod(FilterType::EXP);
+            else
+                filter->SetWeightMethod(FilterType::RICIAN);
+
+            filter->SetInput((const FilteredImageType*)d->input->data());
+            filter->AddObserver(itk::ProgressEvent(), callback );
+            filter->Update();
+            d->output->setData(filter->GetOutput());
+            break;
+        }
+        case 4:
+        {
+            typedef itk::Image <float, 4> FilteredImageType;
+            typedef itk::NonLocalMeansTemporalImageFilter <FilteredImageType>  FilterType;
+            FilterType::Pointer filter = FilterType::New();
+
+            filter->SetPatchHalfSize(d->patchHalfSize);
+            filter->SetSearchStepSize(d->searchStepSize);
+            filter->SetSearchNeighborhood(d->searchNeighborhood);
+            filter->SetWeightThreshold(d->weightThreshold);
+            filter->SetBetaParameter(d->betaParameter);
+            filter->SetMeanMinThreshold(d->meanMinThreshold);
+            filter->SetVarMinThreshold(d->varMinThreshold);
+            filter->SetNumberOfThreads(d->nbThread);
+
+            if (!d->weightedMethod)
+                filter->SetWeightMethod(FilterType::EXP);
+            else
+                filter->SetWeightMethod(FilterType::RICIAN);
+
+            filter->SetInput((const FilteredImageType*)d->input->data());
+            filter->AddObserver(itk::ProgressEvent(), callback );
+            filter->Update();
+            d->output->setData(filter->GetOutput());
+            break;
+        }
+        }
+    }
     return EXIT_SUCCESS;
 }
 

@@ -23,6 +23,7 @@ public:
 
     void emitProgressed(int progression);
 
+
     static bool registered(void);
 
 
