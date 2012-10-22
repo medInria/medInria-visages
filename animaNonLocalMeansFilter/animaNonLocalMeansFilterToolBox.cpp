@@ -42,6 +42,7 @@ public:
     QSpinBox *nbThread;
     QComboBox *weightedMerthod;
     QRadioButton *temporalImage;
+    QRadioButton *notTemporalImage;
     QButtonGroup *temporalImageGroup;
 
 
@@ -101,18 +102,18 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
     parametersLayout->addRow(tr("Weighted Methode : "), d->weightedMerthod);
 
     d->temporalImageGroup = new QButtonGroup();
-    QRadioButton *notTemporalImage = new QRadioButton(tr("No"));
+    d->notTemporalImage = new QRadioButton(tr("No"));
     d->temporalImage = new QRadioButton(tr("Yes"));
 
-    d->temporalImageGroup->addButton(notTemporalImage);
-    d->temporalImageGroup->setId(notTemporalImage, 0);
-    notTemporalImage->setChecked(true);
+    d->temporalImageGroup->addButton(d->notTemporalImage);
+    d->temporalImageGroup->setId(d->notTemporalImage, 0);
+    d->notTemporalImage->setChecked(true);
 
     d->temporalImageGroup->addButton(d->temporalImage);
     d->temporalImageGroup->setId(d->temporalImage, 1);
 
     QVBoxLayout *temporalLayout = new QVBoxLayout();
-    temporalLayout->addWidget(notTemporalImage);
+    temporalLayout->addWidget(d->notTemporalImage);
     temporalLayout->addWidget(d->temporalImage);
     parametersLayout->addRow(tr("Image has a temporal dimension : "), temporalLayout);
 
@@ -241,11 +242,12 @@ void animaNonLocalMeansFilterToolBox::update ( dtkAbstractView* view )
 
         unsigned int nbDimension =(*(identifier.end() - 1)).digitValue();
         d->dataDimensionValue->setText(QString::number(nbDimension));
+        d->notTemporalImage->setChecked(true);
         if (nbDimension == 4)
         {
             d->temporalImage->setChecked(true);
         }
-        else if (nbDimension != 2 || nbDimension != 3 )
+        else if (nbDimension != 2 && nbDimension != 3 )
         {
             qWarning() << "Error : pixel type not yet implemented ("
             << identifier
