@@ -72,11 +72,8 @@ option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProc
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSMIDPLANE_ALIGN_PLUGIN     "Build vistalProcessMidPlaneAlign plugin" "OFF")
-<<<<<<< HEAD
-option(MEDINRIA_BUILD_ANIMASYMMETRYPLANE_PLUGIN     "Build animaSymmetruPlane plugin" "OFF")
-=======
-option(MEDINRIA_BUILD_ANIMA-NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "OFF")
->>>>>>> da4d5499a10ccfca789aa516f8dcf52bd433afa2
+option(MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN     "Build animaSymmetruPlane plugin" "OFF")
+option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "OFF")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 
@@ -120,21 +117,19 @@ if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN)
         subdirs(vistalProcessSegmentationGCEM)
 endif()
 
-
 if (MEDINRIA_BUILD_VISTALPROCESSMIDPLANE_ALIGN_PLUGIN)
     add_subdirectory(vistalProcessMidPlaneAlign)
 endif()
-
 
 if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN)
     subdirs(vistalProcessSegmentationSTREM)
 endif()
 
-if (MEDINRIA_BUILD_ANIMASYMMETRYPLANE_PLUGIN)
+if (MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN)
     subdirs(animaSymmetryPlane)
 endif()
 
-if (MEDINRIA_BUILD_ANIMA-NONLOCALMEANSFILTER_PLUGIN)
+if (MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN)
     subdirs(animaNonLocalMeansFilter)
 endif()
 
