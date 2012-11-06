@@ -72,7 +72,11 @@ option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProc
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSMIDPLANE_ALIGN_PLUGIN     "Build vistalProcessMidPlaneAlign plugin" "OFF")
+<<<<<<< HEAD
 option(MEDINRIA_BUILD_ANIMASYMMETRYPLANE_PLUGIN     "Build animaSymmetruPlane plugin" "OFF")
+=======
+option(MEDINRIA_BUILD_ANIMA-NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "OFF")
+>>>>>>> da4d5499a10ccfca789aa516f8dcf52bd433afa2
 
 option(BUILD_DOCUMENTATION "Build documentation")
 
@@ -130,6 +134,9 @@ if (MEDINRIA_BUILD_ANIMASYMMETRYPLANE_PLUGIN)
     subdirs(animaSymmetryPlane)
 endif()
 
+if (MEDINRIA_BUILD_ANIMA-NONLOCALMEANSFILTER_PLUGIN)
+    subdirs(animaNonLocalMeansFilter)
+endif()
 
 if (APPLE)
   configure_file(${PROJECT_SOURCE_DIR}/packageScripts/mac_vistal_package_maker.sh.in
