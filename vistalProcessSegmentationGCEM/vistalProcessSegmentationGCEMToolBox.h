@@ -3,6 +3,7 @@
 #define VISTALPROCESSSegmentationGCEMTOOLBOX_H
 
 #include <medToolBoxFilteringCustom.h>
+#include <medDataIndex.h>
 
 class vistalProcessSegmentationGCEMToolBoxPrivate;
 
@@ -24,19 +25,17 @@ signals:
 
 public slots:
 
-    void onT1ImageDropped(void);
-    void onPDImageDropped(void);
-    void onT2orFLAIRImageDropped(void);
+    void onT1ImageDropped(const medDataIndex &index);
+    void onPDImageDropped(const medDataIndex &index);
+    void onT2orFLAIRImageDropped(const medDataIndex &index);
 
-    void onMaskImageDropped(void);
+    void onMaskImageDropped(const medDataIndex &index);
 
     void run(void);
 
 private:
     vistalProcessSegmentationGCEMToolBoxPrivate *d;
 };
-
-medToolBoxFilteringCustom *createVistalProcessSegmentationGCEMToolBox(QWidget *parent);
 
 #endif
 

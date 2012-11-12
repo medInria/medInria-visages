@@ -51,36 +51,6 @@ public:
     QDoubleSpinBox* rmax;
     QDoubleSpinBox* alphap;
 
-    /*
-        ENUM(5, initMethod, "I", "init-method", "Method for initialisation", (StraInit)(HierarchicalPD)(HierarchicalFLAIR), HierarchicalFLAIR);
-
-        OPTIONAL(6, double, rejectionRatio, "rej", "rejectionRatio", "Robust estimation rejection Ratio", ".2", InputArgument, "Image3D");
-
-        ENUM(7, EMAlgorithm, "EM", "EM-Algorithm", "EM Algorithm", (GaussianEM)(GaussianCeleuxREM)(GaussianREM), GaussianREM);
-
-        OPTIONAL(8, double, minDistance, "minD", "minDistance", "Minimum distance in EM (stoping criteria)", "1e-4", InputArgument, "");
-
-        OPTIONAL(9, int, emIter, "eit", "emIter", "Iterations of the EM Algorithm", "1e-4", InputArgument, "");
-
-        FLAG(10, GCEM, "st", "GCEM", "Start the first iteration with GCEM?", false);
-
-        //OPTIONAL(11, float, emIter, "eit", "emIter", "Iterations of the EM Algorithm", "10", InputArgument, "");
-
-
-        OPTIONAL(11, double, mahalanobisThreshold, "mTh", "mahalanobisThreshold", "Threshold in the Mahalanobis distance", ".4", InputArgument, "");
-        OPTIONAL(12, double, rulesThreshold, "rTh", "rulesThreshold", "Threshold to apply rules (in times of SD)", "3.", InputArgument, "");
-        OPTIONAL(13, double, minsize, "msize", "minsize", "minimum lesion size", "6", InputArgument, "");
-        OPTIONAL(14, double, wmneighbor, "wm", "wmneighbor", "neighborhing ratio", "0.05", InputArgument, "");
-
-        OPTIONAL(17, float, rulesMin, "rmin", "rulesMin", " Rules Min Threshold (in SD times)", 2, InputArgument, "Image3D");
-        OPTIONAL(18, float, rulesMax, "rmax", "rulesMax", " Rules Max Threshold (in SD times)", 3, InputArgument, "Image3D");
-        OPTIONAL(19, float, alphap, "al", "Alpha", "Mixing energy parameter", 10, InputArgument, "Image3D");
-
-
-      */
-
-
-
     QPushButton *runButton;
 
     int startLock;
@@ -288,11 +258,11 @@ vistalProcessSegmentationGCEMToolBox::vistalProcessSegmentationGCEMToolBox(QWidg
     d->runButton->setDisabled(true); // Need to add all the data prior to start
 
     // Connect the created dropsite
-    connect(d->dropSiteT1, SIGNAL(objectDropped()), this, SLOT(onT1ImageDropped()));
+    connect(d->dropSiteT1, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(onT1ImageDropped(const medDataIndex &)));
 
-    connect(d->dropSiteT2, SIGNAL(objectDropped()), this, SLOT(onT2orFLAIRImageDropped()));
-    connect(d->dropSitePD, SIGNAL(objectDropped()), this, SLOT(onPDImageDropped()));
-    connect(d->dropSiteMask, SIGNAL(objectDropped()), this, SLOT(onMaskImageDropped()));
+    connect(d->dropSiteT2, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(onT2orFLAIRImageDropped(const medDataIndex &)));
+    connect(d->dropSitePD, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(onPDImageDropped(const medDataIndex &)));
+    connect(d->dropSiteMask, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(onMaskImageDropped(const medDataIndex &)));
 
     connect(d->runButton, SIGNAL(clicked()), this, SLOT(run()));
 }
@@ -305,8 +275,10 @@ vistalProcessSegmentationGCEMToolBox::~vistalProcessSegmentationGCEMToolBox(void
 
 bool vistalProcessSegmentationGCEMToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("GraphCut w. EM init + outliers",
-                                                                         createVistalProcessSegmentationGCEMToolBox);
+    return medToolBoxFactory::instance()->registerToolBox <vistalProcessSegmentationGCEMToolBox>
+                            ("gcemSegmentation", "GCEM MS lesions segmentation",
+                             "GraphCut w. EM init + outliers",
+                             QStringList() << "filtering");
 }
 
 
@@ -359,10 +331,8 @@ void vistalProcessSegmentationGCEMToolBox::run(void)
     QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 }
 
-void vistalProcessSegmentationGCEMToolBox::onT1ImageDropped()
+void vistalProcessSegmentationGCEMToolBox::onT1ImageDropped(const medDataIndex &index)
 {
-    medDataIndex index = d->dropSiteT1->index();
-
     if (!index.isValid())
         return;
 
@@ -372,6 +342,7 @@ void vistalProcessSegmentationGCEMToolBox::onT1ImageDropped()
         return;
 
     d->startLock |= 1;
+
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
 
@@ -379,10 +350,8 @@ void vistalProcessSegmentationGCEMToolBox::onT1ImageDropped()
 }
 
 
-void vistalProcessSegmentationGCEMToolBox::onPDImageDropped()
+void vistalProcessSegmentationGCEMToolBox::onPDImageDropped(const medDataIndex &index)
 {
-    medDataIndex index = d->dropSitePD->index();
-
     if (!index.isValid())
         return;
 
@@ -392,6 +361,7 @@ void vistalProcessSegmentationGCEMToolBox::onPDImageDropped()
         return;
 
     d->startLock |= 2;
+    
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
 
@@ -399,10 +369,8 @@ void vistalProcessSegmentationGCEMToolBox::onPDImageDropped()
     //emit dataSelected(d->data);
 }
 
-void vistalProcessSegmentationGCEMToolBox::onT2orFLAIRImageDropped()
+void vistalProcessSegmentationGCEMToolBox::onT2orFLAIRImageDropped(const medDataIndex &index)
 {
-    medDataIndex index = d->dropSiteT2->index();
-
     if (!index.isValid())
         return;
 
@@ -412,16 +380,15 @@ void vistalProcessSegmentationGCEMToolBox::onT2orFLAIRImageDropped()
     if (!d->dataT2)
         return;
     d->startLock |= 4;
+    
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
 
     //emit dataSelected(d->data);
 }
 
-void vistalProcessSegmentationGCEMToolBox::onMaskImageDropped()
+void vistalProcessSegmentationGCEMToolBox::onMaskImageDropped(const medDataIndex &index)
 {
-    medDataIndex index = d->dropSiteMask->index();
-
     if (!index.isValid())
         return;
 
@@ -435,11 +402,4 @@ void vistalProcessSegmentationGCEMToolBox::onMaskImageDropped()
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
     //emit dataSelected(d->data);
-}
-
-
-
-medToolBoxFilteringCustom *createVistalProcessSegmentationGCEMToolBox(QWidget *parent)
-{
-    return new vistalProcessSegmentationGCEMToolBox(parent);
 }
