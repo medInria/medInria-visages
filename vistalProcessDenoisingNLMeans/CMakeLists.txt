@@ -75,6 +75,7 @@ target_link_libraries(${PROJECT_NAME}
   ${VISTAL_LIBS}
   ${Boost_THREAD_LIBRARY} # or more: ${Boost_LIBRARIES}
   ${Boost_DATE_TIME_LIBRARY} 
+  ${Boost_SYSTEM_LIBRARY} 
   dtkCore
   dtkLog
   medCore
