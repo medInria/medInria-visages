@@ -19,10 +19,10 @@ class animaSymmetryPlanePrivate
 public:
 
     typedef double ScalarType;
-    typedef typename itk::SymmetryPlaneTransform<ScalarType> TransformType;
-    typedef typename TransformType::Pointer TransformPointer;
-    typedef typename itk::AffineTransform<ScalarType,3> BaseTransformType;
-    typedef typename BaseTransformType::Pointer BaseTransformPointer;
+    typedef itk::SymmetryPlaneTransform<ScalarType> TransformType;
+    typedef TransformType::Pointer TransformPointer;
+    typedef itk::AffineTransform<ScalarType,3> BaseTransformType;
+    typedef BaseTransformType::Pointer BaseTransformPointer;
 
     dtkSmartPointer <dtkAbstractData> input;
     dtkSmartPointer <dtkAbstractData> output;
@@ -150,7 +150,7 @@ void animaSymmetryPlanePrivate::saveTransformFile(QString filename)
         itk::TransformFileWriter::Pointer writer = itk::TransformFileWriter::New();
 
         // SymmetryPlaneTransforms should not be written as is, this loses information
-        typename BaseTransformType::Pointer tmpTrsf = BaseTransformType::New();
+        BaseTransformType::Pointer tmpTrsf = BaseTransformType::New();
         tmpTrsf->SetMatrix(outputTransform->GetMatrix());
         tmpTrsf->SetOffset(outputTransform->GetOffset());
 

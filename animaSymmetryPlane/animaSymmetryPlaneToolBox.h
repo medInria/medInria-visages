@@ -30,7 +30,6 @@ public slots:
     void run(void);
     void saveRealignTransformFile(void);
     void saveTransformFile(void);
-    void setSuccess(void);
     void updateMetric(int);
 
 private:

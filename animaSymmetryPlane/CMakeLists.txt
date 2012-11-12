@@ -39,8 +39,14 @@ include(dtkPlugin)
 find_package(medInria REQUIRED)
 include(${medInria_USE_FILE})
 
-find_package(ANIMA REQUIRED)
-include(${ANIMA_USE_FILE})
+find_package(ANIMA-REGISTRATION REQUIRED)
+include(${ANIMA-REGISTRATION_USE_FILE})
+
+find_package(ANIMA-FILTERING REQUIRED)
+include(${ANIMA-FILTERING_USE_FILE})
+
+find_package(ANIMA-MATHS REQUIRED)
+include(${ANIMA-MATHS_USE_FILE})
 
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
