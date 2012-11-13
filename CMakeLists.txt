@@ -65,7 +65,6 @@ option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageRea
 option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWriter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
 option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "OFF")
-option(MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN     "Build qtdcmDataSource plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN     "Build vistalProcessSegmentationSTREM plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProcessSegmentationGCEM plugin" "OFF")
@@ -97,10 +96,6 @@ endif()
 
 if (MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN)
     add_subdirectory(qtshanoirDataSource)
-endif()
-
-if (MEDINRIA_BUILD_QTDCMDATASOURCE_PLUGIN)
-    add_subdirectory(qtdcmDataSource)
 endif()
 
 if (MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN)
