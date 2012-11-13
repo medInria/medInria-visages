@@ -42,9 +42,6 @@ include(${medInria_USE_FILE})
 find_package(ANIMA-FILTERING REQUIRED)
 include (${ANIMA-FILTERING_USE_FILE})
 
-find_package(ITK REQUIRED)
-include (${ITK_USE_FILE})
-
 ## #################################################################
 ## Input
 ## #################################################################
