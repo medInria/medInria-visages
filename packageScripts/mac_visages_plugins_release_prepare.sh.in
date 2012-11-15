@@ -36,7 +36,7 @@ do
 		if [ ! -e Frameworks/$libname ]; then
 			\cp -np @Boost_LIBRARY_DIRS@/`basename $libname` Frameworks/
 		fi
-		install_name_tool -change $libname @executable_path/../Frameworks/$libname $f
+		install_name_tool -change $libname @executable_path/../Frameworks/`basename $libname` $f
 	done
 	
 	#Qt stuff (should hopefully be there already)
