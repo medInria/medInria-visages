@@ -148,10 +148,7 @@ int vistalProcessGraphCutSeg::update(void)
     }
     
     // Do real stuff here
-    
-    qDebug() << ((static_cast<vistal::Image3D<unsigned char> * > (d->mask_inside->data())) == NULL);
-    qDebug() << ((static_cast<vistal::Image3D<unsigned char> * > (d->mask_outside->data())) == NULL);
-    
+        
     graphcuts->setTarget(static_cast<vistal::Image3D<unsigned char> * > (d->mask_inside->data()));
     graphcuts->setSink(static_cast<vistal::Image3D<unsigned char> * > (d->mask_outside->data()));
     
