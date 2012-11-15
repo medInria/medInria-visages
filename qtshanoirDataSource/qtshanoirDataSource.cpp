@@ -172,19 +172,13 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
     tmpInfo.replace(QDir::separator(),"_");
     dtkdata->addMetaData(medMetaDataKeys::StudyDescription.key(),tmpInfo);
     
-    qDebug() << tmpInfo;
-    
     tmpInfo = realXMLRoot.firstChildElement("subject").firstChildElement("name").firstChild().nodeValue();
     tmpInfo.replace(QDir::separator(),"_");
     dtkdata->addMetaData(medMetaDataKeys::PatientName.key(),tmpInfo);
     
-    qDebug() << tmpInfo;
-    
     tmpInfo = realXMLRoot.firstChildElement("name").firstChild().nodeValue();
     tmpInfo.replace(QDir::separator(),"_");
     dtkdata->addMetaData(medMetaDataKeys::SeriesDescription.key(),tmpInfo);
-    
-    qDebug() << tmpInfo;
     
     tmpInfo = realXMLRoot.firstChildElement("mrDatasetAcquisition").firstChildElement("mrProtocol").firstChildElement("protocolName").firstChild().nodeValue();
     dtkdata->addMetaData(medMetaDataKeys::Protocol.key(),tmpInfo);
@@ -196,13 +190,9 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
     tmpInfo.resize(10);
     dtkdata->addMetaData(medMetaDataKeys::BirthDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
     
-    qDebug() << tmpInfo;
-    
     tmpInfo = realXMLRoot.firstChildElement("datasetCreationDate").firstChild().nodeValue();
     tmpInfo.resize(10);
     dtkdata->addMetaData(medMetaDataKeys::AcquisitionDate.key(),QDate::fromString(tmpInfo,"yyyy-MM-dd").toString());
-    
-    qDebug() << tmpInfo;
     
     dtkdata->retain();
     emit dataReceived(dtkdata);
