@@ -91,7 +91,14 @@ void qtshanoirDataSource::initWidgets(void)
 
 qtshanoirDataSource::~qtshanoirDataSource(void)
 {
-	delete d;  
+    delete d->mainWidget;
+    delete d->rightWidget;
+
+    
+    foreach(medToolBox *tmpToolbox, d->additional_toolboxes)
+        delete tmpToolbox;
+    
+	delete d;
 	d = NULL;
 }
 
