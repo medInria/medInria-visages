@@ -30,13 +30,21 @@ version number.")
 set(${PROJECT_NAME}_VERSION_MINOR 0 CACHE STRING "${PROJECT_NAME} minor
 version number.")
 set(${PROJECT_NAME}_VERSION_BUILD 1 CACHE STRING "${PROJECT_NAME} build
-version number.")
-set(${PROJECT_NAME}_VERSION
-          "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
+version number." FORCE)
+set(${PROJECT_NAME}_VERSION_BUGFIX 1 CACHE STRING "${PROJECT_NAME} bug-fix version number." FORCE)
+
+if (${${PROJECT_NAME}_VERSION_BUGFIX} GREATER 0)
+  set(${PROJECT_NAME}_VERSION
+    "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}-${${PROJECT_NAME}_VERSION_BUGFIX}")
+else()
+  set(${PROJECT_NAME}_VERSION
+    "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
+endif()
 
 mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
 mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
+mark_as_advanced(${PROJECT_NAME}_VERSION_BUGFIX)
 
 ## #################################################################
 ## Dashboard settings
