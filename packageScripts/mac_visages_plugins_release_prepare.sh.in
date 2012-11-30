@@ -7,8 +7,8 @@ cd @CMAKE_INSTALL_PREFIX@/PackageRootDir/Applications/medInria.app/Contents
 
 mkdir -p Frameworks/Vistal Frameworks/Dcm Frameworks/DCMTK Frameworks/Shanoir
 
-cp @CMAKE_INSTALL_PREFIX@/plugins/libvistal* PlugIns/
-cp @CMAKE_INSTALL_PREFIX@/plugins/libqtshanoir* PlugIns/
+cp @CMAKE_BINARY_DIR@/plugins/libvistal* PlugIns/
+cp @CMAKE_BINARY_DIR@/plugins/libqtshanoir* PlugIns/
 
 for i in $( otool -L PlugIns/*.dylib 2> /dev/null \
 | sort -u | grep -i -E '@medInria_DIR@|@dtk_DIR@|itk|vtk' | cut -d " " -f 1 ); do
