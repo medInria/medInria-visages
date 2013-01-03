@@ -71,6 +71,7 @@ option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProc
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
 option(MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN     "Build animaSymmetryPlane plugin" "OFF")
 option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "OFF")
+option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-PyramidalBMRegistration plugin" "OFF")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 
@@ -120,6 +121,10 @@ endif()
 
 if (MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN)
     subdirs(animaNonLocalMeansFilter)
+endif()
+
+if (MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN)
+    subdirs(animaPyramidalBMRegistration)
 endif()
 
 if (APPLE)
