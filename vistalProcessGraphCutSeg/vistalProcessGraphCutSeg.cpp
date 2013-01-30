@@ -14,6 +14,8 @@
 
 #include "GraphCut_class.hh"
 
+#include <medMetaDataKeys.h>
+
 // /////////////////////////////////////////////////////////////////
 // vistalProcessGraphCutSegPrivate
 // /////////////////////////////////////////////////////////////////
@@ -25,7 +27,7 @@ public:
 
     int image_count;
 
-    QList<dtkAbstractData *> images;
+    QList< dtkSmartPointer<dtkAbstractData> > images;
     dtkSmartPointer<dtkAbstractData> mask;
     dtkSmartPointer<dtkAbstractData> output;
 
@@ -35,7 +37,11 @@ public:
     double alpha;
     double beta;
     double sigma;
+    
+    vistal::Tlinks::e_mode mode;
+    bool useSpectralGradient;
 };
+
 
 ////////////////////////////////////////////////////
 // vistalProcessGraphCutSeg
@@ -48,6 +54,8 @@ vistalProcessGraphCutSeg::vistalProcessGraphCutSeg(void) : dtkAbstractProcess(),
     d->alpha = 1;
     d->beta = 0;
     d->sigma = 0.6;
+    
+    d->useSpectralGradient = false;
 }
 
 vistalProcessGraphCutSeg::~vistalProcessGraphCutSeg(void)
@@ -108,6 +116,12 @@ void vistalProcessGraphCutSeg::setParameter(double data, int channel)
         case 3:
             d->sigma = data;
             break;
+        case 4:
+            d->mode = (vistal::Tlinks::e_mode)data;
+            break;
+        case 5 :
+            d->useSpectralGradient = (bool)data;  
+            break;
         default:
             return;
     }
@@ -117,7 +131,7 @@ int vistalProcessGraphCutSeg::update(void)
 {
     if((!d->mask) || (d->image_count != d->images.size() ))
     {
-        qDebug() << "No mask or not the right number of images" << d->image_count << d->images.size();
+        qWarning() << "No mask or not the right number of images" << d->image_count << d->images.size();
         return -1;
     }
     
@@ -152,28 +166,47 @@ int vistalProcessGraphCutSeg::update(void)
     graphcuts->setTarget(static_cast<vistal::Image3D<unsigned char> * > (d->mask_inside->data()));
     graphcuts->setSink(static_cast<vistal::Image3D<unsigned char> * > (d->mask_outside->data()));
     
-    graphcuts->setTLinkMode(vistal::Tlinks::Density);
-    graphcuts->useSpectralGradient(false);
+    graphcuts->setTLinkMode(d->mode);
+    graphcuts->useSpectralGradient(d->useSpectralGradient);
     
     graphcuts->setAlpha(d->alpha);
     graphcuts->setBeta(d->beta);
     graphcuts->setSigma(d->sigma);
     
+    
+    vistal::Image3D<float> target_proba = vistal::Image3D<float>(*static_cast<vistal::Image3D<float> * > (d->images[0]->data()), 0.5);
+    vistal::Image3D<float> sink_proba = vistal::Image3D<float>(*static_cast<vistal::Image3D<float> * > (d->images[0]->data()), 0.5);
+    
+    graphcuts->setTargetProba( &target_proba );
+    graphcuts->setSinkProba( &sink_proba );
+    
+    vistal::Image3D<char> mask = vistal::Image3D<char>(*static_cast<vistal::Image3D<char> * > (d->images[0]->data()), 1);
+    graphcuts->setMask( &mask );
+    
     graphcuts->run();
     
-    vistal::Image3D<unsigned char> *output = new vistal::Image3D<unsigned char> (*(graphcuts->getOutput()));
+    vistal::Image3D<unsigned char> *output = graphcuts->getOutput();
     
     d->output = dtkAbstractDataFactory::instance()->createSmartPointer("vistalDataImageUChar3");
     d->output->setData(output);
+    
+    
+    foreach(QString list, d->images[0]->metaDataList())
+        d->output->addMetaData(list, d->images[0]->metaDataValues(list));
+        
+    QString newSeriesDescription = d->output->metadata(medMetaDataKeys::SeriesDescription.key());
+    newSeriesDescription += " GraphCut Segmentation";
 
+    d->output->setMetaData(medMetaDataKeys::SeriesDescription.key(),newSeriesDescription);
+ 
     delete graphcuts;
     
     return 0;
 }
 
 dtkAbstractData * vistalProcessGraphCutSeg::output(void)
-{	
-	return d->output;
+{
+    return d->output;
 }
 
 template <typename PixelType>
