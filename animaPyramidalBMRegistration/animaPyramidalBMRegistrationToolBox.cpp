@@ -28,7 +28,6 @@
 
 #include <rpiCommonTools.hxx>
 #include <rpiAnimaPyramidalBMRegistration.h>
-#include <NrrdIO.h>
 
 class animaPyramidalBMRegistrationToolBoxPrivate
 {
@@ -130,9 +129,10 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->optimzer = new QComboBox;
     d->optimzer->setToolTip("Optimizer for optimal block search");
     QStringList optimzerList;
-    optimzerList << "Newuoa" << "Exhaustive " << "Bobyqa";
+    optimzerList << "Newuoa" << "Exhaustive" << "Bobyqa";
     d->optimzer->addItems ( optimzerList );
-
+    d->optimzer->setCurrentIndex(2);
+    
     d->maxIterations = new QSpinBox;
     d->maxIterations->setToolTip("Maximum Block Match Iteration");
     d->maxIterations->setValue(10);
@@ -206,7 +206,8 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->agregator->addItems ( agregatorList );
     
     d->weightedAgregator = new QCheckBox;
-    d->weightedAgregator->setToolTip("Do NOT use Weighted-Agregation");
+    d->weightedAgregator->setChecked(true);
+    d->weightedAgregator->setToolTip("Use Weighted-Agregation");
     
     d->blockRotations = new QCheckBox;
     d->blockRotations->setToolTip("Rotations for each block are centered on it rather than on the fixed image barycenter");
@@ -214,12 +215,14 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->outputTransform = new QComboBox;    
     d->outputTransform->setToolTip("Type of Estimated transformations");
     QStringList outputTransformList;
-    outputTransformList << "outRigid" << "outTranslation" << "outAffine";
+    outputTransformList << "Rigid" << "Translation" << "Affine";
     d->outputTransform->addItems (outputTransformList );
     
     d->agregThreshold = new QDoubleSpinBox;
     d->agregThreshold->setToolTip("Agregator threshold value (for M-estimation or LTS)");
-    d->agregThreshold->setValue(0.5);
+    d->agregThreshold->setValue(0.7);
+    d->agregThreshold->setMaximum(1.0);
+    d->agregThreshold->setSingleStep(0.1);
     
     d->stoppingThreshold = new QDoubleSpinBox;
     d->stoppingThreshold->setToolTip("LTS Stopping Threshold");
@@ -230,18 +233,19 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     // Pyramid parameters:
     d->pyramidLevels = new QSpinBox;
     d->pyramidLevels->setToolTip("Number of pyramid levels");
-    d->pyramidLevels->setValue(3);
+    d->pyramidLevels->setValue(4);
     
     d->lastLevel = new QSpinBox;
-    d->lastLevel->setToolTip("Index of the last pyramid level explored");
-    d->lastLevel->setValue(0);
+    d->lastLevel->setToolTip("Index of the last pyramid level explored (0 is full resolution)");
+    d->lastLevel->setValue(1);
     
      
     // Global Parameters:  
     d->threads = new QSpinBox;
     d->threads->setToolTip("Number of Execution Threads");
     d->threads->setValue(2);
-      
+    d->threads->setMinimum(1);
+    
     
     // Tranform Parameters Layout
     QHBoxLayout *transformLayout = new QHBoxLayout;
@@ -424,7 +428,8 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     process_Registration->setSkewUpperBound( d->skewUpperBound->value() );
     process_Registration->setScaleUpperBound( d->scaleUpperBound->value() );
     process_Registration->setAgregator( d->agregator->currentIndex() );
-    process_Registration->setWeightedAgregation( d->weightedAgregator->isChecked() );
+    // The flag in BM registration wants to know if we should deactivate weighted agregation or not
+    process_Registration->setWeightedAgregation( !d->weightedAgregator->isChecked() );
     process_Registration->setBlockCenteredRotations( d->blockRotations->isChecked() );
     process_Registration->setOutputTransformType( d->outputTransform->currentIndex() );
     process_Registration->setAgregThreshold( d->agregThreshold->value() );
