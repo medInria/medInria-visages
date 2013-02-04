@@ -141,7 +141,7 @@ public:
 private:
     
     typedef PyramidalMatchingBridge <TFixedImage::ImageDimension> PyramidBMType;
-    PyramidBMType *matcher;
+    typename PyramidBMType::Pointer matcher;
 
 };
 
