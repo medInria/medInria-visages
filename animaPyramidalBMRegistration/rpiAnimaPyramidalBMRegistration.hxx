@@ -14,7 +14,7 @@ AnimaPyramidalBMRegistration < TFixedImage, TMovingImage, TTransformScalarType >
     // Initialize the transformation
     this->m_transform = TransformType::New();
 
-    matcher = new PyramidBMType;
+    matcher = PyramidBMType::New();
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >

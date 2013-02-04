@@ -107,7 +107,7 @@ void animaSymmetryPlanePrivate::process ( void )
     typedef itk::Image <float,3> OutImageType;
     typedef PyramidalSymmetryBridge <PixelType, ScalarType> PyramidSymType;
 
-    PyramidSymType *matcher = new PyramidSymType;
+    typename PyramidSymType::Pointer matcher = PyramidSymType::New();
 
     // set callback
     callback = itk::CStyleCommand::New();
@@ -137,8 +137,6 @@ void animaSymmetryPlanePrivate::process ( void )
     output->setData ( matcher->GetOutputImage() );
     outputRealignTransform = matcher->GetOutputRealignTransform();
     outputTransform = matcher->GetOutputTransform();
-
-    delete matcher;
 }
 
 
