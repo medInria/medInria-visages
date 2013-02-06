@@ -2,12 +2,12 @@
 #ifndef VISTALPROCESSSegmentationGCEMTOOLBOX_H
 #define VISTALPROCESSSegmentationGCEMTOOLBOX_H
 
-#include <medToolBoxFilteringCustom.h>
+#include <medToolBoxSegmentationCustom.h>
 #include <medDataIndex.h>
 
 class vistalProcessSegmentationGCEMToolBoxPrivate;
 
-class vistalProcessSegmentationGCEMToolBox : public medToolBoxFilteringCustom
+class vistalProcessSegmentationGCEMToolBox : public medToolBoxSegmentationCustom
 {
     Q_OBJECT
 
@@ -17,11 +17,6 @@ public:
 
 public:
     static bool registered(void);
-    dtkAbstractData* processOutput();
-
-signals:
-    void success(void);
-    void failure(void);
 
 public slots:
 

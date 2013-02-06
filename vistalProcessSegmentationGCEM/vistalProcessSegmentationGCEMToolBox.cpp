@@ -15,8 +15,7 @@
 #include <medAbstractDataImage.h>
 
 #include <medToolBoxFactory.h>
-#include <medToolBoxFiltering.h>
-#include <medToolBoxFilteringCustom.h>
+#include <medToolBoxSegmentation.h>
 #include <medProgressionStack.h>
 #include <medDropSite.h>
 #include <medDataManager.h>
@@ -55,7 +54,7 @@ public:
 
     int startLock;
 
-    dtkAbstractProcess* process;
+    dtkSmartPointer <dtkAbstractProcess> process;
     medProgressionStack * progression_stack;
 
     /* Pointer to the data to be processed*/
@@ -63,8 +62,6 @@ public:
     dtkSmartPointer< dtkAbstractData > dataPD;
     dtkSmartPointer< dtkAbstractData > dataT2;
     dtkSmartPointer< dtkAbstractData > dataMask;
-
-
 };
 
 
@@ -77,7 +74,7 @@ vistalProcessSegmentationGCEMToolBoxPrivate::vistalProcessSegmentationGCEMToolBo
 }
 
 
-vistalProcessSegmentationGCEMToolBox::vistalProcessSegmentationGCEMToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessSegmentationGCEMToolBoxPrivate)
+vistalProcessSegmentationGCEMToolBox::vistalProcessSegmentationGCEMToolBox(QWidget *parent) : medToolBoxSegmentationCustom(parent), d(new vistalProcessSegmentationGCEMToolBoxPrivate)
 {
     /* Image Input */
     d->dropSiteT1 = new medDropSite;
@@ -278,25 +275,15 @@ bool vistalProcessSegmentationGCEMToolBox::registered(void)
     return medToolBoxFactory::instance()->registerToolBox <vistalProcessSegmentationGCEMToolBox>
                             ("gcemSegmentation", "GCEM MS lesions segmentation",
                              "GraphCut w. EM init + outliers",
-                             QStringList() << "filtering");
+                             QStringList() << "segmentation");
 }
-
-
-dtkAbstractData* vistalProcessSegmentationGCEMToolBox::processOutput(void)
-{
-    if(!d->process)
-        return NULL;
-
-    return d->process->output();
-}
-
 
 void vistalProcessSegmentationGCEMToolBox::run(void)
 {
-    if(!this->parent())
+    if(!this->segmentationToolBox())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentationGCEM");
+    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("vistalProcessSegmentationGCEM");
 
     //    if(!this->parent()->data())
     //        return;
@@ -319,16 +306,7 @@ void vistalProcessSegmentationGCEMToolBox::run(void)
     d->process->setParameter((double)d->minSize->value(), 8);
     d->process->setParameter((double)d->wmneighb->value(), 9);
 
-    medRunnableProcess *runProcess = new medRunnableProcess;
-    runProcess->setProcess (d->process);
-
-    d->progression_stack->addJobItem(runProcess, "Progress:");
-
-    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
-    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
-    //    d->process->run();
-    medJobManager::instance()->registerJobItem(runProcess);
-    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
+    this->segmentationToolBox()->run( d->process );
 }
 
 void vistalProcessSegmentationGCEMToolBox::onT1ImageDropped(const medDataIndex &index)
