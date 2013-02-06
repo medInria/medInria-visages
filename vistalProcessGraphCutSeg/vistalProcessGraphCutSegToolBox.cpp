@@ -38,7 +38,6 @@ public:
     dtkSmartPointer<dtkAbstractData> maskData;
     dtkSmartPointer<vistalProcessGraphCutSeg> process;
     QList< dtkSmartPointer<dtkAbstractData> > imageDataList;
-    dtkSmartPointer<dtkAbstractData> outputData;
 };
 
 
@@ -199,7 +198,6 @@ void vistalProcessGraphCutSegToolBox::run()
 
     d->process->setInput( d->maskData,0); //setInput : mask then images
 
-    qDebug() << d->imageDataList.size();
     for(int image_nb = 0 ; image_nb < d->imageDataList.size() ; image_nb ++)
         d->process->setInput(d->imageDataList[image_nb], 1);
 
