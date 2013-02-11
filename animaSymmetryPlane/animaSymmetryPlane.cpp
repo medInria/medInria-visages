@@ -126,9 +126,11 @@ void animaSymmetryPlanePrivate::process ( void )
     matcher->SetNumberOfPyramidLevels(numberOfPyramidLevels);
     matcher->SetNumberOfThreads(numberOfThreads);
 
+    InputImageType *inputObject = dynamic_cast<InputImageType *> ( ( itk::Object* ) input->data() );
+        
     // set images
-    matcher->SetReferenceImage( dynamic_cast<InputImageType *> ( ( itk::Object* ) input->data() ) );
-    matcher->SetFloatingImage(  dynamic_cast<InputImageType *> ( ( itk::Object* ) input->data() ) );
+    matcher->SetReferenceImage(inputObject);
+    matcher->SetFloatingImage(inputObject);
 
     // process image
     matcher->Update();
@@ -259,7 +261,7 @@ int animaSymmetryPlane::update ( void )
 
     QString id = d->input->identifier();
 
-    qDebug() << "itkFilters, update : " << id;
+    qDebug() << "Symmetry plane, update : " << id;
 
     if ( id == "itkDataImageChar3" )
     {
