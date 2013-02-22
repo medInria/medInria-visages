@@ -6,8 +6,8 @@
 #include <dtkCore/dtkAbstractProcessFactory.h>
 
 #include <medToolBoxFactory.h>
-#include <medToolBoxSegmentation.h>
-#include <medToolBoxSegmentationCustom.h>
+#include <medSegmentationSelectorToolBox.h>
+#include <medSegmentationAbstractToolBox.h>
 #include <medPluginManager.h>
 #include <medDropSite.h>
 #include <medMultipleImageSelectionWidget.h>
@@ -41,7 +41,7 @@ public:
 };
 
 
-vistalProcessGraphCutSegToolBox::vistalProcessGraphCutSegToolBox(QWidget *parent) : medToolBoxSegmentationCustom(parent), d(new vistalProcessGraphCutSegToolBoxPrivate)
+vistalProcessGraphCutSegToolBox::vistalProcessGraphCutSegToolBox(QWidget *parent) : medSegmentationAbstractToolBox(parent), d(new vistalProcessGraphCutSegToolBoxPrivate)
 {
     d->process = NULL;
     

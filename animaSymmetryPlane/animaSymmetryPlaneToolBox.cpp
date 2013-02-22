@@ -22,7 +22,7 @@
 #include <medAbstractDataImage.h>
 
 #include <medToolBoxFactory.h>
-#include <medToolBoxFiltering.h>
+#include <medFilteringSelectorToolBox.h>
 #include <medProgressionStack.h>
 
 #include <pyramidalSymmetryBridge.h>
@@ -47,7 +47,7 @@ public:
     medProgressionStack * progression_stack;
 };
 
-animaSymmetryPlaneToolBox::animaSymmetryPlaneToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new animaSymmetryPlaneToolBoxPrivate)
+animaSymmetryPlaneToolBox::animaSymmetryPlaneToolBox(QWidget *parent) : medFilteringAbstractToolBox(parent), d(new animaSymmetryPlaneToolBoxPrivate)
 {
     QWidget *widget = new QWidget(this);
 

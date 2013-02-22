@@ -22,8 +22,9 @@
 #include <medAbstractDataImage.h>
 
 #include <medToolBoxFactory.h>
-#include <medToolBoxFiltering.h>
+#include <medFilteringSelectorToolBox.h>
 #include <medProgressionStack.h>
+#include <medPluginManager.h>
 
 class animaNonLocalMeansFilterToolBoxPrivate
 {
@@ -51,7 +52,7 @@ public:
 
 };
 
-animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new animaNonLocalMeansFilterToolBoxPrivate)
+animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent) : medFilteringAbstractToolBox(parent), d(new animaNonLocalMeansFilterToolBoxPrivate)
 {
 
     // Parameters:
@@ -157,7 +158,11 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
 
     connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
-
+    // Add about plugin
+    medPluginManager* pm = medPluginManager::instance();
+    dtkPlugin* plugin = pm->plugin ( "animaNonLocalMeansFilterPlugin" );
+    setAboutPluginButton ( plugin );
+    setAboutPluginVisibility( true );
 }
 
 animaNonLocalMeansFilterToolBox::~animaNonLocalMeansFilterToolBox(void)

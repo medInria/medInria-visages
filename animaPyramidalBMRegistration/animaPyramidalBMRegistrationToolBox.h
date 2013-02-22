@@ -5,12 +5,12 @@
 #ifndef ANIMAPYRAMIDALBMREGISTRATIONTOOLBOX_H
 #define ANIMAPYRAMIDALBMREGISTRATIONTOOLBOX_H
 
-#include <medToolBoxRegistrationCustom.h>
+#include <medRegistrationAbstractToolBox.h>
 #include "animaPyramidalBMRegistrationPluginExport.h"
 
 class animaPyramidalBMRegistrationToolBoxPrivate;
 
-class ANIMAPYRAMIDALBMREGISTRATIONPLUGIN_EXPORT animaPyramidalBMRegistrationToolBox : public medToolBoxRegistrationCustom
+class ANIMAPYRAMIDALBMREGISTRATIONPLUGIN_EXPORT animaPyramidalBMRegistrationToolBox : public medRegistrationAbstractToolBox
 {
     Q_OBJECT
     

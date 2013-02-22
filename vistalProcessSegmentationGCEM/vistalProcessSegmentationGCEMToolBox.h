@@ -2,12 +2,12 @@
 #ifndef VISTALPROCESSSegmentationGCEMTOOLBOX_H
 #define VISTALPROCESSSegmentationGCEMTOOLBOX_H
 
-#include <medToolBoxSegmentationCustom.h>
+#include <medSegmentationAbstractToolBox.h>
 #include <medDataIndex.h>
 
 class vistalProcessSegmentationGCEMToolBoxPrivate;
 
-class vistalProcessSegmentationGCEMToolBox : public medToolBoxSegmentationCustom
+class vistalProcessSegmentationGCEMToolBox : public medSegmentationAbstractToolBox
 {
     Q_OBJECT
 

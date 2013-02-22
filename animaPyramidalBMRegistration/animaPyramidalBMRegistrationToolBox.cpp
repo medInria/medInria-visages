@@ -22,7 +22,7 @@
 #include <medAbstractDataImage.h>
 
 #include <medToolBoxFactory.h>
-#include <medToolBoxRegistration.h>
+#include <medRegistrationSelectorToolBox.h>
 #include <medProgressionStack.h>
 #include <medToolBoxTab.h>
 
@@ -79,7 +79,7 @@ public:
     medProgressionStack * progression_stack;
 };
 
-animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget *parent) : medToolBoxRegistrationCustom(parent), d(new animaPyramidalBMRegistrationToolBoxPrivate)
+animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget *parent) : medRegistrationAbstractToolBox(parent), d(new animaPyramidalBMRegistrationToolBoxPrivate)
 {
     //QWidget *widget = new QWidget(this);
     //QToolBox *widget = new QToolBox(this);

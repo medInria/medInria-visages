@@ -5,12 +5,12 @@
 #ifndef ANIMANONLOCALMEANSFILTERTOOLBOX_H
 #define ANIMANONLOCALMEANSFILTERTOOLBOX_H
 
-#include <medToolBoxFilteringCustom.h>
+#include <medFilteringAbstractToolBox.h>
 #include "animaNonLocalMeansFilterPluginExport.h"
 
 class animaNonLocalMeansFilterToolBoxPrivate;
 
-class ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT animaNonLocalMeansFilterToolBox : public medToolBoxFilteringCustom
+class ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT animaNonLocalMeansFilterToolBox : public medFilteringAbstractToolBox
 {
     Q_OBJECT
 

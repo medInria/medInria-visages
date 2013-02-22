@@ -15,8 +15,8 @@
 #include <medCore/medJobManager.h>
 
 #include <medToolBoxFactory.h>
-#include <medToolBoxFiltering.h>
-#include <medToolBoxFilteringCustom.h>
+#include <medFilteringSelectorToolBox.h>
+#include <medFilteringAbstractToolBox.h>
 #include <medProgressionStack.h>
 #include <medPluginManager.h>
 
@@ -43,7 +43,7 @@ public:
         medProgressionStack * progression_stack;
 };
 
-vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessDenoisingToolBoxPrivate)
+vistalProcessDenoisingToolBox::vistalProcessDenoisingToolBox(QWidget *parent) : medFilteringAbstractToolBox(parent), d(new vistalProcessDenoisingToolBoxPrivate)
 {
       // Parameters:
 

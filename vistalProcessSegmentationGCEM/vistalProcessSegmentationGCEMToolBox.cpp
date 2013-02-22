@@ -15,7 +15,7 @@
 #include <medAbstractDataImage.h>
 
 #include <medToolBoxFactory.h>
-#include <medToolBoxSegmentation.h>
+#include <medSegmentationSelectorToolBox.h>
 #include <medProgressionStack.h>
 #include <medDropSite.h>
 #include <medDataManager.h>
@@ -74,7 +74,7 @@ vistalProcessSegmentationGCEMToolBoxPrivate::vistalProcessSegmentationGCEMToolBo
 }
 
 
-vistalProcessSegmentationGCEMToolBox::vistalProcessSegmentationGCEMToolBox(QWidget *parent) : medToolBoxSegmentationCustom(parent), d(new vistalProcessSegmentationGCEMToolBoxPrivate)
+vistalProcessSegmentationGCEMToolBox::vistalProcessSegmentationGCEMToolBox(QWidget *parent) : medSegmentationAbstractToolBox(parent), d(new vistalProcessSegmentationGCEMToolBoxPrivate)
 {
     /* Image Input */
     d->dropSiteT1 = new medDropSite;

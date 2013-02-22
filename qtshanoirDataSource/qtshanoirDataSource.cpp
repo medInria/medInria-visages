@@ -203,7 +203,7 @@ void qtshanoirDataSource::find()
 	QtShanoir::instance()->find();  
 }
 
-QList<medToolBox*> qtshanoirDataSource::getToolboxes()
+QList<medToolBox*> qtshanoirDataSource::getToolBoxes()
 {  
     return d->additional_toolboxes;
 }

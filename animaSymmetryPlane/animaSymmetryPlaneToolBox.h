@@ -5,12 +5,12 @@
 #ifndef ANIMASYMMETRYPLANETOOLBOX_H
 #define ANIMASYMMETRYPLANETOOLBOX_H
 
-#include <medToolBoxFilteringCustom.h>
+#include <medFilteringAbstractToolBox.h>
 #include "animaSymmetryPlanePluginExport.h"
 
 class animaSymmetryPlaneToolBoxPrivate;
 
-class ANIMASYMMETRYPLANEPLUGIN_EXPORT animaSymmetryPlaneToolBox : public medToolBoxFilteringCustom
+class ANIMASYMMETRYPLANEPLUGIN_EXPORT animaSymmetryPlaneToolBox : public medFilteringAbstractToolBox
 {
     Q_OBJECT
 

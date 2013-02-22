@@ -60,7 +60,7 @@ QString animaNonLocalMeansFilterPlugin::name(void) const
 
 QString animaNonLocalMeansFilterPlugin::description(void) const
 {
-    return tr("Non Local Means denosing filter for diffusion images.");
+     return "This plugin provides the NL-Means denoising filter as proposed by Coupe et al.: <a href=\"http://dx.doi.org/10.1109/TMI.2007.906087\">http://dx.doi.org/10.1109/TMI.2007.906087</a>. It also implements 4D NL-Means Rician filtering as proposed by Wiest-Daessle et al.: <a href=\"http://dx.doi.org/10.1109/TMI.2007.906087\">http://dx.doi.org/10.1109/TMI.2007.906087</a>. \n 3D and 4D images are supported.";
 }
 
 QString animaNonLocalMeansFilterPlugin::version(void) const
@@ -70,19 +70,17 @@ QString animaNonLocalMeansFilterPlugin::version(void) const
 
 QString animaNonLocalMeansFilterPlugin::contact(void) const
 {
-    return "";
+    return "Olivier Commowick <Olivier.Commowick@inria.fr>";
 }
 
 QStringList animaNonLocalMeansFilterPlugin::authors(void) const
 {
-    QStringList list;
-    return list;
+    return QStringList() << "Rene-Paul Debroize <Rene-Paul.Debroize@inria.fr>";
 }
 
 QStringList animaNonLocalMeansFilterPlugin::contributors(void) const
 {
-    QStringList list;
-    return list;
+    return QStringList() << "Rene-Paul Debroize <Rene-Paul.Debroize@inria.fr>";
 }
 
 QString animaNonLocalMeansFilterPlugin::identifier(void) const

@@ -1,12 +1,12 @@
 #ifndef VISTALPROCESSGRAPHCUTSEGTOOLBOX_H
 #define VISTALPROCESSGRAPHCUTSEGTOOLBOX_H
 
-#include <medToolBoxSegmentationCustom.h>
+#include <medSegmentationAbstractToolBox.h>
 #include <medDataIndex.h>
 
 class vistalProcessGraphCutSegToolBoxPrivate;
 
-class vistalProcessGraphCutSegToolBox : public medToolBoxSegmentationCustom
+class vistalProcessGraphCutSegToolBox : public medSegmentationAbstractToolBox
 {
     Q_OBJECT
 
