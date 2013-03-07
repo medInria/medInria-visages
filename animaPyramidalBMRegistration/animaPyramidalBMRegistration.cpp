@@ -133,7 +133,7 @@ animaPyramidalBMRegistration::~animaPyramidalBMRegistration(void)
     typedef itk::Image< float, 3 >  RegImageType;
     
     if (d->registrationMethod)
-        delete static_cast<rpi::AnimaPyramidalBMRegistration< RegImageType, RegImageType,float > *>(d->registrationMethod);
+        delete static_cast<rpi::AnimaPyramidalBMRegistration< RegImageType, RegImageType,double > *>(d->registrationMethod);
 
     d->registrationMethod = NULL;
     
@@ -186,8 +186,8 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     typedef itk::Image< PixelType, 3 >  FixedImageType;
     typedef itk::Image< PixelType, 3 >  MovingImageType;
         
-    typename rpi::AnimaPyramidalBMRegistration<FixedImageType,MovingImageType, float> * registration =
-    new rpi::AnimaPyramidalBMRegistration<FixedImageType,MovingImageType,float> ();
+    typename rpi::AnimaPyramidalBMRegistration<FixedImageType,MovingImageType, double> * registration =
+    new rpi::AnimaPyramidalBMRegistration<FixedImageType,MovingImageType,double> ();
     
     // set callback
     callback = itk::CStyleCommand::New();
@@ -249,7 +249,7 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     
     qDebug() << "Elasped time: " << (double)(t2-t1)/(double)CLOCKS_PER_SEC;
     
-    typedef itk::ResampleImageFilter< MovingImageType,MovingImageType,float >    ResampleFilterType;
+    typedef itk::ResampleImageFilter< MovingImageType,MovingImageType,double >    ResampleFilterType;
     typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
     resampler->SetTransform(registration->GetTransformation());
     resampler->SetInput((const MovingImageType*)proc->movingImages()[0].GetPointer());
@@ -325,7 +325,7 @@ bool animaPyramidalBMRegistration::writeTransform(const QString& file)
 template <typename PixelType>
 void animaPyramidalBMRegistrationPrivate::abort (void)
 {  
-    typedef float TransformScalarType;
+    typedef double TransformScalarType;
     typedef itk::Image< PixelType, 3 > RegImageType;
     
     if (rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
