@@ -392,9 +392,9 @@ void animaPyramidalBMRegistrationToolBox::run(void)
 
         this->parentToolBox()->setProcess(process);
     }
-    dtkAbstractData *fixedData = this->parentToolBox()->fixedData();
-    dtkAbstractData *movingData = this->parentToolBox()->movingData();
     
+    dtkSmartPointer<dtkAbstractData> fixedData = this->parentToolBox()->fixedData();
+    dtkSmartPointer<dtkAbstractData> movingData = this->parentToolBox()->movingData();    
     
     if (!fixedData || !movingData)
         return;
