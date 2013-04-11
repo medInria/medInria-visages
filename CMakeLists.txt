@@ -1,22 +1,3 @@
-### CMakeLists.txt ---
-##
-## Author: Julien Wintz
-## Copyright (C) 2008 - Julien Wintz, Inria.
-## Created: Mon Sep 21 14:48:02 2009 (+0200)
-## Version: $Id$
-## Last-Updated: Thu Jun 17 09:42:14 2010 (+0200)
-##           By: Julien Wintz
-##     Update #: 25
-######################################################################
-##
-### Commentary:
-##
-######################################################################
-##
-### Change log:
-##
-######################################################################
-
 cmake_minimum_required(VERSION 2.8.1)
 
 project(medInria-visages-plugins)
@@ -60,17 +41,18 @@ option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" 
 option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageReader plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWriter plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "ON")
-option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "OFF")
+option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN     "Build vistalProcessSegmentationSTREM plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProcessSegmentationGCEM plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
-option(MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN     "Build animaSymmetryPlane plugin" "OFF")
-option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "OFF")
-option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-PyramidalBMRegistration plugin" "OFF")
+option(MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN     "Build animaSymmetryPlane plugin" "ON")
+option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "ON")
+option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-PyramidalBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN     "Build vistalProcessGraphCutSeg plugin" "OFF")
 
 option(BUILD_DOCUMENTATION "Build documentation")
+option(BUILD_EXAMPLES "Build examples" OFF)
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
     add_subdirectory(vistalDataImage)

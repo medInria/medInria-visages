@@ -103,17 +103,18 @@ target_link_libraries(${PROJECT_NAME}
 dtk_build_doc(vistalProcessSegmentationSTREMPlugin)
 
 
+if (BUILD_EXAMPLES)
+  add_executable(${PROJECT_NAME}App
+    vistalProcessSegmentationSTREMTestingApp.cpp
+  )
 
-
-add_executable(${PROJECT_NAME}App
-  vistalProcessSegmentationSTREMTestingApp.cpp
-)
-
-target_link_libraries(${PROJECT_NAME}App
- ${QT_LIBRARIES}
-  ${VISTAL_LIBS}
-  dtkCore
-  medCore)
+  target_link_libraries(${PROJECT_NAME}App
+    ${QT_LIBRARIES}
+    ${VISTAL_LIBS}
+    dtkCore
+    medCore
+  )
+endif()
 
 ## #################################################################
 ## Install rules

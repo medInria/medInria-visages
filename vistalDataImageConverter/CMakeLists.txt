@@ -122,17 +122,18 @@ dtk_build_doc(vistalDataImageConverterPlugin)
 
 # Testing app
 
-add_executable(${PROJECT_NAME}Testing
-  vistalDataImageConverterTestingApp.cpp
-)
-
-target_link_libraries(${PROJECT_NAME}Testing
- ${QT_LIBRARIES}
-  ${MSTOOLS_LIB}
-  ${VISTAL_LIBS}
-  dtkCore
+if (BUILD_EXAMPLES)
+  add_executable(${PROJECT_NAME}Testing
+    vistalDataImageConverterTestingApp.cpp
   )
 
+  target_link_libraries(${PROJECT_NAME}Testing
+    ${QT_LIBRARIES}
+    ${MSTOOLS_LIB}
+    ${VISTAL_LIBS}
+    dtkCore
+  )
+endif()
 
 ## #################################################################
 ## Install rules

@@ -88,18 +88,21 @@ target_link_libraries(${PROJECT_NAME}
 
 dtk_build_doc(vistalProcessBiasRemovalPlugin)
 
-add_executable(${PROJECT_NAME}Testing
-  vistalProcessBiasRemovalTestingApp.cpp
-)
+if (BUILD_EXAMPLES)
+  add_executable(${PROJECT_NAME}Testing
+    vistalProcessBiasRemovalTestingApp.cpp
+  )
 
-target_link_libraries(${PROJECT_NAME}Testing
-  ${QT_LIBRARIES}
-  ${VISTAL_LIBS}
-  dtkCore
-  dtkLog
-  medCore
-  medGui
-)
+  target_link_libraries(${PROJECT_NAME}Testing
+    ${QT_LIBRARIES}
+    ${VISTAL_LIBS}
+    dtkCore
+    dtkLog
+    medCore
+    medGui
+  )
+
+endif()
 
 ## #################################################################
 ## Install rules

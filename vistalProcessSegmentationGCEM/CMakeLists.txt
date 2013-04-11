@@ -105,16 +105,19 @@ dtk_build_doc(vistalProcessSegmentationGCEMPlugin)
 
 include_directories(${MSTOOLS_INC})
 
-add_executable(${PROJECT_NAME}App
-  vistalProcessSegmentationGCEMTestingApp.cpp
-)
+if (BUILD_EXAMPLES)
+  add_executable(${PROJECT_NAME}App
+    vistalProcessSegmentationGCEMTestingApp.cpp
+  )
 
-target_link_libraries(${PROJECT_NAME}App
- ${QT_LIBRARIES}
-  mstools
-  ${VISTAL_LIBS}
-  dtkCore
-  medCore)
+  target_link_libraries(${PROJECT_NAME}App
+    ${QT_LIBRARIES}
+    mstools
+    ${VISTAL_LIBS}
+    dtkCore
+    medCore
+  )
+endif()
 
 ## #################################################################
 ## Install rules

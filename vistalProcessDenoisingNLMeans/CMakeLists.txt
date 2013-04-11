@@ -87,13 +87,15 @@ target_link_libraries(${PROJECT_NAME}
 
 dtk_build_doc(vistalProcessDenoisingPlugin)
 
-add_executable(${PROJECT_NAME}Testing
-  vistalProcessDenoisingTestingApp.cpp
-)
+if (BUILD_EXAMPLES)
+  add_executable(${PROJECT_NAME}Testing
+    vistalProcessDenoisingTestingApp.cpp
+  )
 
-target_link_libraries(${PROJECT_NAME}Testing
-  ${PROJECT_NAME}
-)
+  target_link_libraries(${PROJECT_NAME}Testing
+    ${PROJECT_NAME}
+  )
+endif()
 
 ## #################################################################
 ## Install rules
