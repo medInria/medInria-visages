@@ -38,11 +38,6 @@ find_package(Vistal REQUIRED)
 include(${VISTAL_USE_FILE})
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${BACKUP_MODULE_PATH}")
 
-IF(APPLE)
-  include(FixBoostMacInstall)
-  FixBoostMacInstall()
-ENDIF(APPLE)
-
 # medInria
 find_package(medInria REQUIRED)
 include(${medInria_USE_FILE})
@@ -89,11 +84,6 @@ target_link_libraries(${PROJECT_NAME}
   medCore
   medGui
   )
-
-if(APPLE)
-  include(FixBoostMacLink)
-  FixBoostMacLink(${PROJECT_NAME})
-endif(APPLE)
 
 dtk_build_doc(vistalProcessDenoisingPlugin)
 

@@ -44,9 +44,6 @@ if(ITK_FOUND)
    include(${ITK_USE_FILE})
 endif(ITK_FOUND)
 
-find_package(medInria-plugins REQUIRED)
-include(${medInria-plugins_USE_FILE})
-
 find_package(ANIMA-REGISTRATION REQUIRED)
 include(${ANIMA-REGISTRATION_USE_FILE})
 

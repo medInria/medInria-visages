@@ -47,16 +47,6 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_BUILD)
 mark_as_advanced(${PROJECT_NAME}_VERSION_BUGFIX)
 
 ## #################################################################
-## Dashboard settings
-## #################################################################
-
-enable_testing()
-
-mark_as_advanced(DART_ROOT)
-
-include(Dart)
-
-## #################################################################
 ## Input
 ## #################################################################
 
