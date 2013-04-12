@@ -49,4 +49,11 @@ if(UNIX AND NOT APPLE)
   set (CPACK_DEBIAN_PACKAGE_DEPENDS "dtk (>= 0.1.21)") 
 endif(UNIX AND NOT APPLE)
 
+if (APPLE)
+  set(CPACK_BINARY_PACKAGEMAKER OFF)
+  set(CPACK_BINARY_TGZ ON)
+
+  set(CPACK_INSTALL_SCRIPT ${PROJECT_BINARY_DIR}/ApplePackScript.cmake)
+endif()
+
 include(CPack)

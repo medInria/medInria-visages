@@ -1,0 +1,2 @@
+execute_process(COMMAND make install)
+execute_process(COMMAND @PROJECT_BINARY_DIR@/fix_apple_links_and_package.sh)

@@ -31,11 +31,9 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_BUGFIX)
 ## Input
 ## #################################################################
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(DEPENDS_ON_DTK 1)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(pack)
 
 option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" "ON")
 option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageReader plugin" "ON")
@@ -111,10 +109,12 @@ if (MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN)
 endif()
 
 if (APPLE)
-  configure_file(${PROJECT_SOURCE_DIR}/packageScripts/mac_vistal_package_maker.sh.in
-                 ${PROJECT_BINARY_DIR}/mac_vistal_package_maker.sh)
-  configure_file(${PROJECT_SOURCE_DIR}/packageScripts/mac_visages_plugins_release_prepare.sh.in
-                 ${PROJECT_BINARY_DIR}/mac_visages_plugins_release_prepare.sh)
+  configure_file(${PROJECT_SOURCE_DIR}/packageScripts/fix_apple_links_and_package.sh.in
+                 ${PROJECT_BINARY_DIR}/tmp_fix_apple_links_and_package.sh.in)
+  configure_file(${PROJECT_BINARY_DIR}/tmp_fix_apple_links_and_package.sh.in
+                 ${PROJECT_BINARY_DIR}/fix_apple_links_and_package.sh)
+  configure_file(${PROJECT_SOURCE_DIR}/cmake/ApplePackScript.cmake.in
+                 ${PROJECT_BINARY_DIR}/ApplePackScript.cmake)
 endif()
 
 if(BUILD_DOCUMENTATION)
@@ -148,3 +148,5 @@ if(WIN32)
     endif(NOT CYGWIN)
   endif(NOT BORLAND)
 endif(WIN32)
+
+include(pack)

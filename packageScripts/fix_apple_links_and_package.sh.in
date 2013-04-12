@@ -1,0 +1,19 @@
+#!/bin/bash
+
+cd @CMAKE_INSTALL_PREFIX@
+
+# Copy medInria from somewhere else not to pollute it
+\cp -r @medInria_DIR@/bin/medInria.app .
+@dtk_DIR@/bin/dtkDeploy medInria.app -inject=@CMAKE_INSTALL_PREFIX@/plugins &>/dev/null
+
+\rm -fr plugins/*
+\cp -r medInria.app/Contents/PlugIns/*.dylib plugins
+
+\rm -fr medInria.app
+
+\rm -fr PackageRootDir
+mkdir -p PackageRootDir/Library/Application\ Support/inria/medInria-plugins
+\cp -r plugins/* PackageRootDir/Library/Application\ Support/inria/medInria-plugins/
+
+# Now do the packaging using package maker
+/Developer/usr/bin/packagemaker --title "@PROJECT_NAME@" --version @@PROJECT_NAME@_VERSION@ --filter "\.DS_Store" --root-volume-only --domain user --verbose --no-relocate --target 10.5 --id com.fr.inria.medInria.visages --root @CMAKE_INSTALL_PREFIX@/PackageRootDir --out @CMAKE_INSTALL_PREFIX@/@PROJECT_NAME@-@@PROJECT_NAME@_VERSION@.pkg
