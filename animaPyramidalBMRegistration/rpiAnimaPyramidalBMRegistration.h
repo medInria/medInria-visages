@@ -126,7 +126,10 @@ public:
     void SetLastPyramidLevel ( unsigned int LastPyramidLevel );
 
     void SetNumberOfThreads ( int numberOfThreads );
-
+    
+    unsigned int GetNumberOfPyramidLevels ();
+    
+    unsigned int GetMaximumIterations ();
 
     /**
      * Performs the image registration. Must be called before GetTransformation().

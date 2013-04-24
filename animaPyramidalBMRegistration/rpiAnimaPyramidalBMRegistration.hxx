@@ -149,6 +149,13 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 {
     matcher->SetMaximumIterations ( MaximumIterations );
 }
+    
+    template < class TFixedImage, class TMovingImage, class TTransformScalarType >
+    unsigned int AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
+    ::GetMaximumIterations ()
+    {
+        return matcher->GetMaximumIterations ();
+    }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
@@ -289,6 +296,13 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 {
     matcher->SetNumberOfPyramidLevels ( NumberOfPyramidLevels );
 }
+    
+    template < class TFixedImage, class TMovingImage, class TTransformScalarType >
+    unsigned int AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
+    ::GetNumberOfPyramidLevels ()
+    {
+        return matcher->GetNumberOfPyramidLevels ();
+    }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >

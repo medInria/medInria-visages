@@ -149,7 +149,7 @@ bool animaPyramidalBMRegistration::registered(void)
 
 QString animaPyramidalBMRegistration::description(void) const
 {
-    return "animaPyramidalBMRegistration";
+    return "Pyramidal BM Registration";
 }
 
 QString animaPyramidalBMRegistration::identifier(void) const
@@ -157,7 +157,38 @@ QString animaPyramidalBMRegistration::identifier(void) const
     return "animaPyramidalBMRegistration";
 }
 
+itk::Transform<double,3,3>::Pointer animaPyramidalBMRegistration::getTransform()
+{
+    typedef float PixelType;
+    typedef double TransformScalarType;
+    typedef itk::Image< PixelType, 3 > RegImageType;
+    //normaly should use long switch cases, but here we know we work with float3 data.
+    if (rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
+        static_cast<rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> *>(d->registrationMethod))
+    {
+        return registration->GetTransformation();
+    }
+    else
+        return NULL;
+}
 
+QStringList * animaPyramidalBMRegistration::getTitleAndParameters()
+{
+    typedef float PixelType;
+    typedef double TransformScalarType;
+    typedef itk::Image< PixelType, 3 > RegImageType;
+    //normaly should use long switch cases, but here we know we work with float3 data.
+    typedef rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> RegistrationType;
+    RegistrationType * registration = static_cast<RegistrationType *>(d->registrationMethod);
+    
+    QStringList * titleAndParameters = new QStringList();
+    titleAndParameters->append(QString("Pyramidal BM Registration"));
+    titleAndParameters->append(QString(" Number of pyramid levels: ") + QString::number(registration->GetNumberOfPyramidLevels()));
+    titleAndParameters->append(QString(" Number of iterations per level: ") + QString::number(registration->GetMaximumIterations()));
+
+    //TO DO : add transform type and optimizer used to parameters given
+    return titleAndParameters;
+}
 
 // /////////////////////////////////////////////////////////////////
 // Templated Version of update
