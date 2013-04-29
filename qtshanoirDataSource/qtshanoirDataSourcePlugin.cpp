@@ -26,7 +26,7 @@ public:
 
 qtshanoirDataSourcePlugin::qtshanoirDataSourcePlugin(QObject *parent) : dtkPlugin(parent), d(new qtshanoirDataSourcePluginPrivate)
 {
-  
+    Q_INIT_RESOURCE(qtshanoir);
 }
 
 qtshanoirDataSourcePlugin::~qtshanoirDataSourcePlugin(void)
