@@ -6,7 +6,7 @@
 #include "vistalProcessSegmentationSTREMPlugin.h"
 #include "vistalProcessSegmentationSTREMToolBox.h"
 
-#include <dtkCore/dtkLog.h>
+#include <dtkLog/dtkLog.h>
 
 // /////////////////////////////////////////////////////////////////
 // vistalProcessSegmentationPluginPrivate
@@ -37,10 +37,14 @@ vistalProcessSegmentationSTREMPlugin::~vistalProcessSegmentationSTREMPlugin(void
 bool vistalProcessSegmentationSTREMPlugin::initialize(void)
 {
     if(!vistalProcessSegmentationSTREM::registered())
-        dtkWarning() << "Unable to register vistalProcessSegmentationSTREM type";
+    {
+        dtkWarn() << "Unable to register vistalProcessSegmentationSTREM type";
+    }
 
     if(!vistalProcessSegmentationSTREMToolBox::registered())
-        dtkWarning() << "Unable to register vistalProcessSegmentationSTREM toolbox";
+    {
+        dtkWarn() << "Unable to register vistalProcessSegmentationSTREM toolbox";
+    }
 
     return true;
 }

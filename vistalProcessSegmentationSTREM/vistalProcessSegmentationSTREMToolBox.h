@@ -2,11 +2,12 @@
 #ifndef VISTALPROCESSSegmentationSTREMTOOLBOX_H
 #define VISTALPROCESSSegmentationSTREMTOOLBOX_H
 
-#include <medToolBoxFilteringCustom.h>
+#include <medDataIndex.h>
+#include <medSegmentationAbstractToolBox.h>
 
 class vistalProcessSegmentationSTREMToolBoxPrivate;
 
-class vistalProcessSegmentationSTREMToolBox : public medToolBoxFilteringCustom
+class vistalProcessSegmentationSTREMToolBox : public medSegmentationAbstractToolBox
 {
     Q_OBJECT
 
@@ -16,7 +17,6 @@ public:
 
 public:
     static bool registered(void);
-    dtkAbstractData* processOutput();
 
 signals:
     void success(void);
@@ -24,19 +24,17 @@ signals:
 
 public slots:
 
-    void onT1ImageDropped(void);
-    void onPDImageDropped(void);
-    void onT2orFLAIRImageDropped(void);
+    void onT1ImageDropped(const medDataIndex &index);
+    void onPDImageDropped(const medDataIndex &index);
+    void onT2orFLAIRImageDropped(const medDataIndex &index);
 
-    void onMaskImageDropped(void);
+    void onMaskImageDropped(const medDataIndex &index);
 
     void run(void);
 
 private:
     vistalProcessSegmentationSTREMToolBoxPrivate *d;
 };
-
-medToolBoxFilteringCustom *createVistalProcessSegmentationSTREMToolBox(QWidget *parent);
 
 #endif
 

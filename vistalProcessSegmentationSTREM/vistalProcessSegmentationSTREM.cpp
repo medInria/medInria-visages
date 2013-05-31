@@ -40,7 +40,7 @@
 #include "mstoolsMahalanobisThreshold.h"
 #include "mstoolsChi2.h"
 
-
+#include <medMetaDataKeys.h>
 
 
 //#include "mstoolsIO.h"
@@ -56,7 +56,7 @@ public:
     vistalProcessSegmentationSTREMPrivate();
     ~vistalProcessSegmentationSTREMPrivate();
     // Channel 0 to 2
-    std::vector< vistal::Image3D<unsigned char> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
+    QList < dtkSmartPointer <dtkAbstractData> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
     vistal::Image3D<unsigned char> im1,im2, im3;
     // Channel 3
     vistal::Image3D<unsigned char> mask; // Mask image
@@ -77,7 +77,7 @@ public:
     int minsize, wmneighbor;
 
 
-    dtkAbstractData *output;
+    dtkSmartPointer <dtkAbstractData> output;
 
 };
 
@@ -131,12 +131,9 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
     if (!d) return;
     if (d->input.size() != 3)
     {
-        //		qDebug() << "Setting the size of temporary input";
-     //   vistal::Image3D<unsigned char> ima;
-//        d->input.push_back(ima);
-//        d->input.push_back(ima);
-//        d->input.push_back(ima);
-        d->input.resize(3);
+        d->input.push_back(NULL);
+        d->input.push_back(NULL);
+        d->input.push_back(NULL);
     }
 
     dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
@@ -152,10 +149,7 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
 
     if (channel >= 0 && channel < 3)
     {
-
-        vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )dU8->data());
-        if (!ima) { qDebug() << "Input error with image!!!"; return; }
-        d->input[channel] = *ima;
+        d->input[channel] = dU8;
     }
     if (channel == 3)
     {
@@ -241,9 +235,16 @@ int vistalProcessSegmentationSTREM::update(void)
         return -1;
     }
 
-    std::vector<vistal::Image3D<unsigned char> > &input = d->input ;
-
-
+    std::vector<vistal::Image3D<unsigned char> > input;
+    
+    foreach (dtkAbstractData *image, d->input)
+    {
+        vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )image->data());
+        if (!ima) { qDebug() << "What the fuck the image is fucked up here!!!"; return -1; }
+        
+        input.push_back(*ima);
+    }
+    
     FiniteModel initia;
 
     for(unsigned int i=0; i<3; i++)
@@ -347,10 +348,7 @@ int vistalProcessSegmentationSTREM::update(void)
 
     unsigned iterations = 0;
 
-    //        double value =
-
     estimator->run(iterations);
-
 
     FiniteModel solution = estimator->getModel();
 
@@ -449,8 +447,17 @@ int vistalProcessSegmentationSTREM::update(void)
     vistal::Image3D<unsigned char> *fclassif = new vistal::Image3D<unsigned char>;
     rulesWM4lesions(*fclassif,noborderlesions,nclassif,solution.size()+1,d->wmneighbor,/*verbose=*/false);
 
-    d->output = dynamic_cast <dtkAbstractData *>(dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3"));
-    d->output->setData(fclassif);
+    dtkAbstractData *tmpData = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+    tmpData->setData(fclassif);
+    d->output = tmpData->convert("itkDataImageUChar3");
+    
+    foreach(QString list, d->input[0]->metaDataList())
+    d->output->addMetaData(list, d->input[0]->metaDataValues(list));
+    
+    QString newSeriesDescription = d->output->metadata(medMetaDataKeys::SeriesDescription.key());
+    newSeriesDescription += " STREM lesions segmentation";
+    
+    d->output->setMetaData(medMetaDataKeys::SeriesDescription.key(),newSeriesDescription);
 
     return EXIT_SUCCESS;
 }

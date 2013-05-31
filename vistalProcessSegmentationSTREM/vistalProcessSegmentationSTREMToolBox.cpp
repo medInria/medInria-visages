@@ -15,8 +15,8 @@
 #include <medAbstractDataImage.h>
 
 #include <medToolBoxFactory.h>
-#include <medToolBoxFiltering.h>
-#include <medToolBoxFilteringCustom.h>
+#include <medSegmentationSelectorToolBox.h>
+#include <medSegmentationAbstractToolBox.h>
 #include <medProgressionStack.h>
 #include <medDropSite.h>
 #include <medCore/medDataManager.h>
@@ -72,13 +72,11 @@ public:
 
       */
 
-
-
     QPushButton *runButton;
 
     int startLock;
 
-    dtkAbstractProcess* process;
+    dtkSmartPointer <dtkAbstractProcess> process;
     medProgressionStack * progression_stack;
 
     /* Pointer to the data to be processed*/
@@ -86,8 +84,6 @@ public:
     dtkSmartPointer <dtkAbstractData> dataPD;
     dtkSmartPointer <dtkAbstractData> dataT2;
     dtkSmartPointer <dtkAbstractData> dataMask;
-
-
 };
 
 
@@ -100,7 +96,7 @@ vistalProcessSegmentationSTREMToolBoxPrivate::vistalProcessSegmentationSTREMTool
 }
 
 
-vistalProcessSegmentationSTREMToolBox::vistalProcessSegmentationSTREMToolBox(QWidget *parent) : medToolBoxFilteringCustom(parent), d(new vistalProcessSegmentationSTREMToolBoxPrivate)
+vistalProcessSegmentationSTREMToolBox::vistalProcessSegmentationSTREMToolBox(QWidget *parent) : medSegmentationAbstractToolBox(parent), d(new vistalProcessSegmentationSTREMToolBoxPrivate)
 {
     /* Image Input */
     d->dropSiteT1 = new medDropSite;
@@ -256,11 +252,11 @@ vistalProcessSegmentationSTREMToolBox::vistalProcessSegmentationSTREMToolBox(QWi
     d->runButton->setDisabled(true); // Need to add all the data prior to start
 
     // Connect the created dropsite
-    connect(d->dropSiteT1, SIGNAL(objectDropped()), this, SLOT(onT1ImageDropped()));
+    connect(d->dropSiteT1, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(onT1ImageDropped(const medDataIndex &)));
 
-    connect(d->dropSiteT2, SIGNAL(objectDropped()), this, SLOT(onT2orFLAIRImageDropped()));
-    connect(d->dropSitePD, SIGNAL(objectDropped()), this, SLOT(onPDImageDropped()));
-    connect(d->dropSiteMask, SIGNAL(objectDropped()), this, SLOT(onMaskImageDropped()));
+    connect(d->dropSiteT2, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(onT2orFLAIRImageDropped(const medDataIndex &)));
+    connect(d->dropSitePD, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(onPDImageDropped(const medDataIndex &)));
+    connect(d->dropSiteMask, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(onMaskImageDropped(const medDataIndex &)));
 
     connect(d->runButton, SIGNAL(clicked()), this, SLOT(run()));
 }
@@ -274,26 +270,17 @@ vistalProcessSegmentationSTREMToolBox::~vistalProcessSegmentationSTREMToolBox(vo
 
 bool vistalProcessSegmentationSTREMToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerCustomFilteringToolBox("Rob. EM Segm. with outliers detection",
-                                                                         createVistalProcessSegmentationSTREMToolBox);
+    return medToolBoxFactory::instance()->registerToolBox <vistalProcessSegmentationSTREMToolBox> ("stremSegmentation", "STREM MS lesions segmentation",
+                                                          "Rob. EM Segm. with outliers detection",
+                                                          QStringList() << "segmentation");
 }
-
-
-dtkAbstractData* vistalProcessSegmentationSTREMToolBox::processOutput(void)
-{
-    if(!d->process)
-        return NULL;
-
-    return d->process->output();
-}
-
 
 void vistalProcessSegmentationSTREMToolBox::run(void)
 {
-    if(!this->parent())
+    if(!this->segmentationToolBox())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->create("vistalProcessSegmentationSTREM");
+    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("vistalProcessSegmentationSTREM");
 
 //    if(!this->parent()->data())
 //        return;
@@ -316,24 +303,11 @@ void vistalProcessSegmentationSTREMToolBox::run(void)
     d->process->setParameter((double)d->minSize->value(), 8);
     d->process->setParameter((double)d->wmneighb->value(), 9);
 
-    medRunnableProcess *runProcess = new medRunnableProcess;
-    runProcess->setProcess (d->process);
-
-    d->progression_stack->addJobItem(runProcess, "Progress:");
-
-    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
-    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
-//    d->process->run();
-    medJobManager::instance()->registerJobItem(runProcess);
-    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
+    this->segmentationToolBox()->run( d->process );
 }
 
-void vistalProcessSegmentationSTREMToolBox::onT1ImageDropped()
+void vistalProcessSegmentationSTREMToolBox::onT1ImageDropped(const medDataIndex &index)
 {
-    medDataIndex index = d->dropSiteT1->index();
-
-    qDebug() << "Loading index " << index;
-    
     if (!index.isValid())
         return;
 
@@ -352,10 +326,8 @@ void vistalProcessSegmentationSTREMToolBox::onT1ImageDropped()
 }
 
 
-void vistalProcessSegmentationSTREMToolBox::onPDImageDropped()
+void vistalProcessSegmentationSTREMToolBox::onPDImageDropped(const medDataIndex &index)
 {
-    medDataIndex index = d->dropSitePD->index();
-
     if (!index.isValid())
         return;
 
@@ -372,10 +344,8 @@ void vistalProcessSegmentationSTREMToolBox::onPDImageDropped()
     //emit dataSelected(d->data);
 }
 
-void vistalProcessSegmentationSTREMToolBox::onT2orFLAIRImageDropped()
+void vistalProcessSegmentationSTREMToolBox::onT2orFLAIRImageDropped(const medDataIndex &index)
 {
-    medDataIndex index = d->dropSiteT2->index();
-
     if (!index.isValid())
         return;
 
@@ -391,10 +361,8 @@ void vistalProcessSegmentationSTREMToolBox::onT2orFLAIRImageDropped()
     //emit dataSelected(d->data);
 }
 
-void vistalProcessSegmentationSTREMToolBox::onMaskImageDropped()
+void vistalProcessSegmentationSTREMToolBox::onMaskImageDropped(const medDataIndex &index)
 {
-    medDataIndex index = d->dropSiteMask->index();
-
     if (!index.isValid())
         return;
 
@@ -408,11 +376,4 @@ void vistalProcessSegmentationSTREMToolBox::onMaskImageDropped()
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
     //emit dataSelected(d->data);
-}
-
-
-
-medToolBoxFilteringCustom *createVistalProcessSegmentationSTREMToolBox(QWidget *parent)
-{
-    return new vistalProcessSegmentationSTREMToolBox(parent);
 }

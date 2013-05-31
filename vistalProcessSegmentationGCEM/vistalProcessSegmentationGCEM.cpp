@@ -416,7 +416,6 @@ int vistalProcessSegmentationGCEM::update(void)
     
     estimator->run(iterations);
     
-    
     FiniteModel solution = estimator->getModel();
     
     // Got the segmentation ....
@@ -579,8 +578,9 @@ int vistalProcessSegmentationGCEM::update(void)
     vistal::Image3D<unsigned char> *fclassif = new vistal::Image3D<unsigned char>;
     rulesWM4lesions(*fclassif,noborderlesions,nclassif,solution.size()+1,d->wmneighbor,/*verbose=*/false);
     
-    d->output = dtkAbstractDataFactory::instance()->createSmartPointer("vistalDataImageUChar3");
-    d->output->setData(fclassif);
+    dtkAbstractData *tmpData = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+    tmpData->setData(fclassif);
+    d->output = tmpData->convert("itkDataImageUChar3");
     
     foreach(QString list, d->input[0]->metaDataList())
         d->output->addMetaData(list, d->input[0]->metaDataValues(list));

@@ -97,6 +97,7 @@ target_link_libraries(${PROJECT_NAME}
   ${VISTAL_LIBS}
   mstools
   dtkCore
+  dtkLog
   medCore
   medGui)
 
