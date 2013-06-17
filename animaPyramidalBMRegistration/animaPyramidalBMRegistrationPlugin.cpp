@@ -64,7 +64,7 @@ QString animaPyramidalBMRegistrationPlugin::name(void) const
 
 QString animaPyramidalBMRegistrationPlugin::description(void) const
 {
-    return tr("");
+    return "This plugin provides an ITK implementation of global block-matching based registration as proposed by Commowick et al.: <a href=\"http://dx.doi.org/10.1109/ISBI.2012.6235644\">http://dx.doi.org/10.1109/ISBI.2012.6235644</a>.";
 }
 
 QString animaPyramidalBMRegistrationPlugin::version(void) const
@@ -74,19 +74,17 @@ QString animaPyramidalBMRegistrationPlugin::version(void) const
 
 QString animaPyramidalBMRegistrationPlugin::contact(void) const
 {
-    return "";
+    return "Olivier Commowick <Olivier.Commowick@inria.fr>";
 }
 
 QStringList animaPyramidalBMRegistrationPlugin::authors(void) const
 {
-    QStringList list;
-    return list;
+    return QStringList() << "Guillaume Pasquier <Guillaume.Pasquier@inria.fr>";
 }
 
 QStringList animaPyramidalBMRegistrationPlugin::contributors(void) const
 {
-    QStringList list;
-    return list;
+    return QStringList() << "Olivier Commowick <Olivier.Commowick@inria.fr>";
 }
 
 QString animaPyramidalBMRegistrationPlugin::identifier(void) const
