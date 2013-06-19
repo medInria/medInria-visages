@@ -3,7 +3,6 @@
 
 // This example class implements a non rigid algorithm with a displacement field transform, change for rigid or affine.
 
-#include <itkDisplacementFieldTransform.h>
 #include "rpiRegistrationMethod.hxx"
 
 #include "pyramidalMatchingBridge.h"
@@ -37,7 +36,7 @@ class ITK_EXPORT AnimaPyramidalBMRegistration : public RegistrationMethod< TFixe
 
 public:
 
-    typedef itk::DisplacementFieldTransform< TTransformScalarType, TFixedImage::ImageDimension >
+    typedef typename PyramidalMatchingBridge<TFixedImage::ImageDimension>::BaseTransformType
     TransformType;
 
     typedef typename TransformType::Pointer

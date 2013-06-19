@@ -319,7 +319,7 @@ int animaPyramidalBMRegistration::update(itkProcessRegistration::ImageType imgTy
 template <typename PixelType>
 bool animaPyramidalBMRegistrationPrivate::writeTransform(const QString& file)
 {
-    typedef float TransformScalarType;
+    typedef double TransformScalarType;
     typedef itk::Image< PixelType, 3 > RegImageType;
     
     if (rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
