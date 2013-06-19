@@ -216,10 +216,10 @@ void animaSymmetryPlane::setParameter ( double  data, int channel )
     switch (channel)
     {
     case 0:
-      d->metric = (Metric)data;
+      d->metric = (Metric)((int)data);
       break;
     case 1:
-      d->optType = (OptimizerType)data;
+      d->optType = (OptimizerType)((int)data);
       break;
     case 2:
       d->optMaxIterations= data;

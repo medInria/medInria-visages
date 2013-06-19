@@ -82,7 +82,7 @@ add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME}
   ${QT_LIBRARIES}
   ${QTSHANOIR_LIBS}
-  z
+  ${ZLIB_LIBRARIES}
   dtkCore
   dtkLog
   medCore

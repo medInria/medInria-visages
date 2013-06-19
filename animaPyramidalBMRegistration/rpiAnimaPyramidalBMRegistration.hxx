@@ -44,9 +44,6 @@ AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     typedef  typename  TransformType::ScalarType
     ScalarType;
 
-    typedef  typename  TransformType::VectorFieldType
-    VectorFieldType;
-
     // Local images
     typename  TFixedImage::ConstPointer   fixedImage  = this->m_fixedImage;
     typename  TMovingImage::ConstPointer  movingImage = this->m_movingImage;

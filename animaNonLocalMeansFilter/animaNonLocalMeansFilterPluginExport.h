@@ -6,7 +6,7 @@
 #define ANIMANONLOCALMEANSFILTERPLUGINEXPORT_H
 
 #ifdef WIN32
-    #ifdef medtkNLMeansDiffusionPlugin_EXPORTS
+    #ifdef animaNonLocalMeansFilterPlugin_EXPORTS
         #define ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT __declspec(dllexport) 
     #else
         #define ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT __declspec(dllimport) 
