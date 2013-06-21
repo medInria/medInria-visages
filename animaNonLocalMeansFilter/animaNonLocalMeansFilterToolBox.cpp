@@ -54,53 +54,52 @@ public:
 
 animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent) : medFilteringAbstractToolBox(parent), d(new animaNonLocalMeansFilterToolBoxPrivate)
 {
-
     // Parameters:
 
     QFormLayout *parametersLayout = new QFormLayout();
 
     d->patchHalfSize = new QSpinBox();
-    d->patchHalfSize->setValue(3);
+    d->patchHalfSize->setValue(1);
     d->patchHalfSize->setRange(1, 10);
-    parametersLayout->addRow(tr("Patch half size : "), d->patchHalfSize);
+    parametersLayout->addRow(tr("Patch half size"), d->patchHalfSize);
 
     d->searchNeighborhood = new QSpinBox();
-    d->searchNeighborhood->setValue(6);
+    d->searchNeighborhood->setValue(3);
     d->searchNeighborhood->setRange(1, 20);
     d->searchNeighborhood->setMinimum(1);
-    parametersLayout->addRow(tr("Patch search neighborhood size : "), d->searchNeighborhood);
+    parametersLayout->addRow(tr("Patch search neighborhood size"), d->searchNeighborhood);
 
     d->searchStepSize = new QSpinBox();
-    d->searchStepSize->setValue(3);
+    d->searchStepSize->setValue(1);
     d->searchStepSize->setRange(1, 10);
-    parametersLayout->addRow(tr("Patch search step size : "), d->searchStepSize);
+    parametersLayout->addRow(tr("Patch search step size"), d->searchStepSize);
 
     d->weightThreshold = new QDoubleSpinBox();
     d->weightThreshold->setValue(0.0);
-    parametersLayout->addRow(tr("NL weight threshold : "), d->weightThreshold);
+    parametersLayout->addRow(tr("NL weight threshold"), d->weightThreshold);
 
     d->betaParameter = new QDoubleSpinBox();
     d->betaParameter->setValue(1);
-    parametersLayout->addRow(tr("Beta for local Noise estimation : "), d->betaParameter);
+    parametersLayout->addRow(tr("Beta for local Noise estimation"), d->betaParameter);
 
     d->meanMinThreshold = new QDoubleSpinBox();
     d->meanMinThreshold->setValue(0.95);
-    parametersLayout->addRow(tr("Means Threshold Min : "), d->meanMinThreshold);
+    parametersLayout->addRow(tr("Means Threshold Min"), d->meanMinThreshold);
 
     d->varMinThreshold = new QDoubleSpinBox();
     d->varMinThreshold->setValue(0.5);
-    parametersLayout->addRow(tr("Variance Threshold Min : "), d->varMinThreshold);
+    parametersLayout->addRow(tr("Variance Threshold Min"), d->varMinThreshold);
 
     d->nbThread = new QSpinBox();
     d->nbThread->setValue(4);
     d->nbThread->setRange(1, 20);
-    parametersLayout->addRow(tr("Number of Thread : "), d->nbThread);
+    parametersLayout->addRow(tr("Number of Threads"), d->nbThread);
 
     d->weightedMerthod = new QComboBox();
     QStringList weightedMerthods;
-    weightedMerthods << "EXP" << "RICIAN";
+    weightedMerthods << "Gaussian" << "Rician";
     d->weightedMerthod->addItems(weightedMerthods);
-    parametersLayout->addRow(tr("Weighted Methode : "), d->weightedMerthod);
+    parametersLayout->addRow(tr("Noise assumption"), d->weightedMerthod);
 
     d->temporalImageGroup = new QButtonGroup();
     d->notTemporalImage = new QRadioButton(tr("No"));
@@ -116,7 +115,7 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
     QVBoxLayout *temporalLayout = new QVBoxLayout();
     temporalLayout->addWidget(d->notTemporalImage);
     temporalLayout->addWidget(d->temporalImage);
-    parametersLayout->addRow(tr("Image has a temporal dimension : "), temporalLayout);
+    parametersLayout->addRow(tr("Image has a temporal dimension?"), temporalLayout);
 
 
     QGroupBox *groupParameters = new QGroupBox("Mandatory");
@@ -132,14 +131,14 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
 
-    QLabel * dataTypeLabel = new QLabel (tr("Data type : "));
-    d->dataTypeValue = new QLabel(tr("Unknow"));
+    QLabel * dataTypeLabel = new QLabel (tr("Data type: "));
+    d->dataTypeValue = new QLabel(tr("Unknown"));
     QHBoxLayout * dataTypeLayout = new QHBoxLayout;
     dataTypeLayout->addWidget (dataTypeLabel);
     dataTypeLayout->addWidget (d->dataTypeValue);
 
-    QLabel * dataDimensionLabel = new QLabel (tr("Data dimension : "));
-    d->dataDimensionValue = new QLabel(tr("Unknow"));
+    QLabel * dataDimensionLabel = new QLabel (tr("Data dimension: "));
+    d->dataDimensionValue = new QLabel(tr("Unknown"));
     QHBoxLayout * dataDimensionLayout = new QHBoxLayout;
     dataDimensionLayout->addWidget (dataDimensionLabel);
     dataDimensionLayout->addWidget (d->dataDimensionValue);
@@ -154,7 +153,7 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
     widget->setLayout(mainLayout);
     this->addWidget(widget);
 
-    this->setTitle("animaNonLocalMeansFilter");
+    this->setTitle("Non-Local Means Denoising");
 
     connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
 
@@ -176,7 +175,7 @@ bool animaNonLocalMeansFilterToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->
     registerToolBox<animaNonLocalMeansFilterToolBox>("animaNonLocalMeansFilterToolBox",
-                               tr("Non local means denoising filter"),
+                               tr("Non-Local Means Denoising"),
                                tr("Applies a non local means denoising filter"),
                                QStringList()<< "filtering");
 }
