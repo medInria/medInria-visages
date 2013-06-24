@@ -14,6 +14,7 @@
 #include <dtkCore/dtkAbstractProcess.h>
 #include <dtkCore/dtkAbstractViewFactory.h>
 #include <dtkCore/dtkSmartPointer.h>
+#include <medPluginManager.h>
 
 #include <medAbstractView.h>
 #include <medRunnableProcess.h>
@@ -297,3 +298,9 @@ void animaSymmetryPlaneToolBox::updateMetric(int newValue)
     }
 }
 
+dtkPlugin* animaSymmetryPlaneToolBox::plugin()
+{
+    medPluginManager* pm = medPluginManager::instance();
+    dtkPlugin* plugin = pm->plugin ( "animaSymmetryPlanePlugin" );
+    return plugin;
+}
