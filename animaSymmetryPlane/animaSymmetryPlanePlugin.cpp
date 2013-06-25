@@ -64,7 +64,7 @@ QString animaSymmetryPlanePlugin::name(void) const
 
 QString animaSymmetryPlanePlugin::description(void) const
 {
-    return "This plugin provides an ITK implementation of inter-hemispheric symmetry plane estimation as proposed by Prima et al.: <a href=\"http://dx.doi.org/10.1109/42.993131\">http://dx.doi.org/10.1109/42.993131</a>.";
+    return "This plugin provides an ITK implementation of inter-hemispheric symmetry plane estimation as proposed by Prima et al.: <a href=\"http://dx.doi.org/10.1117/12.2007075\">http://dx.doi.org/10.1117/12.2007075</a>.";
 }
 
 QString animaSymmetryPlanePlugin::version(void) const
@@ -84,7 +84,7 @@ QStringList animaSymmetryPlanePlugin::authors(void) const
 
 QStringList animaSymmetryPlanePlugin::contributors(void) const
 {
-    return QStringList() << "Olivier Commowick <Olivier.Commowick@inria.fr>";
+    return QStringList() << "Sylvain Prima <Sylvain.Prima@inria.fr>" << "Olivier Commowick <Olivier.Commowick@inria.fr>";
 }
 
 QString animaSymmetryPlanePlugin::identifier(void) const

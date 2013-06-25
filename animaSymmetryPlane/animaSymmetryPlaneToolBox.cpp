@@ -20,6 +20,7 @@
 #include <medJobManager.h>
 
 #include <medAbstractDataImage.h>
+#include <medPluginManager.h>
 
 #include <medToolBoxFactory.h>
 #include <medFilteringSelectorToolBox.h>
@@ -55,7 +56,7 @@ animaSymmetryPlaneToolBox::animaSymmetryPlaneToolBox(QWidget *parent) : medFilte
     QPushButton *saveRealignTransformFileButton = new QPushButton(tr("Save realign transform"), this);
     QPushButton *saveTransformFileButton = new QPushButton(tr("Save transform"), this);
 
-    this->setTitle("animaSymmetryPlane");
+    this->setTitle("Symmetry Plane");
 
     // progression stack
     d->progression_stack = new medProgressionStack(widget);
@@ -182,6 +183,12 @@ animaSymmetryPlaneToolBox::animaSymmetryPlaneToolBox(QWidget *parent) : medFilte
 
     //explicit call to updateMetric with default value to update other parameters (histrogram size,...)
     updateMetric(0);
+    
+    // Add about plugin
+    medPluginManager* pm = medPluginManager::instance();
+    dtkPlugin* plugin = pm->plugin ( "animaSymmetryPlanePlugin" );
+    setAboutPluginButton ( plugin );
+    setAboutPluginVisibility( true );
 }
 
 animaSymmetryPlaneToolBox::~animaSymmetryPlaneToolBox(void)
@@ -196,7 +203,7 @@ bool animaSymmetryPlaneToolBox::registered(void)
     return medToolBoxFactory::instance()->
     registerToolBox<animaSymmetryPlaneToolBox>("animaSymmetryPlaneToolBox",
                                tr("Symmetry Plane"),
-                               tr("short tooltip description"),
+                               tr("Symmetry plane computation"),
                                QStringList()<< "filtering");
 }
 
