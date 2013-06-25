@@ -309,4 +309,9 @@ void animaNonLocalMeansFilterToolBox::update ( dtkAbstractView* view )
     }
 }
 
-
+dtkPlugin* animaNonLocalMeansFilterToolBox::plugin()
+{
+    medPluginManager* pm = medPluginManager::instance();
+    dtkPlugin* plugin = pm->plugin ( "animaNonLocalMeansFilterPlugin" );
+    return plugin;
+}

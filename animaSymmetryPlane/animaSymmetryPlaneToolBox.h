@@ -19,6 +19,7 @@ public:
     ~animaSymmetryPlaneToolBox(void);
 
     dtkAbstractData *processOutput();
+    dtkPlugin* plugin();
 
     static bool registered(void);
 

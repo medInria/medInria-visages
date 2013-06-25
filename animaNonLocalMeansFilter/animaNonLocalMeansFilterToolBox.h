@@ -19,6 +19,7 @@ public:
     ~animaNonLocalMeansFilterToolBox(void);
 
     dtkAbstractData *processOutput();
+    dtkPlugin* plugin();
 
     static bool registered(void);
 
