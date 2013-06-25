@@ -124,6 +124,7 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->numberOfThreads = 2;
     
     d->parent = this;
+    this->setProperty("transformType","rigid");
 }
 
 animaPyramidalBMRegistration::~animaPyramidalBMRegistration(void)
