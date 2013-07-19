@@ -24,6 +24,7 @@
 #include <medToolBoxFactory.h>
 #include <medRegistrationSelectorToolBox.h>
 #include <medProgressionStack.h>
+#include <medPluginManager.h>
 #include <medToolBoxTab.h>
 
 #include <rpiCommonTools.hxx>
@@ -321,8 +322,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     QGroupBox *globalParamGroupBox = new QGroupBox(tr("Global Parameters"));
     globalParamGroupBox->setLayout(globalParamLayout);
     
-    
-    
     QWidget *header = new QWidget;
     QVBoxLayout *layoutheader = new QVBoxLayout(header);   
     layoutheader->addWidget(runButton);
@@ -355,7 +354,12 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     connect(d->agregator, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
     
     updateBMParams(0);
-   
+    
+    // Add about plugin
+    medPluginManager* pm = medPluginManager::instance();
+    dtkPlugin* plugin = pm->plugin ( "animaPyramidalBMRegistrationPlugin" );
+    setAboutPluginButton ( plugin );
+    setAboutPluginVisibility( true );
 }
 
 animaPyramidalBMRegistrationToolBox::~animaPyramidalBMRegistrationToolBox(void)
