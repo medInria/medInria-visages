@@ -88,7 +88,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
 
     QPushButton *runButton = new QPushButton(tr("Run"), this);
 
-    this->setTitle("animaPyramidalBMRegistration");
+    this->setTitle("Pyramidal BM Registration");
 
     // progression stack
     d->progression_stack = new medProgressionStack(widget);
