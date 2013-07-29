@@ -57,9 +57,8 @@ public:
     ~vistalProcessSegmentationSTREMPrivate();
     // Channel 0 to 2
     QList < dtkSmartPointer <dtkAbstractData> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
-    vistal::Image3D<unsigned char> im1,im2, im3;
     // Channel 3
-    vistal::Image3D<unsigned char> mask; // Mask image
+    dtkSmartPointer <dtkAbstractData> mask;
     int imported;
 
     enum InitialisationMethod { StraInit, HierarchicalPD, HierarchicalFLAIR } initMethod; // Type of initialisation for the EM, D. Garcia used Hierachical PD or FLAIR depending on the input
@@ -152,11 +151,7 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
         d->input[channel] = dU8;
     }
     if (channel == 3)
-    {
-        vistal::Image3D<unsigned char>* ima = dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )dU8->data());
-        if (!ima) { qDebug() << "Input error with image!"; return; }
-        d->mask = *ima;
-    }
+        d->mask = dU8;
 
     d->imported |= (1<< channel);
 
@@ -236,6 +231,7 @@ int vistalProcessSegmentationSTREM::update(void)
     }
 
     std::vector<vistal::Image3D<unsigned char> > input;
+    vistal::Image3D <unsigned char> mask;
     
     foreach (dtkAbstractData *image, d->input)
     {
@@ -245,6 +241,8 @@ int vistalProcessSegmentationSTREM::update(void)
         input.push_back(*ima);
     }
     
+    mask = * (dynamic_cast<vistal::Image3D<unsigned char>* >((vistal::Image3D<unsigned char>* )d->mask->data()));
+
     FiniteModel initia;
 
     for(unsigned int i=0; i<3; i++)
@@ -259,7 +257,7 @@ int vistalProcessSegmentationSTREM::update(void)
     case vistalProcessSegmentationSTREMPrivate::StraInit:
     {
         qDebug() << "Stra Init";
-        StraInitializer init(input,d->mask);
+        StraInitializer init(input,mask);
 
 
         if(!init. getInitialization(initia))
@@ -274,7 +272,7 @@ int vistalProcessSegmentationSTREM::update(void)
         qDebug() << "Hierarch PD";
 
         std::vector<std::string> seq;
-        HierarchicalInitializer init(input,d->mask,seq,false,0.01, 0);
+        HierarchicalInitializer init(input,mask,seq,false,0.01, 0);
         if(!init. getInitialization(initia))
         {
             qDebug() << "Error in initialisation";
@@ -287,7 +285,7 @@ int vistalProcessSegmentationSTREM::update(void)
         qDebug() << "Hierarch init FLAIR";
 
         std::vector<std::string> seq;
-        HierarchicalInitializer init(input, d->mask, seq, true, 0.01, 0);
+        HierarchicalInitializer init(input, mask, seq, true, 0.01, 0);
         qDebug() << "init loaded";
         if(!init. getInitialization(initia))
         {
@@ -312,10 +310,10 @@ int vistalProcessSegmentationSTREM::update(void)
     std::vector<double> min( modalities, 255.0 ); //min values for random initialization
     std::vector<double> max( modalities, 0.0 ); //max values for random initialization
 
-    for (unsigned i = 0; i < 3; ++i) min[i] = vistal::stats::GetMinPixelValue( input[ i ] , d->mask );
-    for (unsigned i = 0; i < 3; ++i) max[i] = vistal::stats::GetMaxPixelValue( input[ i ] , d->mask );
+    for (unsigned i = 0; i < 3; ++i) min[i] = vistal::stats::GetMinPixelValue( input[ i ] , mask );
+    for (unsigned i = 0; i < 3; ++i) max[i] = vistal::stats::GetMaxPixelValue( input[ i ] , mask );
 
-    if (! jointHistogram.createJointHistogram( input, d->mask, false ))
+    if (! jointHistogram.createJointHistogram( input, mask, false ))
     {
         qDebug() << "Error in Joint Histogram creation";
         return -1;  // Joint histogram construction failure
@@ -362,7 +360,7 @@ int vistalProcessSegmentationSTREM::update(void)
 
         vistal::Image3D<unsigned char> outima;
 
-        classifier.getOutputImage( input , d->mask, outima );
+        classifier.getOutputImage( input , mask, outima );
 
         // Fixme tell medINRIA that outima is the output....
 
@@ -385,7 +383,7 @@ int vistalProcessSegmentationSTREM::update(void)
     threshold.setModel( solution );
     threshold.setThreshold( d->mahalanobisThreshold );
 
-    threshold.getThresholdImage( input, d->mask, thImage );
+    threshold.getThresholdImage( input, mask, thImage );
 
     vistal::Image3D<unsigned char> rulesIma;
     double rules3[3];
@@ -402,7 +400,7 @@ int vistalProcessSegmentationSTREM::update(void)
     }
     vistal::Image3D<unsigned int > labels;
     int numLabels=0;
-    vistal::Image3D<unsigned int> tmpIma(d->mask, 0);
+    vistal::Image3D<unsigned int> tmpIma(mask, 0);
     for (vistal::Image3D<unsigned>::iterator it = tmpIma.begin(); it != tmpIma.end(); ++it)
         if (rulesIma(it.Position()) == 5)
             *it = 1;
@@ -410,13 +408,13 @@ int vistalProcessSegmentationSTREM::update(void)
     numLabels = Labelize( tmpIma, labels, 0 );
 
     vistal::Image3D<unsigned int> biglesions(tmpIma);
-    rulesLesionSize(biglesions,d->mask,labels, d->minsize,/* verbose = */ false);
+    rulesLesionSize(biglesions,mask,labels, d->minsize,/* verbose = */ false);
 
     // Removing border lesions
     //////////////////////////////
     vistal::Image3D<unsigned int> noborderlesions;
 
-    if(!rulesBorder( noborderlesions, d->mask, biglesions,/* verbose = */false ))
+    if(!rulesBorder( noborderlesions, mask, biglesions,/* verbose = */false ))
     {
         std::cout<<" ** ERROR in rulesBorder"<<std::endl;
         return -1;
@@ -425,7 +423,7 @@ int vistalProcessSegmentationSTREM::update(void)
     vistal::Image3D<unsigned char> classifIma;
     ImageClassifier classifier;
     classifier.setModel( solution );
-    classifier.getOutputImage( input , d->mask, classifIma );
+    classifier.getOutputImage( input , mask, classifIma );
 
 
     vistal::Image3D<unsigned char> classifplus(classifIma);
