@@ -76,7 +76,23 @@ target_link_libraries(${PROJECT_NAME}
   dtkLog
   dtkCore
   medCore
-  medGui)
+  medGui
+  ITKIOImageBase
+  ITKIOBMP
+  ITKIOLSM
+  ITKIOJPEG
+  ITKIOPNG
+  ITKIOVTK
+  ITKIOGDCM
+  ITKNrrdIO
+  ITKIONRRD
+  ITKIOMeta
+  ITKIONIFTI
+  ITKIOGIPL
+  ITKIOHDF5
+  ITKIOBioRad
+  ITKIOStimulate
+)
 
 #not useful if plugin in the medInria-plugins directory
 dtk_build_doc(animaNonLocalMeansFilterPlugin)

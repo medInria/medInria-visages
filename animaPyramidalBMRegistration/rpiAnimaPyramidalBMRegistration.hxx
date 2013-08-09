@@ -1,5 +1,4 @@
-#ifndef _RPIANIMAPYRAMIDALBMREGISTRATION_HXX_
-#define _RPIANIMAPYRAMIDALBMREGISTRATION_HXX_
+#pragma once
 
 // Namespace RPI : Registration Programming Interface
 namespace rpi
@@ -316,6 +315,3 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 }
 
 } // End of namespace
-
-
-#endif // _RPIANIMAPYRAMIDALBMREGISTRATION_HXX_

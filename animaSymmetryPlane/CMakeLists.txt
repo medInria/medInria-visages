@@ -78,10 +78,27 @@ target_link_libraries(${PROJECT_NAME}
   medGui
   AnimaOptimizers
   Parsing
-  ITKIO
-  ITKStatistics
-  ITKCommon
-  ITKNumerics)
+  ITKOptimizers
+  ITKIOImageBase
+  ITKIOBMP
+  ITKIOLSM
+  ITKIOJPEG
+  ITKIOPNG
+  ITKIOVTK
+  ITKIOGDCM
+  ITKNrrdIO
+  ITKIONRRD
+  ITKIOMeta
+  ITKIONIFTI
+  ITKIOGIPL
+  ITKIOHDF5
+  ITKIOBioRad
+  ITKIOStimulate
+  ITKIOTransformBase
+  ITKIOTransformHDF5
+  ITKIOTransformInsightLegacy
+  ITKIOTransformMatlab
+)
 
 #not useful if plugin in the medInria-plugins directory
 dtk_build_doc(animaSymmetryPlanePlugin)
