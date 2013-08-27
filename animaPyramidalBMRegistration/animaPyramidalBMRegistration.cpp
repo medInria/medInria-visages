@@ -173,7 +173,7 @@ itk::Transform<double,3,3>::Pointer animaPyramidalBMRegistration::getTransform()
         return NULL;
 }
 
-QStringList * animaPyramidalBMRegistration::getTitleAndParameters()
+QString animaPyramidalBMRegistration::getTitleAndParameters()
 {
     typedef float PixelType;
     typedef double TransformScalarType;
@@ -182,10 +182,10 @@ QStringList * animaPyramidalBMRegistration::getTitleAndParameters()
     typedef rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> RegistrationType;
     RegistrationType * registration = static_cast<RegistrationType *>(d->registrationMethod);
     
-    QStringList * titleAndParameters = new QStringList();
-    titleAndParameters->append(QString("Pyramidal BM Registration"));
-    titleAndParameters->append(QString(" Number of pyramid levels: ") + QString::number(registration->GetNumberOfPyramidLevels()));
-    titleAndParameters->append(QString(" Number of iterations per level: ") + QString::number(registration->GetMaximumIterations()));
+    QString titleAndParameters;
+    titleAndParameters += "Pyramidal BM Registration\n";
+    titleAndParameters += " Number of pyramid levels: " + QString::number(registration->GetNumberOfPyramidLevels()) + "\n";
+    titleAndParameters += " Number of iterations per level: " + QString::number(registration->GetMaximumIterations()) + "\n";
 
     //TO DO : add transform type and optimizer used to parameters given
     return titleAndParameters;
