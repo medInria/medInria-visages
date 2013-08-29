@@ -60,7 +60,7 @@ public:
     virtual QString identifier(void) const;
     
     virtual itk::Transform<double,3,3>::Pointer getTransform();
-    virtual QStringList * getTitleAndParameters();
+    virtual QString getTitleAndParameters();
 
 public:
     /**
