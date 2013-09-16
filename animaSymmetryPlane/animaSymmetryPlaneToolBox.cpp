@@ -107,8 +107,8 @@ animaSymmetryPlaneToolBox::animaSymmetryPlaneToolBox(QWidget *parent) : medFilte
     d->numberOfPyramidLevelsValue->setValue(3);
 
     d->numberOfThreadsValue = new QSpinBox;
-    d->numberOfThreadsValue->setMinimum(1);
-    d->numberOfThreadsValue->setValue(2);
+    d->numberOfThreadsValue->setValue(itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
+    d->numberOfThreadsValue->setRange(1, itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
 
 
     QLabel *metricLabel = new QLabel(tr("Metric:"));

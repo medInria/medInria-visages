@@ -244,9 +244,9 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     // Global Parameters:  
     d->threads = new QSpinBox;
     d->threads->setToolTip("Number of Execution Threads");
-    d->threads->setValue(2);
-    d->threads->setMinimum(1);
-    
+    d->threads->setValue(itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
+    d->threads->setRange(1, itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
+
     
     // Tranform Parameters Layout
     QHBoxLayout *transformLayout = new QHBoxLayout;

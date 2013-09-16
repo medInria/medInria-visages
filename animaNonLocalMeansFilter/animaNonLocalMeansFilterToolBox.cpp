@@ -26,6 +26,8 @@
 #include <medProgressionStack.h>
 #include <medPluginManager.h>
 
+#include <itkMultiThreader.h>
+
 class animaNonLocalMeansFilterToolBoxPrivate
 {
 public:
@@ -91,8 +93,8 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
     parametersLayout->addRow(tr("Variance Threshold Min"), d->varMinThreshold);
 
     d->nbThread = new QSpinBox();
-    d->nbThread->setValue(4);
-    d->nbThread->setRange(1, 20);
+    d->nbThread->setValue(itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
+    d->nbThread->setRange(1, itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
     parametersLayout->addRow(tr("Number of Threads"), d->nbThread);
 
     d->weightedMerthod = new QComboBox();
