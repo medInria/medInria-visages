@@ -96,7 +96,7 @@ target_link_libraries(${PROJECT_NAME}
   ITKIOHDF5
   ITKIOBioRad
   ITKIOStimulate
-  ITKReview
+  ${ITKReview_LIBRARIES}
   ITKIOTransformBase
   ITKIOTransformHDF5
   ITKIOTransformInsightLegacy
