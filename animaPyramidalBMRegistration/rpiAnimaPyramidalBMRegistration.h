@@ -1,5 +1,4 @@
-#ifndef _RPIANIMAPYRAMIDALBMREGISTRATION_H_
-#define _RPIANIMAPYRAMIDALBMREGISTRATION_H_
+#pragma once
 
 // This example class implements a non rigid algorithm with a displacement field transform, change for rigid or affine.
 
@@ -36,7 +35,7 @@ class ITK_EXPORT AnimaPyramidalBMRegistration : public RegistrationMethod< TFixe
 
 public:
 
-    typedef typename PyramidalMatchingBridge<TFixedImage::ImageDimension>::BaseTransformType
+    typedef typename PyramidalMatchingBridge<TFixedImage::ImageDimension>::AffineTransformType
     TransformType;
 
     typedef typename TransformType::Pointer
@@ -149,9 +148,5 @@ private:
 
 } // End of namespace
 
-
 /** Add the source code file (template) */
 #include "rpiAnimaPyramidalBMRegistration.hxx"
-
-
-#endif // _RPIANIMAPYRAMIDALBMREGISTRATION_H_

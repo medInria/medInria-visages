@@ -78,13 +78,29 @@ target_link_libraries(${PROJECT_NAME}
   dtkCore
   medCore
   medGui
-  ITKCommon
-  ITKIO
-  ITKStatistics
-  ITKNumerics
-  ITKAlgorithms
   itkProcessRegistration
   AnimaOptimizers
+  ITKOptimizers
+  ITKIOImageBase
+  ITKIOBMP
+  ITKIOLSM
+  ITKIOJPEG
+  ITKIOPNG
+  ITKIOVTK
+  ITKIOGDCM
+  ITKNrrdIO
+  ITKIONRRD
+  ITKIOMeta
+  ITKIONIFTI
+  ITKIOGIPL
+  ITKIOHDF5
+  ITKIOBioRad
+  ITKIOStimulate
+  ${ITKReview_LIBRARIES}
+  ITKIOTransformBase
+  ITKIOTransformHDF5
+  ITKIOTransformInsightLegacy
+  ITKIOTransformMatlab
 )
 
 ## #################################################################

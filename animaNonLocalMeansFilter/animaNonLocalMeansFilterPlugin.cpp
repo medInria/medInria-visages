@@ -40,10 +40,14 @@ animaNonLocalMeansFilterPlugin::~animaNonLocalMeansFilterPlugin(void)
 bool animaNonLocalMeansFilterPlugin::initialize(void)
 {
     if(!animaNonLocalMeansFilter::registered())
+    {
         dtkWarn() << "Unable to register animaNonLocalMeansFilter type";
+    }
 
     if ( !animaNonLocalMeansFilterToolBox::registered() )
+    {
         dtkWarn() << "Unable to register animaNonLocalMeansFilter toolbox";
+    }
 
     return true;
 }

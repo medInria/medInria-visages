@@ -39,7 +39,9 @@ qtshanoirDataSourcePlugin::~qtshanoirDataSourcePlugin(void)
 bool qtshanoirDataSourcePlugin::initialize(void)
 {
   if(!qtshanoirDataSource::registered())
+  {
     dtkWarn() << "Unable to register qtshanoirDataSource type";
+  }
   
   return true;
 }
