@@ -36,8 +36,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(DEPENDS_ON_DTK 1)
 
 option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" "OFF")
-option(MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN     "Build vistalDataImageReader plugin" "OFF")
-option(MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN     "Build vistalDataImageWriter plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "OFF")
 option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
@@ -54,14 +52,6 @@ option(BUILD_EXAMPLES "Build examples" OFF)
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
     add_subdirectory(vistalDataImage)
-endif()
-
-if (MEDINRIA_BUILD_VISTALDATAIMAGEREADER_PLUGIN)
-    add_subdirectory(vistalDataImageReader)
-endif()
-
-if (MEDINRIA_BUILD_VISTALDATAIMAGEWRITER_PLUGIN)
-    add_subdirectory(vistalDataImageWriter)
 endif()
 
 if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
