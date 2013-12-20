@@ -39,8 +39,8 @@ include(dtkPlugin)
 find_package(medInria REQUIRED)
 include(${medInria_USE_FILE})
 
-find_package(ANIMA-REGISTRATION REQUIRED)
-include(${ANIMA-REGISTRATION_USE_FILE})
+find_package(ANIMA REQUIRED)
+include(${ANIMA_USE_FILE})
 
 ## #################################################################
 ## Input
