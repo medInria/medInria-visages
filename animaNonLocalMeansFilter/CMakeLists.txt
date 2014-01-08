@@ -92,7 +92,7 @@ target_link_libraries(${PROJECT_NAME}
   ITKIOHDF5
   ITKIOBioRad
   ITKIOStimulate
-  ${ITKReview_LIBRARIES}
+  ITKIOMRC
 )
 
 #not useful if plugin in the medInria-plugins directory
