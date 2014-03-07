@@ -94,8 +94,8 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->blockSpacing = 5;
     d->stDevThreshold = 5;
     d->transform = Translation;
-    d->metric = FastCorrelation;  
-    d->optimizer = Newuoa;
+    d->metric = SquaredCorrelation;  
+    d->optimizer = Bobyqa;
     d->maximumIterations = 10;
     d->minimalTransformError = 0.01;
     d->optimizerMaximumIterations = 100;
@@ -237,8 +237,7 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     registration->SetOptimizer( optimizer);
     registration->SetMaximumIterations( maximumIterations);
     registration->SetMinimalTransformError( minimalTransformError);   
-    registration->SetOptimizerMaximumIterations( optimizerMaximumIterations);    
-    registration->SetHistogramSize( histogramSize);
+    registration->SetOptimizerMaximumIterations( optimizerMaximumIterations);
     registration->SetSearchRadius( searchRadius);
     registration->SetSearchAngleRadius( searchAngleRadius);
     registration->SetSearchSkewRadius( searchSkewRadius);
@@ -250,8 +249,6 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     registration->SetSkewUpperBound( skewUpperBound);
     registration->SetScaleUpperBound( scaleUpperBound);
     registration->SetAgregator( agregator);
-    registration->SetWeightedAgregation( weightedAgregation);
-    registration->SetBlockCenteredRotations( blockCenteredRotations);
     registration->SetOutputTransformType( outputTransformType);    
     registration->SetAgregThreshold( agregThreshold);    
     registration->SetSeStoppingThreshold( seStoppingThreshold);
