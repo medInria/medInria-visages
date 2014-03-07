@@ -35,7 +35,7 @@ class ITK_EXPORT AnimaPyramidalBMRegistration : public RegistrationMethod< TFixe
 
 public:
 
-    typedef typename PyramidalMatchingBridge<TFixedImage::ImageDimension>::AffineTransformType
+    typedef typename PyramidalBlockMatchingBridge<TFixedImage::ImageDimension>::AffineTransformType
     TransformType;
 
     typedef typename TransformType::Pointer
