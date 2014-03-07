@@ -58,7 +58,6 @@ public:
     unsigned int maximumIterations;
     float minimalTransformError;
     unsigned int optimizerMaximumIterations;
-    unsigned int histogramSize;
     double searchRadius;
     double searchAngleRadius;
     double searchSkewRadius;
@@ -70,8 +69,6 @@ public:
     double skewUpperBound;
     double scaleUpperBound;
     unsigned int agregator;
-    bool weightedAgregation;
-    bool blockCenteredRotations;
     unsigned int outputTransformType;
     float agregThreshold;
     float seStoppingThreshold;
@@ -102,7 +99,6 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->maximumIterations = 10;
     d->minimalTransformError = 0.01;
     d->optimizerMaximumIterations = 100;
-    d->histogramSize = 128;
     d->searchRadius = 2;
     d->searchAngleRadius = 5;
     d->searchSkewRadius = 5;
@@ -114,8 +110,6 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->skewUpperBound = 45;
     d->scaleUpperBound = 3;
     d->agregator = MEstimation;
-    d->weightedAgregation = false;
-    d->blockCenteredRotations = false;
     d->outputTransformType = outRigid;
     d->agregThreshold = 0.5;
     d->seStoppingThreshold = 0.01;
@@ -424,11 +418,6 @@ void animaPyramidalBMRegistration::setOptimizerMaximumIterations(unsigned int Op
     d->optimizerMaximumIterations=OptimizerMaximumIterations;
 }
 
-void animaPyramidalBMRegistration::setHistogramSize(unsigned int HistogramSize) 
-{
-    d->histogramSize=HistogramSize;
-}
-
 void animaPyramidalBMRegistration::setSearchRadius(double SearchRadius) 
 {
     d->searchRadius=SearchRadius;
@@ -482,16 +471,6 @@ void animaPyramidalBMRegistration::setScaleUpperBound(double ScaleUpperBound)
 void animaPyramidalBMRegistration::setAgregator(unsigned int agregator)
 {
     d->agregator=agregator;
-}
-
-void animaPyramidalBMRegistration::setWeightedAgregation(bool WeightedAgregation) 
-{
-    d->weightedAgregation=WeightedAgregation;
-}
-
-void animaPyramidalBMRegistration::setBlockCenteredRotations(bool BlockCenteredRotations) 
-{
-    d->blockCenteredRotations=BlockCenteredRotations;
 }
 
 void animaPyramidalBMRegistration::setOutputTransformType(unsigned int outputTransform)

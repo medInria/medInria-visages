@@ -40,8 +40,7 @@ AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 
 
     // Type definition
-    typedef  typename  TransformType::ScalarType
-    ScalarType;
+    typedef  typename  TransformType::ScalarType ScalarType;
 
     // Local images
     typename  TFixedImage::ConstPointer   fixedImage  = this->m_fixedImage;
@@ -169,13 +168,6 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-::SetHistogramSize ( unsigned int HistogramSize )
-{
-    matcher->SetHistogramSize ( HistogramSize );
-}
-
-template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetSearchRadius ( double SearchRadius )
 {
     matcher->SetSearchRadius ( SearchRadius );
@@ -249,20 +241,6 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 ::SetAgregator ( unsigned int agregator )
 {
     matcher->SetAgregator ( ( Agregator ) agregator );
-}
-
-template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-::SetWeightedAgregation ( bool WeightedAgregation )
-{
-    matcher->SetWeightedAgregation ( WeightedAgregation );
-}
-
-template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-::SetBlockCenteredRotations ( bool BlockCenteredRotations )
-{
-    matcher->SetBlockCenteredRotations ( BlockCenteredRotations );
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >

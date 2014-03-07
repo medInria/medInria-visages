@@ -99,8 +99,6 @@ public:
     
     void setOptimizerMaximumIterations(unsigned int OptimizerMaximumIterations);    
     
-    void setHistogramSize(unsigned int HistogramSize);
-    
     void setSearchRadius(double SearchRadius);
     
     void setSearchAngleRadius(double SearchAngleRadius);
@@ -122,10 +120,6 @@ public:
     void setScaleUpperBound(double ScaleUpperBound);
     
     void setAgregator(unsigned int agregator);
-    
-    void setWeightedAgregation(bool WeightedAgregation);
-    
-    void setBlockCenteredRotations(bool BlockCenteredRotations);
     
     void setOutputTransformType(unsigned int outputTransform);
     

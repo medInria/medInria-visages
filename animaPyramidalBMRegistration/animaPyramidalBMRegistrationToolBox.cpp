@@ -49,7 +49,6 @@ public:
     QSpinBox *maxIterations;
     QDoubleSpinBox * minError;
     QSpinBox *optIterations;
-    QSpinBox *histogramSize;
     QDoubleSpinBox * searchRadius;
     QDoubleSpinBox * searchAngleRadius;
     QDoubleSpinBox * searchSkewRadius;
@@ -63,8 +62,6 @@ public:
 
     //Agregation Parameters:
     QComboBox *agregator;
-    QCheckBox *weightedAgregator;
-    QCheckBox *blockRotations;
     QComboBox *outputTransform;
     QDoubleSpinBox * agregThreshold;
     QDoubleSpinBox * stoppingThreshold;
@@ -124,13 +121,13 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->metric = new QComboBox;
     d->metric->setToolTip("Similarity metric between blocks");
     QStringList metricList;
-    metricList << "FastCorrelation" << "MutualInformation" << "MeanSquares";
+    metricList << "SquaredCorrelation" << "Correlation" << "MeanSquares";
     d->metric->addItems ( metricList );
     
     d->optimzer = new QComboBox;
     d->optimzer->setToolTip("Optimizer for optimal block search");
     QStringList optimzerList;
-    optimzerList << "Newuoa" << "Exhaustive" << "Bobyqa";
+    optimzerList << "Exhaustive" << "Bobyqa";
     d->optimzer->addItems ( optimzerList );
     d->optimzer->setCurrentIndex(2);
     
@@ -147,12 +144,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->optIterations->setToolTip("Maximum Local Optimizer Iterations");
     d->optIterations->setRange(0,10000);
     d->optIterations->setValue(100);
-    
-    d->histogramSize = new QSpinBox;
-    d->histogramSize->setToolTip("Histogram Size for Mutual Information");
-    d->histogramSize->setRange(0,10000);
-    d->histogramSize->setValue(128);
-    
     
     d->searchRadius = new QDoubleSpinBox;
     d->searchRadius->setToolTip("The search radius (exhaustive search window, rho start for newuoa");
@@ -205,13 +196,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     QStringList agregatorList;
     agregatorList << "MEstimation" << "LeastSquares" << "LeastTrimmedSquares";
     d->agregator->addItems ( agregatorList );
-    
-    d->weightedAgregator = new QCheckBox;
-    d->weightedAgregator->setChecked(true);
-    d->weightedAgregator->setToolTip("Use Weighted-Agregation");
-    
-    d->blockRotations = new QCheckBox;
-    d->blockRotations->setToolTip("Rotations for each block are centered on it rather than on the fixed image barycenter");
     
     d->outputTransform = new QComboBox;    
     d->outputTransform->setToolTip("Type of Estimated transformations");
@@ -274,7 +258,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     blockMatchLayout->addRow(new QLabel(tr("Max Iterations"),this),d->maxIterations);
     blockMatchLayout->addRow(new QLabel(tr("Min error"),this),d->minError);
     blockMatchLayout->addRow(new QLabel(tr("Optimzer Iterations"),this),d->optIterations);
-    blockMatchLayout->addRow(new QLabel(tr("Histogram Size"),this),d->histogramSize);
     blockMatchLayout->addRow(new QLabel(tr("Search Radius"),this),d->searchRadius);
     blockMatchLayout->addRow(new QLabel(tr("Search Angle Radius"),this),d->searchAngleRadius);
     blockMatchLayout->addRow(new QLabel(tr("Search Skew Radius"),this),d->searchSkewRadius);
@@ -296,8 +279,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     // Agregation Parameters Layout
     QFormLayout *agregationParamLayout = new QFormLayout();
     agregationParamLayout->addRow(new QLabel(tr("Agregator"),this),d->agregator);
-    agregationParamLayout->addRow(new QLabel(tr("Weighted Agregator"),this),d->weightedAgregator);
-    agregationParamLayout->addRow(new QLabel(tr("Block Rotations"),this),d->blockRotations);
     agregationParamLayout->addRow(new QLabel(tr("Output Transform"),this),d->outputTransform);
     agregationParamLayout->addRow(new QLabel(tr("Agreg. Threshold"),this),d->agregThreshold);
     agregationParamLayout->addRow(new QLabel(tr("Stopping Threshold"),this),d->stoppingThreshold);
@@ -421,7 +402,6 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     process_Registration->setMaximumIterations( d->maxIterations->value() );
     process_Registration->setMinimalTransformError( d->minError->value() );
     process_Registration->setOptimizerMaximumIterations( d->optIterations->value() );
-    process_Registration->setHistogramSize( d->histogramSize->value() );
     process_Registration->setSearchRadius( d->searchRadius->value() );
     process_Registration->setSearchAngleRadius( d->searchAngleRadius->value() );
     process_Registration->setSearchSkewRadius( d->searchSkewRadius->value() );
@@ -432,9 +412,6 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     process_Registration->setSkewUpperBound( d->skewUpperBound->value() );
     process_Registration->setScaleUpperBound( d->scaleUpperBound->value() );
     process_Registration->setAgregator( d->agregator->currentIndex() );
-    // The flag in BM registration wants to know if we should deactivate weighted agregation or not
-    process_Registration->setWeightedAgregation( !d->weightedAgregator->isChecked() );
-    process_Registration->setBlockCenteredRotations( d->blockRotations->isChecked() );
     process_Registration->setOutputTransformType( d->outputTransform->currentIndex() );
     process_Registration->setAgregThreshold( d->agregThreshold->value() );
     process_Registration->setSeStoppingThreshold( d->stoppingThreshold->value() );
@@ -481,8 +458,6 @@ void animaPyramidalBMRegistrationToolBox::updateBMParams(int index)
     Transform tr = (Transform) d->transform->currentIndex();
     Metric metric = (Metric) d->metric->currentIndex();
     Agregator agreg = (Agregator) d->agregator->currentIndex();
-    
-    d->histogramSize->setEnabled(metric == MutualInformation); 
     
     // updates according to Transform
     d->searchAngleRadius->setEnabled(tr == Affine || tr == Rigid);

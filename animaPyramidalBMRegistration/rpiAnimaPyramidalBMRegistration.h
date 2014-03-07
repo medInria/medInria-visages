@@ -4,7 +4,7 @@
 
 #include "rpiRegistrationMethod.hxx"
 
-#include "pyramidalMatchingBridge.h"
+#include "pyramidalBlockMatchingBridge.h"
 
 
 // Namespace RPI : Registration Programming Interface
@@ -85,8 +85,6 @@ public:
 
     void SetOptimizerMaximumIterations ( unsigned int OptimizerMaximumIterations );
 
-    void SetHistogramSize ( unsigned int HistogramSize );
-
     void SetSearchRadius ( double SearchRadius );
 
     void SetSearchAngleRadius ( double SearchAngleRadius );
@@ -108,10 +106,6 @@ public:
     void SetScaleUpperBound ( double ScaleUpperBound );
 
     void SetAgregator ( unsigned int agregator );
-
-    void SetWeightedAgregation ( bool WeightedAgregation );
-
-    void SetBlockCenteredRotations ( bool BlockCenteredRotations );
 
     void SetOutputTransformType ( unsigned int outputTransform );
 
@@ -141,7 +135,7 @@ public:
     
 private:
     
-    typedef PyramidalMatchingBridge <TFixedImage::ImageDimension> PyramidBMType;
+    typedef PyramidalBlockMatchingBridge <TFixedImage::ImageDimension> PyramidBMType;
     typename PyramidBMType::Pointer matcher;
 
 };
