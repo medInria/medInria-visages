@@ -456,7 +456,6 @@ void animaPyramidalBMRegistrationToolBox::updateBMParams(int index)
 {
     Optimizer opt = (Optimizer) d->optimzer->currentIndex();
     Transform tr = (Transform) d->transform->currentIndex();
-    Metric metric = (Metric) d->metric->currentIndex();
     Agregator agreg = (Agregator) d->agregator->currentIndex();
     
     // updates according to Transform
