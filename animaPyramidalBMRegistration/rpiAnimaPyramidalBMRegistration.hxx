@@ -287,7 +287,7 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >
     void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-    ::SetPercentageKept ( bool PercentageKept )
+    ::SetPercentageKept ( double PercentageKept )
     {
         matcher->SetPercentageKept ( PercentageKept );
     }
