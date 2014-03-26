@@ -115,8 +115,8 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->percentageKept = new QDoubleSpinBox;
     d->percentageKept->setToolTip("Percentage of blocks actually used");
     d->percentageKept->setValue(0.8);
-    d->percentageKept->setMinimum(0);
-    d->percentageKept->setMaximum(1);
+    d->percentageKept->setRange(0,1);
+    d->percentageKept->setSingleStep(0.01);
 
     // Block Match Parameters
     d->transform = new QComboBox;
@@ -146,6 +146,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->minError->setToolTip("Minimal distance between consecutive estimated transforms");
     d->minError->setDecimals(3);
     d->minError->setValue(0.01);   
+    d->minError->setSingleStep(0.001);
     
     d->optIterations = new QSpinBox;
     d->optIterations->setToolTip("Maximum Local Optimizer Iterations");
@@ -167,11 +168,13 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->searchScaleRadius = new QDoubleSpinBox;
     d->searchScaleRadius->setToolTip("The search scale radius (rho start for newuoa on scales part)");
     d->searchScaleRadius->setValue(0.1);
+    d->searchScaleRadius->setSingleStep(0.01);
 
     d->finalRadius = new QDoubleSpinBox;
     d->finalRadius->setToolTip("The final radius (rho end for newuoa)");
     d->finalRadius->setDecimals(4);
     d->finalRadius->setValue(0.001);
+    d->finalRadius->setSingleStep(0.0001);
     
     d->stepSize = new QDoubleSpinBox;
     d->stepSize->setToolTip("The  stepping size (for exhaustive search)");
@@ -216,13 +219,13 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->agregThreshold->setToolTip("Agregator threshold value (for M-estimation or LTS)");
     d->agregThreshold->setValue(0.7);
     d->agregThreshold->setMaximum(1.0);
-    d->agregThreshold->setSingleStep(0.1);
+    d->agregThreshold->setSingleStep(0.01);
     
     d->stoppingThreshold = new QDoubleSpinBox;
     d->stoppingThreshold->setToolTip("LTS Stopping Threshold");
     d->stoppingThreshold->setDecimals(3);
     d->stoppingThreshold->setValue(0.01);
-    
+    d->stoppingThreshold->setSingleStep(0.001);
 
     // Pyramid parameters:
     d->pyramidLevels = new QSpinBox;
