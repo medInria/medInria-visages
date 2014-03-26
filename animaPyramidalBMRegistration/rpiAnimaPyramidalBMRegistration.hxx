@@ -285,6 +285,20 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
     matcher->SetLastPyramidLevel ( LastPyramidLevel );
 }
 
+    template < class TFixedImage, class TMovingImage, class TTransformScalarType >
+    void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
+    ::SetPercentageKept ( bool PercentageKept )
+    {
+        matcher->SetPercentageKept ( PercentageKept );
+    }
+    
+    template < class TFixedImage, class TMovingImage, class TTransformScalarType >
+    void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
+    ::SetInitializeOnCenterOfGravity ( bool InitializeOnCenterOfGravity )
+    {
+        matcher->SetInitializeOnCenterOfGravity ( InitializeOnCenterOfGravity );
+    }
+    
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetNumberOfThreads ( int numberOfThreads )

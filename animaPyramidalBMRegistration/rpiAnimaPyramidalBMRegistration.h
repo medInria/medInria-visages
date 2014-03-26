@@ -117,6 +117,10 @@ public:
 
     void SetLastPyramidLevel ( unsigned int LastPyramidLevel );
 
+    void SetPercentageKept ( double PercentageKept );
+    
+    void SetInitializeOnCenterOfGravity ( bool InitializeOnCenterOfGravity );
+
     void SetNumberOfThreads ( int numberOfThreads );
     
     unsigned int GetNumberOfPyramidLevels ();

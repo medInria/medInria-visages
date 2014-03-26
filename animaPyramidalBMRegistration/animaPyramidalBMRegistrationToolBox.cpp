@@ -41,11 +41,12 @@ public:
     QSpinBox *blockSize;
     QSpinBox *blockSpacing;
     QDoubleSpinBox *stdThreshold;
+    QDoubleSpinBox *percentageKept;
 
     //Block Match Parameters
     QComboBox *transform;
     QComboBox * metric;
-    QComboBox * optimzer;
+    QComboBox * optimizer;
     QSpinBox *maxIterations;
     QDoubleSpinBox * minError;
     QSpinBox *optIterations;
@@ -59,6 +60,7 @@ public:
     QDoubleSpinBox * angleUpperBound;
     QDoubleSpinBox * skewUpperBound;
     QDoubleSpinBox * scaleUpperBound;
+    QCheckBox * initializeOnCenterOfGravity;
 
     //Agregation Parameters:
     QComboBox *agregator;
@@ -110,6 +112,11 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->stdThreshold->setToolTip("Threshold block standard deviation");
     d->stdThreshold->setValue(5);
     
+    d->percentageKept = new QDoubleSpinBox;
+    d->percentageKept->setToolTip("Percentage of blocks actually used");
+    d->percentageKept->setValue(0.8);
+    d->percentageKept->setMinimum(0);
+    d->percentageKept->setMaximum(1);
 
     // Block Match Parameters
     d->transform = new QComboBox;
@@ -124,12 +131,12 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     metricList << "SquaredCorrelation" << "Correlation" << "MeanSquares";
     d->metric->addItems ( metricList );
     
-    d->optimzer = new QComboBox;
-    d->optimzer->setToolTip("Optimizer for optimal block search");
-    QStringList optimzerList;
-    optimzerList << "Exhaustive" << "Bobyqa";
-    d->optimzer->addItems ( optimzerList );
-    d->optimzer->setCurrentIndex(2);
+    d->optimizer = new QComboBox;
+    d->optimizer->setToolTip("Optimizer for optimal block search");
+    QStringList optimizerList;
+    optimizerList << "Exhaustive" << "Bobyqa";
+    d->optimizer->addItems ( optimizerList );
+    d->optimizer->setCurrentIndex(1);
     
     d->maxIterations = new QSpinBox;
     d->maxIterations->setToolTip("Maximum Block Match Iteration");
@@ -188,7 +195,9 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->scaleUpperBound->setToolTip("The upper bound on scales for bobyqa");
     d->scaleUpperBound->setValue(3);
     
-
+    d->initializeOnCenterOfGravity = new QCheckBox;
+    d->initializeOnCenterOfGravity->setToolTip("Initialize the transformation on images centers of gravity?");
+    d->initializeOnCenterOfGravity->setCheckState(Qt::Checked);
 
     // Agregation Parameters:
     d->agregator = new QComboBox;
@@ -245,6 +254,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     blockInitLayout->addRow(new QLabel(tr("Block size"),this),d->blockSize);
     blockInitLayout->addRow(new QLabel(tr("Block spacing"),this),d->blockSpacing);
     blockInitLayout->addRow(new QLabel(tr("Std Threshold"),this),d->stdThreshold);
+    blockInitLayout->addRow(new QLabel(tr("Percentage kept"),this),d->percentageKept);
 
     QGroupBox *blockInitGroupBox = new QGroupBox(tr("Block Initialisation Parameters"));
     blockInitGroupBox->setLayout(blockInitLayout);
@@ -254,10 +264,11 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     QFormLayout *blockMatchLayout = new QFormLayout();
     blockMatchLayout->addRow(new QLabel(tr("Transform"),this),d->transform);
     blockMatchLayout->addRow(new QLabel(tr("Metric"),this),d->metric);
-    blockMatchLayout->addRow(new QLabel(tr("Optimzer"),this),d->optimzer);
+    blockMatchLayout->addRow(new QLabel(tr("Optimizer"),this),d->optimizer);
+    blockMatchLayout->addRow(new QLabel(tr("Initialize on center of mass"),this),d->initializeOnCenterOfGravity);
     blockMatchLayout->addRow(new QLabel(tr("Max Iterations"),this),d->maxIterations);
     blockMatchLayout->addRow(new QLabel(tr("Min error"),this),d->minError);
-    blockMatchLayout->addRow(new QLabel(tr("Optimzer Iterations"),this),d->optIterations);
+    blockMatchLayout->addRow(new QLabel(tr("Optimizer Iterations"),this),d->optIterations);
     blockMatchLayout->addRow(new QLabel(tr("Search Radius"),this),d->searchRadius);
     blockMatchLayout->addRow(new QLabel(tr("Search Angle Radius"),this),d->searchAngleRadius);
     blockMatchLayout->addRow(new QLabel(tr("Search Skew Radius"),this),d->searchSkewRadius);
@@ -329,7 +340,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
     connect(openTransformFileButton, SIGNAL (clicked()), this, SLOT(openTransformFile()));
     
-    connect(d->optimzer, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
+    connect(d->optimizer, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
     connect(d->metric, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
     connect(d->transform, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
     connect(d->agregator, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
@@ -395,10 +406,12 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     process_Registration->initTransformFile( d->initTransformFile );
     process_Registration->setBlockSize( d->blockSize->value() );
     process_Registration->setBlockSpacing( d->blockSpacing->value() );
+    process_Registration->setPercentageKept( d->percentageKept->value() );
     process_Registration->setStDevThreshold( d->stdThreshold->value() );
     process_Registration->setTransform( d->transform->currentIndex() );
     process_Registration->setMetric( d->metric->currentIndex() );
-    process_Registration->setOptimizer( d->optimzer->currentIndex() );
+    process_Registration->setOptimizer( d->optimizer->currentIndex() );
+    process_Registration->setInitializeOnCenterOfGravity( d->initializeOnCenterOfGravity->checkState() == Qt::Checked );
     process_Registration->setMaximumIterations( d->maxIterations->value() );
     process_Registration->setMinimalTransformError( d->minError->value() );
     process_Registration->setOptimizerMaximumIterations( d->optIterations->value() );
@@ -454,7 +467,7 @@ void animaPyramidalBMRegistrationToolBox::openTransformFile()
 
 void animaPyramidalBMRegistrationToolBox::updateBMParams(int index)
 {
-    Optimizer opt = (Optimizer) d->optimzer->currentIndex();
+    Optimizer opt = (Optimizer) d->optimizer->currentIndex();
     Transform tr = (Transform) d->transform->currentIndex();
     Agregator agreg = (Agregator) d->agregator->currentIndex();
     

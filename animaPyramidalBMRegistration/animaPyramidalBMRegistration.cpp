@@ -74,6 +74,8 @@ public:
     float seStoppingThreshold;
     unsigned int numberOfPyramidLevels;
     unsigned int lastPyramidLevel;
+    double percentageKept;
+    bool initializeOnCenterOfGravity;
     unsigned int numberOfThreads;
     
     animaPyramidalBMRegistration* parent;
@@ -115,6 +117,8 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->seStoppingThreshold = 0.01;
     d->numberOfPyramidLevels = 3;
     d->lastPyramidLevel = 0;
+    d->percentageKept = 0.8;
+    d->initializeOnCenterOfGravity = false;
     d->numberOfThreads = 2;
     
     d->parent = this;
@@ -253,7 +257,9 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     registration->SetAgregThreshold( agregThreshold);    
     registration->SetSeStoppingThreshold( seStoppingThreshold);
     registration->SetNumberOfPyramidLevels( numberOfPyramidLevels);
-    registration->SetLastPyramidLevel( lastPyramidLevel);    
+    registration->SetLastPyramidLevel( lastPyramidLevel);
+    registration->SetPercentageKept( d->percentageKept);
+    registration->SetInitializeOnCenterOfGravity( d->initializeOnCenterOfGravity);
     registration->SetNumberOfThreads( numberOfThreads);
     
     
@@ -493,6 +499,16 @@ void animaPyramidalBMRegistration::setNumberOfPyramidLevels(unsigned int NumberO
 void animaPyramidalBMRegistration::setLastPyramidLevel(unsigned int LastPyramidLevel) 
 {
     d->lastPyramidLevel=LastPyramidLevel;
+}
+
+void animaPyramidalBMRegistration::setPercentageKept(double PercentageKept)
+{
+    d->percentageKept=PercentageKept;
+}
+
+void animaPyramidalBMRegistration::setInitializeOnCenterOfGravity(bool InitializeOnCenterOfGravity)
+{
+    d->initializeOnCenterOfGravity=InitializeOnCenterOfGravity;
 }
 
 void animaPyramidalBMRegistration::setNumberOfThreads(int numberOfThreads) 
