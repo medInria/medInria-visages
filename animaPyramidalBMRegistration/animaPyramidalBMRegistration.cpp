@@ -258,8 +258,8 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     registration->SetSeStoppingThreshold( seStoppingThreshold);
     registration->SetNumberOfPyramidLevels( numberOfPyramidLevels);
     registration->SetLastPyramidLevel( lastPyramidLevel);
-    registration->SetPercentageKept( d->percentageKept);
-    registration->SetInitializeOnCenterOfGravity( d->initializeOnCenterOfGravity);
+    registration->SetPercentageKept( percentageKept);
+    registration->SetInitializeOnCenterOfGravity( initializeOnCenterOfGravity);
     registration->SetNumberOfThreads( numberOfThreads);
     
     
