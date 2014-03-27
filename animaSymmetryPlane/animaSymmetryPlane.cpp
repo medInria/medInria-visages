@@ -7,12 +7,10 @@
 #include <dtkCore/dtkAbstractProcessFactory.h>
 #include <dtkCore/dtkSmartPointer.h>
 
-#include <dtkCore/dtkAbstractDataFactory.h>
-#include <dtkCore/dtkAbstractData.h>
-#include <dtkCore/dtkAbstractProcess.h>
+#include <medAbstractDataFactory.h>
+#include <medAbstractImageData.h>
 
 #include <pyramidalSymmetryBridge.h>
-
 
 class animaSymmetryPlanePrivate
 {
@@ -24,8 +22,8 @@ public:
     typedef itk::AffineTransform<ScalarType,3> BaseTransformType;
     typedef BaseTransformType::Pointer BaseTransformPointer;
 
-    dtkSmartPointer <dtkAbstractData> input;
-    dtkSmartPointer <dtkAbstractData> output;
+    dtkSmartPointer <medAbstractImageData> input;
+    dtkSmartPointer <medAbstractImageData> output;
 
     animaSymmetryPlane* parent;
 
@@ -43,8 +41,6 @@ public:
     TransformPointer outputTransform;
 
     itk::CStyleCommand::Pointer callback;
-
-
 
     animaSymmetryPlanePrivate( animaSymmetryPlane* parent );
 
@@ -198,61 +194,69 @@ QString animaSymmetryPlane::description(void) const
     return "animaSymmetryPlane";
 }
 
-void animaSymmetryPlane::setInput ( dtkAbstractData *data )
+void animaSymmetryPlane::setInputImage (medAbstractData *data)
 {
-    if ( !data )
+    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
+    
+    if (!medData)
         return;
 
     QString identifier = data->identifier();
-    qDebug() << identifier;
 
-    d->output = dtkAbstractDataFactory::instance()->createSmartPointer ( "itkDataImageFloat3" );
+    d->output = dynamic_cast <medAbstractImageData *> (medAbstractDataFactory::instance()->create ("itkDataImageFloat3"));
 
-    d->input = data;
+    d->input = medData;
 }
 
-void animaSymmetryPlane::setParameter ( double  data, int channel )
+void animaSymmetryPlane::setMetric(int m)
 {
-    switch (channel)
-    {
-    case 0:
-      d->metric = (Metric)((int)data);
-      break;
-    case 1:
-      d->optType = (OptimizerType)((int)data);
-      break;
-    case 2:
-      d->optMaxIterations= data;
-      break;
-    case 3:
-      d->histogramSize = data;
-      break;
-    case 4:
-      d->searchRadius = data;
-      break;
-    case 5:
-      d->searchAngleRadius = data;
-      break;
-    case 6:
-      d->finalRadius = data;
-      break;
-    case 7:
-      d->numberOfPyramidLevels= data;
-      break;
-    case 8:
-      d->numberOfThreads = data;
-      break;
-    default :
-      break;
-    }
+    d->metric = (Metric)m;
 }
 
+void animaSymmetryPlane::setOptimizerType(int opt)
+{
+    d->optType = (OptimizerType)opt;
+}
+
+void animaSymmetryPlane::setOptimizerMaximumIterations(unsigned int mit)
+{
+    d->optMaxIterations = mit;
+}
+
+void animaSymmetryPlane::setHistogramSize(unsigned int hSize)
+{
+    d->histogramSize = hSize;
+}
+
+void animaSymmetryPlane::setSearchRadius(double sRadius)
+{
+    d->searchRadius = sRadius;
+}
+
+void animaSymmetryPlane::setSearchAngleRadius(double saRadius)
+{
+    d->searchAngleRadius = saRadius;
+}
+
+void animaSymmetryPlane::setFinalRadius(double fRadius)
+{
+    d->finalRadius = fRadius;
+}
+
+void animaSymmetryPlane::setNumberOfPyramidLevels(unsigned int pLevels)
+{
+    d->numberOfPyramidLevels = pLevels;
+}
+
+void animaSymmetryPlane::setNumberOfThreads(unsigned int nThreads)
+{
+    d->numberOfThreads = nThreads;
+}
 
 void animaSymmetryPlane::emitProgress(int prog)
 {
     emit progressed(prog);
 }
-
 
 int animaSymmetryPlane::update ( void )
 {
@@ -260,8 +264,6 @@ int animaSymmetryPlane::update ( void )
         return -1;
 
     QString id = d->input->identifier();
-
-    qDebug() << "Symmetry plane, update : " << id;
 
     if ( id == "itkDataImageChar3" )
     {
@@ -315,7 +317,7 @@ int animaSymmetryPlane::update ( void )
 }
 
 
-dtkAbstractData * animaSymmetryPlane::output ( void )
+medAbstractData * animaSymmetryPlane::output ( void )
 {
     return ( d->output );
 }

@@ -6,7 +6,7 @@
 #include "qtshanoirDataSourceToolBox.h"
 #include "qtshanoirDataSourceProgressToolBox.h"
 
-#include <medCore/medAbstractDataSourceFactory.h>
+#include <medAbstractDataSourceFactory.h>
 #include <medToolBox.h>
 #include <medMetaDataKeys.h>
 
@@ -15,8 +15,8 @@
 #include <QtShanoirSettingsWidget.h>
 
 #include <dtkCore/dtkAbstractDataReader.h>
-#include <dtkCore/dtkAbstractDataFactory.h>
-#include <dtkCore/dtkAbstractData.h>
+#include <medAbstractDataFactory.h>
+#include <medAbstractData.h>
 #include <dtkCore/dtkSmartPointer.h>
 
 
@@ -129,18 +129,18 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
 {
     QFileInfo fileInfo(fileName);
     
-    dtkSmartPointer <dtkAbstractData> dtkdata;
+    dtkSmartPointer <medAbstractData> dtkdata;
     
-    QList<QString> readers = dtkAbstractDataFactory::instance()->readers();
+    QList<QString> readers = medAbstractDataFactory::instance()->readers();
     
     // cycle through readers to see if the last used reader can handle the file
     for (int i=0; i<readers.size(); i++) {
         dtkSmartPointer<dtkAbstractDataReader> dataReader;
-        dataReader = dtkAbstractDataFactory::instance()->readerSmartPointer(readers[i]);
+        dataReader = medAbstractDataFactory::instance()->readerSmartPointer(readers[i]);
         if (dataReader->canRead( fileInfo.filePath() )) {
             if (dataReader->read( fileInfo.filePath() ))
             {
-                dtkdata = dataReader->data();
+                dtkdata = dynamic_cast<medAbstractData*>(dataReader->data());
                 if (dtkdata)
                     break;
             }
