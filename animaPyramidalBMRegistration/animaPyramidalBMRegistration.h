@@ -73,7 +73,6 @@ public:
      */
     virtual void onCanceled (void);
     
-    
     void initTransformFile(QString initTransformFile);
     
     void setBlockSize(int blockSize);
@@ -154,5 +153,3 @@ private:
  * @param void
  */
 dtkAbstractProcess *createAnimaPyramidalBMRegistration(void);
-
-#endif
