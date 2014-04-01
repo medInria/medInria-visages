@@ -9,10 +9,8 @@
 
 #include <dtkCore/dtkAbstractProcessFactory.h>
 #include <medAbstractRegistrationProcess.h>
-#include <dtkCore/dtkAbstractViewFactory.h>
 #include <dtkCore/dtkSmartPointer.h>
 
-#include <medAbstractView.h>
 #include <medRunnableProcess.h>
 #include <medJobManager.h>
 
