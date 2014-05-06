@@ -24,8 +24,9 @@ public:
 public slots:
     void run(void);
     void openTransformFile(void);
-    void updateBMParams(int);
-
+    void updateBMOptimizerParams(int);
+    void updateBMTransformParams(int);
+    void updateBMAgregatorParams(int);
     
 private:
     animaPyramidalBMRegistrationToolBoxPrivate *d;

@@ -344,11 +344,12 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     connect(openTransformFileButton, SIGNAL (clicked()), this, SLOT(openTransformFile()));
     
     connect(d->optimizer, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
-    connect(d->metric, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
     connect(d->transform, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
     connect(d->agregator, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
     
-    updateBMParams(0);
+    updateBMOptimizerParams(0);
+    updateBMTransformParams(0);
+    updateBMAgregatorParams(0);
     
     // Add about plugin
     medPluginManager* pm = medPluginManager::instance();
@@ -467,29 +468,15 @@ void animaPyramidalBMRegistrationToolBox::openTransformFile()
     d->initTransformFileEdit->setText( d->initTransformFile );
 }
 
-
-void animaPyramidalBMRegistrationToolBox::updateBMParams(int index)
+void animaPyramidalBMRegistrationToolBox::updateBMOptimizerParams(int index)
 {
     Optimizer opt = (Optimizer) d->optimizer->currentIndex();
-    Transform tr = (Transform) d->transform->currentIndex();
-    Agregator agreg = (Agregator) d->agregator->currentIndex();
-    
-    // updates according to Transform
-    d->searchAngleRadius->setEnabled(tr == Affine || tr == Rigid);
-    d->angleUpperBound->setEnabled( tr == Affine || tr == Rigid);
-    
-    d->searchScaleRadius->setEnabled(tr == Affine);
-    d->scaleUpperBound->setEnabled(tr == Affine);
-   
-    d->searchSkewRadius->setEnabled(tr == Affine);
-    d->skewUpperBound->setEnabled(tr == Affine);
-   
-    // updates according to Optimizer
-    d->translateUpperBound->setEnabled( opt == Bobyqa ); 
+
+    d->translateUpperBound->setEnabled( opt == Bobyqa );
     d->angleUpperBound->setEnabled( d->angleUpperBound->isEnabled() && opt == Bobyqa );
     d->scaleUpperBound->setEnabled( d->scaleUpperBound->isEnabled() && opt == Bobyqa );
     d->skewUpperBound->setEnabled( d->skewUpperBound->isEnabled() && opt == Bobyqa );
-
+    
     d->stepSize->setEnabled( opt == Exhaustive);
     
     d->searchAngleRadius->setEnabled(d->searchAngleRadius->isEnabled() && opt != Exhaustive );
@@ -497,10 +484,27 @@ void animaPyramidalBMRegistrationToolBox::updateBMParams(int index)
     d->searchSkewRadius->setEnabled( d->searchSkewRadius->isEnabled() && opt != Exhaustive );
     
     d->finalRadius->setEnabled( opt != Exhaustive );
+}
+
+void animaPyramidalBMRegistrationToolBox::updateBMTransformParams(int index)
+{
+    Transform tr = (Transform) d->transform->currentIndex();
+
+    d->searchAngleRadius->setEnabled(tr == Affine || tr == Rigid);
+    d->angleUpperBound->setEnabled( tr == Affine || tr == Rigid);
     
-    // updates according to Agregator
+    d->searchScaleRadius->setEnabled(tr == Affine);
+    d->scaleUpperBound->setEnabled(tr == Affine);
+    
+    d->searchSkewRadius->setEnabled(tr == Affine);
+    d->skewUpperBound->setEnabled(tr == Affine);
+}
+
+void animaPyramidalBMRegistrationToolBox::updateBMAgregatorParams(int index)
+{
+    Agregator agreg = (Agregator) d->agregator->currentIndex();
+
     d->agregThreshold->setEnabled( agreg != LeastSquares);
     d->stoppingThreshold->setEnabled( agreg != LeastSquares);
-    
 }
 
