@@ -364,8 +364,8 @@ bool animaPyramidalBMRegistrationToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->
     registerToolBox<animaPyramidalBMRegistrationToolBox>("animaPyramidalBMRegistrationToolBox",
-                               tr("Pyramidal BM Registration"),
-                               tr("Pyramidal global block-matching registration"),
+                               tr("Linear BM Registration"),
+                               tr("Global linear block-matching registration"),
                                QStringList() << "registration");
 }
 
