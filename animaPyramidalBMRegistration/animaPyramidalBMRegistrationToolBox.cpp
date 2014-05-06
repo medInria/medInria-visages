@@ -423,7 +423,7 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     process_Registration->setSearchSkewRadius( d->searchSkewRadius->value() );
     process_Registration->setSearchScaleRadius( d->searchScaleRadius->value() );
     process_Registration->setStepSize( d->stepSize->value() );
-    process_Registration->setTranlateUpperBound( d->translateUpperBound->value() );
+    process_Registration->setTranslateUpperBound( d->translateUpperBound->value() );
     process_Registration->setAngleUpperBound( d->angleUpperBound->value() );
     process_Registration->setSkewUpperBound( d->skewUpperBound->value() );
     process_Registration->setScaleUpperBound( d->scaleUpperBound->value() );

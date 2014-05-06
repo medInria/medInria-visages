@@ -210,9 +210,9 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-::SetTranlateUpperBound ( double TranlateUpperBound )
+::SetTranslateUpperBound ( double TranslateUpperBound )
 {
-    matcher->SetTranlateUpperBound ( TranlateUpperBound );
+    matcher->SetTranslateUpperBound ( TranslateUpperBound );
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >

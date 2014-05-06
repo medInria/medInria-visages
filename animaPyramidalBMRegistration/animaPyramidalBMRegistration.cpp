@@ -64,7 +64,7 @@ public:
     double searchScaleRadius;
     double finalRadius;
     double stepSize;
-    double tranlateUpperBound;
+    double translateUpperBound;
     double angleUpperBound;
     double skewUpperBound;
     double scaleUpperBound;
@@ -107,7 +107,7 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->searchScaleRadius = 0.1;
     d->finalRadius = 0.001;
     d->stepSize = 1;
-    d->tranlateUpperBound = 50;
+    d->translateUpperBound = 50;
     d->angleUpperBound = 180;
     d->skewUpperBound = 45;
     d->scaleUpperBound = 3;
@@ -148,7 +148,7 @@ bool animaPyramidalBMRegistration::registered(void)
 
 QString animaPyramidalBMRegistration::description(void) const
 {
-    return "Pyramidal BM Registration";
+    return "Linear BM Registration";
 }
 
 QString animaPyramidalBMRegistration::identifier(void) const
@@ -181,7 +181,7 @@ QString animaPyramidalBMRegistration::getTitleAndParameters()
     RegistrationType * registration = static_cast<RegistrationType *>(d->registrationMethod);
     
     QString titleAndParameters;
-    titleAndParameters += "Pyramidal BM Registration\n";
+    titleAndParameters += "Linear BM Registration\n";
     titleAndParameters += " Number of pyramid levels: " + QString::number(registration->GetNumberOfPyramidLevels()) + "\n";
     titleAndParameters += " Number of iterations per level: " + QString::number(registration->GetMaximumIterations()) + "\n";
 
@@ -248,7 +248,7 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     registration->SetSearchScaleRadius( searchScaleRadius);
     registration->SetFinalRadius( finalRadius);
     registration->SetStepSize( stepSize);
-    registration->SetTranlateUpperBound( tranlateUpperBound);
+    registration->SetTranslateUpperBound( translateUpperBound);
     registration->SetAngleUpperBound( angleUpperBound);
     registration->SetSkewUpperBound( skewUpperBound);
     registration->SetScaleUpperBound( scaleUpperBound);
@@ -451,9 +451,9 @@ void animaPyramidalBMRegistration::setStepSize(double StepSize)
     d->stepSize=StepSize;
 }
 
-void animaPyramidalBMRegistration::setTranlateUpperBound(double TranlateUpperBound) 
+void animaPyramidalBMRegistration::setTranslateUpperBound(double TranslateUpperBound)
 {
-    d->tranlateUpperBound=TranlateUpperBound;
+    d->translateUpperBound=TranslateUpperBound;
 }
 
 void animaPyramidalBMRegistration::setAngleUpperBound(double AngleUpperBound) 

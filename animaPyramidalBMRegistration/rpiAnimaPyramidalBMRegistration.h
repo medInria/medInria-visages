@@ -97,7 +97,7 @@ public:
 
     void SetStepSize ( double StepSize );
 
-    void SetTranlateUpperBound ( double TranlateUpperBound );
+    void SetTranslateUpperBound ( double TranslateUpperBound );
 
     void SetAngleUpperBound ( double AngleUpperBound );
 

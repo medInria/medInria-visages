@@ -111,7 +111,7 @@ public:
     
     void setStepSize(double StepSize);
     
-    void setTranlateUpperBound(double TranlateUpperBound);
+    void setTranslateUpperBound(double TranslateUpperBound);
     
     void setAngleUpperBound(double AngleUpperBound);
     
