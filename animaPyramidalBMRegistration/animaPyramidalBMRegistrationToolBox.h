@@ -22,7 +22,6 @@ public:
     
 public slots:
     void run(void);
-    void openTransformFile(void);
     void updateBMOptimizerParams(int);
     void updateBMTransformParams(int);
     void updateBMAgregatorParams(int);

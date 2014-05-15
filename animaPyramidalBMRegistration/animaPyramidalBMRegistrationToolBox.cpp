@@ -28,9 +28,6 @@
 class animaPyramidalBMRegistrationToolBoxPrivate
 {
 public:
- 
-    QLineEdit *initTransformFileEdit;
-    QString initTransformFile;
     
     //Block Initialisation Parameters
     QSpinBox *blockSize;
@@ -89,11 +86,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     QHBoxLayout *progressStackLayout = new QHBoxLayout;
     progressStackLayout->addWidget(d->progression_stack);
     
-    
-    d->initTransformFileEdit = new QLineEdit;
-    QPushButton *openTransformFileButton = new QPushButton(tr("..."), this);
-
-
     // Block Initialisation Parameters
     d->blockSize = new QSpinBox;
     d->blockSize->setToolTip("Size of the blocks");
@@ -238,15 +230,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->threads->setValue(itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
     d->threads->setRange(1, itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
 
-    
-    // Tranform Parameters Layout
-    QHBoxLayout *transformLayout = new QHBoxLayout;
-    QLabel *initTransformLabel = new QLabel(tr("Init. Transform"));
-    transformLayout->addWidget(initTransformLabel);
-    transformLayout->addWidget(d->initTransformFileEdit);
-    transformLayout->addWidget(openTransformFileButton);
-    
-
     // Block Initialisation Parameters Layout
     QFormLayout *blockInitLayout = new QFormLayout();
     blockInitLayout->addRow(new QLabel(tr("Block size"),this),d->blockSize);
@@ -263,7 +246,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     blockMatchLayout->addRow(new QLabel(tr("Transform"),this),d->transform);
     blockMatchLayout->addRow(new QLabel(tr("Metric"),this),d->metric);
     blockMatchLayout->addRow(new QLabel(tr("Optimizer"),this),d->optimizer);
-    blockMatchLayout->addRow(new QLabel(tr("Initialize on center of mass"),this),d->initializeOnCenterOfGravity);
+    blockMatchLayout->addRow(new QLabel(tr("Center of mass init"),this),d->initializeOnCenterOfGravity);
     blockMatchLayout->addRow(new QLabel(tr("Max Iterations"),this),d->maxIterations);
     blockMatchLayout->addRow(new QLabel(tr("Min error"),this),d->minError);
     blockMatchLayout->addRow(new QLabel(tr("Optimizer Iterations"),this),d->optIterations);
@@ -318,8 +301,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     layoutheader->addWidget(d->progression_stack);
     
     QWidget *page1 = new QWidget;
-    QVBoxLayout *layout1 = new QVBoxLayout(page1);   
-    layout1->addLayout(transformLayout);
+    QVBoxLayout *layout1 = new QVBoxLayout(page1);
     layout1->addWidget(blockInitGroupBox);
     layout1->addWidget(agregationParamGroupBox);
     layout1->addWidget(pyramidParamGroupBox);
@@ -336,11 +318,10 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     this->addWidget( widget );
 
     connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
-    connect(openTransformFileButton, SIGNAL (clicked()), this, SLOT(openTransformFile()));
     
-    connect(d->optimizer, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
-    connect(d->transform, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
-    connect(d->agregator, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMParams(int)));
+    connect(d->optimizer, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMOptimizerParams(int)));
+    connect(d->transform, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMTransformParams(int)));
+    connect(d->agregator, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMAgregatorParams(int)));
     
     updateBMOptimizerParams(0);
     updateBMTransformParams(0);
@@ -402,7 +383,6 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     }
 
     // Setting process arguments
-    process_Registration->initTransformFile( d->initTransformFile );
     process_Registration->setBlockSize( d->blockSize->value() );
     process_Registration->setBlockSpacing( d->blockSpacing->value() );
     process_Registration->setPercentageKept( d->percentageKept->value() );
@@ -452,12 +432,6 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     
     medJobManager::instance()->registerJobItem(runProcess);
     QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
-}
-
-void animaPyramidalBMRegistrationToolBox::openTransformFile()
-{
-    d->initTransformFile = QFileDialog::getOpenFileName(this, tr("Open transform file")); 
-    d->initTransformFileEdit->setText( d->initTransformFile );
 }
 
 void animaPyramidalBMRegistrationToolBox::updateBMOptimizerParams(int index)
