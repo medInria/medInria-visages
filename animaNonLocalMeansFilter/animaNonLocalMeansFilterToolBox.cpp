@@ -8,18 +8,13 @@
 
 #include <QtGui>
 
-#include <dtkCore/dtkAbstractDataFactory.h>
-#include <dtkCore/dtkAbstractData.h>
-#include <dtkCore/dtkAbstractProcessFactory.h>
-#include <dtkCore/dtkAbstractProcess.h>
-#include <dtkCore/dtkAbstractViewFactory.h>
+#include <medAbstractDataFactory.h>
+#include <medAbstractImageData.h>
 #include <dtkCore/dtkSmartPointer.h>
 
 #include <medAbstractView.h>
 #include <medRunnableProcess.h>
 #include <medJobManager.h>
-
-#include <medAbstractDataImage.h>
 
 #include <medToolBoxFactory.h>
 #include <medFilteringSelectorToolBox.h>
@@ -27,6 +22,7 @@
 #include <medPluginManager.h>
 
 #include <itkMultiThreader.h>
+#include <animaNonLocalMeansFilter.h>
 
 class animaNonLocalMeansFilterToolBoxPrivate
 {
@@ -48,8 +44,7 @@ public:
     QRadioButton *notTemporalImage;
     QButtonGroup *temporalImageGroup;
 
-
-    dtkSmartPointer <dtkAbstractProcess> process;
+    dtkSmartPointer <animaNonLocalMeansFilter> process;
     medProgressionStack * progression_stack;
 
 };
@@ -119,7 +114,6 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
     temporalLayout->addWidget(d->temporalImage);
     parametersLayout->addRow(tr("Image has a temporal dimension?"), temporalLayout);
 
-
     QGroupBox *groupParameters = new QGroupBox("Mandatory");
     groupParameters->setLayout(parametersLayout);
 
@@ -169,7 +163,6 @@ animaNonLocalMeansFilterToolBox::animaNonLocalMeansFilterToolBox(QWidget *parent
 animaNonLocalMeansFilterToolBox::~animaNonLocalMeansFilterToolBox(void)
 {
     delete d;
-
     d = NULL;
 }
 
@@ -182,7 +175,7 @@ bool animaNonLocalMeansFilterToolBox::registered(void)
                                QStringList()<< "filtering");
 }
 
-dtkAbstractData* animaNonLocalMeansFilterToolBox::processOutput(void)
+medAbstractData* animaNonLocalMeansFilterToolBox::processOutput(void)
 {
     if(!d->process)
         return NULL;
@@ -195,27 +188,27 @@ void animaNonLocalMeansFilterToolBox::run(void)
     if(!this->parentToolBox())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("animaNonLocalMeansFilter");
+    d->process = new animaNonLocalMeansFilter;
 
     if(!this->parentToolBox()->data())
         return;
 
-    d->process->setInput(this->parentToolBox()->data());
+    d->process->setInputImage(this->parentToolBox()->data());
 
     // Set your parameters here
     medRunnableProcess *runProcess = new medRunnableProcess;
     runProcess->setProcess (d->process);
 
-    d->process->setParameter(double(d->patchHalfSize->value()), 0);
-    d->process->setParameter(double(d->searchNeighborhood->value()), 1);
-    d->process->setParameter(double(d->searchStepSize->value()), 2);
-    d->process->setParameter(d->weightThreshold->value(), 3);
-    d->process->setParameter(d->betaParameter->value(), 4);
-    d->process->setParameter(d->meanMinThreshold->value(), 5);
-    d->process->setParameter(d->varMinThreshold->value(), 6);
-    d->process->setParameter(double(d->nbThread->value()), 7);
-    d->process->setParameter(double(d->weightedMerthod->currentIndex()), 8);
-    d->process->setParameter(double(d->temporalImageGroup->checkedId()), 9);
+    d->process->setPatchHalfSize(d->patchHalfSize->value());
+    d->process->setSearchNeighborhood(d->searchNeighborhood->value());
+    d->process->setSearchStepSize(d->searchStepSize->value());
+    d->process->setWeightThreshold(d->weightThreshold->value());
+    d->process->setBetaParameter(d->betaParameter->value());
+    d->process->setMeanMinThreshold(d->meanMinThreshold->value());
+    d->process->setVarMinThreshold(d->varMinThreshold->value());
+    d->process->setNumberOfThreads(d->nbThread->value());
+    d->process->setWeightedMethod(d->weightedMerthod->currentIndex());
+    d->process->setTemporalImage(d->temporalImageGroup->checkedId());
     d->progression_stack->addJobItem(runProcess, "Progress:");
 
     d->progression_stack->disableCancel(runProcess);
@@ -231,83 +224,75 @@ void animaNonLocalMeansFilterToolBox::run(void)
     QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 }
 
-void animaNonLocalMeansFilterToolBox::update ( dtkAbstractView* view )
+void animaNonLocalMeansFilterToolBox::update(medAbstractData* data)
 {
-    if ( !view )
+    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
+    if (!medData)
+        return;
+
+    QString identifier = medData->identifier();
+
+    unsigned int nbDimension = medData->Dimension();
+    d->dataDimensionValue->setText(QString::number(nbDimension));
+    d->notTemporalImage->setChecked(true);
+    if (nbDimension == 4)
     {
-        clear();
+        d->temporalImage->setChecked(true);
+    }
+    else if (nbDimension != 2 && nbDimension != 3 )
+    {
+        qWarning() << "Error : pixel type not yet implemented ("
+        << identifier
+        << ")";
+    }
+    
+    identifier.truncate(identifier.size() - 1);
+    
+    if ( identifier == "itkDataImageChar" )
+    {
+        d->dataTypeValue->setText ( "Char" );
+    }
+    else if ( identifier == "itkDataImageUChar" )
+    {
+        d->dataTypeValue->setText ( "Unsigned char" );
+    }
+    else if ( identifier == "itkDataImageShort" )
+    {
+        d->dataTypeValue->setText ( "Short" );
+    }
+    else if ( identifier == "itkDataImageUShort" )
+    {
+        d->dataTypeValue->setText ( "Unsigned short" );
+    }
+    else if ( identifier == "itkDataImageInt" )
+    {
+        d->dataTypeValue->setText ( "Int" );
+    }
+    else if ( identifier == "itkDataImageUInt" )
+    {
+        d->dataTypeValue->setText ( "Unsigned int" );
+    }
+    else if ( identifier == "itkDataImageLong" )
+    {
+        d->dataTypeValue->setText ( "Long" );
+    }
+    else if ( identifier == "itkDataImageULong" )
+    {
+        d->dataTypeValue->setText ( "Unsigned long" );
+    }
+    else if ( identifier == "itkDataImageFloat" )
+    {
+        d->dataTypeValue->setText ( "Float" );
+    }
+    else if ( identifier == "itkDataImageDouble" )
+    {
+        d->dataTypeValue->setText ( "Double" );
     }
     else
     {
-        if ( !this->parentToolBox()->data() )
-        {
-            return;
-        }
-
-        QString identifier = this->parentToolBox()->data()->identifier();
-
-        unsigned int nbDimension =(*(identifier.end() - 1)).digitValue();
-        d->dataDimensionValue->setText(QString::number(nbDimension));
-        d->notTemporalImage->setChecked(true);
-        if (nbDimension == 4)
-        {
-            d->temporalImage->setChecked(true);
-        }
-        else if (nbDimension != 2 && nbDimension != 3 )
-        {
-            qWarning() << "Error : pixel type not yet implemented ("
-            << identifier
-            << ")";
-        }
-
-        identifier.truncate(identifier.size() - 1);
-
-        if ( identifier == "itkDataImageChar" )
-        {
-            d->dataTypeValue->setText ( "Char" );
-        }
-        else if ( identifier == "itkDataImageUChar" )
-        {
-            d->dataTypeValue->setText ( "Unsigned char" );
-        }
-        else if ( identifier == "itkDataImageShort" )
-        {
-            d->dataTypeValue->setText ( "Short" );
-        }
-        else if ( identifier == "itkDataImageUShort" )
-        {
-            d->dataTypeValue->setText ( "Unsigned short" );
-        }
-        else if ( identifier == "itkDataImageInt" )
-        {
-            d->dataTypeValue->setText ( "Int" );
-        }
-        else if ( identifier == "itkDataImageUInt" )
-        {
-            d->dataTypeValue->setText ( "Unsigned int" );
-        }
-        else if ( identifier == "itkDataImageLong" )
-        {
-            d->dataTypeValue->setText ( "Long" );
-        }
-        else if ( identifier == "itkDataImageULong" )
-        {
-            d->dataTypeValue->setText ( "Unsigned long" );
-        }
-        else if ( identifier == "itkDataImageFloat" )
-        {
-            d->dataTypeValue->setText ( "Float" );
-        }
-        else if ( identifier == "itkDataImageDouble" )
-        {
-            d->dataTypeValue->setText ( "Double" );
-        }
-        else
-        {
-            qWarning() << "Error : pixel type not yet implemented ("
-            << identifier
-            << ")";
-        }
+        qWarning() << "Error : pixel type not yet implemented ("
+        << identifier
+        << ")";
     }
 }
 

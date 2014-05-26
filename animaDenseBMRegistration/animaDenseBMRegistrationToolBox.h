@@ -5,17 +5,17 @@
 #pragma once
 
 #include <medRegistrationAbstractToolBox.h>
-#include "animaPyramidalBMRegistrationPluginExport.h"
+#include "animaDenseBMRegistrationPluginExport.h"
 
-class animaPyramidalBMRegistrationToolBoxPrivate;
+class animaDenseBMRegistrationToolBoxPrivate;
 
-class ANIMAPYRAMIDALBMREGISTRATIONPLUGIN_EXPORT animaPyramidalBMRegistrationToolBox : public medRegistrationAbstractToolBox
+class ANIMADENSEBMREGISTRATIONPLUGIN_EXPORT animaDenseBMRegistrationToolBox : public medRegistrationAbstractToolBox
 {
     Q_OBJECT
     
 public:
-    animaPyramidalBMRegistrationToolBox(QWidget *parent = 0);
-    ~animaPyramidalBMRegistrationToolBox(void);
+    animaDenseBMRegistrationToolBox(QWidget *parent = 0);
+    ~animaDenseBMRegistrationToolBox(void);
     
 public:
     static bool registered(void);
@@ -25,7 +25,8 @@ public slots:
     void updateBMOptimizerParams(int);
     void updateBMTransformParams(int);
     void updateBMAgregatorParams(int);
+    void updateDamUsage(int);
     
 private:
-    animaPyramidalBMRegistrationToolBoxPrivate *d;
+    animaDenseBMRegistrationToolBoxPrivate *d;
 };

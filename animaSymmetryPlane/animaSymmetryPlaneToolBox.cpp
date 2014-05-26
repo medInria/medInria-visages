@@ -8,19 +8,15 @@
 
 #include <QtGui>
 
-#include <dtkCore/dtkAbstractDataFactory.h>
-#include <dtkCore/dtkAbstractData.h>
-#include <dtkCore/dtkAbstractProcessFactory.h>
-#include <dtkCore/dtkAbstractProcess.h>
-#include <dtkCore/dtkAbstractViewFactory.h>
+#include <medAbstractDataFactory.h>
+#include <medAbstractData.h>
 #include <dtkCore/dtkSmartPointer.h>
 #include <medPluginManager.h>
 
-#include <medAbstractView.h>
 #include <medRunnableProcess.h>
 #include <medJobManager.h>
 
-#include <medAbstractDataImage.h>
+#include <medAbstractImageData.h>
 #include <medPluginManager.h>
 
 #include <medToolBoxFactory.h>
@@ -28,7 +24,7 @@
 #include <medProgressionStack.h>
 
 #include <pyramidalSymmetryBridge.h>
-
+#include <animaSymmetryPlane.h>
 
 class animaSymmetryPlaneToolBoxPrivate
 {
@@ -44,8 +40,7 @@ public:
     QSpinBox *numberOfPyramidLevelsValue;
     QSpinBox *numberOfThreadsValue;
 
-
-    dtkSmartPointer <dtkAbstractProcess> process;
+    dtkSmartPointer <animaSymmetryPlane> process;
     medProgressionStack * progression_stack;
 };
 
@@ -101,6 +96,7 @@ animaSymmetryPlaneToolBox::animaSymmetryPlaneToolBox(QWidget *parent) : medFilte
     d->finalRadiusValue->setToolTip("The final radius (rho end for newuoa");
     d->finalRadiusValue->setDecimals(4);
     d->finalRadiusValue->setValue(0.001);
+    d->finalRadiusValue->setSingleStep(0.0001);
 
     d->numberOfPyramidLevelsValue = new QSpinBox;
     d->numberOfPyramidLevelsValue->setToolTip("Number of pyramid levels");
@@ -208,7 +204,7 @@ bool animaSymmetryPlaneToolBox::registered(void)
                                QStringList()<< "filtering");
 }
 
-dtkAbstractData* animaSymmetryPlaneToolBox::processOutput(void)
+medAbstractData* animaSymmetryPlaneToolBox::processOutput(void)
 {
     if(!d->process)
         return NULL;
@@ -221,23 +217,22 @@ void animaSymmetryPlaneToolBox::run(void)
     if(!this->parentToolBox())
         return;
 
-    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("animaSymmetryPlane");
+    d->process = new animaSymmetryPlane;
 
     if(!this->parentToolBox()->data())
         return;
 
-    d->process->setInput(this->parentToolBox()->data());
+    d->process->setInputImage(this->parentToolBox()->data());
 
-    d->process->setParameter((double)d->metricComboBox->currentIndex(), 0);
-    d->process->setParameter((double)d->optTypeComboBox->currentIndex(), 1);
-    d->process->setParameter((double)d->optMaxIterations->value(),2);
-    d->process->setParameter((double)d->histogramSize->value(), 3);
-    d->process->setParameter((double)d->searchRadiusValue->value(),4);
-    d->process->setParameter((double)d->searchAngleRadiusValue->value(),5);
-    d->process->setParameter((double)d->finalRadiusValue->value(), 6);
-    d->process->setParameter((double)d->numberOfPyramidLevelsValue->value(), 7);
-    d->process->setParameter((double)d->numberOfThreadsValue->value(), 8);
-
+    d->process->setMetric(d->metricComboBox->currentIndex());
+    d->process->setOptimizerType(d->optTypeComboBox->currentIndex());
+    d->process->setOptimizerMaximumIterations(d->optMaxIterations->value());
+    d->process->setHistogramSize(d->histogramSize->value());
+    d->process->setSearchRadius(d->searchRadiusValue->value());
+    d->process->setSearchAngleRadius(d->searchAngleRadiusValue->value());
+    d->process->setFinalRadius(d->finalRadiusValue->value());
+    d->process->setNumberOfPyramidLevels(d->numberOfPyramidLevelsValue->value());
+    d->process->setNumberOfThreads(d->numberOfThreadsValue->value());
 
     medRunnableProcess *runProcess = new medRunnableProcess;
     runProcess->setProcess (d->process);
@@ -253,7 +248,6 @@ void animaSymmetryPlaneToolBox::run(void)
     connect (runProcess, SIGNAL(activate(QObject*,bool)),
              d->progression_stack, SLOT(setActive(QObject*,bool)));
 
-
     medJobManager::instance()->registerJobItem(runProcess);
     QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 }
@@ -261,26 +255,23 @@ void animaSymmetryPlaneToolBox::run(void)
 
 void animaSymmetryPlaneToolBox::saveRealignTransformFile(void)
 {
-     QString fileName = QFileDialog::getSaveFileName(this, tr("Save realign transform file"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save realign transform file"),QDir::homePath());
 
      if(!fileName.isEmpty())
      {
-         dtkSmartPointer<animaSymmetryPlane> symmetryPlaneProcess = (dtkSmartPointer<animaSymmetryPlane>)d->process;
-         if(symmetryPlaneProcess)
-           symmetryPlaneProcess->saveTransformFile(fileName);
+         if(d->process)
+           d->process->saveTransformFile(fileName);
      }
-
 }
 
 void animaSymmetryPlaneToolBox::saveTransformFile(void)
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save transform file"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save transform file"),QDir::homePath());
 
     if(!fileName.isEmpty())
     {
-        dtkSmartPointer<animaSymmetryPlane> symmetryPlaneProcess = (dtkSmartPointer<animaSymmetryPlane>)d->process;
-        if(symmetryPlaneProcess)
-          symmetryPlaneProcess->saveRealignTransformFile(fileName);
+        if(d->process)
+          d->process->saveRealignTransformFile(fileName);
     }
 }
 

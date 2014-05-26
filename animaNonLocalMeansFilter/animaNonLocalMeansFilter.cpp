@@ -4,12 +4,10 @@
 
 #include "animaNonLocalMeansFilter.h"
 
-#include <dtkCore/dtkAbstractProcessFactory.h>
 #include <dtkCore/dtkSmartPointer.h>
-
-#include <dtkCore/dtkAbstractDataFactory.h>
-#include <dtkCore/dtkAbstractData.h>
-#include <dtkCore/dtkAbstractProcess.h>
+#include <dtkCore/dtkAbstractProcessFactory.h>
+#include <medAbstractDataFactory.h>
+#include <medAbstractImageData.h>
 
 #include <medMetaDataKeys.h>
 
@@ -28,8 +26,8 @@
 class animaNonLocalMeansFilterPrivate
 {
 public:
-    dtkSmartPointer <dtkAbstractData> input;
-    dtkSmartPointer <dtkAbstractData> output;
+    dtkSmartPointer <medAbstractImageData> input;
+    dtkSmartPointer <medAbstractImageData> output;
 
     unsigned int patchHalfSize;
     unsigned int searchNeighborhood;
@@ -56,8 +54,6 @@ public:
     template <class ImageType> void updateNLMeansTemporal();
     static void eventCallback(itk::Object* caller, const itk::EventObject& event, void* clientData);
 };
-
-
 
 void
 animaNonLocalMeansFilterPrivate::update ()
@@ -215,84 +211,95 @@ animaNonLocalMeansFilterPrivate::eventCallback(itk::Object* caller, const itk::E
 }
 
 
-
 // /////////////////////////////////////////////////////////////////
 // animaNonLocalMeansFilter
 // /////////////////////////////////////////////////////////////////
 
-animaNonLocalMeansFilter::animaNonLocalMeansFilter(void) : dtkAbstractProcess(), d(new animaNonLocalMeansFilterPrivate)
+animaNonLocalMeansFilter::animaNonLocalMeansFilter() : dtkAbstractProcess(), d(new animaNonLocalMeansFilterPrivate)
 {
     d->parent = this;
 }
 
-animaNonLocalMeansFilter::~animaNonLocalMeansFilter(void)
+animaNonLocalMeansFilter::~animaNonLocalMeansFilter()
 {
 
 }
 
-bool animaNonLocalMeansFilter::registered(void)
+bool animaNonLocalMeansFilter::registered()
 {
     return dtkAbstractProcessFactory::instance()->registerProcessType("animaNonLocalMeansFilter", createanimaNonLocalMeansFilter);
 }
 
-QString animaNonLocalMeansFilter::description(void) const
+QString animaNonLocalMeansFilter::description() const
 {
     return "animaNonLocalMeansFilter";
 }
 
-void animaNonLocalMeansFilter::setInput ( dtkAbstractData *data )
+void animaNonLocalMeansFilter::setInputImage (medAbstractData *data)
 {
-    if ( !data )
+    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
+    
+    if (!medData)
         return;
 
     QString identifier = data->identifier();
 
-    d->output = dtkAbstractDataFactory::instance()->createSmartPointer ( identifier );
+    d->output = dynamic_cast <medAbstractImageData *> (medAbstractDataFactory::instance()->create (identifier));
 
-    d->input = data;
+    d->input = medData;
 }
 
-void animaNonLocalMeansFilter::setParameter ( double  data, int channel )
+void animaNonLocalMeansFilter::setPatchHalfSize(unsigned int patchHalfSize)
 {
-    switch (channel)
-    {
-        case (0):
-            d->patchHalfSize = (unsigned int)data;
-            break;
-        case (1):
-            d->searchNeighborhood = (unsigned int)data;
-            break;
-        case (2):
-            d->searchStepSize = (unsigned int)data;
-            break;
-        case (3):
-            d->weightThreshold = data;
-            break;
-        case (4):
-            d->betaParameter = data;
-            break;
-        case (5):
-            d->meanMinThreshold = data;
-            break;
-        case (6):
-            d->varMinThreshold= data;
-            break;
-        case (7):
-            d->nbThread = (unsigned int)data;
-            break;
-        case (8):
-            d->weightedMethod = (int)data;
-            break;
-        case (9):
-            d->temporalImage = (int)data;
-            break;
-        default :
-            return;
-    }
-
+    d->patchHalfSize = patchHalfSize;
 }
 
-int animaNonLocalMeansFilter::update ( void )
+void animaNonLocalMeansFilter::setSearchNeighborhood(unsigned int searchNeighborhood)
+{
+    d->searchNeighborhood = searchNeighborhood;
+}
+
+void animaNonLocalMeansFilter::setSearchStepSize(unsigned int searchStepSize)
+{
+    d->searchStepSize = searchStepSize;
+}
+
+void animaNonLocalMeansFilter::setWeightThreshold(double weightThreshold)
+{
+    d->weightThreshold = weightThreshold;
+}
+
+void animaNonLocalMeansFilter::setBetaParameter(double betaParameter)
+{
+    d->betaParameter = betaParameter;
+}
+
+void animaNonLocalMeansFilter::setMeanMinThreshold(double meanMinThreshold)
+{
+    d->meanMinThreshold = meanMinThreshold;
+}
+
+void animaNonLocalMeansFilter::setVarMinThreshold(double varMinThreshold)
+{
+    d->varMinThreshold = varMinThreshold;
+}
+
+void animaNonLocalMeansFilter::setNumberOfThreads(unsigned int nbThread)
+{
+    d->nbThread = nbThread;
+}
+
+void animaNonLocalMeansFilter::setWeightedMethod(int weightedMethod)
+{
+    d->weightedMethod = weightedMethod;
+}
+
+void animaNonLocalMeansFilter::setTemporalImage(int temporalImage)
+{
+    d->temporalImage = temporalImage;
+}
+
+int animaNonLocalMeansFilter::update ()
 {
     if ( !d->input )
     {
@@ -305,9 +312,9 @@ int animaNonLocalMeansFilter::update ( void )
     return EXIT_SUCCESS;
 }
 
-dtkAbstractData * animaNonLocalMeansFilter::output ( void )
+medAbstractData * animaNonLocalMeansFilter::output ()
 {
-    return ( d->output );
+    return d->output;
 }
 
 void animaNonLocalMeansFilter::emitProgressed(int progression)
