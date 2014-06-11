@@ -215,9 +215,20 @@ animaNonLocalMeansFilterPrivate::eventCallback(itk::Object* caller, const itk::E
 // animaNonLocalMeansFilter
 // /////////////////////////////////////////////////////////////////
 
-animaNonLocalMeansFilter::animaNonLocalMeansFilter() : dtkAbstractProcess(), d(new animaNonLocalMeansFilterPrivate)
+animaNonLocalMeansFilter::animaNonLocalMeansFilter() : medAbstractFilteringProcess(), d(new animaNonLocalMeansFilterPrivate)
 {
     d->parent = this;
+
+    d->patchHalfSize = 1;
+    d->searchNeighborhood = 3;
+    d->searchStepSize = 1;
+    d->weightThreshold = 0.0;
+    d->betaParameter = 1;
+    d->meanMinThreshold = 0.95;
+    d->varMinThreshold = 0.5;
+    d->nbThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
+    d->weightedMethod = 0;
+    d->temporalImage = 0;
 }
 
 animaNonLocalMeansFilter::~animaNonLocalMeansFilter()
@@ -227,7 +238,7 @@ animaNonLocalMeansFilter::~animaNonLocalMeansFilter()
 
 bool animaNonLocalMeansFilter::registered()
 {
-    return dtkAbstractProcessFactory::instance()->registerProcessType("animaNonLocalMeansFilter", createanimaNonLocalMeansFilter);
+    return dtkAbstractProcessFactory::instance()->registerProcessType("animaNonLocalMeansFilter", createanimaNonLocalMeansFilter, "dtkAbstractProcess");
 }
 
 QString animaNonLocalMeansFilter::description() const

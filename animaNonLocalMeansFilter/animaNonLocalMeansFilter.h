@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <dtkCore/dtkAbstractProcess.h>
+#include <medAbstractFilteringProcess.h>
 #include <medAbstractData.h>
 
 #include "animaNonLocalMeansFilterPluginExport.h"
 
 class animaNonLocalMeansFilterPrivate;
 
-class ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT animaNonLocalMeansFilter : public dtkAbstractProcess
+class ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT animaNonLocalMeansFilter : public medAbstractFilteringProcess
 {
     Q_OBJECT
 
