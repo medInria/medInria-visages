@@ -91,16 +91,8 @@ template<typename DataType>
 	} \
 	bool vistalDataImage##suffix::registered(void) \
 	{ \
-		return dtkAbstractDataFactory::instance()->registerDataType("vistalDataImage"#suffix, createVistalDataImage##suffix); \
+        return medAbstractDataFactory::instance()->registerDataType<vistalDataImage##suffix>(); \
 	} \
-    QString vistalDataImage##suffix::identifier(void) const \
-    { \
-        return "vistalDataImage"#suffix; \
-    } \
-    QString vistalDataImage##suffix::description(void) const \
-    { \
-        return "vistalDataImage"#suffix; \
-    } \
     QImage & vistalDataImage##suffix::thumbnail(void) const \
 	{ \
 	     if (d->thumbnails.isEmpty()){\
@@ -178,10 +170,5 @@ template<typename DataType>
 				d->range_max = vistal::stats::GetMaxPixelValue (*d->image); \
 		} \
 		return d->range_max; \
-	} \
-	dtkAbstractData *createVistalDataImage##suffix(void) \
-	{ \
-		return new vistalDataImage##suffix; \
-	}
-
+    }
 #endif

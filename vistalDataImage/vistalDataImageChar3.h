@@ -5,24 +5,21 @@
 #ifndef VISTALDATAIMAGECHAR3_H
 #define VISTALDATAIMAGECHAR3_H
 
-#include <dtkCore/dtkAbstractData.h>
-
 #include <medAbstractImageData.h>
 
-#include "vistalDataImagePluginExport.h"
+#include <vistalDataImagePluginExport.h>
 
 class vistalDataImageChar3Private;
 
 class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageChar3 : public medAbstractImageData
 {
     Q_OBJECT
+    MED_DATA_INTERFACE("Vistal Image (Char3)",
+                       "Vistal Image (Char3)")
 
 public:
              vistalDataImageChar3(void);
     virtual ~vistalDataImageChar3(void);
-
-    virtual QString description(void) const;
-    virtual QString identifier(void) const;
 
     static bool registered(void);
 	
@@ -30,8 +27,6 @@ public:
 		virtual QList<QImage> &thumbnails (void) const;
 	
 public slots:
-    // derived from dtkAbstractData
-
     void *output(void);
     void *data(void);
     void setData(void* data);
@@ -48,7 +43,5 @@ public slots:
 private:
     vistalDataImageChar3Private *d;
 };
-
-dtkAbstractData *createVistalDataImageChar3(void);
 
 #endif
