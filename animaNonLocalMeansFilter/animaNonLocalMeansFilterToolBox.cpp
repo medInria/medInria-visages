@@ -169,10 +169,7 @@ animaNonLocalMeansFilterToolBox::~animaNonLocalMeansFilterToolBox(void)
 bool animaNonLocalMeansFilterToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->
-    registerToolBox<animaNonLocalMeansFilterToolBox>("animaNonLocalMeansFilterToolBox",
-                               tr("Non-Local Means Denoising"),
-                               tr("Applies a non local means denoising filter"),
-                               QStringList()<< "filtering");
+    registerToolBox<animaNonLocalMeansFilterToolBox>();
 }
 
 medAbstractData* animaNonLocalMeansFilterToolBox::processOutput(void)

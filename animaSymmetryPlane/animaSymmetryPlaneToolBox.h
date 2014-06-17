@@ -12,6 +12,9 @@ class animaSymmetryPlaneToolBoxPrivate;
 class ANIMASYMMETRYPLANEPLUGIN_EXPORT animaSymmetryPlaneToolBox : public medFilteringAbstractToolBox
 {
     Q_OBJECT
+    MED_TOOLBOX_INTERFACE("Symmetry Plane",
+                          "Symmetry plane computation",
+                           << "filtering")
 
 public:
     animaSymmetryPlaneToolBox(QWidget *parent = 0);

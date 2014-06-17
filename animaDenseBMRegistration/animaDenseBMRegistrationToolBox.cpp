@@ -366,10 +366,7 @@ animaDenseBMRegistrationToolBox::~animaDenseBMRegistrationToolBox(void)
 bool animaDenseBMRegistrationToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->
-    registerToolBox<animaDenseBMRegistrationToolBox>("animaDenseBMRegistrationToolBox",
-                               tr("Dense Anatomical BM Registration"),
-                               tr("Dense non linear block-matching registration"),
-                               QStringList() << "registration");
+    registerToolBox<animaDenseBMRegistrationToolBox>();
 }
 
 void animaDenseBMRegistrationToolBox::run(void)

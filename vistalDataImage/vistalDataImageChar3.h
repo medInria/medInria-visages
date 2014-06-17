@@ -7,16 +7,13 @@
 
 #include <dtkCore/dtkAbstractData.h>
 
-// #include <dtkCore/dtkAbstractDataImage.h>
-
-// #include <medCore/medAbstractData.h>
-#include <medCore/medAbstractDataImage.h>
+#include <medAbstractImageData.h>
 
 #include "vistalDataImagePluginExport.h"
 
 class vistalDataImageChar3Private;
 
-class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageChar3 : public medAbstractDataImage
+class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageChar3 : public medAbstractImageData
 {
     Q_OBJECT
 

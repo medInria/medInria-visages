@@ -6,13 +6,13 @@
 #define VISTALDATAIMAGEUINT3_H
 
 #include <dtkCore/dtkAbstractData.h>
-#include <medCore/medAbstractDataImage.h>
+#include <medAbstractImageData.h>
 
 #include "vistalDataImagePluginExport.h"
 
 class vistalDataImageUInt3Private;
 
-class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageUInt3 : public medAbstractDataImage
+class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageUInt3 : public medAbstractImageData
 {
     Q_OBJECT
 
