@@ -23,7 +23,7 @@
 #include <medFilteringSelectorToolBox.h>
 #include <medProgressionStack.h>
 
-#include <pyramidalSymmetryBridge.h>
+#include <animaPyramidalSymmetryBridge.h>
 #include <animaSymmetryPlane.h>
 
 class animaSymmetryPlaneToolBoxPrivate
@@ -180,7 +180,7 @@ animaSymmetryPlaneToolBox::animaSymmetryPlaneToolBox(QWidget *parent) : medFilte
 
     //explicit call to updateMetric with default value to update other parameters (histrogram size,...)
     updateMetric(0);
-    
+
     // Add about plugin
     medPluginManager* pm = medPluginManager::instance();
     dtkPlugin* plugin = pm->plugin ( "animaSymmetryPlanePlugin" );

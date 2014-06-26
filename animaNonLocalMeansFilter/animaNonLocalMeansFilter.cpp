@@ -12,8 +12,8 @@
 #include <medMetaDataKeys.h>
 
 #include <itkImageFileWriter.h>
-#include <itkNonLocalMeansImageFilter.h>
-#include <itkNonLocalMeansTemporalImageFilter.h>
+#include <animaNonLocalMeansImageFilter.h>
+#include <animaNonLocalMeansTemporalImageFilter.h>
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -150,7 +150,7 @@ void
 animaNonLocalMeansFilterPrivate::updateNLMeans()
 {
 
-    typedef itk::NonLocalMeansImageFilter <ImageType>  FilterType;
+    typedef anima::NonLocalMeansImageFilter <ImageType>  FilterType;
     typename FilterType::Pointer filter = FilterType::New();
 
     filter->SetPatchHalfSize(patchHalfSize);
@@ -178,7 +178,7 @@ template <class ImageType>
 void
 animaNonLocalMeansFilterPrivate::updateNLMeansTemporal()
 {
-    typedef itk::NonLocalMeansTemporalImageFilter<ImageType>  FilterType;
+    typedef anima::NonLocalMeansTemporalImageFilter<ImageType>  FilterType;
     typename FilterType::Pointer filter = FilterType::New();
 
     filter->SetPatchHalfSize(patchHalfSize);
@@ -238,7 +238,7 @@ QString animaNonLocalMeansFilter::description() const
 void animaNonLocalMeansFilter::setInputImage (medAbstractData *data)
 {
     medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-    
+
     if (!medData)
         return;
 

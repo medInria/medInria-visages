@@ -75,7 +75,7 @@ qt4_wrap_cpp(${PROJECT_NAME}_SOURCES_MOC ${${PROJECT_NAME}_HEADERS_MOC})
 include_directories(${QTSHANOIR_INCLUDE_DIR} ${QTSHANOIR_DIR} ${QTSHANOIR_DIR})
 
 add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES_MOC} 
+  ${${PROJECT_NAME}_SOURCES_MOC}
   ${${PROJECT_NAME}_SOURCES}
   ${${PROJECT_NAME}_HEADERS})
 
@@ -87,8 +87,6 @@ target_link_libraries(${PROJECT_NAME}
   dtkLog
   medCore
   medGui)
-
-dtk_build_doc(qtshanoirDataSourcePlugin)
 
 ## #################################################################
 ## Source file layout in development environments like Visual Studio

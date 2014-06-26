@@ -51,8 +51,8 @@ AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     matcher->SetReferenceImage ( this->m_fixedImage );
     matcher->SetFloatingImage ( this->m_movingImage );
 
-    
-    typedef BaseTransformAgregator < TFixedImage::ImageDimension > AgregatorType;
+
+    typedef anima::BaseTransformAgregator < TFixedImage::ImageDimension > AgregatorType;
     typedef itk::AffineTransform<typename AgregatorType::ScalarType,TFixedImage::ImageDimension> AffineTransformType;
     typedef typename AffineTransformType::Pointer AffineTransformPointer;
 
@@ -70,20 +70,20 @@ AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-void 
+void
 AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >::
 SetProgressCallback(itk::CStyleCommand::Pointer callback )
 {
-    matcher->SetProgressCallback(callback);    
+    matcher->SetProgressCallback(callback);
 }
-    
+
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-void 
+void
 AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::Abort ( void )
 {
-    matcher->Abort(); 
+    matcher->Abort();
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
@@ -93,7 +93,7 @@ AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 {
     matcher->SetInitialTransform ( initTransformFile );
 }
-    
+
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void
 AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
@@ -144,7 +144,7 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 {
     matcher->SetMaximumIterations ( MaximumIterations );
 }
-    
+
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >
     unsigned int AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::GetMaximumIterations ()
@@ -270,7 +270,7 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 {
     matcher->SetNumberOfPyramidLevels ( NumberOfPyramidLevels );
 }
-    
+
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >
     unsigned int AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::GetNumberOfPyramidLevels ()
@@ -291,14 +291,14 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
     {
         matcher->SetPercentageKept ( PercentageKept );
     }
-    
+
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >
     void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::SetInitializeOnCenterOfGravity ( bool InitializeOnCenterOfGravity )
     {
         matcher->SetInitializeOnCenterOfGravity ( InitializeOnCenterOfGravity );
     }
-    
+
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetNumberOfThreads ( int numberOfThreads )
