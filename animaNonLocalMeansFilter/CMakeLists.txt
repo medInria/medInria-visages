@@ -95,8 +95,6 @@ target_link_libraries(${PROJECT_NAME}
   ITKIOMRC
 )
 
-#not useful if plugin in the medInria-plugins directory
-dtk_build_doc(animaNonLocalMeansFilterPlugin)
 
 ## #################################################################
 ## Source file layout in development environments like Visual Studio

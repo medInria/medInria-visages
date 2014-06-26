@@ -77,7 +77,7 @@ target_link_libraries(${PROJECT_NAME}
   medCore
   medGui
   AnimaOptimizers
-  Parsing
+  AnimaParsing
   ITKOptimizers
   ITKIOImageBase
   ITKIOBMP
@@ -101,8 +101,6 @@ target_link_libraries(${PROJECT_NAME}
   ITKIOTransformMatlab
 )
 
-#not useful if plugin in the medInria-plugins directory
-dtk_build_doc(animaSymmetryPlanePlugin)
 
 ## #################################################################
 ## Source file layout in development environments like Visual Studio

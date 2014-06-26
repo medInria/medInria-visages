@@ -4,7 +4,7 @@
 
 #include "rpiRegistrationMethod.hxx"
 
-#include "pyramidalBlockMatchingBridge.h"
+#include "animaPyramidalBlockMatchingBridge.h"
 
 
 // Namespace RPI : Registration Programming Interface
@@ -35,7 +35,7 @@ class ITK_EXPORT AnimaPyramidalBMRegistration : public RegistrationMethod< TFixe
 
 public:
 
-    typedef typename PyramidalBlockMatchingBridge<TFixedImage::ImageDimension>::AffineTransformType
+    typedef typename anima::PyramidalBlockMatchingBridge<TFixedImage::ImageDimension>::AffineTransformType
     TransformType;
 
     typedef typename TransformType::Pointer
@@ -66,7 +66,7 @@ public:
      * Setters and getters go here
      */
     void SetInitialTransform( std::string initTransformFile);
-    
+
     void SetBlockSize ( int blockSize );
 
     void SetBlockSpacing ( unsigned int blockSpacing );
@@ -118,28 +118,28 @@ public:
     void SetLastPyramidLevel ( unsigned int LastPyramidLevel );
 
     void SetPercentageKept ( double PercentageKept );
-    
+
     void SetInitializeOnCenterOfGravity ( bool InitializeOnCenterOfGravity );
 
     void SetNumberOfThreads ( int numberOfThreads );
-    
+
     unsigned int GetNumberOfPyramidLevels ();
-    
+
     unsigned int GetMaximumIterations ();
 
     /**
      * Performs the image registration. Must be called before GetTransformation().
      */
     virtual void StartRegistration ( void );
-    
+
     void Abort ( void );
-    
+
     void SetProgressCallback(itk::CStyleCommand::Pointer callback );
-    
-    
+
+
 private:
-    
-    typedef PyramidalBlockMatchingBridge <TFixedImage::ImageDimension> PyramidBMType;
+
+    typedef anima::PyramidalBlockMatchingBridge <TFixedImage::ImageDimension> PyramidBMType;
     typename PyramidBMType::Pointer matcher;
 
 };

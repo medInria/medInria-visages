@@ -10,14 +10,14 @@
 #include <medAbstractDataFactory.h>
 #include <medAbstractImageData.h>
 
-#include <pyramidalSymmetryBridge.h>
+#include <animaPyramidalSymmetryBridge.h>
 
 class animaSymmetryPlanePrivate
 {
 public:
 
     typedef double ScalarType;
-    typedef itk::SymmetryPlaneTransform<ScalarType> TransformType;
+    typedef anima::SymmetryPlaneTransform<ScalarType> TransformType;
     typedef TransformType::Pointer TransformPointer;
     typedef itk::AffineTransform<ScalarType,3> BaseTransformType;
     typedef BaseTransformType::Pointer BaseTransformPointer;
@@ -101,7 +101,7 @@ void animaSymmetryPlanePrivate::process ( void )
 {
     typedef itk::Image <PixelType,3> InputImageType;
     typedef itk::Image <float,3> OutImageType;
-    typedef PyramidalSymmetryBridge <PixelType, ScalarType> PyramidSymType;
+    typedef anima::PyramidalSymmetryBridge <PixelType, ScalarType> PyramidSymType;
 
     typename PyramidSymType::Pointer matcher = PyramidSymType::New();
 
@@ -123,7 +123,7 @@ void animaSymmetryPlanePrivate::process ( void )
     matcher->SetNumberOfThreads(numberOfThreads);
 
     InputImageType *inputObject = dynamic_cast<InputImageType *> ( ( itk::Object* ) input->data() );
-        
+
     // set images
     matcher->SetReferenceImage(inputObject);
     matcher->SetFloatingImage(inputObject);
@@ -197,7 +197,7 @@ QString animaSymmetryPlane::description(void) const
 void animaSymmetryPlane::setInputImage (medAbstractData *data)
 {
     medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-    
+
     if (!medData)
         return;
 
