@@ -198,10 +198,7 @@ animaSymmetryPlaneToolBox::~animaSymmetryPlaneToolBox(void)
 bool animaSymmetryPlaneToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->
-    registerToolBox<animaSymmetryPlaneToolBox>("animaSymmetryPlaneToolBox",
-                               tr("Symmetry Plane"),
-                               tr("Symmetry plane computation"),
-                               QStringList()<< "filtering");
+    registerToolBox<animaSymmetryPlaneToolBox>();
 }
 
 medAbstractData* animaSymmetryPlaneToolBox::processOutput(void)

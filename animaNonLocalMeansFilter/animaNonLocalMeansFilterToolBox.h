@@ -12,6 +12,9 @@ class animaNonLocalMeansFilterToolBoxPrivate;
 class ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT animaNonLocalMeansFilterToolBox : public medFilteringAbstractToolBox
 {
     Q_OBJECT
+    MED_TOOLBOX_INTERFACE("Non-Local Means Denoising",
+                          "Applies a non local means denoising filter",
+                           << "filtering")
 
 public:
     animaNonLocalMeansFilterToolBox(QWidget *parent = 0);

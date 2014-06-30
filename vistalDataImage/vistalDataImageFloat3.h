@@ -5,23 +5,21 @@
 #ifndef VISTALDATAIMAGEFLOAT3_H
 #define VISTALDATAIMAGEFLOAT3_H
 
-#include <dtkCore/dtkAbstractData.h>
-#include <medCore/medAbstractDataImage.h>
+#include <medAbstractImageData.h>
 
-#include "vistalDataImagePluginExport.h"
+#include <vistalDataImagePluginExport.h>
 
 class vistalDataImageFloat3Private;
 
-class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageFloat3 : public medAbstractDataImage
+class VISTALDATAIMAGEPLUGIN_EXPORT vistalDataImageFloat3 : public medAbstractImageData
 {
     Q_OBJECT
+    MED_DATA_INTERFACE("Vistal Image (Float3)",
+                       "Vistal Image (Float3)")
 
 public:
              vistalDataImageFloat3(void);
     virtual ~vistalDataImageFloat3(void);
-
-    virtual QString description(void) const;
-    virtual QString identifier(void) const;
 
     static bool registered(void);
 	
@@ -29,8 +27,6 @@ public:
 		virtual QList<QImage> &thumbnails (void) const;
 	
 public slots:
-    // derived from dtkAbstractData
-
     void *output(void);
     void *data(void);
     void setData(void* data);
@@ -48,6 +44,5 @@ private:
     vistalDataImageFloat3Private *d;
 };
 
-dtkAbstractData *createVistalDataImageFloat3(void);
 
 #endif
