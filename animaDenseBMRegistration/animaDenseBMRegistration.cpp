@@ -101,13 +101,13 @@ animaDenseBMRegistration::animaDenseBMRegistration(void) : itkProcessRegistratio
     d->maximumIterations = 10;
     d->minimalTransformError = 0.01;
     d->optimizerMaximumIterations = 100;
-    d->searchRadius = 2;
+    d->searchRadius = 1;
     d->searchAngleRadius = 5;
     d->searchSkewRadius = 5;
     d->searchScaleRadius = 0.1;
     d->finalRadius = 0.001;
     d->stepSize = 1;
-    d->translateUpperBound = 50;
+    d->translateUpperBound = 10;
     d->angleUpperBound = 180;
     d->skewUpperBound = 45;
     d->scaleUpperBound = 3;

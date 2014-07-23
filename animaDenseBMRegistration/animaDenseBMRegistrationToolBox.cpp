@@ -144,7 +144,7 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     
     d->searchRadius = new QDoubleSpinBox;
     d->searchRadius->setToolTip("The search radius (exhaustive search window, rho start for newuoa");
-    d->searchRadius->setValue(2);
+    d->searchRadius->setValue(1);
     
     d->searchAngleRadius = new QDoubleSpinBox;
     d->searchAngleRadius->setToolTip("The search angle radius (rho start for newuoa on angles part)");
@@ -170,17 +170,17 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     d->stepSize->setValue(1);
 
     d->translateUpperBound = new QDoubleSpinBox;
-    d->translateUpperBound->setToolTip("The upper bound on translation for bobyqa (in mm)");
-    d->translateUpperBound->setValue(50);
+    d->translateUpperBound->setToolTip("The upper bound on translation for bobyqa (in voxels)");
+    d->translateUpperBound->setValue(10);
     
     d->angleUpperBound = new QDoubleSpinBox;
     d->angleUpperBound->setToolTip("The upper bound on angles for bobyqa (in degrees)");
-    d->angleUpperBound->setRange(0,360);
+    d->angleUpperBound->setRange(0,180);
     d->angleUpperBound->setValue(180);
     
     d->skewUpperBound = new QDoubleSpinBox;
     d->skewUpperBound->setToolTip("The upper bound on skews for bobyqa (in degrees)");
-    d->skewUpperBound->setRange(0,360);
+    d->skewUpperBound->setRange(0,180);
     d->skewUpperBound->setValue(45);
     
     d->scaleUpperBound = new QDoubleSpinBox;
