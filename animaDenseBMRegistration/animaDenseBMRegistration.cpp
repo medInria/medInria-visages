@@ -327,8 +327,7 @@ bool animaDenseBMRegistrationPrivate::writeTransform(const QString& file)
     {
         try
         {
-            rpi::writeLinearTransformation<TransformScalarType, 3>(registration->GetTransformation(),
-                                                                              file.toStdString());
+            rpi::writeDisplacementFieldTransformation<TransformScalarType, 3>(registration->GetTransformation(), file.toStdString());
             
         }
         catch (std::exception)
