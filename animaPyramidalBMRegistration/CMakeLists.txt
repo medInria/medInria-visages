@@ -88,6 +88,7 @@ target_link_libraries(${PROJECT_NAME}
   ITKIOPNG
   ITKIOVTK
   ITKIOGDCM
+  ITKIOGE
   ITKNrrdIO
   ITKIONRRD
   ITKIOMeta
