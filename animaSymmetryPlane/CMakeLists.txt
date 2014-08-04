@@ -91,6 +91,7 @@ target_link_libraries(${PROJECT_NAME}
   ITKIOMeta
   ITKIONIFTI
   ITKIOGIPL
+  ITKIOGE
   ITKIOHDF5
   ITKIOBioRad
   ITKIOStimulate
