@@ -35,6 +35,7 @@ public slots:
   void find(void);
   void onImportData(void);   
   void onDownloadFinished(QString fileName, QString xmlName);
+  void errorMessage(QString msg);
   
 private:
   qtshanoirDataSourcePrivate *d;

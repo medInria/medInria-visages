@@ -9,6 +9,7 @@
 #include <medAbstractDataSourceFactory.h>
 #include <medToolBox.h>
 #include <medMetaDataKeys.h>
+#include <medMessageController.h>
 
 #include <QtShanoir.h>
 #include <QtShanoirTreeWidget.h>
@@ -18,7 +19,6 @@
 #include <medAbstractDataFactory.h>
 #include <medAbstractData.h>
 #include <dtkCore/dtkSmartPointer.h>
-
 
 // /////////////////////////////////////////////////////////////////
 // qtshanoirDataSourcePrivate
@@ -51,8 +51,9 @@ qtshanoirDataSource::qtshanoirDataSource(void) : medAbstractDataSource(), d(new 
     connect(d->additional_toolboxes.back(),SIGNAL(importButtonPressed()),this,SLOT(onImportData()));
     connect(d->additional_toolboxes.back(),SIGNAL(findButtonPressed()),this,SLOT(find()));
     
-	connect(QtShanoir::instance(),SIGNAL(downloadFinished(QString,QString)),this,SLOT(onDownloadFinished(QString,QString)));
-    
+    connect(QtShanoir::instance(),SIGNAL(downloadFinished(QString,QString)),this,SLOT(onDownloadFinished(QString,QString)));
+    connect(QtShanoir::instance(),SIGNAL(queryFailed(QString)),this,SLOT(errorMessage(QString)));
+
     d->additional_toolboxes.push_back(new qtshanoirDataSourceProgressToolBox);
 }
 
@@ -115,6 +116,11 @@ QString qtshanoirDataSource::description(void) const
 QString qtshanoirDataSource::tabName()
 {
 	return QString("Shanoir");
+}
+
+void qtshanoirDataSource::errorMessage(QString msg)
+{
+    medMessageController::instance()->showError(msg, 3000);
 }
 
 void qtshanoirDataSource::onImportData()
@@ -200,7 +206,7 @@ void qtshanoirDataSource::onDownloadFinished(QString fileName, QString xmlName)
 
 void qtshanoirDataSource::find()
 {
-	QtShanoir::instance()->find();  
+    QtShanoir::instance()->find();
 }
 
 QList<medToolBox*> qtshanoirDataSource::getToolBoxes()
