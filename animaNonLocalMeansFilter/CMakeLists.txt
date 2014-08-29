@@ -76,7 +76,6 @@ target_link_libraries(${PROJECT_NAME}
   dtkLog
   dtkCore
   medCore
-  medGui
   ITKIOImageBase
   ITKIOBMP
   ITKIOLSM

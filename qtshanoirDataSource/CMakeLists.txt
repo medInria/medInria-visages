@@ -85,8 +85,7 @@ target_link_libraries(${PROJECT_NAME}
   ${ZLIB_LIBRARIES}
   dtkCore
   dtkLog
-  medCore
-  medGui)
+  medCore)
 
 ## #################################################################
 ## Source file layout in development environments like Visual Studio
