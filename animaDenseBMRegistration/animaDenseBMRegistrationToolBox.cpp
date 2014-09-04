@@ -196,13 +196,13 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     
     d->extrapolationSigma = new QDoubleSpinBox;
     d->extrapolationSigma->setToolTip("Sigma for dense field extrapolation (similar to fluid regularization)");
-    d->extrapolationSigma->setValue(2.0);
+    d->extrapolationSigma->setValue(3.0);
     d->extrapolationSigma->setDecimals(2);
     d->extrapolationSigma->setSingleStep(0.01);
     
     d->elasticSigma = new QDoubleSpinBox;
     d->elasticSigma->setToolTip("Sigma for transformation elastic smoothing");
-    d->elasticSigma->setValue(2.0);
+    d->elasticSigma->setValue(3.0);
     d->elasticSigma->setDecimals(2);
     d->elasticSigma->setSingleStep(0.01);
     
