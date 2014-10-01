@@ -215,7 +215,7 @@ animaNonLocalMeansFilterPrivate::eventCallback(itk::Object* caller, const itk::E
 // animaNonLocalMeansFilter
 // /////////////////////////////////////////////////////////////////
 
-animaNonLocalMeansFilter::animaNonLocalMeansFilter() : dtkAbstractProcess(), d(new animaNonLocalMeansFilterPrivate)
+animaNonLocalMeansFilter::animaNonLocalMeansFilter() : medAbstractFilteringProcess(), d(new animaNonLocalMeansFilterPrivate)
 {
     d->parent = this;
 }
@@ -227,7 +227,8 @@ animaNonLocalMeansFilter::~animaNonLocalMeansFilter()
 
 bool animaNonLocalMeansFilter::registered()
 {
-    return dtkAbstractProcessFactory::instance()->registerProcessType("animaNonLocalMeansFilter", createanimaNonLocalMeansFilter);
+    return dtkAbstractProcessFactory::instance()->registerProcessType("animaNonLocalMeansFilter",
+                                                                      createanimaNonLocalMeansFilter, "medAbstractFilteringProcess");
 }
 
 QString animaNonLocalMeansFilter::description() const

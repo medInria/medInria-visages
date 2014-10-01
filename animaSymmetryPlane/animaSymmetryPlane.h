@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <dtkCore/dtkAbstractProcess.h>
+#include <medAbstractFilteringProcess.h>
 #include <medAbstractData.h>
 
 #include "animaSymmetryPlanePluginExport.h"
 
 class animaSymmetryPlanePrivate;
 
-class ANIMASYMMETRYPLANEPLUGIN_EXPORT animaSymmetryPlane : public dtkAbstractProcess
+class ANIMASYMMETRYPLANEPLUGIN_EXPORT animaSymmetryPlane : public medAbstractFilteringProcess
 {
     Q_OBJECT
 

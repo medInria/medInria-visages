@@ -172,7 +172,7 @@ void animaSymmetryPlanePrivate::saveRealignTransformFile(QString filename)
 // animaSymmetryPlane
 // /////////////////////////////////////////////////////////////////
 
-animaSymmetryPlane::animaSymmetryPlane(void) : dtkAbstractProcess(), d(new animaSymmetryPlanePrivate(this))
+animaSymmetryPlane::animaSymmetryPlane(void) : medAbstractFilteringProcess(), d(new animaSymmetryPlanePrivate(this))
 {
 
 }
@@ -186,7 +186,8 @@ animaSymmetryPlane::~animaSymmetryPlane(void)
 
 bool animaSymmetryPlane::registered(void)
 {
-    return dtkAbstractProcessFactory::instance()->registerProcessType("animaSymmetryPlane", createAnimaSymmetryPlane);
+    return dtkAbstractProcessFactory::instance()->registerProcessType("animaSymmetryPlane",
+                                                                      createAnimaSymmetryPlane, "medAbstractFilteringProcess");
 }
 
 QString animaSymmetryPlane::description(void) const

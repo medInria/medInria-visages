@@ -146,7 +146,7 @@ animaDenseBMRegistration::~animaDenseBMRegistration(void)
 bool animaDenseBMRegistration::registered(void)
 {
     return dtkAbstractProcessFactory::instance()->registerProcessType("animaDenseBMRegistration",
-                                                                      createAnimaDenseBMRegistration);
+                                                                      createAnimaDenseBMRegistration, "medAbstractRegistrationProcess");
 }
 
 QString animaDenseBMRegistration::description(void) const

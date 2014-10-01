@@ -143,7 +143,7 @@ animaPyramidalBMRegistration::~animaPyramidalBMRegistration(void)
 bool animaPyramidalBMRegistration::registered(void)
 {
     return dtkAbstractProcessFactory::instance()->registerProcessType("animaPyramidalBMRegistration",
-                                                                 createAnimaPyramidalBMRegistration);
+                                                                      createAnimaPyramidalBMRegistration, "medAbstractRegistrationProcess");
 }
 
 QString animaPyramidalBMRegistration::description(void) const
