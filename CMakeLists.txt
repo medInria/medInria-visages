@@ -47,6 +47,7 @@ option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocal
 option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-PyramidalBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_DENSEBMREGISTRATION_PLUGIN     "Build anima-DenseBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN     "Build vistalProcessGraphCutSeg plugin" "OFF")
+option(MEDINRIA_BUILD_ANIMA_LESIONSSEGMENTATION_PLUGIN     "Build animaLesionsSegmentation plugin" "ON")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 option(BUILD_EXAMPLES "Build examples" OFF)
@@ -101,6 +102,10 @@ endif()
 
 if (MEDINRIA_BUILD_ANIMA_DENSEBMREGISTRATION_PLUGIN)
     subdirs(animaDenseBMRegistration)
+endif()
+
+if (MEDINRIA_BUILD_ANIMA_LESIONSSEGMENTATION_PLUGIN)
+    subdirs(animaLesionsSegmentation)
 endif()
 
 if (APPLE)
