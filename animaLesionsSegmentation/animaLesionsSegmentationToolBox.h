@@ -26,15 +26,48 @@ public:
     dtkPlugin* plugin();
 
     static bool registered(void);
+
+    // Define get for process
+    bool getEnableAuto();
+    bool getEnableManu();
+    unsigned int getNumberOfThreads();
+    unsigned int getInitMethod();
+    double getRejRatioHierar();
+    unsigned int getEmAlgo();
+    int getEmIter();
+    double getMinDistance();
+    double getRejRatio();
+    int getEmIter_concentration();
+    bool getEm_before_concentration();
+    bool getUseStrem();
+    double getMaha();
+    double getFuzzyRuleMin();
+    double getFuzzyRuleMax();
+    //void getUseT2();
+    //void getUseDP();
+    //void getUseFLAIR();
+    bool getUseSpecGrad();
+    //int getTLinkMode(int TLinkMode);
+    float getMultiVarSources();
+    float getMultiVarSinks();
+    float getSigma();
+    float getAlpha();
+    float getMinLesionSize();
+    float getMinGMSize();
+    bool getRemoveBorder();
+    bool getIntensityRule();
+    double getIntensityT2();
+    double getIntensityDP();
+    double getIntensityFLAIR();
+    bool getUseFormerSegModel();
+    //QString getMatrixGrad();
+    //QString getReadSolutionFile();
     
 
 signals:
-    void success(void);
-    void failure(void);
+    void runRequest(void);
 
 public slots:
-    void run(void);
-    void updateDamUsage(int);
     void onClearImagesClicked();
 
     void ChangeAutomaticState(int);
@@ -52,6 +85,13 @@ public slots:
     void onDPDropped(const medDataIndex& index);
     void onFLAIRDropped(const medDataIndex& index);
     void onT1GdDropped(const medDataIndex& index);
+
+    medAbstractData* getT1();
+    medAbstractData* getT2();
+    medAbstractData* getDP();
+    medAbstractData* getFLAIR();
+    medAbstractData* getT1Gd();
+    medAbstractData* getMask();
 
 private:
     animaLesionsSegmentationToolBoxPrivate *d;

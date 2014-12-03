@@ -13,7 +13,7 @@
 #include <dtkCore/dtkSmartPointer.h>
 
 #include <medAbstractView.h>
-#include <medRunnableProcess.h>
+//#include <medRunnableProcess.h>
 #include <medJobManager.h>
 
 #include <medToolBoxFactory.h>
@@ -26,7 +26,10 @@
 #include <medDataManager.h>
 
 #include <itkMultiThreader.h>
+#include <medDataIndexParameter.h>
 
+#include <medMessageController.h>
+#include <medDataIndexListParameter.h>
 
 
 class animaLesionsSegmentationToolBoxPrivate
@@ -60,6 +63,8 @@ public:
 
     QCheckBox *enableAuto;
     QCheckBox *enableManu;
+
+    QCheckBox *useFormerSegModel;
 
     // NABT estimation
     QComboBox *algoEM;
@@ -113,6 +118,15 @@ public:
     medDropSite *T1GdDropSite;
     medDropSite *maskDropSite;
 
+    medDataIndexParameter *T1Parameter;
+    medDataIndexParameter *T2Parameter;
+    medDataIndexParameter *DPParameter;
+    medDataIndexParameter *FLAIRParameter;
+    medDataIndexParameter *T1GdParameter;
+    medDataIndexParameter *MaskParameter;
+
+    medDataIndexListParameter *seedParameter;
+
     medDataIndex indexT1;
     medDataIndex indexT2;
     medDataIndex indexDP;
@@ -129,6 +143,8 @@ public:
     QPushButton *openMatrixFileButton;
     QPushButton *PreviewMultiVarButton;
 
+    QPushButton *SaveLesionLoadButton;
+
     bool T1isSet,T2isSet,DPisSet,FLAIRisSet,T1GdisSet,MaskisSet;
 };
 
@@ -137,13 +153,18 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     //Segmentation
     this->setTitle("Lesion Segmentation");
     medToolBoxTab *widget = new medToolBoxTab(this);
+
+
+    ///nb:run button can be set by dtkAbstractProcess (si on utilise pas la surcharge de la methode toolbox)
     QPushButton *runButton = new QPushButton(tr("Run"), this);
+
+    d->SaveLesionLoadButton = new QPushButton(tr("Save lesion load"), this);
+    d->SaveLesionLoadButton->setEnabled(false);
 
     // progression stack
     d->progression_stack = new medProgressionStack(widget);
     QHBoxLayout *progressStackLayout = new QHBoxLayout;
     progressStackLayout->addWidget(d->progression_stack);
-
 
     // Heuristic Rules Parameters
     d->removeBorderLesions = new QCheckBox;
@@ -219,35 +240,41 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     imagesBoxLayout->addWidget(inputSelectionLabel);
     imagesBoxLayout->addWidget(inputSelectionButton);
 
-    d->T1DropSite = new medDropSite();
-    d->T1DropSite->setText(tr("Drop here T1"));
+    d->T1Parameter = new medDataIndexParameter("T1", this);
+    d->T1Parameter->setToolTip(tr("Drag-and-drop A T1 from the database or click here."));
+    d->T1Parameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T1."));
 
-    d->T2DropSite = new medDropSite();
-    d->T2DropSite->setText(tr("Drop here T2"));
+    d->T2Parameter = new medDataIndexParameter("T2", this);
+    d->T2Parameter->setToolTip(tr("Drag-and-drop A T2 from the database or click here."));
+    d->T2Parameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T2."));
 
-    d->DPDropSite = new medDropSite();
-    d->DPDropSite->setText(tr("Drop here DP"));
+    d->DPParameter = new medDataIndexParameter("DP", this);
+    d->DPParameter->setToolTip(tr("Drag-and-drop A DP from the database or click here."));
+    d->DPParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a DP."));
 
-    d->FLAIRDropSite = new medDropSite();
-    d->FLAIRDropSite->setText(tr("Drop here FLAIR"));
+    d->FLAIRParameter = new medDataIndexParameter("FLAIR", this);
+    d->FLAIRParameter->setToolTip(tr("Drag-and-drop A FLAIR from the database or click here."));
+    d->FLAIRParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a FLAIR."));
 
-    d->T1GdDropSite = new medDropSite();
-    d->T1GdDropSite->setText(tr("Drop here T1Gd"));
+    d->T1GdParameter = new medDataIndexParameter("T1Gd", this);
+    d->T1GdParameter->setToolTip(tr("Drag-and-drop A T1Gd from the database or click here."));
+    d->T1GdParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T1Gd."));
 
-    d->maskDropSite = new medDropSite();
-    d->maskDropSite->setText(tr("Drop here the \n 3D brain mask"));
+    d->MaskParameter = new medDataIndexParameter("Mask", this);
+    d->MaskParameter->setToolTip(tr("Drag-and-drop A Mask from the database or click here."));
+    d->MaskParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a Mask."));
 
     QHBoxLayout *MRIBox1Layout = new QHBoxLayout();
-    MRIBox1Layout->addWidget(d->T1DropSite);
-    MRIBox1Layout->addWidget(d->T2DropSite);
+    MRIBox1Layout->addWidget(d->T1Parameter->getWidget(), 0, Qt::AlignCenter);
+    MRIBox1Layout->addWidget(d->T2Parameter->getWidget(), 0, Qt::AlignCenter);
 
     QHBoxLayout *MRIBox2Layout = new QHBoxLayout();
-    MRIBox2Layout->addWidget(d->DPDropSite);
-    MRIBox2Layout->addWidget(d->FLAIRDropSite);
+    MRIBox2Layout->addWidget(d->DPParameter->getWidget(), 0, Qt::AlignCenter);
+    MRIBox2Layout->addWidget(d->FLAIRParameter->getWidget(), 0, Qt::AlignCenter);
 
     QHBoxLayout *MRIBox3Layout = new QHBoxLayout();
-    MRIBox3Layout->addWidget(d->T1GdDropSite);
-    MRIBox3Layout->addWidget(d->maskDropSite);
+    MRIBox3Layout->addWidget(d->T1GdParameter->getWidget(), 0, Qt::AlignCenter);
+    MRIBox3Layout->addWidget(d->MaskParameter->getWidget(), 0, Qt::AlignCenter);
 
     QPushButton *clearImagesButton = new QPushButton(tr("Remove whole images"));
 
@@ -304,8 +331,13 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     d->enableAuto->setToolTip("Enable automatic segmentation");
     d->enableAuto->setCheckState(Qt::Checked);
 
+    d->useFormerSegModel = new QCheckBox;
+    d->useFormerSegModel->setToolTip("Keep former NABT estination");
+    d->useFormerSegModel->setCheckState(Qt::Unchecked);
+
     QFormLayout *enableAutoLayout = new QFormLayout();
     enableAutoLayout->addRow(new QLabel(tr("Enable automatic computation"),this),d->enableAuto);
+    enableAutoLayout->addRow(new QLabel(tr("Keep former NABT estimation"),this),d->useFormerSegModel);
 
     QGroupBox *AutoGroupBox = new QGroupBox(tr("Use automatic seg"));
     AutoGroupBox->setLayout(enableAutoLayout);
@@ -315,8 +347,10 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     QStringList initList;
     initList << "Atlas" << "Hierar DP" << "Hierar FLAIR";
     d->init->addItems ( initList );
+    d->init->setCurrentIndex(1);
 
     d->SelectAtlasButton = new QPushButton(tr("Select Atlas"), this);
+    d->SelectAtlasButton->setEnabled(false);
 
     QVBoxLayout *initLayout = new QVBoxLayout();
     initLayout->addWidget(d->init);
@@ -506,6 +540,7 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     QWidget *header = new QWidget;
     QVBoxLayout *layoutheader = new QVBoxLayout(header);
     layoutheader->addWidget(runButton);
+    layoutheader->addWidget(d->SaveLesionLoadButton);
     layoutheader->addWidget(d->progression_stack);
 
     QWidget *page1 = new QWidget;
@@ -538,13 +573,13 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
 
 
     //Connect slots
-    connect(d->maskDropSite, SIGNAL(objectDropped(const medDataIndex &)),this,SLOT(onMaskDropped(const medDataIndex &)));
-    connect(d->T1DropSite, SIGNAL(objectDropped(const medDataIndex &)),this,SLOT(onT1Dropped(const medDataIndex &)));
-    connect(d->T2DropSite, SIGNAL(objectDropped(const medDataIndex &)),this,SLOT(onT2Dropped(const medDataIndex &)));
+    connect(d->MaskParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onMaskDropped(const medDataIndex &)));
+    connect(d->T1Parameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onT1Dropped(const medDataIndex &)));
+    connect(d->T2Parameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onT2Dropped(const medDataIndex &)));
 
-    connect(d->DPDropSite, SIGNAL(objectDropped(const medDataIndex &)),this,SLOT(onDPDropped(const medDataIndex &)));
-    connect(d->FLAIRDropSite, SIGNAL(objectDropped(const medDataIndex &)),this,SLOT(onFLAIRDropped(const medDataIndex &)));
-    connect(d->T1GdDropSite, SIGNAL(objectDropped(const medDataIndex &)),this,SLOT(onT1GdDropped(const medDataIndex &)));
+    connect(d->DPParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onDPDropped(const medDataIndex &)));
+    connect(d->FLAIRParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onFLAIRDropped(const medDataIndex &)));
+    connect(d->T1GdParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onT1GdDropped(const medDataIndex &)));
 
     connect(clearImagesButton,SIGNAL(clicked()),this,SLOT(onClearImagesClicked()));
 
@@ -557,7 +592,7 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     connect(d->algoEM, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRejectionFeatures(int)));
 
     connect(d->useIntensityRule, SIGNAL(stateChanged(int)), this, SLOT(ChangedIntensityState(int)));
-    connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
+    connect(runButton, SIGNAL(clicked()), this, SIGNAL(runRequest()));
 
     // Add about plugin
     medPluginManager* pm = medPluginManager::instance();
@@ -593,23 +628,52 @@ dtkPlugin* animaLesionsSegmentationToolBox::plugin()
 }
 
 
-void animaLesionsSegmentationToolBox::onMaskDropped(const medDataIndex& index)
+medAbstractData* animaLesionsSegmentationToolBox::getT1()
 {
-    if (!index.isValid()){
-        return;
-    }
-    d->indexMask = index;
-    d->maskDropSite->setPixmap(medDataManager::instance()->thumbnail(index));
-    d->MaskisSet=true;
+    return d->T1Data;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getT2()
+{
+    return d->T2Data;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getDP()
+{
+    return d->DPData;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getFLAIR()
+{
+    return d->FLAIRData;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getT1Gd()
+{
+    return d->T1GdData;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getMask()
+{
+    return d->maskData;
 }
 
 void animaLesionsSegmentationToolBox::onT1Dropped(const medDataIndex& index)
 {
-    if (!index.isValid()){
+    if (!index.isValidForSeries()){
         return;
     }
-    d->indexT1 = index;
-    d->T1DropSite->setPixmap(medDataManager::instance()->thumbnail(index));
+    d->T1Data = medDataManager::instance()->retrieveData(index);
+    // we accept only ROIs (medItkUChar3ImageData)
+    if (!d->T1Data ||
+            (d->T1Data->identifier() != "medItkUChar3ImageData" &&
+             d->T1Data->identifier() != "medItkChar3ImageData" &&
+             d->T1Data->identifier() != "medItkUShort3ImageData" &&
+             d->T1Data->identifier() != "medItkShort3ImageData" &&
+             d->T1Data->identifier() != "medItkUInt3ImageData" &&
+             d->T1Data->identifier() != "medItkInt3ImageData" &&
+             d->T1Data->identifier() != "medItkFloat3ImageData" &&
+             d->T1Data->identifier() != "medItkDouble3ImageData"))
+    {
+        medMessageController::instance()->showError(tr("Unable to load ROI, format not supported yet"), 3000);
+        qDebug() << "unable to read T1";
+        return;
+    }
     d->T1isSet=true;
 }
 
@@ -618,8 +682,7 @@ void animaLesionsSegmentationToolBox::onT2Dropped(const medDataIndex& index)
     if (!index.isValid()){
         return;
     }
-    d->indexT2 = index;
-    d->T2DropSite->setPixmap(medDataManager::instance()->thumbnail(index));
+    d->T2Data = medDataManager::instance()->retrieveData(index);
     d->T2isSet=true;
 }
 
@@ -628,8 +691,7 @@ void animaLesionsSegmentationToolBox::onDPDropped(const medDataIndex& index)
     if (!index.isValid()){
         return;
     }
-    d->indexDP = index;
-    d->DPDropSite->setPixmap(medDataManager::instance()->thumbnail(index));
+    d->DPData = medDataManager::instance()->retrieveData(index);
     d->DPisSet=true;
 }
 
@@ -638,8 +700,7 @@ void animaLesionsSegmentationToolBox::onFLAIRDropped(const medDataIndex& index)
     if (!index.isValid()){
         return;
     }
-    d->indexFLAIR = index;
-    d->FLAIRDropSite->setPixmap(medDataManager::instance()->thumbnail(index));
+    d->FLAIRData = medDataManager::instance()->retrieveData(index);
     d->FLAIRisSet=true;
 }
 
@@ -648,30 +709,44 @@ void animaLesionsSegmentationToolBox::onT1GdDropped(const medDataIndex& index)
     if (!index.isValid()){
         return;
     }
-    d->indexT1Gd = index;
-    d->T1GdDropSite->setPixmap(medDataManager::instance()->thumbnail(index));
+    d->T1GdData = medDataManager::instance()->retrieveData(index);
     d->T1GdisSet=true;
+}
+void animaLesionsSegmentationToolBox::onMaskDropped(const medDataIndex& index)
+{
+    if (!index.isValid()){
+        return;
+    }
+    d->maskData = medDataManager::instance()->retrieveData(index);
+    d->MaskisSet=true;
 }
 
 void animaLesionsSegmentationToolBox::onClearImagesClicked()
 {
-    d->maskDropSite->clearMask();
-    d->maskDropSite->setText(tr("Drop here the \n 3D brain mask"));
+    // clear medDropSite and put text again   
+    d->T1Parameter->clear();
+    d->T1Parameter->setToolTip(tr("Drag-and-drop A T1 from the database or click here."));
+    d->T1Parameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T1."));
 
-    d->T1DropSite->clearMask();
-    d->T1DropSite->setText(tr("Drop here T1"));
+    d->T2Parameter->clear();
+    d->T2Parameter->setToolTip(tr("Drag-and-drop A T2 from the database or click here."));
+    d->T2Parameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T2."));
 
-    d->T2DropSite->clearMask();
-    d->T2DropSite->setText(tr("Drop here tT2"));
+    d->DPParameter->clear();
+    d->DPParameter->setToolTip(tr("Drag-and-drop A DP from the database or click here."));
+    d->DPParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a DP."));
 
-    d->DPDropSite->clearMask();
-    d->DPDropSite->setText(tr("Drop here DP"));
+    d->FLAIRParameter->clear();
+    d->FLAIRParameter->setToolTip(tr("Drag-and-drop A FLAIR from the database or click here."));
+    d->FLAIRParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a FLAIR."));
 
-    d->FLAIRDropSite->clearMask();
-    d->FLAIRDropSite->setText(tr("Drop here FLAIR"));
+    d->T1GdParameter->clear();
+    d->T1GdParameter->setToolTip(tr("Drag-and-drop A T1Gd from the database or click here."));
+    d->T1GdParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T1Gd."));
 
-    d->T1GdDropSite->clearMask();
-    d->T1GdDropSite->setText(tr("Drop here T1Gd"));
+    d->MaskParameter->clear();
+    d->MaskParameter->setToolTip(tr("Drag-and-drop A Mask from the database or click here."));
+    d->MaskParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a Mask."));
 
     d->T1isSet=false;
     d->T2isSet=false;
@@ -773,13 +848,159 @@ void animaLesionsSegmentationToolBox::ChangedIntensityState(int state)
     }
 }
 
+///todo set warning segmentation input
+
+
+// Define get for process
+bool animaLesionsSegmentationToolBox::getEnableAuto(void)
+{
+    return d->enableAuto->isChecked();
+}
+bool animaLesionsSegmentationToolBox::getEnableManu(void)
+{
+    return d->enableManu->isChecked();
+}
+
+unsigned int animaLesionsSegmentationToolBox::getNumberOfThreads()
+{
+    return d->threads->value();
+}
+unsigned int animaLesionsSegmentationToolBox::getInitMethod()
+{
+    return d->init->currentIndex();
+}
+
+double animaLesionsSegmentationToolBox::getRejRatioHierar()
+{
+    return d->rejRatio->value();
+}
+unsigned int animaLesionsSegmentationToolBox::getEmAlgo()
+{
+    return d->algoEM->currentIndex();
+}
+int animaLesionsSegmentationToolBox::getEmIter()
+{
+    return d->emIter->value();
+}
+double animaLesionsSegmentationToolBox::getMinDistance()
+{
+    return d->minDistance->value();
+}
+double animaLesionsSegmentationToolBox::getRejRatio()
+{
+    return d->rejRatio->value();
+}
+int animaLesionsSegmentationToolBox::getEmIter_concentration()
+{
+    return d->emIterConcentration->value();
+}
+bool animaLesionsSegmentationToolBox::getEm_before_concentration()
+{
+    return d->emBeforeConcentration->isChecked();
+}\
+bool animaLesionsSegmentationToolBox::getUseStrem()
+{
+    return d->strem->isChecked();
+}
+double animaLesionsSegmentationToolBox::getMaha()
+{
+    return d->mahaDist->value();
+}
+double animaLesionsSegmentationToolBox::getFuzzyRuleMin()
+{
+    return d->fuzzyMin->value();
+}
+double animaLesionsSegmentationToolBox::getFuzzyRuleMax()
+{
+    return d->fuzzyMax->value();
+}
+/*
+void animaLesionsSegmentationToolBox::getUseT2()
+{
+    d->useT2 = useT2;
+}
+void animaLesionsSegmentationToolBox::getUseDP()
+{
+    d->useDP = useDP;
+}
+void animaLesionsSegmentationToolBox::getUseFLAIR()
+{
+    d->useFLAIR = useFLAIR;
+}*/
+
+bool animaLesionsSegmentationToolBox::getUseSpecGrad()
+{
+    return d->useSpectralGrad->isChecked();
+}
+/*
+int animaLesionsSegmentationToolBox::getTLinkMode()
+{
+    d->TLinkMode = TLinkMode;
+}*/
+float animaLesionsSegmentationToolBox::getMultiVarSources()
+{
+    return (float)d->multiVarSources->value();
+}
+float animaLesionsSegmentationToolBox::getMultiVarSinks()
+{
+    return (float)d->multiVarSinks->value();
+}
+
+float animaLesionsSegmentationToolBox::getSigma()
+{
+    return d->sigma->value();
+}
+float animaLesionsSegmentationToolBox::getAlpha()
+{
+    return d->alpha->value();
+}
+float animaLesionsSegmentationToolBox::getMinLesionSize()
+{
+    return d->minLesionsSize->value();
+}
+float animaLesionsSegmentationToolBox::getMinGMSize()
+{
+    return d->minGMSize->value();
+}
+bool animaLesionsSegmentationToolBox::getRemoveBorder()
+{
+    return d->removeBorderLesions->isChecked();
+}
+bool animaLesionsSegmentationToolBox::getIntensityRule()
+{
+    return d->useIntensityRule->isChecked();
+}
+double animaLesionsSegmentationToolBox::getIntensityT2()
+{
+    return d->T2intensityFactor->value();
+}
+double animaLesionsSegmentationToolBox::getIntensityDP()
+{
+    return d->DPintensityFactor->value();
+}
+double animaLesionsSegmentationToolBox::getIntensityFLAIR()
+{
+    return d->FLAIRintensityFactor->value();
+}
+bool animaLesionsSegmentationToolBox::getUseFormerSegModel()
+{
+    return d->useFormerSegModel->isChecked();
+}
+/*QString animaLesionsSegmentationToolBox::getMatrixGrad()
+{
+    d->matrixGrad = matrixGrad;
+}
+QString animaLesionsSegmentationToolBox::getReadSolutionFile()
+{
+    d->readSolutionFile = readSolutionFile;
+}*/
+
+
+/*
 void animaLesionsSegmentationToolBox::run(void)
 {
     if(!this->segmentationToolBox())
         return;
-
-    int a = this->segmentationToolBox()->Getparam();
-    std::cout << "number parameter: " << a << std::endl;
 
     d->process = new animaLesionsSegmentation;
 
@@ -863,20 +1084,21 @@ void animaLesionsSegmentationToolBox::run(void)
 
 
     // Set your parameters here
-    medRunnableProcess *runProcess = new medRunnableProcess;
+    //medRunnableProcess *runProcess = new medRunnableProcess;
+    /*medRunnableProcess *runProcess = new medRunnableProcess(d->process, d->process->name());
     runProcess->setProcess (d->process);
 
     connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
     connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
     connect (runProcess, SIGNAL (cancelled (QObject*)),  this, SIGNAL (failure ()));
 
-    /*d->progression_stack->addJobItem(runProcess, tr("Progress:"));
+    d->progression_stack->addJobItem(runProcess, tr("Progress:"));
     d->progression_stack->disableCancel(runProcess);
     //If there is no observer to track the progression,make the progress bar spin:
     d->progression_stack->setActive(runProcess,true);
-    //connect (runProcess, SIGNAL(activate(QObject*,bool)),d->progression_stack, SLOT(setActive(QObject*,bool)));*/
+    //connect (runProcess, SIGNAL(activate(QObject*,bool)),d->progression_stack, SLOT(setActive(QObject*,bool)));
 
-    medJobManager::instance()->registerJobItem(runProcess);
-    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
+   // medJobManager::instance()->registerJobItem(runProcess);
+   // QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 
-}
+}*/

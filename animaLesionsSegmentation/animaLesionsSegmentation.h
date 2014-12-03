@@ -7,12 +7,13 @@
 #include <dtkCore/dtkAbstractProcess.h>
 #include <medAbstractData.h>
 #include <medAbstractImageData.h>
+#include <medAbstractSegmentationProcess.h>
 #include <itkImageFileReader.h>
 #include "animaLesionsSegmentationPluginExport.h"
 
 class animaLesionsSegmentationPrivate;
 
-class ANIMALESIONSSEGMENTATIONPLUGIN_EXPORT animaLesionsSegmentation : public dtkAbstractProcess
+class ANIMALESIONSSEGMENTATIONPLUGIN_EXPORT animaLesionsSegmentation : public medAbstractSegmentationProcess
 {
     Q_OBJECT
 
@@ -20,66 +21,23 @@ public:
     animaLesionsSegmentation(void);
     virtual ~animaLesionsSegmentation(void);
 
-    virtual QString description(void) const;
+    virtual QString description(void) const;//
 
     //void emitProgressed(int progression);
+
+    QList<medAbstractParameter*> parameters();
+
+    bool isInteractive();
+
+    virtual medToolBox* toolbox();
 
     static bool registered(void);
     itk::Image <float,3>::Pointer createInputImages(medAbstractImageData *data);
     itk::Image <unsigned char,3>::Pointer createInputMasks(medAbstractImageData *medInput);
-    
-    // Parameters setting
-   void setSegAutoEnable(bool segAutoEnable);
-   void setSeganuEnable(bool segManuEnable);
-   void setNumberOfThreads(unsigned int numberOfThreads);
-   void setInitMethod(unsigned int initMethod);
-   void setRejRatioHierar(double rejRatioHierar);
-   void setEmAlgo(unsigned int emAlgo);
-   void setEmIter(int emIter);
-   void setMinDistance(double minDistance);
-   void setRejRatio(double rejRatio);
-   void setEmIter_concentration(int emIter_concentration);
-   void setEm_before_concentration(bool em_before_concentration);
-   void setUseStrem(bool useStrem);
-   void setMaha(double maha);
-   void setFuzzyRuleMin(double fuzzyRuleMin);
-   void setFuzzyRuleMax(double fuzzyRuleMax);
-   void setUseT2(bool useT2);
-   void setUseDP(bool useDP);
-   void setUseFLAIR(bool useFLAIR);
-   void setUseSpecGrad(bool useSpecGrad);
-   void setTLinkMode(int TLinkMode);
-   void setMultiVarSources(float multiVarSources);
-   void setMultiVarSinks(float multiVarSinks);
-   void setSigma(float sigma);
-   void setAlpha(float alpha);
-   void setMinLesionSize(float minLesionSize);
-   void setMinGMSize(float minGMSize);
-   void setRemoveBorder(bool removeBorder);
-   void setIntensityRule(bool intensityRule);
-   void setIntensityT2(double intensityT2);
-   void setIntensityDP(double intensityDP);
-   void setIntensityFLAIR(double intensityFLAIR);
-   void setMatrixGrad(QString matrixGrad);
-   void setReadSolutionFile(QString readSolutionFile);
-
-   void setMaskInput(medAbstractData *data);
-   void setT1Input(medAbstractData *data);
-   void setT2Input(medAbstractData *data);
-   void setDPInput(medAbstractData *data);
-   void setFLAIRInput(medAbstractData *data);
-   void setT1GdInput(medAbstractData *data);
-
-   void setAtlasCSF(medAbstractData *data);
-   void setAtlasGM(medAbstractData *data);
-   void setAtlasWM(medAbstractData *data);
-
-   void setSourcesMask(medAbstractData *data);
-   void setSinksMask(medAbstractData *data);
 
 
 public slots:
-
+    void run();
     //! Input data to the plugin is set through here
     //void setInputImage(medAbstractData *data);
 

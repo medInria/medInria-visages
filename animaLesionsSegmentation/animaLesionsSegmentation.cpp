@@ -3,6 +3,7 @@
 // /////////////////////////////////////////////////////////////////
 
 #include "animaLesionsSegmentation.h"
+#include "animaLesionsSegmentationToolBox.h"
 
 #include <dtkCore/dtkSmartPointer.h>
 #include <dtkCore/dtkAbstractProcessFactory.h>
@@ -19,11 +20,14 @@
 #include <itkImageFileWriter.h>
 #include "animaSegmentationFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
+#include "animaFiniteModel.h"
 #include "time.h"
 
 class animaLesionsSegmentationPrivate
 {
 public:
+
+    animaLesionsSegmentationToolBox *toolbox;
 
     dtkSmartPointer <medAbstractImageData> output;
 
@@ -82,6 +86,9 @@ public:
     float lesionLoad;
     std::vector<float> lesionLoadVector;
 
+    anima::FiniteModel FiniteModelSolution;
+    bool useFormerSegModel;
+
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -89,7 +96,7 @@ public:
 // /////////////////////////////////////////////////////////////////
 
 
-animaLesionsSegmentation::animaLesionsSegmentation(): dtkAbstractProcess(), d(new animaLesionsSegmentationPrivate)
+animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationProcess(), d(new animaLesionsSegmentationPrivate)
 {
     d->parent = this;
 
@@ -124,7 +131,7 @@ animaLesionsSegmentation::animaLesionsSegmentation(): dtkAbstractProcess(), d(ne
     d->intensityT2 = 0;
     d->intensityDP = 0;
     d->intensityFLAIR = 0;
-
+    d->useFormerSegModel = false;
 
 }
 
@@ -134,7 +141,7 @@ animaLesionsSegmentation::~animaLesionsSegmentation(void)
 
 bool animaLesionsSegmentation::registered()
 {
-    return dtkAbstractProcessFactory::instance()->registerProcessType("animaLesionsSegmentation", createanimaLesionsSegmentation);
+    return dtkAbstractProcessFactory::instance()->registerProcessType("animaLesionsSegmentation", createanimaLesionsSegmentation, "SemiAutomaticSeg");
 }
 
 QString animaLesionsSegmentation::description() const
@@ -143,518 +150,35 @@ QString animaLesionsSegmentation::description() const
 }
 
 
-void animaLesionsSegmentation::setSegAutoEnable(bool segAutoEnable)
+/// TODO mettre la liste des parameters et au lieu de surcharger la method toolbox()
+QList<medAbstractParameter*> animaLesionsSegmentation::parameters()
 {
-    d->segAutoEnable = segAutoEnable;
+    return QList<medAbstractParameter*>();
 }
-void animaLesionsSegmentation::setSeganuEnable(bool segManuEnable)
+
+bool animaLesionsSegmentation::isInteractive()
 {
-    d->segManuEnable = segManuEnable;
+    return false;
 }
-void animaLesionsSegmentation::setNumberOfThreads(unsigned int numberOfThreads)
+
+medToolBox* animaLesionsSegmentation::toolbox()
 {
-    d->numberOfThreads = numberOfThreads;
+    d->toolbox = new animaLesionsSegmentationToolBox;
+    connect(d->toolbox, SIGNAL(runRequest()), this, SLOT(run()));
+    return d->toolbox;
 }
-void animaLesionsSegmentation::setInitMethod(unsigned int initMethod)
+
+void animaLesionsSegmentation::run()
 {
-    d->initMethod = initMethod;
-}
-void animaLesionsSegmentation::setRejRatioHierar(double rejRatioHierar)
-{
-    d->rejRatioHierar = rejRatioHierar;
-}
-void animaLesionsSegmentation::setEmAlgo(unsigned int emAlgo)
-{
-    d->emAlgo = emAlgo;
-}
-void animaLesionsSegmentation::setEmIter(int emIter)
-{
-    d->emIter = emIter;
-}
-void animaLesionsSegmentation::setMinDistance(double minDistance)
-{
-    d->minDistance = minDistance;
-}
-void animaLesionsSegmentation::setRejRatio(double rejRatio)
-{
-    d->rejRatio = rejRatio;
-}
-void animaLesionsSegmentation::setEmIter_concentration(int emIter_concentration)
-{
-    d->emIter_concentration = emIter_concentration;
-}
-void animaLesionsSegmentation::setEm_before_concentration(bool em_before_concentration)
-{
-    d->em_before_concentration = em_before_concentration;
-}
-void animaLesionsSegmentation::setUseStrem(bool useStrem)
-{
-    d->useStrem = useStrem;
-}
-void animaLesionsSegmentation::setMaha(double maha)
-{
-    d->maha = maha;
-}
-void animaLesionsSegmentation::setFuzzyRuleMin(double fuzzyRuleMin)
-{
-    d->fuzzyRuleMin = fuzzyRuleMin;
-}
-void animaLesionsSegmentation::setFuzzyRuleMax(double fuzzyRuleMax)
-{
-    d->fuzzyRuleMax = fuzzyRuleMax;
-}
-void animaLesionsSegmentation::setUseT2(bool useT2)
-{
-    d->useT2 = useT2;
-}
-void animaLesionsSegmentation::setUseDP(bool useDP)
-{
-    d->useDP = useDP;
-}
-void animaLesionsSegmentation::setUseFLAIR(bool useFLAIR)
-{
-    d->useFLAIR = useFLAIR;
-}
-void animaLesionsSegmentation::setUseSpecGrad(bool useSpecGrad)
-{
-    d->useSpecGrad = useSpecGrad;
-}
-void animaLesionsSegmentation::setTLinkMode(int TLinkMode)
-{
-    d->TLinkMode = TLinkMode;
-}
-void animaLesionsSegmentation::setMultiVarSources(float multiVarSources)
-{
-    d->multiVarSources = multiVarSources;
-}
-void animaLesionsSegmentation::setMultiVarSinks(float multiVarSinks)
-{
-    d->multiVarSinks = multiVarSinks;
-}
-void animaLesionsSegmentation::setSigma(float sigma)
-{
-    d->sigma = sigma;
-}
-void animaLesionsSegmentation::setAlpha(float alpha)
-{
-    d->alpha = alpha;
-}
-void animaLesionsSegmentation::setMinLesionSize(float minLesionSize)
-{
-    d->minLesionSize = minLesionSize;
-}
-void animaLesionsSegmentation::setMinGMSize(float minGMSize)
-{
-    d->minGMSize = minGMSize;
-}
-void animaLesionsSegmentation::setRemoveBorder(bool removeBorder)
-{
-    d->removeBorder = removeBorder;
-}
-void animaLesionsSegmentation::setIntensityRule(bool intensityRule)
-{
-    d->intensityRule = intensityRule;
-}
-void animaLesionsSegmentation::setIntensityT2(double intensityT2)
-{
-    d->intensityT2 = intensityT2;
-}
-void animaLesionsSegmentation::setIntensityDP(double intensityDP)
-{
-    d->intensityDP = intensityDP;
-}
-void animaLesionsSegmentation::setIntensityFLAIR(double intensityFLAIR)
-{
-    d->intensityFLAIR = intensityFLAIR;
-}
-void animaLesionsSegmentation::setMatrixGrad(QString matrixGrad)
-{
-    d->matrixGrad = matrixGrad;
-}
-void animaLesionsSegmentation::setReadSolutionFile(QString readSolutionFile)
-{
-    d->readSolutionFile = readSolutionFile;
-}
-
-
-void animaLesionsSegmentation::setMaskInput(medAbstractData *data)
-{
-    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-    if (!medData)
-        return;
-
-    QString identifier = data->identifier();
-
-    d->output = dynamic_cast <medAbstractImageData *> (medAbstractDataFactory::instance()->create (identifier));
-
-    d->mask = medData;
-}
-
-void animaLesionsSegmentation::setT1Input(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->T1 = medData;
-}
-void animaLesionsSegmentation::setT2Input(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->T2 = medData;
-}
-void animaLesionsSegmentation::setDPInput(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->DP = medData;
-}
-
-void animaLesionsSegmentation::setFLAIRInput(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->FLAIR = medData;
-}
-
-void animaLesionsSegmentation::setT1GdInput(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->T1Gd = medData;
-}
-
-void animaLesionsSegmentation::setAtlasCSF(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->AtlasCSF = medData;
-}
-void animaLesionsSegmentation::setAtlasGM(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->AtlasGM = medData;
-}
-void animaLesionsSegmentation::setAtlasWM(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->AtlasWM = medData;
-}
-
-void animaLesionsSegmentation::setSourcesMask(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->SourcesMask = medData;
-}
-
-void animaLesionsSegmentation::setSinksMask(medAbstractData *data)
-{    medAbstractImageData *medData = dynamic_cast <medAbstractImageData *> (data);
-     if (!medData)
-         return;
-
-    d->SinksMask = medData;
-}
-
-
-itk::Image <unsigned char,3>::Pointer animaLesionsSegmentation::createInputMasks(medAbstractImageData *medInput)
-{
-    //get the number of dimension and type of the image from the dtk identifier
-    QString type = QString (medInput->identifier());
-    unsigned int nbDimension =(*(type.end() - 1)).digitValue();
-    if(nbDimension!=3)
-    {
-        qDebug() << "input dimension != 3";
-        return NULL;
-    }
-
-    // typedef
-    typedef itk::Image <char,3> InputImageTypeC;
-    typedef itk::Image <unsigned char,3> InputImageTypeUC;
-    typedef itk::Image <short,3> InputImageTypeS;
-    typedef itk::Image <unsigned short,3> InputImageTypeUS;
-    typedef itk::Image <int,3> InputImageTypeI;
-    typedef itk::Image <unsigned int,3> InputImageTypeUI;
-    typedef itk::Image <long,3> InputImageTypeL;
-    typedef itk::Image <unsigned long,3> InputImageTypeUL;
-    typedef itk::Image <float,3> InputImageTypeF;
-    typedef itk::Image <double,3> InputImageTypeD;
-
-
-    // Rescale image
-    itk::Image <unsigned char ,3>::Pointer inputUC = itk::Image <unsigned char ,3>::New();
-
-    unsigned char valMinInput = std::numeric_limits<unsigned char >::min();
-    unsigned char valMaxInput = std::numeric_limits<unsigned char >::max();
-    std::cout << "valMinInput UC: " << valMinInput << std::endl;
-    std::cout << "valMaxInput UC: " << valMaxInput << std::endl;
-
-    type.truncate(type.size() - 1);
-
-    if ( type == "itkDataImageChar" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeC,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeC::Pointer input = dynamic_cast<InputImageTypeC *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageUChar" )
-    {
-        inputUC = dynamic_cast<InputImageTypeUC *>((itk::Object*)( medInput->data() ));
-    }
-    else if ( type == "itkDataImageShort" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeS,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeS::Pointer input = dynamic_cast<InputImageTypeS *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageUShort" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeUS,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeUS::Pointer input = dynamic_cast<InputImageTypeUS *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageInt" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeI,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeI::Pointer input = dynamic_cast<InputImageTypeI *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageUInt" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeUI,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeUI::Pointer input = dynamic_cast<InputImageTypeUI *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageLong" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeL,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeL::Pointer input = dynamic_cast<InputImageTypeL *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageULong" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeUL,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeUL::Pointer input = dynamic_cast<InputImageTypeUL *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageFloat" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeF,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeF::Pointer input = dynamic_cast<InputImageTypeF *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-
-    }
-    else if ( type == "itkDataImageDouble" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeD,InputImageTypeUC> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeD::Pointer input = dynamic_cast<InputImageTypeD *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputUC = rescaleFilter->GetOutput();
-    }
-
-    return inputUC;
-
-}
-
-itk::Image <float,3>::Pointer animaLesionsSegmentation::createInputImages(medAbstractImageData *medInput)
-{
-    //get the number of dimension and type of the image from the dtk identifier
-    QString type = QString (medInput->identifier());
-    unsigned int nbDimension =(*(type.end() - 1)).digitValue();
-    if(nbDimension!=3)
-    {
-        qDebug() << "input dimension != 3";
-        return NULL;
-    }
-
-    // typedef
-    typedef itk::Image <char,3> InputImageTypeC;
-    typedef itk::Image <unsigned char,3> InputImageTypeUC;
-    typedef itk::Image <short,3> InputImageTypeS;
-    typedef itk::Image <unsigned short,3> InputImageTypeUS;
-    typedef itk::Image <int,3> InputImageTypeI;
-    typedef itk::Image <unsigned int,3> InputImageTypeUI;
-    typedef itk::Image <long,3> InputImageTypeL;
-    typedef itk::Image <unsigned long,3> InputImageTypeUL;
-    typedef itk::Image <float,3> InputImageTypeF;
-    typedef itk::Image <double,3> InputImageTypeD;
-
-
-    // Rescale image
-    itk::Image <float,3>::Pointer inputF = itk::Image <float,3>::New();
-
-    float valMinInput = std::numeric_limits<float>::min();
-    float valMaxInput = std::numeric_limits<float>::max();
-    std::cout << "valMinInput F: " << valMinInput << std::endl;
-    std::cout << "valMaxInput F: " << valMaxInput << std::endl;
-
-    type.truncate(type.size() - 1);
-
-    if ( type == "itkDataImageChar" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeC,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeC::Pointer input = dynamic_cast<InputImageTypeC *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageUChar" )
-    {
-
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeUC,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeUC::Pointer input = dynamic_cast<InputImageTypeUC *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageShort" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeS,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeS::Pointer input = dynamic_cast<InputImageTypeS *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageUShort" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeUS,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeUS::Pointer input = dynamic_cast<InputImageTypeUS *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageInt" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeI,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeI::Pointer input = dynamic_cast<InputImageTypeI *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageUInt" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeUI,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeUI::Pointer input = dynamic_cast<InputImageTypeUI *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageLong" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeL,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeL::Pointer input = dynamic_cast<InputImageTypeL *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageULong" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeUL,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeUL::Pointer input = dynamic_cast<InputImageTypeUL *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-    else if ( type == "itkDataImageFloat" )
-    {
-        inputF = dynamic_cast<InputImageTypeF *>((itk::Object*)( medInput->data() ));
-    }
-    else if ( type == "itkDataImageDouble" )
-    {
-        typedef itk::RescaleIntensityImageFilter<InputImageTypeD,InputImageTypeF> RescaleFilterType;
-        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-        InputImageTypeD::Pointer input = dynamic_cast<InputImageTypeD *>((itk::Object*)( medInput->data() ));
-        rescaleFilter->SetInput( input );
-        rescaleFilter->SetOutputMinimum( valMinInput );
-        rescaleFilter->SetOutputMaximum( valMaxInput );
-        rescaleFilter->UpdateLargestPossibleRegion();
-        inputF = rescaleFilter->GetOutput();
-    }
-
-    return inputF;
-
+    medRunnableProcess *runable = new medRunnableProcess(this, this->name());
+    runable->start();
 }
 
 int animaLesionsSegmentation::update()
 {
+
+    //set manual masks: from database + segmented from paint segmentation
+    //todo: AND
 
     typedef itk::Image <float,3> InputImageTypeF;
     typedef InputImageTypeF::Pointer InputImagePointerF;
@@ -681,20 +205,33 @@ int animaLesionsSegmentation::update()
     InputImagePointerUC inputSourcesMask = NULL;
     InputImagePointerUC inputSinksMask = NULL;
 
+
+    d->T1 = dynamic_cast <medAbstractImageData *> (d->toolbox->getT1());
+    d->T2 = dynamic_cast <medAbstractImageData *> (d->toolbox->getT2());
+    d->DP = dynamic_cast <medAbstractImageData *> (d->toolbox->getDP());
+
+    d->FLAIR = dynamic_cast <medAbstractImageData *> (d->toolbox->getFLAIR());
+    d->T1Gd = dynamic_cast <medAbstractImageData *> (d->toolbox->getT1Gd());
+    d->mask = dynamic_cast <medAbstractImageData *> (d->toolbox->getMask());
+
+
     if(!(d->T1.isNull()))
     {
         inputT1 = this->createInputImages(d->T1);
         segFilter->SetInputImageT1( inputT1 );
+        qDebug()<<"T1 set";
     }
     if(!(d->T2.isNull()))
     {
         inputT2 = this->createInputImages(d->T2);
         segFilter->SetInputImageT2( inputT2 );
+        qDebug()<<"t2 set";
     }
     if(!(d->DP.isNull()))
     {
         inputDP = this->createInputImages(d->DP);
         segFilter->SetInputImageDP( inputDP );
+        qDebug()<<"dp set";
     }
     if(!(d->FLAIR.isNull()))
     {
@@ -710,6 +247,7 @@ int animaLesionsSegmentation::update()
     {
         brainMask = this->createInputMasks(d->mask);
         segFilter->SetMask( brainMask );
+        qDebug()<<"mask set";
     }
 
     if(!(d->AtlasCSF.isNull()))
@@ -739,6 +277,38 @@ int animaLesionsSegmentation::update()
         segFilter->SetSinksMask( inputSinksMask );
     }
 
+    d->segAutoEnable = d->toolbox->getEnableAuto();
+    d->segManuEnable = d->toolbox->getEnableManu();
+    d->numberOfThreads = d->toolbox->getNumberOfThreads();
+    d->initMethod = d->toolbox->getInitMethod();
+    d->rejRatioHierar = d->toolbox->getRejRatioHierar();
+    d->emAlgo = d->toolbox->getEmAlgo();
+    d->emIter = d->toolbox->getEmIter();
+    d->minDistance = d->toolbox->getMinDistance();
+    d->rejRatio = d->toolbox->getRejRatio();
+    d->emIter_concentration = d->toolbox->getEmIter_concentration();
+    d->em_before_concentration = d->toolbox->getEm_before_concentration();
+    d->useStrem = d->toolbox->getUseStrem();
+    d->maha = d->toolbox->getMaha();
+    d->fuzzyRuleMin = d->toolbox->getFuzzyRuleMin();
+    d->fuzzyRuleMax = d->toolbox->getFuzzyRuleMax();
+    //void getUseT2();
+    //void getUseDP();
+    //void getUseFLAIR();
+    d->useSpecGrad = d->toolbox->getUseSpecGrad();
+    // = d->toolbox->getTLinkMode(int TLinkMode);
+    d->multiVarSources = d->toolbox->getMultiVarSources();
+    d->multiVarSinks = d->toolbox->getMultiVarSinks();
+    d->sigma = d->toolbox->getSigma();
+    d->alpha = d->toolbox->getAlpha();
+    d->minLesionSize = d->toolbox->getMinLesionSize();
+    d->minGMSize = d->toolbox->getMinGMSize();
+    d->removeBorder = d->toolbox->getRemoveBorder();
+    d->intensityRule  = d->toolbox->getIntensityRule();
+    d->intensityT2 = d->toolbox->getIntensityT2();
+    d->intensityDP = d->toolbox->getIntensityDP();
+    d->intensityFLAIR = d->toolbox->getIntensityFLAIR();
+    d->useFormerSegModel = d->toolbox->getUseFormerSegModel();
 
     // Set parameters
     segFilter->SetSegAutoEnable( d->segAutoEnable );
@@ -783,12 +353,10 @@ int animaLesionsSegmentation::update()
     segFilter->SetMinGMSize( d->minGMSize );
     segFilter->SetMinLesionSize( d->minLesionSize );
 
-    std::string readSolutionFile = "/home/lcatanes/trash/writeSolution";
-    segFilter->SetSolutionReadFilename( readSolutionFile );
-
-    //segFilter->SetSolutionReadFilename( readSolutionFileArg.getValue() );
-    //segFilter->SetSolutionWriteFilename( writeSolutionFileArg.getValue() );
-
+    if(d->FiniteModelSolution.size()==3 && d->useFormerSegModel)
+    {
+        segFilter->SetSolution(d->FiniteModelSolution);
+    }
 
     // Run the segmentation
     time_t t1 = clock();
@@ -806,11 +374,18 @@ int animaLesionsSegmentation::update()
 
     qDebug() << "Elasped time: " << (double)(t2-t1)/(double)CLOCKS_PER_SEC;
 
+    // save solution of automatic segmenation in case we need to relaunch the seg with additional seed
+    // FiniteModelSolution cointains the estimation of the NABT model (mean and covar matrix)
+    // this allow to save computation time (EM is not performed) and avoid diiferences due to random intialisation
+    d->FiniteModelSolution = segFilter->GetSolution();
+
+    // save number lesion load to print it
     d->lesionLoad = segFilter->GetLesionLoad();
     d->lesionLoadVector = segFilter->GetLesionLoadVector();
 
-    //d->output->setData(segFilter->GetOutputWholeSeg());
-    //d->output->setData(brainMask);
+    QString identifier = d->toolbox->getMask()->identifier();
+    d->output = dynamic_cast <medAbstractImageData *> (medAbstractDataFactory::instance()->create (identifier));
+    d->output->setData(segFilter->GetOutputWholeSeg());
 
     return(0);
 }
@@ -834,4 +409,276 @@ dtkAbstractProcess *createanimaLesionsSegmentation(void)
     return new animaLesionsSegmentation;
 }
 
+itk::Image <unsigned char,3>::Pointer animaLesionsSegmentation::createInputMasks(medAbstractImageData *medInput)
+{
+    QString type = QString (medInput->identifier());
+
+    // typedef
+    typedef itk::Image <char,3> InputImageTypeC;
+    typedef itk::Image <unsigned char,3> InputImageTypeUC;
+    typedef itk::Image <short,3> InputImageTypeS;
+    typedef itk::Image <unsigned short,3> InputImageTypeUS;
+    typedef itk::Image <int,3> InputImageTypeI;
+    typedef itk::Image <unsigned int,3> InputImageTypeUI;
+    typedef itk::Image <long,3> InputImageTypeL;
+    typedef itk::Image <unsigned long,3> InputImageTypeUL;
+    typedef itk::Image <float,3> InputImageTypeF;
+    typedef itk::Image <double,3> InputImageTypeD;
+
+    // Rescale image
+    itk::Image <unsigned char ,3>::Pointer inputUC = itk::Image <unsigned char ,3>::New();
+
+    unsigned char valMinInput = std::numeric_limits<unsigned char >::min();
+    unsigned char valMaxInput = std::numeric_limits<unsigned char >::max();
+
+    if ( type == "medItkChar3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeC,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeC::Pointer input = dynamic_cast<InputImageTypeC *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkUChar3ImageData" )
+    {
+        inputUC = dynamic_cast<InputImageTypeUC *>((itk::Object*)( medInput->data() ));
+    }
+    else if ( type == "medItkShort3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeS,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeS::Pointer input = dynamic_cast<InputImageTypeS *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkUShort3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeUS,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeUS::Pointer input = dynamic_cast<InputImageTypeUS *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkInt3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeI,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeI::Pointer input = dynamic_cast<InputImageTypeI *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkUInt3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeUI,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeUI::Pointer input = dynamic_cast<InputImageTypeUI *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+    }
+    else if ( type == "itkDataImageLong" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeL,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeL::Pointer input = dynamic_cast<InputImageTypeL *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+    }
+    else if ( type == "itkDataImageULong" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeUL,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeUL::Pointer input = dynamic_cast<InputImageTypeUL *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkFloat3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeF,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeF::Pointer input = dynamic_cast<InputImageTypeF *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+
+    }
+    else if ( type == "medItkDouble3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeD,InputImageTypeUC> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeD::Pointer input = dynamic_cast<InputImageTypeD *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputUC = rescaleFilter->GetOutput();
+    }
+    else
+    {
+        qDebug() << "invalid data";
+        return NULL;
+    }
+
+    return inputUC;
+}
+
+itk::Image <float,3>::Pointer animaLesionsSegmentation::createInputImages(medAbstractImageData *medInput)
+{
+    //get the number of dimension and type of the image from the dtk identifier
+    QString type = QString (medInput->identifier());
+
+    // typedef
+    typedef itk::Image <char,3> InputImageTypeC;
+    typedef itk::Image <unsigned char,3> InputImageTypeUC;
+    typedef itk::Image <short,3> InputImageTypeS;
+    typedef itk::Image <unsigned short,3> InputImageTypeUS;
+    typedef itk::Image <int,3> InputImageTypeI;
+    typedef itk::Image <unsigned int,3> InputImageTypeUI;
+    typedef itk::Image <long,3> InputImageTypeL;
+    typedef itk::Image <unsigned long,3> InputImageTypeUL;
+    typedef itk::Image <float,3> InputImageTypeF;
+    typedef itk::Image <double,3> InputImageTypeD;
+
+
+    // Rescale image
+    itk::Image <float,3>::Pointer inputF = itk::Image <float,3>::New();
+
+    float valMinInput = std::numeric_limits<float>::min();
+    float valMaxInput = std::numeric_limits<float>::max();
+
+    if ( type == "medItkChar3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeC,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeC::Pointer input = dynamic_cast<InputImageTypeC *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkUChar3ImageData" )
+    {
+
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeUC,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeUC::Pointer input = dynamic_cast<InputImageTypeUC *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkShort3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeS,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeS::Pointer input = dynamic_cast<InputImageTypeS *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkUShort3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeUS,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeUS::Pointer input = dynamic_cast<InputImageTypeUS *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkInt3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeI,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeI::Pointer input = dynamic_cast<InputImageTypeI *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkUInt3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeUI,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeUI::Pointer input = dynamic_cast<InputImageTypeUI *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkInt3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeL,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeL::Pointer input = dynamic_cast<InputImageTypeL *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else if ( type == "itkDataImageULong" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeUL,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeUL::Pointer input = dynamic_cast<InputImageTypeUL *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else if ( type == "medItkFloat3ImageData" )
+    {
+        inputF = dynamic_cast<InputImageTypeF *>((itk::Object*)( medInput->data() ));
+    }
+    else if ( type == "medItkDouble3ImageData" )
+    {
+        typedef itk::RescaleIntensityImageFilter<InputImageTypeD,InputImageTypeF> RescaleFilterType;
+        RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
+        InputImageTypeD::Pointer input = dynamic_cast<InputImageTypeD *>((itk::Object*)( medInput->data() ));
+        rescaleFilter->SetInput( input );
+        rescaleFilter->SetOutputMinimum( valMinInput );
+        rescaleFilter->SetOutputMaximum( valMaxInput );
+        rescaleFilter->UpdateLargestPossibleRegion();
+        inputF = rescaleFilter->GetOutput();
+    }
+    else
+    {
+        qDebug() << "invalid data";
+        return NULL;
+    }
+
+    return inputF;
+
+}
 
