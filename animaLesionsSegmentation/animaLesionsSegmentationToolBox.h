@@ -32,7 +32,7 @@ public:
     bool getEnableManu();
     unsigned int getNumberOfThreads();
     unsigned int getInitMethod();
-    double getRejRatioHierar();
+    //double getRejRatioHierar();
     unsigned int getEmAlgo();
     int getEmIter();
     double getMinDistance();
@@ -92,6 +92,11 @@ public slots:
     medAbstractData* getFLAIR();
     medAbstractData* getT1Gd();
     medAbstractData* getMask();
+    medAbstractData* getAtlasCSF();
+    medAbstractData* getAtlasGM();
+    medAbstractData* getAtlasWM();
+    medAbstractData* getSources();
+    medAbstractData* getSinks();
 
 private:
     animaLesionsSegmentationToolBoxPrivate *d;

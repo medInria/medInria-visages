@@ -49,6 +49,9 @@ public:
     dtkSmartPointer<medAbstractData> AtlasGMData;
     dtkSmartPointer<medAbstractData> AtlasWMData;
 
+    dtkSmartPointer<medAbstractData> SourcesData;
+    dtkSmartPointer<medAbstractData> SinksData;
+
 
     QLabel *dataTypeValue;
     QLabel *dataDimensionValue;
@@ -125,7 +128,12 @@ public:
     medDataIndexParameter *T1GdParameter;
     medDataIndexParameter *MaskParameter;
 
-    medDataIndexListParameter *seedParameter;
+    medDataIndexParameter *AtlasCSFParameter;
+    medDataIndexParameter *AtlasGMParameter;
+    medDataIndexParameter *AtlasWMParameter;
+
+    medDataIndexParameter *SourcesParameter;
+    medDataIndexParameter *SinksParameter;
 
     medDataIndex indexT1;
     medDataIndex indexT2;
@@ -352,6 +360,18 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     d->SelectAtlasButton = new QPushButton(tr("Select Atlas"), this);
     d->SelectAtlasButton->setEnabled(false);
 
+    d->AtlasCSFParameter = new medDataIndexParameter("CSF", this);
+    d->AtlasCSFParameter->setToolTip(tr("Drag-and-drop a CSF atlas from the database or click here."));
+    d->AtlasCSFParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a CSF atlas."));
+
+    d->AtlasGMParameter = new medDataIndexParameter("GM", this);
+    d->AtlasGMParameter->setToolTip(tr("Drag-and-drop GM atlas from the database or click here."));
+    d->AtlasGMParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a GM atlas."));
+
+    d->AtlasWMParameter = new medDataIndexParameter("WM", this);
+    d->AtlasWMParameter->setToolTip(tr("Drag-and-drop a WM atlas from the database or click here."));
+    d->AtlasWMParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a WM atlas."));
+
     QVBoxLayout *initLayout = new QVBoxLayout();
     initLayout->addWidget(d->init);
     initLayout->addWidget(d->SelectAtlasButton);
@@ -476,19 +496,33 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     d->useSpectralGrad = new QCheckBox;
     d->useSpectralGrad ->setChecked(true);
 
+    d->enableManu = new QCheckBox;
+    d->enableManu->setToolTip("Enable manual masks as entries");
+    d->enableManu->setCheckState(Qt::Unchecked);
+
     QFormLayout *gcBoxLayout = new QFormLayout();
     gcBoxLayout->addRow(new QLabel(tr("Alpha"),this),d->alpha);
     gcBoxLayout->addRow(new QLabel(tr("Sigma"),this),d->sigma);
     gcBoxLayout->addRow(new QLabel(tr("Use Spectral Gradient"),this),d->useSpectralGrad);
     //gcBoxLayout->addRow(new QLabel(tr("Matrix"),this),matrixLayout);
-
-    d->enableManu = new QCheckBox;
-    d->enableManu->setToolTip("Enable manual masks as entries");
-    d->enableManu->setCheckState(Qt::Unchecked);
     gcBoxLayout->addRow(new QLabel(tr("Enable manual masks"),this),d->enableManu);
 
-    d->SelectSourcesButton = new QPushButton(tr("sources"));
-    d->SelectSinksButton = new QPushButton(tr("sinks"));
+    //d->SelectSourcesButton = new QPushButton(tr("sources"));
+    //d->SelectSinksButton = new QPushButton(tr("sinks"));
+
+
+    d->SourcesParameter = new medDataIndexParameter("Sources", this);
+    d->SourcesParameter->setToolTip(tr("Drag-and-drop a source from the database or click here."));
+    d->SourcesParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here to open \n a source mask."));
+
+    d->SinksParameter = new medDataIndexParameter("Sinks", this);
+    d->SinksParameter->setToolTip(tr("Drag-and-drop a sink from the database or click here."));
+    d->SinksParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here to open \n a sink mask."));
+
+    QHBoxLayout *seedMasksLayout = new QHBoxLayout;
+    seedMasksLayout->addWidget(d->SourcesParameter->getWidget(), 0, Qt::AlignCenter);
+    seedMasksLayout->addWidget(d->SinksParameter->getWidget(), 0, Qt::AlignCenter);
+
 
     d->multiVarSources = new QDoubleSpinBox();
     d->multiVarSources->setToolTip("xx");
@@ -506,21 +540,29 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
 
     d->PreviewMultiVarButton = new QPushButton(tr("Preview variance"));
 
-    d->SelectSourcesButton->setDisabled(true);
-    d->SelectSinksButton->setDisabled(true);
+    //d->SelectSourcesButton->setDisabled(true);
+    //d->SelectSinksButton->setDisabled(true);
     d->multiVarSources->setDisabled(true);
     d->multiVarSinks->setDisabled(true);
     d->PreviewMultiVarButton->setDisabled(true);
 
     //QFormLayout *SeedsLayout = new QFormLayout();
-    gcBoxLayout->addRow(new QLabel(tr("Select sources masks"),this),d->SelectSourcesButton);
-    gcBoxLayout->addRow(new QLabel(tr("Select sinks masks"),this),d->SelectSinksButton);
+    //gcBoxLayout->addRow(new QLabel(tr("Select sources masks"),this),d->SelectSourcesButton);
+    //gcBoxLayout->addRow(new QLabel(tr("Select sinks masks"),this),d->SelectSinksButton);
     gcBoxLayout->addRow(new QLabel(tr("Multiply source variance factor"),this),d->multiVarSources);
     gcBoxLayout->addRow(new QLabel(tr("Multiply source variance factor"),this),d->multiVarSinks);
     gcBoxLayout->addRow(new QLabel(tr("Preview variance"),this),d->PreviewMultiVarButton);
 
+    //d->gcGroupBox = new QGroupBox(tr("Graph Cut Parameters"));
+    //d->gcGroupBox->setLayout(gcBoxLayout);
+
+
+    QVBoxLayout *aaa = new QVBoxLayout();
+    aaa->addLayout(gcBoxLayout);
+    aaa->addLayout(seedMasksLayout);
+
     d->gcGroupBox = new QGroupBox(tr("Graph Cut Parameters"));
-    d->gcGroupBox->setLayout(gcBoxLayout);
+    d->gcGroupBox->setLayout(aaa);
 
 
     d->threads = new QSpinBox();
@@ -554,7 +596,7 @@ animaLesionsSegmentationToolBox::animaLesionsSegmentationToolBox(QWidget *parent
     layout2->addWidget(AutoGroupBox);
     layout2->addWidget(d->NABTGroupBox);
     layout2->addWidget(d->DetectionGroupBox);
-    layout2->addWidget(d->SeedsGroupBox);
+    //layout2->addWidget(d->SeedsGroupBox);
     layout2->addWidget(d->gcGroupBox);
     layout2->addWidget(d->globalParametersGroupBox);
 
@@ -617,7 +659,7 @@ medAbstractData* animaLesionsSegmentationToolBox::processOutput(void)
     if(!d->process)
         return NULL;
 
-    return d->process->output();
+    //return d->process->output();
 }
 
 dtkPlugin* animaLesionsSegmentationToolBox::plugin()
@@ -652,7 +694,26 @@ medAbstractData* animaLesionsSegmentationToolBox::getMask()
 {
     return d->maskData;
 }
-
+medAbstractData* animaLesionsSegmentationToolBox::getAtlasCSF()
+{
+    return d->AtlasCSFData;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getAtlasGM()
+{
+    return d->AtlasGMData;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getAtlasWM()
+{
+    return d->AtlasWMData;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getSources()
+{
+    return d->SourcesData;
+}
+medAbstractData* animaLesionsSegmentationToolBox::getSinks()
+{
+    return d->SinksData;
+}
 void animaLesionsSegmentationToolBox::onT1Dropped(const medDataIndex& index)
 {
     if (!index.isValidForSeries()){
@@ -779,8 +840,8 @@ void animaLesionsSegmentationToolBox::ChangeManuState(int state)
 {
     // manu enable
     if(state==2){
-        d->SelectSourcesButton->setDisabled(false);
-        d->SelectSinksButton->setDisabled(false);
+        //d->SelectSourcesButton->setDisabled(false);
+        //d->SelectSinksButton->setDisabled(false);
         d->multiVarSources->setDisabled(false);
         d->multiVarSinks->setDisabled(false);
         d->PreviewMultiVarButton->setDisabled(false);
@@ -789,8 +850,8 @@ void animaLesionsSegmentationToolBox::ChangeManuState(int state)
     // manu disable
     if(state==0){
         d->enableAuto->setChecked(true);
-        d->SelectSourcesButton->setDisabled(true);
-        d->SelectSinksButton->setDisabled(true);
+        //d->SelectSourcesButton->setDisabled(true);
+        //d->SelectSinksButton->setDisabled(true);
         d->multiVarSources->setDisabled(true);
         d->multiVarSinks->setDisabled(true);
         d->PreviewMultiVarButton->setDisabled(true);
@@ -870,10 +931,10 @@ unsigned int animaLesionsSegmentationToolBox::getInitMethod()
     return d->init->currentIndex();
 }
 
-double animaLesionsSegmentationToolBox::getRejRatioHierar()
+/*double animaLesionsSegmentationToolBox::getRejRatioHierar()
 {
     return d->rejRatio->value();
-}
+}*/
 unsigned int animaLesionsSegmentationToolBox::getEmAlgo()
 {
     return d->algoEM->currentIndex();

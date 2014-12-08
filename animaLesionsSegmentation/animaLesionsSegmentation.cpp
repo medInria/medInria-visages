@@ -15,6 +15,7 @@
 #include <itkImageFileWriter.h>
 #include <animaNonLocalMeansImageFilter.h>
 #include <animaNonLocalMeansTemporalImageFilter.h>
+#include <medViewContainer.h>
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -22,6 +23,25 @@
 #include "itkRescaleIntensityImageFilter.h"
 #include "animaFiniteModel.h"
 #include "time.h"
+
+#include <medBoolParameter.h>
+#include <medBoolGroupParameter.h>
+#include <medTriggerParameter.h>
+#include <medDoubleParameter.h>
+#include <medStringListParameter.h>
+#include <medIntParameter.h>
+#include <medDataIndexParameter.h>
+
+#include <medToolBoxFactory.h>
+#include <medSegmentationSelectorToolBox.h>
+#include <medProgressionStack.h>
+#include <medPluginManager.h>
+#include <medToolBoxTab.h>
+#include <medDropSite.h>
+#include <medDataIndex.h>
+#include <medDataManager.h>
+
+
 
 class animaLesionsSegmentationPrivate
 {
@@ -44,6 +64,8 @@ public:
 
     dtkSmartPointer <medAbstractImageData> SourcesMask;
     dtkSmartPointer <medAbstractImageData> SinksMask;
+
+    medAbstractData* maskData;
 
 
     animaLesionsSegmentation *parent;
@@ -89,6 +111,16 @@ public:
     anima::FiniteModel FiniteModelSolution;
     bool useFormerSegModel;
 
+    medDataIndexParameter *T1Parameter;
+    medDataIndexParameter *T2Parameter;
+    medDataIndexParameter *DPParameter;
+    medDataIndexParameter *FLAIRParameter;
+    medDataIndexParameter *T1GdParameter;
+    medDataIndexParameter *MaskParameter;
+
+    QList <medAbstractParameter*> parameters;
+    QPointer<QWidget> parameterWidget;
+
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -102,8 +134,8 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
 
     d->segAutoEnable = true;
     d->segManuEnable = false;
-    d->numberOfThreads = 2;
-    d->initMethod = 2;
+    d->numberOfThreads = 8;
+    d->initMethod = 1;
     d->rejRatioHierar = 0.01;
     d->emAlgo = 2;
     d->emIter = 100;
@@ -115,8 +147,8 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     d->maha = 0.4;
     d->fuzzyRuleMin = 2;
     d->fuzzyRuleMax = 3;
-    d->useT2 = false;
-    d->useDP = false;
+    d->useT2 = true;
+    d->useDP = true;
     d->useFLAIR = false;
     d->useSpecGrad = true;
     d->TLinkMode = 0;
@@ -133,10 +165,201 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     d->intensityFLAIR = 0;
     d->useFormerSegModel = false;
 
+    /*d->T1Parameter = new medDataIndexParameter("T1", this);
+    d->T1Parameter->setToolTip(tr("Drag-and-drop A T1 from the database or click here."));
+    d->T1Parameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T1."));
+
+    d->T2Parameter = new medDataIndexParameter("T2", this);
+    d->T2Parameter->setToolTip(tr("Drag-and-drop A T2 from the database or click here."));
+    d->T2Parameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T2."));
+
+    d->DPParameter = new medDataIndexParameter("DP", this);
+    d->DPParameter->setToolTip(tr("Drag-and-drop A DP from the database or click here."));
+    d->DPParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a DP."));
+
+    d->FLAIRParameter = new medDataIndexParameter("FLAIR", this);
+    d->FLAIRParameter->setToolTip(tr("Drag-and-drop A FLAIR from the database or click here."));
+    d->FLAIRParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a FLAIR."));
+
+    d->T1GdParameter = new medDataIndexParameter("T1Gd", this);
+    d->T1GdParameter->setToolTip(tr("Drag-and-drop A T1Gd from the database or click here."));
+    d->T1GdParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T1Gd."));
+
+    d->MaskParameter = new medDataIndexParameter("Mask", this);
+    d->MaskParameter->setToolTip(tr("Drag-and-drop A Mask from the database or click here."));
+    d->MaskParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a Mask."));*/
+
+    /*d->parameters << d->T1Parameter;
+    d->parameters << d->T2Parameter;
+    d->parameters << d->DPParameter;
+    d->parameters << d->MaskParameter;*/
+
+    /*medInputDataPort *input = new medInputDataPort("Image MRI", false);
+    if(input)
+    {
+        medInputDataPort *data = dynamic_cast<medInputDataPort*> (input);
+        medViewContainer* cont2 = this->container(data);
+        cont2->setMultiLayered(true);
+        cont2->splitVertically();
+    }*/
+
+    /*medInputDataPort *input = new medInputDataPort("Image DP", false);
+    input->setInput(NULL);
+
+    this->appendInput(input);
+
+    medInputDataPort *input2 = new medInputDataPort("Image T2", false);
+    input2->setInput(NULL);
+
+    this->appendInput(input2);
+
+
+    medInputDataPort *input3 = new medInputDataPort("Mask", false);
+    input3->setInput(NULL);
+
+    this->appendInput(input3);
+
+    connect(d->MaskParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onMaskDropped(const medDataIndex &)));*/
+
 }
+
+void animaLesionsSegmentation::onMaskDropped(const medDataIndex& index)
+{
+    if (!index.isValid()){
+        return;
+    }
+    d->maskData = medDataManager::instance()->retrieveData(index);
+}
+
+// permettre le multilayer sur les containers
+/*medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
+{
+    medViewContainerSplitter* split = medAbstractProcess::viewContainerSplitter();
+
+    typedef medProcessInput<medAbstractData> medInputDataPort;
+    medProcessIOPort *inputPort = this->inputs()[0];
+    if(inputPort)
+    {
+        medInputDataPort *dataPort = dynamic_cast<medInputDataPort*> (inputPort);
+        medViewContainer* cont = this->container(dataPort);
+        cont->setMultiLayered(true);
+    }
+
+
+   // medViewContainer *container = inputContainer->splitHorizontally();
+    //input->setInput(NULL);
+
+    //this->appendInput(input);
+
+
+    return split;
+}*/
 
 animaLesionsSegmentation::~animaLesionsSegmentation(void)
 {
+    /*delete d->toolbox;
+    d->toolbox = NULL;
+    delete d;*/
+}
+
+
+
+
+
+QWidget* animaLesionsSegmentation::parameterWidget()
+{
+    if(d->parameterWidget.isNull())
+    {
+        d->parameterWidget = new QWidget;
+        //QFormLayout *layout = new QFormLayout(d->parameterWidget);
+
+        QHBoxLayout *layoutH = new QHBoxLayout(d->parameterWidget);
+        //layoutH->addWidget(d->T1Parameter->getWidget());
+        //layoutH->addWidget(d->T2Parameter->getWidget());
+
+        //this->setTitle("Lesion Segmentation");
+        medToolBoxTab *widget = new medToolBoxTab(d->parameterWidget);
+
+
+
+        // Set Tabs
+        /*QWidget *header = new QWidget;
+        QVBoxLayout *layoutheader = new QVBoxLayout(header);
+        layoutheader->addWidget(runButton);
+        layoutheader->addWidget(d->SaveLesionLoadButton);
+        layoutheader->addWidget(d->progression_stack);*/
+
+        d->T1Parameter = new medDataIndexParameter("T1", this);
+        d->T1Parameter->setToolTip(tr("Drag-and-drop A T1 from the database or click here."));
+        d->T1Parameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T1."));
+
+        d->T2Parameter = new medDataIndexParameter("T2", this);
+        d->T2Parameter->setToolTip(tr("Drag-and-drop A T2 from the database or click here."));
+        d->T2Parameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T2."));
+
+        d->DPParameter = new medDataIndexParameter("DP", this);
+        d->DPParameter->setToolTip(tr("Drag-and-drop A DP from the database or click here."));
+        d->DPParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a DP."));
+
+        d->FLAIRParameter = new medDataIndexParameter("FLAIR", this);
+        d->FLAIRParameter->setToolTip(tr("Drag-and-drop A FLAIR from the database or click here."));
+        d->FLAIRParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a FLAIR."));
+
+        d->T1GdParameter = new medDataIndexParameter("T1Gd", this);
+        d->T1GdParameter->setToolTip(tr("Drag-and-drop A T1Gd from the database or click here."));
+        d->T1GdParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a T1Gd."));
+
+        d->MaskParameter = new medDataIndexParameter("Mask", this);
+        d->MaskParameter->setToolTip(tr("Drag-and-drop A Mask from the database or click here."));
+        d->MaskParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here\nto open a Mask."));
+
+        QHBoxLayout *MRIBox1Layout = new QHBoxLayout();
+        MRIBox1Layout->addWidget(d->T1Parameter->getWidget(), 0, Qt::AlignCenter);
+        MRIBox1Layout->addWidget(d->T2Parameter->getWidget(), 0, Qt::AlignCenter);
+
+        QHBoxLayout *MRIBox2Layout = new QHBoxLayout();
+        MRIBox2Layout->addWidget(d->DPParameter->getWidget(), 0, Qt::AlignCenter);
+        MRIBox2Layout->addWidget(d->FLAIRParameter->getWidget(), 0, Qt::AlignCenter);
+
+        QHBoxLayout *MRIBox3Layout = new QHBoxLayout();
+        MRIBox3Layout->addWidget(d->T1GdParameter->getWidget(), 0, Qt::AlignCenter);
+        MRIBox3Layout->addWidget(d->MaskParameter->getWidget(), 0, Qt::AlignCenter);
+
+        QPushButton *clearImagesButton = new QPushButton(tr("Remove whole images"));
+
+        QVBoxLayout *box1Layout = new QVBoxLayout();
+        box1Layout->addLayout(MRIBox1Layout);
+        box1Layout->addLayout(MRIBox2Layout);
+        box1Layout->addLayout(MRIBox3Layout);
+        box1Layout->addWidget(clearImagesButton);
+
+        QGroupBox *ImagesGroupBox = new QGroupBox(tr("Select MRI Images"));
+        ImagesGroupBox->setLayout(box1Layout);
+
+        QWidget *page1 = new QWidget;
+        QVBoxLayout *layout1 = new QVBoxLayout(page1);
+        layout1->addWidget(ImagesGroupBox);
+        /*layout1->addWidget(heuristicGroupBox);
+        layout1->addWidget(OutputTypeGroupBox);*/
+
+        QWidget *page2 = new QWidget;
+        /*QVBoxLayout *layout2 = new QVBoxLayout(page2);
+        layout2->addWidget(AutoGroupBox);
+        layout2->addWidget(d->NABTGroupBox);
+        layout2->addWidget(d->DetectionGroupBox);
+        //layout2->addWidget(d->SeedsGroupBox);
+        layout2->addWidget(d->gcGroupBox);
+        layout2->addWidget(d->globalParametersGroupBox);*/
+
+        widget->addTab(page1, "Main");
+        widget->addTab(page2, "Segmentation Parameters");
+
+        layoutH->addWidget(widget);
+
+        //this->addWidget( header );
+        //d->parameterWidget->addWidget( widget );
+    }
+    return d->parameterWidget;
 }
 
 bool animaLesionsSegmentation::registered()
@@ -150,10 +373,12 @@ QString animaLesionsSegmentation::description() const
 }
 
 
-/// TODO mettre la liste des parameters et au lieu de surcharger la method toolbox()
+
+/// TODO mettre la liste des parameters et au lieu de surcharger la method toolbox() (run button...)
 QList<medAbstractParameter*> animaLesionsSegmentation::parameters()
 {
-    return QList<medAbstractParameter*>();
+    //return QList<medAbstractParameter*>();
+    return d->parameters;
 }
 
 bool animaLesionsSegmentation::isInteractive()
@@ -161,12 +386,12 @@ bool animaLesionsSegmentation::isInteractive()
     return false;
 }
 
-medToolBox* animaLesionsSegmentation::toolbox()
+/*medToolBox* animaLesionsSegmentation::toolbox()
 {
     d->toolbox = new animaLesionsSegmentationToolBox;
     connect(d->toolbox, SIGNAL(runRequest()), this, SLOT(run()));
     return d->toolbox;
-}
+}*/
 
 void animaLesionsSegmentation::run()
 {
@@ -177,8 +402,13 @@ void animaLesionsSegmentation::run()
 int animaLesionsSegmentation::update()
 {
 
+    qDebug() << "in process update";
     //set manual masks: from database + segmented from paint segmentation
     //todo: AND
+
+
+
+
 
     typedef itk::Image <float,3> InputImageTypeF;
     typedef InputImageTypeF::Pointer InputImagePointerF;
@@ -206,13 +436,17 @@ int animaLesionsSegmentation::update()
     InputImagePointerUC inputSinksMask = NULL;
 
 
-    d->T1 = dynamic_cast <medAbstractImageData *> (d->toolbox->getT1());
-    d->T2 = dynamic_cast <medAbstractImageData *> (d->toolbox->getT2());
-    d->DP = dynamic_cast <medAbstractImageData *> (d->toolbox->getDP());
+    d->T1 = dynamic_cast <medAbstractImageData *> (d->parent->input<medAbstractData>(0));
+    d->T2 = dynamic_cast <medAbstractImageData *> (d->parent->input<medAbstractData>(2));
+    d->DP = dynamic_cast <medAbstractImageData *> (d->parent->input<medAbstractData>(1));
+    d->mask = dynamic_cast <medAbstractImageData *> (d->parent->input<medAbstractData>(3));
+    //d->T1 = dynamic_cast <medAbstractImageData *> (d->toolbox->getT1());
+    //d->T2 = dynamic_cast <medAbstractImageData *> (d->toolbox->getT2());
+    //d->DP = dynamic_cast <medAbstractImageData *> (d->toolbox->getDP());
 
-    d->FLAIR = dynamic_cast <medAbstractImageData *> (d->toolbox->getFLAIR());
-    d->T1Gd = dynamic_cast <medAbstractImageData *> (d->toolbox->getT1Gd());
-    d->mask = dynamic_cast <medAbstractImageData *> (d->toolbox->getMask());
+    /*d->FLAIR = dynamic_cast <medAbstractImageData *> (d->toolbox->getFLAIR());
+    d->T1Gd = dynamic_cast <medAbstractImageData *> (d->toolbox->getT1Gd());*/
+    //d->mask = dynamic_cast <medAbstractImageData *> (d->maskData);
 
 
     if(!(d->T1.isNull()))
@@ -245,6 +479,7 @@ int animaLesionsSegmentation::update()
     }
     if(!(d->mask.isNull()))
     {
+        //brainMask = this->createInputMasks(d->mask);
         brainMask = this->createInputMasks(d->mask);
         segFilter->SetMask( brainMask );
         qDebug()<<"mask set";
@@ -277,18 +512,29 @@ int animaLesionsSegmentation::update()
         segFilter->SetSinksMask( inputSinksMask );
     }
 
-    d->segAutoEnable = d->toolbox->getEnableAuto();
+
+
+    medAbstractData *in = medAbstractDataFactory::instance()->create("medItkFloat3ImageData");
+    //in->setData ( inputT1 );
+    //QString newSeriesDescription = d->toolbox->getMask()->metadata ( medMetaDataKeys::SeriesDescription.key() );
+    //QString newSeriesDescription = d->parent->input<medAbstractData>(0)->metadata ( medMetaDataKeys::SeriesDescription.key() );
+    //output->addMetaData ( medMetaDataKeys::SeriesDescription.key(), newSeriesDescription );
+    d->parent->setOutput<medAbstractData>(d->T1, 0);
+
+    //return (0);
+
+    /*d->segAutoEnable = d->toolbox->getEnableAuto();
     d->segManuEnable = d->toolbox->getEnableManu();
     d->numberOfThreads = d->toolbox->getNumberOfThreads();
     d->initMethod = d->toolbox->getInitMethod();
-    d->rejRatioHierar = d->toolbox->getRejRatioHierar();
+    //d->rejRatioHierar = d->toolbox->getRejRatioHierar();
     d->emAlgo = d->toolbox->getEmAlgo();
     d->emIter = d->toolbox->getEmIter();
     d->minDistance = d->toolbox->getMinDistance();
     d->rejRatio = d->toolbox->getRejRatio();
     d->emIter_concentration = d->toolbox->getEmIter_concentration();
-    d->em_before_concentration = d->toolbox->getEm_before_concentration();
-    d->useStrem = d->toolbox->getUseStrem();
+    d->em_before_concentration = d->toolbox->getEm_before_concentration();*/
+    /*d->useStrem = d->toolbox->getUseStrem();
     d->maha = d->toolbox->getMaha();
     d->fuzzyRuleMin = d->toolbox->getFuzzyRuleMin();
     d->fuzzyRuleMax = d->toolbox->getFuzzyRuleMax();
@@ -308,17 +554,17 @@ int animaLesionsSegmentation::update()
     d->intensityT2 = d->toolbox->getIntensityT2();
     d->intensityDP = d->toolbox->getIntensityDP();
     d->intensityFLAIR = d->toolbox->getIntensityFLAIR();
-    d->useFormerSegModel = d->toolbox->getUseFormerSegModel();
+    d->useFormerSegModel = d->toolbox->getUseFormerSegModel();*/
 
     // Set parameters
     segFilter->SetSegAutoEnable( d->segAutoEnable );
     segFilter->SetSegManuEnable( d->segManuEnable );
-    segFilter->SetVerbose(false);
+    segFilter->SetVerbose(true);
     segFilter->SetNumberOfThreads( d->numberOfThreads );
 
     segFilter->SetUseT2( d->useT2 );
-    segFilter->SetUseFLAIR( d->useDP );
-    segFilter->SetUseDP( d->useFLAIR );
+    segFilter->SetUseDP( d->useDP );
+    segFilter->SetUseFLAIR( d->useFLAIR );
 
     segFilter->SetInitMethodType( d->initMethod );
     segFilter->SetRejRatioHierar( d->rejRatioHierar );
@@ -358,6 +604,15 @@ int animaLesionsSegmentation::update()
         segFilter->SetSolution(d->FiniteModelSolution);
     }
 
+    /*std::string outputGCFile="/home/lcatanes/outGC.nii";
+     segFilter->SetOutputGCFilename(outputGCFile);
+
+     std::string outputSourcesFile="/home/lcatanes/outSources.nii";
+     segFilter->SetOutputSourcesFilename(outputSourcesFile);
+
+      std::string outputFile="/home/lcatanes/outlesions.nii";
+      segFilter-> SetOutputLesionFilename(outputFile);*/
+
     // Run the segmentation
     time_t t1 = clock();
     try
@@ -383,17 +638,32 @@ int animaLesionsSegmentation::update()
     d->lesionLoad = segFilter->GetLesionLoad();
     d->lesionLoadVector = segFilter->GetLesionLoadVector();
 
-    QString identifier = d->toolbox->getMask()->identifier();
-    d->output = dynamic_cast <medAbstractImageData *> (medAbstractDataFactory::instance()->create (identifier));
-    d->output->setData(segFilter->GetOutputWholeSeg());
+
+    medAbstractData *output = medAbstractDataFactory::instance()->create("medItkFloat3ImageData");
+    output->setData ( segFilter->GetOutputWholeSeg() );
+    //QString newSeriesDescription = d->toolbox->getMask()->metadata ( medMetaDataKeys::SeriesDescription.key() );
+    QString newSeriesDescription = d->parent->input<medAbstractData>(0)->metadata ( medMetaDataKeys::SeriesDescription.key() );
+    output->addMetaData ( medMetaDataKeys::SeriesDescription.key(), newSeriesDescription );
+    d->parent->setOutput<medAbstractData>(output, 0);
+
+
+
+
+     /*medAbstractData *in = medAbstractDataFactory::instance()->create("medItkFloat3ImageData");
+     in->setData ( segFilter->GetOutputWholeSeg() );
+     QString newSeriesDescription = d->toolbox->getMask()->metadata ( medMetaDataKeys::SeriesDescription.key() );
+     QString newSeriesDescription = d->parent->input<medAbstractData>(0)->metadata ( medMetaDataKeys::SeriesDescription.key() );
+     output->addMetaData ( medMetaDataKeys::SeriesDescription.key(), newSeriesDescription );
+     d->parent->setInput<medAbstractData>(d->maskData, 0);*/
+
 
     return(0);
 }
 
-medAbstractData * animaLesionsSegmentation::output()
+/*medAbstractData * animaLesionsSegmentation::output()
 {
     return d->output;
-}
+}*/
 
 /*void animaLesionsSegmentation::emitProgressed(int progression)
 {

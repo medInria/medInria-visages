@@ -27,14 +27,17 @@ public:
 
     QList<medAbstractParameter*> parameters();
 
+    QWidget* parameterWidget();
+
     bool isInteractive();
 
-    virtual medToolBox* toolbox();
+    //virtual medToolBox* toolbox();
 
     static bool registered(void);
     itk::Image <float,3>::Pointer createInputImages(medAbstractImageData *data);
     itk::Image <unsigned char,3>::Pointer createInputMasks(medAbstractImageData *medInput);
 
+    //virtual medViewContainerSplitter* viewContainerSplitter();
 
 public slots:
     void run();
@@ -45,7 +48,9 @@ public slots:
     int update(void);
 
     //! The output will be available through here
-    medAbstractData *output(void);
+    //medAbstractData *output(void);
+
+    void onMaskDropped(const medDataIndex& index);
 
 private:
     animaLesionsSegmentationPrivate *d;
