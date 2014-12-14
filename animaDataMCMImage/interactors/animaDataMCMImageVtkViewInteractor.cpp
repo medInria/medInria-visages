@@ -7,12 +7,14 @@
 #include <vtkImageView2D.h>
 #include <vtkImageView3D.h>
 #include <vtkRenderer.h>
+#include <vtkProperty.h>
 
 #include <medAbstractData.h>
 #include <medAbstractParameter.h>
 #include <medStringListParameter.h>
 #include <medIntParameter.h>
 #include <medBoolParameter.h>
+#include <medDoubleParameter.h>
 #include <medAbstractImageView.h>
 #include <medViewFactory.h>
 #include <medVtkViewBackend.h>
@@ -41,7 +43,10 @@ public:
 
     medIntParameter *slicingParameter;
 
-    //  The filters will convert from itk SH image format to vtkStructuredPoint (format handled by the SH manager)
+    typedef vtkSmartPointer <vtkProperty>  PropertySmartPointer;
+    PropertySmartPointer actorProperty;
+
+    //  The filters will convert from itk MCM image format to vtkStructuredPoint (format handled by the MCM manager)
 
     animaMCMITKToVTKFilter<itk::VectorImage<float,3> >::Pointer  filterFloat;
     animaMCMITKToVTKFilter<itk::VectorImage<double,3> >::Pointer filterDouble;
@@ -60,6 +65,8 @@ public:
 
         manager->SetInput(filter->GetVTKMCMData());
         manager->SetMatrixT(filter->GetDirectionMatrix());
+
+        manager->ResetPosition();
 
         manager->Update();
         data = d;
@@ -99,7 +106,6 @@ animaDataMCMImageVtkViewInteractor::animaDataMCMImageVtkViewInteractor(medAbstra
             this, SLOT(setPosition(QVector3D)));
 
     d->slicingParameter = new medIntParameter("Slicing", this);
-
 }
 
 animaDataMCMImageVtkViewInteractor::~animaDataMCMImageVtkViewInteractor()
@@ -164,6 +170,11 @@ void animaDataMCMImageVtkViewInteractor::setInputData(medAbstractData *data)
     d->view2d->SetInput(d->manager->GetMCMVisuManagerAxial()->GetActor(), d->view->layer(d->data), dim);
     d->view2d->SetInput(d->manager->GetMCMVisuManagerSagittal()->GetActor(), d->view->layer(d->data), dim);
     d->view2d->SetInput(d->manager->GetMCMVisuManagerCoronal()->GetActor(), d->view->layer(d->data), dim);
+
+    d->actorProperty = animaDataMCMImageVtkViewInteractorPrivate::PropertySmartPointer::New();
+    d->manager->GetMCMVisuManagerAxial()->GetActor()->SetProperty( d->actorProperty );
+    d->manager->GetMCMVisuManagerSagittal()->GetActor()->SetProperty( d->actorProperty );
+    d->manager->GetMCMVisuManagerCoronal()->GetActor()->SetProperty( d->actorProperty );
 
     setupParameters();
 }
@@ -257,7 +268,9 @@ void animaDataMCMImageVtkViewInteractor::setWindowLevel(QHash<QString,QVariant>)
 
 void animaDataMCMImageVtkViewInteractor::setOpacity(double opacity)
 {
-    //TODO
+    d->actorProperty->SetOpacity(opacity);
+
+    d->view->render();
 }
 
 void animaDataMCMImageVtkViewInteractor::setVisibility(bool visibility)
@@ -376,7 +389,8 @@ void animaDataMCMImageVtkViewInteractor::moveToSlice(int slice)
 
 QWidget* animaDataMCMImageVtkViewInteractor::buildLayerWidget()
 {
-    return new QWidget;
+    this->opacityParameter()->getSlider()->setOrientation(Qt::Horizontal);
+    return this->opacityParameter()->getSlider();
 }
 
 QWidget* animaDataMCMImageVtkViewInteractor::buildToolBoxWidget()
@@ -398,7 +412,7 @@ QWidget* animaDataMCMImageVtkViewInteractor::buildToolBarWidget()
 QList<medAbstractParameter*> animaDataMCMImageVtkViewInteractor::linkableParameters()
 {
     QList <medAbstractParameter*> linkableParams = d->parameters;
-    linkableParams << this->visibilityParameter();
+    linkableParams << this->visibilityParameter() << this->opacityParameter();
     return linkableParams;
 }
 
