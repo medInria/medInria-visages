@@ -159,9 +159,6 @@ int vtkMCMGlyph::RequestData(vtkInformation*,vtkInformationVector** inputVector,
     vtkPoints* newPts = vtkPoints::New();
     newPts->Allocate(newpts_sz);
 
-    vtkPointData* newPointData = vtkPointData::New();
-    newPointData->Allocate(newpts_sz);
-
     // Setting up for calls to PolyData::InsertNextCell()
     vtkPolyData* output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
     vtkPointData* outPD = output->GetPointData();
@@ -204,14 +201,6 @@ int vtkMCMGlyph::RequestData(vtkInformation*,vtkInformationVector** inputVector,
 
     vtkFloatArray* newScalars = vtkFloatArray::New();
     newScalars->Allocate(numDirs*numPts*numSourcePts);
-
-    if (pd->GetNormals())
-    {
-        vtkFloatArray* newNormals = vtkFloatArray::New();
-        newNormals->SetNumberOfComponents(3);
-        newNormals->Allocate(numDirs*3*numPts*numSourcePts);
-        newNormals->Delete();
-    }
 
     // First copy all topology (transformation independent)
     for (vtkIdType inPtId=0,inPtIdReal=0;inPtId<numPts;++inPtId)
@@ -307,7 +296,6 @@ int vtkMCMGlyph::RequestData(vtkInformation*,vtkInformationVector** inputVector,
     newScalars->Delete();
 
     newPts->Delete();
-    newPointData->Delete();
     trans->Delete();
 
     return 1;
