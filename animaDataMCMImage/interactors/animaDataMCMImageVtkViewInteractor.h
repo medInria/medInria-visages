@@ -97,6 +97,8 @@ public slots:
 
     virtual void moveToSlice (int slice);
 
+    virtual void changeOrientationVisibility();
+
 protected:
     void setupParameters();
 

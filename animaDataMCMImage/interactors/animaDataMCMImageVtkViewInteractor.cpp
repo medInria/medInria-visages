@@ -79,6 +79,7 @@ animaDataMCMImageVtkViewInteractor::animaDataMCMImageVtkViewInteractor(medAbstra
     d->data = 0;
 
     d->view = dynamic_cast<medAbstractImageView*>(parent);
+    connect(d->view,SIGNAL(orientationChanged()),this,SLOT(changeOrientationVisibility()), Qt::UniqueConnection);
 
     medVtkViewBackend* backend = static_cast<medVtkViewBackend*>(parent->backend());
     d->view2d = backend->view2D;
@@ -244,15 +245,15 @@ void animaDataMCMImageVtkViewInteractor::setupParameters()
     {
         switch(d->view2d->GetViewOrientation())
         {
-        case vtkImageView2D::VIEW_ORIENTATION_AXIAL:
-            d->view->setOrientation(medImageView::VIEW_ORIENTATION_AXIAL);
-            break;
-        case vtkImageView2D::VIEW_ORIENTATION_SAGITTAL:
-            d->view->setOrientation(medImageView::VIEW_ORIENTATION_SAGITTAL);
-            break;
-        case vtkImageView2D::VIEW_ORIENTATION_CORONAL:
-            d->view->setOrientation(medImageView::VIEW_ORIENTATION_CORONAL);
-            break;
+            case vtkImageView2D::VIEW_ORIENTATION_AXIAL:
+                d->view->setOrientation(medImageView::VIEW_ORIENTATION_AXIAL);
+                break;
+            case vtkImageView2D::VIEW_ORIENTATION_SAGITTAL:
+                d->view->setOrientation(medImageView::VIEW_ORIENTATION_SAGITTAL);
+                break;
+            case vtkImageView2D::VIEW_ORIENTATION_CORONAL:
+                d->view->setOrientation(medImageView::VIEW_ORIENTATION_CORONAL);
+                break;
         }
     }
 
@@ -280,6 +281,34 @@ void animaDataMCMImageVtkViewInteractor::setVisibility(bool visibility)
     d->manager->GetMCMVisuManagerAxial()->GetActor()->SetVisibility(v);
     d->manager->GetMCMVisuManagerSagittal()->GetActor()->SetVisibility(v);
     d->manager->GetMCMVisuManagerCoronal()->GetActor()->SetVisibility(v);
+
+    this->update();
+}
+
+void animaDataMCMImageVtkViewInteractor::changeOrientationVisibility()
+{
+    d->manager->GetMCMVisuManagerAxial()->GetActor()->SetVisibility(0);
+    d->manager->GetMCMVisuManagerSagittal()->GetActor()->SetVisibility(0);
+    d->manager->GetMCMVisuManagerCoronal()->GetActor()->SetVisibility(0);
+
+    switch(d->view->orientation())
+    {
+        case medImageView::VIEW_ORIENTATION_AXIAL:
+            d->manager->GetMCMVisuManagerAxial()->GetActor()->SetVisibility(1);
+            break;
+        case medImageView::VIEW_ORIENTATION_SAGITTAL:
+            d->manager->GetMCMVisuManagerSagittal()->GetActor()->SetVisibility(1);
+            break;
+        case medImageView::VIEW_ORIENTATION_CORONAL:
+            d->manager->GetMCMVisuManagerCoronal()->GetActor()->SetVisibility(1);
+            break;
+        case medImageView::VIEW_ORIENTATION_3D:
+        default:
+            d->manager->GetMCMVisuManagerAxial()->GetActor()->SetVisibility(1);
+            d->manager->GetMCMVisuManagerSagittal()->GetActor()->SetVisibility(1);
+            d->manager->GetMCMVisuManagerCoronal()->GetActor()->SetVisibility(1);
+            break;
+    }
 
     this->update();
 }
