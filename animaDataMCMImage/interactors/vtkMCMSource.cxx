@@ -28,7 +28,11 @@ vtkMCMSource::vtkMCMSource(const int tess)
     Center[0] = 0.0;
     Center[1] = 0.0;
     Center[2] = 0.0;
+
     RotationMatrix = 0;
+    InverseRotationMatrix = vtkMatrix4x4::New();
+    InverseRotationMatrix->Identity();
+
     Normalization = false;
 
     SetNumberOfInputPorts(0);
@@ -59,6 +63,16 @@ vtkMCMSource::~vtkMCMSource()
         delete[] MCMData;
 
     MCMData = 0;
+}
+
+void vtkMCMSource::SetRotationMatrix(vtkMatrix4x4 *mat)
+{
+    if (!mat)
+        return;
+
+    vtkSetObjectBodyMacro(RotationMatrix, vtkMatrix4x4, mat);
+
+    vtkMatrix4x4::Invert(this->RotationMatrix, this->InverseRotationMatrix);
 }
 
 int *vtkMCMSource::GetTesselationRange()
@@ -103,13 +117,6 @@ int vtkMCMSource::RequestData(vtkInformation *vtkNotUsed(request),vtkInformation
         return 1;
     }
 
-    vtkMatrix4x4 *InverseRotationMatrix = 0;
-    if (RotationMatrix)
-    {
-        InverseRotationMatrix = vtkMatrix4x4::New();
-        vtkMatrix4x4::Invert(RotationMatrix,InverseRotationMatrix);
-    }
-
     vtkPoints* vertices = sphereT->GetOutput()->GetPoints();
     vnl_vector_fixed <double,3> point;
 
@@ -126,7 +133,11 @@ int vtkMCMSource::RequestData(vtkInformation *vtkNotUsed(request),vtkInformation
         p[3] = 1.0;
 
         if (InverseRotationMatrix)
-            InverseRotationMatrix->MultiplyDoublePoint(p);
+        {
+            const double *pTmp = InverseRotationMatrix->MultiplyDoublePoint(p);
+            for (unsigned int j = 0;j < 3;++j)
+                p[j] = pTmp[j];
+        }
 
         for (unsigned int j = 0;j < 3;++j)
             point[j] = (FlipVector[j]) ? -p[j] : p[j];
@@ -164,7 +175,7 @@ int vtkMCMSource::RequestData(vtkInformation *vtkNotUsed(request),vtkInformation
             }
             else
             {
-                double normalizedValue = sValues->GetTuple1(i) / 10000;
+                double normalizedValue = sValues->GetTuple1(i) / 1000;
                 sValues->SetTuple1(i,normalizedValue);
             }
         }
@@ -203,9 +214,9 @@ int vtkMCMSource::RequestInformation(vtkInformation*,vtkInformationVector**,vtkI
 
     outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
     outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
-                 Center[0]-1,Center[0]+1,
-            Center[1]-1,Center[1]+1,
-            Center[2]-1,Center[2]+1);
+                 Center[0]-0.5,Center[0]+0.4,
+            Center[1]-0.4,Center[1]+0.4,
+            Center[2]-0.4,Center[2]+0.4);
 
     return 1;
 }
@@ -231,13 +242,14 @@ void vtkMCMSource::TranslateAndDeformShell(vtkPolyData *shell,vtkPoints* outPts,
                                            vtkMatrix4x4* transform)
 {
     vtkPoints* inPts = shell->GetPoints();
-    const int  n = inPts->GetNumberOfPoints();
+    const int n = inPts->GetNumberOfPoints();
 
-    vtkDataArray* sValues  = shell->GetPointData()->GetScalars();
+    vtkDataArray* sValues = shell->GetPointData()->GetScalars();
 
+    double point[4];
+    point[3] = 1;
     for (int i=0;i<n;++i)
     {
-        double point[4];
         inPts->GetPoint(i,point);
 
         const double val = sValues->GetTuple1(i);
@@ -245,7 +257,6 @@ void vtkMCMSource::TranslateAndDeformShell(vtkPolyData *shell,vtkPoints* outPts,
         point[1] = val*point[1];
         point[2] = val*point[2];
 
-        point[3] = 1.0;
         const double* pointOut = (transform!=0) ? transform->MultiplyDoublePoint(point) : &point[0];
         outPts->InsertNextPoint(pointOut[0]+center[0],pointOut[1]+center[1],pointOut[2]+center[2]);
     }

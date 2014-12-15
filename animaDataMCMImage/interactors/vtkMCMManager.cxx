@@ -1,5 +1,6 @@
 #include <vtkMCMManager.h>
 #include <vtkObjectFactory.h>
+#include <vtkMath.h>
 
 vtkCxxRevisionMacro(vtkMCMManager, "$Revision: 477 $");
 vtkStandardNewMacro(vtkMCMManager);
@@ -9,12 +10,15 @@ vtkMCMManager::vtkMCMManager()
     RenderWindowInteractor = 0;
 
     Input = 0;
-    MatrixT = 0;
+    DirectionMatrix = 0;
     Renderer = 0;
 
     MCMVisuManagerAxial = vtkMCMVisuManager::New();
     MCMVisuManagerSagittal = vtkMCMVisuManager::New();
     MCMVisuManagerCoronal = vtkMCMVisuManager::New();
+
+    this->PhysicalToVoxelCoordinatesTransformMatrix = vtkMatrix4x4::New();
+    this->PhysicalToVoxelCoordinatesTransformMatrix->Identity();
 
     for(int i=0;i<3;++i)
         CurrentPosition[i] = 0;
@@ -30,8 +34,8 @@ vtkMCMManager::~vtkMCMManager()
     if (Input)
         Input->Delete();
 
-    if (MatrixT)
-        MatrixT->Delete();
+    if (DirectionMatrix)
+        DirectionMatrix->Delete();
 
     if (MCMVisuManagerAxial)
         MCMVisuManagerAxial->Delete();
@@ -105,9 +109,9 @@ void vtkMCMManager::Update()
     const int Y = clamp(CurrentPosition[1],dims[1]);
     const int Z = clamp(CurrentPosition[2],dims[2]);
 
-    MCMVisuManagerAxial->SetMatrixT(MatrixT);
-    MCMVisuManagerSagittal->SetMatrixT(MatrixT);
-    MCMVisuManagerCoronal->SetMatrixT(MatrixT);
+    MCMVisuManagerAxial->SetMatrixT(DirectionMatrix);
+    MCMVisuManagerSagittal->SetMatrixT(DirectionMatrix);
+    MCMVisuManagerCoronal->SetMatrixT(DirectionMatrix);
 
     // synchronize with VOI
     MCMVisuManagerSagittal->SetVOI(X, X, 0, dims[1]-1, 0, dims[2]-1);
@@ -125,6 +129,16 @@ void vtkMCMManager::Update()
         Renderer->AddActor(MCMVisuManagerSagittal->GetActor());
         Renderer->AddActor(MCMVisuManagerCoronal->GetActor());
     }
+}
+
+void vtkMCMManager::SetDirectionMatrix(vtkMatrix4x4 *mat)
+{
+    if (!mat)
+        return;
+
+    vtkSetObjectBodyMacro(DirectionMatrix, vtkMatrix4x4, mat);
+
+    vtkMatrix4x4::Invert(this->DirectionMatrix, this->PhysicalToVoxelCoordinatesTransformMatrix);
 }
 
 void vtkMCMManager::SetCurrentPosition(const int& X, const int& Y, const int& Z)
@@ -153,6 +167,32 @@ void vtkMCMManager::SetCurrentPosition(const int& X, const int& Y, const int& Z)
 void vtkMCMManager::SetCurrentPosition(const int pos[3])
 {
     SetCurrentPosition(pos[0], pos[1], pos[2]);
+}
+
+void vtkMCMManager::SetCurrentPosition (double pos[3])
+{
+  this->SetCurrentPosition (pos[0], pos[1], pos[2]);
+}
+
+void vtkMCMManager::SetCurrentPosition(const double& X, const double& Y, const double& Z)
+{
+    if( !this->Input )
+    {
+      return;
+    }
+
+    double *spacing = this->Input->GetSpacing();
+    double *origin  = this->Input->GetOrigin();
+
+    double pos[4]={X, Y, Z, 1.0};
+
+    this->PhysicalToVoxelCoordinatesTransformMatrix->MultiplyPoint(pos, pos);
+
+    int vox_pos[3];
+    for (int i=0; i<3; i++)
+        vox_pos[i] = vtkMath::Round((pos[i]-origin[i])/spacing[i]);
+
+    this->SetCurrentPosition(vox_pos[0], vox_pos[1], vox_pos[2]);
 }
 
 void vtkMCMManager::ResetPosition()

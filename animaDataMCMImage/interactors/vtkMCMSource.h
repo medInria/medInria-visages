@@ -75,7 +75,7 @@ public:
 
     /** Set the rotation matrix that defines the individual tesselated deformed
       *  sphere pose. virtual*/
-    vtkSetObjectMacro(RotationMatrix,vtkMatrix4x4);
+    void SetRotationMatrix (vtkMatrix4x4 *mat);
 
     /** Get the rotation matrix that defines the individual tesselated deformed
       *  sphere pose. virtual*/
@@ -118,6 +118,7 @@ protected:
     bool Normalization;
 
     vtkMatrix4x4 *RotationMatrix;
+    vtkMatrix4x4 *InverseRotationMatrix;
 
 private:
     vtkMCMSource(const vtkMCMSource&);  // Not implemented.

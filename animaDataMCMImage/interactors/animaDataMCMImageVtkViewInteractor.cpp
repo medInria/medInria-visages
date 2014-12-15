@@ -64,7 +64,7 @@ public:
         filter->Update();
 
         manager->SetInput(filter->GetVTKMCMData());
-        manager->SetMatrixT(filter->GetDirectionMatrix());
+        manager->SetDirectionMatrix(filter->GetDirectionMatrix());
 
         manager->ResetPosition();
 
