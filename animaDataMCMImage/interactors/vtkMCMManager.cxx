@@ -169,7 +169,7 @@ void vtkMCMManager::SetCurrentPosition(const int pos[3])
     SetCurrentPosition(pos[0], pos[1], pos[2]);
 }
 
-void vtkMCMManager::SetCurrentPosition (double pos[3])
+void vtkMCMManager::SetCurrentPosition (const double pos[3])
 {
   this->SetCurrentPosition (pos[0], pos[1], pos[2]);
 }
