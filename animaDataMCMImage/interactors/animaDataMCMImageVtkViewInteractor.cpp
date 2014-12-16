@@ -33,6 +33,7 @@ public:
     vtkImageView2D *view2d;
     vtkImageView3D *view3d;
     vtkRenderWindow *render;
+    vtkMatrix4x4 *orientationMatrix;
 
     QList <medAbstractParameter*> parameters;
     vtkMCMManager *manager;
@@ -63,6 +64,25 @@ public:
         filter->SetInput(dataset);
         filter->Update();
 
+        itk::ImageBase<3>::DirectionType directions = dataset->GetDirection();
+        itk::ImageBase<3>::PointType origin = dataset->GetOrigin();
+        orientationMatrix = vtkMatrix4x4::New();
+        orientationMatrix->Identity();
+        for (int i=0; i<3; i++)
+            for (int j=0; j<3; j++)
+                orientationMatrix->SetElement (i, j, directions (i,j));
+        double v_origin[4], v_origin2[4];
+        for (int i=0; i<3; i++)
+            v_origin[i] = origin[i];
+        v_origin[3] = 1.0;
+        orientationMatrix->MultiplyPoint (v_origin, v_origin2);
+        for (int i=0; i<3; i++)
+            orientationMatrix->SetElement (i, 3, v_origin[i]-v_origin2[i]);
+
+        double v_spacing[3];
+        for (int i=0; i<3; i++)
+            v_spacing[i] = dataset->GetSpacing()[i];
+
         manager->SetInput(filter->GetVTKMCMData());
         manager->SetDirectionMatrix(filter->GetDirectionMatrix());
 
@@ -70,6 +90,15 @@ public:
 
         manager->Update();
         data = d;
+
+        if (view)
+        {
+            int dim[3];
+            manager->GetMCMDimensions(dim);
+            view2d->SetInput(manager->GetMCMVisuManagerAxial()->GetActor(), view->layer(data), orientationMatrix, dim, v_spacing, v_origin);
+            view2d->SetInput(manager->GetMCMVisuManagerSagittal()->GetActor(), view->layer(data), orientationMatrix, dim, v_spacing, v_origin);
+            view2d->SetInput(manager->GetMCMVisuManagerCoronal()->GetActor(), view->layer(data), orientationMatrix, dim, v_spacing, v_origin);
+        }
     }
 };
 
@@ -85,6 +114,7 @@ animaDataMCMImageVtkViewInteractor::animaDataMCMImageVtkViewInteractor(medAbstra
     d->view2d = backend->view2D;
     d->view3d = backend->view3D;
     d->render = backend->renWin;
+    d->orientationMatrix = 0;
 
     d->manager = vtkMCMManager::New();
 
@@ -165,12 +195,6 @@ void animaDataMCMImageVtkViewInteractor::setInputData(medAbstractData *data)
         qDebug() << "Unrecognized MCM data type: " << identifier;
         return;
     }
-
-    int dim[3];
-    d->manager->GetMCMDimensions(dim);
-    d->view2d->SetInput(d->manager->GetMCMVisuManagerAxial()->GetActor(), d->view->layer(d->data), dim);
-    d->view2d->SetInput(d->manager->GetMCMVisuManagerSagittal()->GetActor(), d->view->layer(d->data), dim);
-    d->view2d->SetInput(d->manager->GetMCMVisuManagerCoronal()->GetActor(), d->view->layer(d->data), dim);
 
     d->actorProperty = animaDataMCMImageVtkViewInteractorPrivate::PropertySmartPointer::New();
     d->manager->GetMCMVisuManagerAxial()->GetActor()->SetProperty( d->actorProperty );
