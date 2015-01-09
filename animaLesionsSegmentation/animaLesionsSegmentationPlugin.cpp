@@ -4,7 +4,6 @@
 
 #include "animaLesionsSegmentation.h"
 #include "animaLesionsSegmentationPlugin.h"
-#include "animaLesionsSegmentationToolBox.h"
 
 #include <dtkLog/dtkLog.h>
 
@@ -41,11 +40,6 @@ bool animaLesionsSegmentationPlugin::initialize(void)
     if(!animaLesionsSegmentation::registered())
     {
         dtkWarn() << "Unable to register animaLesionsSegmentation type";
-    }
-
-    if ( !animaLesionsSegmentationToolBox::registered() )
-    {
-        dtkWarn() << "Unable to register animaLesionsSegmentation toolbox";
     }
 
     return true;

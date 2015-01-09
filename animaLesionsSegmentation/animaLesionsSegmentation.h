@@ -11,6 +11,7 @@
 #include <itkImageFileReader.h>
 #include "animaLesionsSegmentationPluginExport.h"
 
+
 class animaLesionsSegmentationPrivate;
 
 class ANIMALESIONSSEGMENTATIONPLUGIN_EXPORT animaLesionsSegmentation : public medAbstractSegmentationProcess
@@ -37,7 +38,11 @@ public:
     itk::Image <float,3>::Pointer createInputImages(medAbstractImageData *data);
     itk::Image <unsigned char,3>::Pointer createInputMasks(medAbstractImageData *medInput);
 
-    //virtual medViewContainerSplitter* viewContainerSplitter();
+    virtual medViewContainerSplitter* viewContainerSplitter();
+
+    void setDataInContainer(medAbstractData *medInput, int &pos, QString mod);
+    void checkNbSequences();
+    void removeSeq(int &pos);
 
 public slots:
     void run();
@@ -50,7 +55,43 @@ public slots:
     //! The output will be available through here
     //medAbstractData *output(void);
 
+    void onClearImagesClicked();    
+    void onClearManuSegMaskClicked();
+    void onClearExternalMaskClicked();
+
+    void displayOutputs();
+    void displayWarnings();
+
     void onMaskDropped(const medDataIndex& index);
+    void onT1Dropped(const medDataIndex& index);
+    void onT2Dropped(const medDataIndex& index);
+    void onDPDropped(const medDataIndex& index);
+    void onFLAIRDropped(const medDataIndex& index);
+    void onT1GdDropped(const medDataIndex& index);
+
+    void onManuSegMaskDropped(const medDataIndex& index);
+    void onExternalMaskDropped(const medDataIndex& index);
+
+    void chooseT1changed(bool state);
+    void chooseT2changed(bool state);
+    void chooseDPchanged(bool state);
+    void chooseFLAIRchanged(bool state);
+    void chooseT1Gdchanged(bool state);
+
+
+    void ChangeAutomaticState(bool);
+    void ChangeManuState(bool);
+    void CheckedStrem(bool);
+    void CheckedFuzzy(bool);
+    void updateRejectionFeatures(int);
+    void ChangedIntensityState(bool);
+
+    void currentLayerChangedSlot();
+    void viewChangedSlot();
+    void viewContentChangedSlotView1();
+    void viewContentChangedSlotView2();
+    void viewContentChangedSlotView3();
+
 
 private:
     animaLesionsSegmentationPrivate *d;

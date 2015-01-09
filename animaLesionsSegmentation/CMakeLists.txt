@@ -53,12 +53,10 @@ include(${ANIMA_USE_FILE})
 
 set(${PROJECT_NAME}_HEADERS_MOC
   animaLesionsSegmentationPlugin.h
-  animaLesionsSegmentationToolBox.h
   animaLesionsSegmentation.h)
 
 set(${PROJECT_NAME}_SOURCES
   animaLesionsSegmentationPlugin.cpp
-  animaLesionsSegmentationToolBox.cpp
   animaLesionsSegmentation.cpp
   )
 
