@@ -738,7 +738,6 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
     return split;
 }
 
-
 void animaLesionsSegmentation::viewContentChangedSlotView1()
 {
     medAbstractView *view1 = d->containerImage1->view();
@@ -746,34 +745,30 @@ void animaLesionsSegmentation::viewContentChangedSlotView1()
     if(!imageView1)
         return;
 
-    medAbstractData *data = imageView1->layerData(imageView1->layersCount()-1);
-    if(!data)
-    {
+    medImageMaskAnnotationData * existingMaskAnnData1 = dynamic_cast<medImageMaskAnnotationData *>(imageView1->layerData(1));
+    if(!existingMaskAnnData1)
         return;
-    }
-
-    medImageMaskAnnotationData * existingMaskAnnData = dynamic_cast<medImageMaskAnnotationData *>(data);
-    if(!existingMaskAnnData)
-    {
-        return;
-    }
 
     medAbstractView *view3 = d->containerImage3->view();
     medAbstractImageView * imageView3 = dynamic_cast<medAbstractImageView *>(view3);
-    if(!imageView3)
-        return;
+    if(imageView3)
+    {
+        imageView3->addLayer(existingMaskAnnData1);
 
-
-    imageView3->addLayer(data);
-
-
+        medAbstractData * referenceData3 = imageView3->layerData(0);
+        if(referenceData3)
+          referenceData3->addAttachedData(existingMaskAnnData1);
+    }
 
     medAbstractView *view2 = d->containerImage2->view();
     medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
-    if(!imageView2)
-        return;
-
-    imageView2->addLayer(data);
+    if(imageView2)
+    {
+        imageView2->addLayer(existingMaskAnnData1);
+        medAbstractData * referenceData2 = imageView2->layerData(0);
+        if(referenceData2)
+          referenceData2->addAttachedData(existingMaskAnnData1);
+    }
 
 
         /*medAbstractData *data2 =  dynamic_cast <medAbstractData *> ( data );
