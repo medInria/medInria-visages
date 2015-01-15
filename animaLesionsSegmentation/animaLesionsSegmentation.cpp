@@ -32,6 +32,7 @@
 #include <medPluginManager.h>
 #include <medAbstractView.h>
 #include <medAbstractImageView.h>
+#include <medViewContainerSplitter.h>
 
 #include <itkRescaleIntensityImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
@@ -699,6 +700,92 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
 {
     medViewContainerSplitter* split = medAbstractProcess::viewContainerSplitter();
 
+
+    /*QPointer<medViewContainerSplitter> viewContainerSplitter;
+    if(viewContainerSplitter.isNull())
+    {
+        viewContainerSplitter = new medViewContainerSplitter;
+        QList<medInputDataPort*> inputDataPortList;
+        QList<medOutputDataPort*> outputDataPortList;
+
+        foreach(medProcessIOPort *port, this->inputs())
+        {
+            medInputDataPort* input = reinterpret_cast< medInputDataPort*>(port);
+            if(input)
+                inputDataPortList << input;
+        }
+        foreach(medProcessIOPort *port, this->outputs())
+        {
+            medOutputDataPort *output = reinterpret_cast<medOutputDataPort*>(port);
+            if(output)
+                outputDataPortList << output;
+        }
+
+        medViewContainer* inputContainer;
+        medViewContainer* outputContainer;
+
+        if(!inputDataPortList.isEmpty())
+        {
+            inputContainer = new medViewContainer;
+            medInputDataPort* i = inputDataPortList.takeFirst();
+            inputContainer->addData(i->input());
+            viewContainerSplitter->addViewContainer(inputContainer);
+            //containerForInputPort[i] = inputContainer;
+            inputContainer->setClosingMode(medViewContainer::CLOSE_VIEW_ONLY);
+            inputContainer->setDefaultWidget(new QLabel(i->name()));
+            inputContainer->setUserSplittable(false);
+            inputContainer->setMultiLayered(false);
+
+            connect(inputContainer, SIGNAL(viewContentChanged()), this, SLOT(handleInput()));
+            connect(inputContainer, SIGNAL(viewRemoved()), this, SLOT(handleInput()));
+
+            foreach(medInputDataPort* i, inputDataPortList)
+            {
+                medViewContainer *container = inputContainer->splitHorizontally();
+                container->addData(i->input());
+                //containerForInputPort[i] = container;
+                container->setClosingMode(medViewContainer::CLOSE_VIEW_ONLY);
+                container->setDefaultWidget(new QLabel(i->name()));
+                container->setUserSplittable(false);
+                container->setMultiLayered(false);
+
+                connect(container, SIGNAL(viewContentChanged()), this, SLOT(handleInput()));
+                connect(container, SIGNAL(viewRemoved()), this, SLOT(handleInput()));
+            }
+        }
+
+       /* if(!outputDataPortList.isEmpty())
+        {
+            outputContainer = new medViewContainer;
+            medOutputDataPort* o = outputDataPortList.takeFirst();
+            viewContainerSplitter->addViewContainer(outputContainer);
+            containerForOutputPort[o] = outputContainer;
+            outputContainer->setClosingMode(medViewContainer::CLOSE_VIEW_ONLY);
+            outputContainer->setDefaultWidget(new QLabel(o->name()));
+            outputContainer->setUserOpenable(false);
+            outputContainer->setUserSplittable(false);
+            outputContainer->setMultiLayered(false);
+
+            foreach(medOutputDataPort* o, outputDataPortList)
+            {
+                medViewContainer *container = outputContainer->splitHorizontally();
+                container->addData(o->output());
+                d->containerForOutputPort[o] = container;
+                container->setClosingMode(medViewContainer::CLOSE_VIEW_ONLY);
+                container->setDefaultWidget(new QLabel(o->name()));
+                container->setUserOpenable(false);
+                container->setUserSplittable(false);
+                container->setMultiLayered(false);
+            }
+        }
+
+        viewContainerSplitter->adjustContainersSize();
+    }*/
+   // return viewContainerSplitter;
+
+
+
+
     typedef medProcessInput<medAbstractData> medInputDataPort;
 
     medProcessIOPort *inputPort1 = this->inputs()[0];
@@ -731,7 +818,7 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
         d->containerImage3->setClosingMode(medViewContainer::CLOSE_BUTTON_HIDDEN);
     }
 
-    connect(d->containerImage1, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView1()));
+    //connect(d->containerImage1, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView1()));
   //  connect(d->containerImage2, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView2()));
   //  connect(d->containerImage3, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView3()));
 
@@ -740,6 +827,7 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
 
 void animaLesionsSegmentation::viewContentChangedSlotView1()
 {
+
     medAbstractView *view1 = d->containerImage1->view();
     medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
     if(!imageView1)
@@ -747,7 +835,10 @@ void animaLesionsSegmentation::viewContentChangedSlotView1()
 
     medImageMaskAnnotationData * existingMaskAnnData1 = dynamic_cast<medImageMaskAnnotationData *>(imageView1->layerData(1));
     if(!existingMaskAnnData1)
+    {
+        std::cout << "non mask in change view1" << std::endl;
         return;
+    }
 
     medAbstractView *view3 = d->containerImage3->view();
     medAbstractImageView * imageView3 = dynamic_cast<medAbstractImageView *>(view3);
@@ -1161,7 +1252,51 @@ void animaLesionsSegmentation::onClearImagesClicked()
 
 void animaLesionsSegmentation::displayOutputs()
 {
+
     medAbstractView *view1 = d->containerImage1->view();
+    medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
+    if(!imageView1)
+        return;
+
+
+    medImageMaskAnnotationData *existingMaskAnnData1 = new medImageMaskAnnotationData;
+    if(!existingMaskAnnData1)
+    {
+        std::cout << "no data 1" << std::endl;
+        return;
+    }
+
+
+    medAbstractData *data = d->outputLesions;
+    if(!data)
+    {
+         std::cout << "no data 2" << std::endl;
+        return;
+    }
+    medAbstractImageData *dataImage = dynamic_cast <medAbstractImageData *> ( data );
+    if(!dataImage)
+    {
+        std::cout << "no data 3" << std::endl;
+        return;
+    }
+    existingMaskAnnData1->setMaskData(dataImage);
+    //existingMaskAnnData1->setData(dataImage);
+
+    if(imageView1)
+    {
+        std::cout << "add layer" << std::endl;
+       // imageView1->addLayer(data);
+        d->containerImage1->addData(existingMaskAnnData1);
+
+        medAbstractData * referenceData1 = imageView1->layerData(0);
+        if(referenceData1)
+          referenceData1->addAttachedData(existingMaskAnnData1);
+    }
+
+
+
+    // ------------------------------------------------------------
+    /*medAbstractView *view1 = d->containerImage1->view();
     medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
     if(!imageView1)
         return;
@@ -1181,20 +1316,36 @@ void animaLesionsSegmentation::displayOutputs()
     if(imageView1->contains(d->outputLesions))
     {
         imageView1->removeData(d->outputLesions);
+    }*/
+
+
+    // mettre les CSF, GM et WM en image normal, mettre les lesions en annotation
+
+    //d->containerImage1->addData(d->outputLesions);
+
+
+   /*// dtkSmartPointer <medAbstractData> outputLesions;
+    medAbstractData *outputLesions = d->outputLesions;
+
+    medImageMaskAnnotationData * existingMaskAnnData1 = dynamic_cast<medImageMaskAnnotationData *>(d->outputLesions);
+    if(!existingMaskAnnData1){
+        std::cout << "non annott data" << std::endl;
+        return;
     }
 
-    d->containerImage1->addData(d->outputLesions);
-    if(d->enableAuto->getCheckBox()->isChecked())
+    imageView1->addLayer(existingMaskAnnData1);*/
+
+
+    /*if(d->enableAuto->getCheckBox()->isChecked())
     {
         d->containerImage1->addData(d->outputCSF);
         d->containerImage1->addData(d->outputGM);
         d->containerImage1->addData(d->outputWM);
-    }
-
-    dtkSmartPointer <medImageMaskAnnotationData> aa;
-    d->containerImage1->addData(aa);
+    }*/
 
 
+
+/*
     medAbstractView *view2 = d->containerImage2->view();
     medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
     if(!imageView2)
@@ -1255,7 +1406,7 @@ void animaLesionsSegmentation::displayOutputs()
         d->containerImage3->addData(d->outputCSF);
         d->containerImage3->addData(d->outputGM);
         d->containerImage3->addData(d->outputWM);
-    }
+    }*/
 }
 
 bool animaLesionsSegmentation::registered()
