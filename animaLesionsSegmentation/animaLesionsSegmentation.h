@@ -10,7 +10,7 @@
 #include <medAbstractSegmentationProcess.h>
 #include <itkImageFileReader.h>
 #include "animaLesionsSegmentationPluginExport.h"
-
+#include <medImageMaskAnnotationData.h>
 
 class animaLesionsSegmentationPrivate;
 
@@ -43,6 +43,7 @@ public:
     void setDataInContainer(medAbstractData *medInput, int &pos, QString mod);
     void checkNbSequences();
     void removeSeq(int &pos);
+    medImageMaskAnnotationData::ColorMapType generateLabelColorMap(unsigned int numLabels);
 
 public slots:
     void run();

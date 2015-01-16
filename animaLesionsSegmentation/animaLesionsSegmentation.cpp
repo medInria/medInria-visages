@@ -173,6 +173,9 @@ public:
     int nb_seq, nb_seq_checked;
     int tour;
 
+
+    medImageMaskAnnotationData *existingMaskAnnData11;
+
     itk::Image<unsigned char,3> *LesionsSeg;
 
     ~animaLesionsSegmentationPrivate()
@@ -700,10 +703,11 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
 {
     medViewContainerSplitter* split = medAbstractProcess::viewContainerSplitter();
 
-
-    /*QPointer<medViewContainerSplitter> viewContainerSplitter;
-    if(viewContainerSplitter.isNull())
-    {
+    /*medViewContainerSplitter* viewContainerSplitter = NULL;
+    QHash <medAbstractProcess::medInputDataPort*, medViewContainer*> containerForInputPort;
+    //QPointer<medViewContainerSplitter> viewContainerSplitter;
+   // if(viewContainerSplitter.isNull())
+  //  {
         viewContainerSplitter = new medViewContainerSplitter;
         QList<medInputDataPort*> inputDataPortList;
         QList<medOutputDataPort*> outputDataPortList;
@@ -730,7 +734,7 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
             medInputDataPort* i = inputDataPortList.takeFirst();
             inputContainer->addData(i->input());
             viewContainerSplitter->addViewContainer(inputContainer);
-            //containerForInputPort[i] = inputContainer;
+            containerForInputPort[i] = inputContainer;
             inputContainer->setClosingMode(medViewContainer::CLOSE_VIEW_ONLY);
             inputContainer->setDefaultWidget(new QLabel(i->name()));
             inputContainer->setUserSplittable(false);
@@ -741,9 +745,9 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
 
             foreach(medInputDataPort* i, inputDataPortList)
             {
-                medViewContainer *container = inputContainer->splitHorizontally();
+                medViewContainer *container = inputContainer->splitVertically();
                 container->addData(i->input());
-                //containerForInputPort[i] = container;
+                containerForInputPort[i] = container;
                 container->setClosingMode(medViewContainer::CLOSE_VIEW_ONLY);
                 container->setDefaultWidget(new QLabel(i->name()));
                 container->setUserSplittable(false);
@@ -754,12 +758,12 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
             }
         }
 
-       /* if(!outputDataPortList.isEmpty())
+        if(!outputDataPortList.isEmpty())
         {
             outputContainer = new medViewContainer;
             medOutputDataPort* o = outputDataPortList.takeFirst();
             viewContainerSplitter->addViewContainer(outputContainer);
-            containerForOutputPort[o] = outputContainer;
+        //    containerForOutputPort[o] = outputContainer;
             outputContainer->setClosingMode(medViewContainer::CLOSE_VIEW_ONLY);
             outputContainer->setDefaultWidget(new QLabel(o->name()));
             outputContainer->setUserOpenable(false);
@@ -770,7 +774,7 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
             {
                 medViewContainer *container = outputContainer->splitHorizontally();
                 container->addData(o->output());
-                d->containerForOutputPort[o] = container;
+           //     d->containerForOutputPort[o] = container;
                 container->setClosingMode(medViewContainer::CLOSE_VIEW_ONLY);
                 container->setDefaultWidget(new QLabel(o->name()));
                 container->setUserOpenable(false);
@@ -780,8 +784,8 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
         }
 
         viewContainerSplitter->adjustContainersSize();
-    }*/
-   // return viewContainerSplitter;
+    //}
+   // return viewContainerSplitter;*/
 
 
 
@@ -793,16 +797,29 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
     {
         medInputDataPort *dataPort1 = dynamic_cast<medInputDataPort*> (inputPort1);
         d->containerImage1 = this->container(dataPort1);
+       // d->containerImage1 = containerForInputPort[dataPort1 ];
         d->containerImage1->setMultiLayered(true);
         d->containerImage1->setUserOpenable(false);
         d->containerImage1->setClosingMode(medViewContainer::CLOSE_BUTTON_HIDDEN);
     }
+
+
+
+    /*medViewContainer* medAbstractProcess::container(medInputDataPort *inputDataPort)
+    {
+        if(!inputDataPort)
+            return NULL;
+
+        return d->containerForInputPort.value(inputDataPort);
+    }*/
+
 
     medProcessIOPort *inputPort2 = this->inputs()[1];
     if(inputPort2)
     {
         medInputDataPort *dataPort2 = dynamic_cast<medInputDataPort*> (inputPort2);
         d->containerImage2 = this->container(dataPort2);
+        //d->containerImage2 = containerForInputPort[dataPort2 ];
         d->containerImage2->setMultiLayered(true);
         d->containerImage2->setUserOpenable(false);
         d->containerImage2->setClosingMode(medViewContainer::CLOSE_BUTTON_HIDDEN);
@@ -813,6 +830,7 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
     {
         medInputDataPort *dataPort3 = dynamic_cast<medInputDataPort*> (inputPort3);
         d->containerImage3 = this->container(dataPort3);
+        //d->containerImage3 = containerForInputPort[dataPort3];
         d->containerImage3->setMultiLayered(true);
         d->containerImage3->setUserOpenable(false);
         d->containerImage3->setClosingMode(medViewContainer::CLOSE_BUTTON_HIDDEN);
@@ -822,6 +840,7 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
   //  connect(d->containerImage2, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView2()));
   //  connect(d->containerImage3, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView3()));
 
+    //return viewContainerSplitter;
     return split;
 }
 
@@ -1285,8 +1304,8 @@ void animaLesionsSegmentation::displayOutputs()
     if(imageView1)
     {
         std::cout << "add layer" << std::endl;
-       // imageView1->addLayer(data);
-        d->containerImage1->addData(existingMaskAnnData1);
+        imageView1->addLayer(data);
+       // d->containerImage1->addData(existingMaskAnnData1);
 
         medAbstractData * referenceData1 = imageView1->layerData(0);
         if(referenceData1)
@@ -1571,7 +1590,7 @@ void animaLesionsSegmentation::onManuSegMaskDropped(const medDataIndex& index)
         return;
     }
 
-    if(d->ManuSegMaskisSet) // first remove form the view if already set before
+    /*if(d->ManuSegMaskisSet) // first remove form the view if already set before
     {
         medAbstractView *view1 = d->containerImage1->view();
         medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
@@ -1594,16 +1613,70 @@ void animaLesionsSegmentation::onManuSegMaskDropped(const medDataIndex& index)
 
         imageView3->removeData(d->ManuSegMaskData);
 
-    }
+    }*/
 
-    d->ManuSegMask = dynamic_cast <medAbstractImageData *> ( medDataManager::instance()->retrieveData(index));
     d->ManuSegMaskisSet=true;
 
-    d->containerImage1->addData(medDataManager::instance()->retrieveData(index));
-    d->containerImage2->addData(medDataManager::instance()->retrieveData(index));
-    d->containerImage3->addData(medDataManager::instance()->retrieveData(index));
-
     d->ManuSegMaskData = medDataManager::instance()->retrieveData(index);
+    medAbstractData *data = d->ManuSegMaskData;
+
+    d->ManuSegMask = dynamic_cast <medAbstractImageData *> ( data);
+
+   // d->containerImage1->addData(data);
+    d->containerImage2->addData(data);
+    d->containerImage3->addData(data);
+
+
+   /* medAbstractView *view1 = d->containerImage1->view();
+    medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
+    if(!imageView1)
+        return;*/
+
+
+    d->existingMaskAnnData11 = new medImageMaskAnnotationData;
+    if(!d->existingMaskAnnData11)
+    {
+        std::cout << "no data annot" << std::endl;
+        return;
+    }
+
+    medAbstractImageData *dataImage = d->ManuSegMask;
+    d->existingMaskAnnData11->setMaskData(dataImage);
+
+    medImageMaskAnnotationData::ColorMapType colorMap = generateLabelColorMap(10);
+    d->existingMaskAnnData11->setColorMap(colorMap);
+
+
+        std::cout << "add layer" << std::endl;
+       // imageView1->addLayer(existingMaskAnnData1);
+        d->containerImage1->addData(d->existingMaskAnnData11);
+
+        /*medAbstractData * referenceData1 = imageView1->layerData(0);
+        if(referenceData1)
+          referenceData1->addAttachedData(d->existingMaskAnnData11);*/
+
+
+}
+
+medImageMaskAnnotationData::ColorMapType animaLesionsSegmentation::generateLabelColorMap(unsigned int numLabels)
+{
+    medImageMaskAnnotationData::ColorMapType colorMap;
+    typedef medImageMaskAnnotationData::ColorMapType::value_type PairType;
+
+    QColor tmpColor;
+    double realHueValue = 0;
+    double factor = (1.0 + sqrt(5.0)) / 2.0;
+    for (unsigned int i = 0;i < numLabels;++i)
+    {
+        tmpColor.setHsvF(realHueValue,1.0,1.0);
+        colorMap.push_back(PairType(i+1 , tmpColor));
+
+        realHueValue += 1.0 / factor;
+        if (realHueValue > 1.0)
+            realHueValue -= 1.0;
+    }
+
+    return colorMap;
 }
 
 void animaLesionsSegmentation::onExternalMaskDropped(const medDataIndex& index)
