@@ -45,21 +45,6 @@
 
 
 
-#include <medAbstractProcess.h>
-
-#include <medAbstractParameter.h>
-#include <medToolBox.h>
-#include <medAbstractJob.h>
-#include <medJobManager.h>
-#include <medViewContainer.h>
-#include <medViewContainerSplitter.h>
-#include <medAbstractData.h>
-#include <medMetaDataKeys.h>
-#include <medAbstractLayeredView.h>
-#include <medDataManager.h>
-
-#include <typeinfo>
-
 class animaLesionsSegmentationPrivate
 {
 public:
@@ -85,7 +70,6 @@ public:
     dtkSmartPointer <medAbstractImageData> AtlasWM;
 
     dtkSmartPointer <medAbstractImageData> ManuSegMask;
-    dtkSmartPointer <medAbstractImageData> ExternalMask;
 
     dtkSmartPointer <medAbstractData> maskData;
     dtkSmartPointer <medAbstractData> DPData;
@@ -95,14 +79,11 @@ public:
     dtkSmartPointer <medAbstractData> T1GdData;
 
     dtkSmartPointer <medAbstractData> ManuSegMaskData;
-    dtkSmartPointer <medAbstractData> ExternalMaskData;
 
     dtkSmartPointer <medAbstractData> outputLesions;
     dtkSmartPointer <medAbstractData> outputCSF;
     dtkSmartPointer <medAbstractData> outputGM;
     dtkSmartPointer <medAbstractData> outputWM;
-
-    dtkSmartPointer <medImageMaskAnnotationData> outputCSFAnnot;
 
     QString filenameLoad;
     float lesionLoad;
@@ -121,7 +102,6 @@ public:
     medDataIndexParameter *AtlasWMParameter;
 
     medDataIndexParameter *ManuSegMaskParameter;
-    medDataIndexParameter *ExternalMaskParameter;
 
     medBoolParameter *chooseT1;
     medBoolParameter *chooseT2;
@@ -182,17 +162,14 @@ public:
     QWidget *page2;
     medToolBoxTab *widgetTab;
 
-    bool T1isSet,T2isSet,DPisSet,FLAIRisSet,T1GdisSet,MaskisSet,ManuSegMaskisSet,ExternalMaskisSet;
+    bool T1isSet,T2isSet,DPisSet,FLAIRisSet,T1GdisSet,MaskisSet,ManuSegMaskisSet;
     bool cont1isFree, cont2isFree, cont3isFree;
     int posT1, posT2, posDP, posFLAIR, posT1Gd;
     QString cont1mod, cont2mod, cont3mod;
     int nb_seq, nb_seq_checked;
     int tour;
 
-
-    dtkSmartPointer <medImageMaskAnnotationData> existingMaskAnnData11;
-
-    itk::Image<unsigned char,3> *LesionsSeg;
+    dtkSmartPointer <medImageMaskAnnotationData> lesionAnnData;
 
     ~animaLesionsSegmentationPrivate()
     {
@@ -218,7 +195,7 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
 {
     d->parent = this;
 
-    d->LesionsSeg = NULL;
+    //d->LesionsSeg = NULL;
 
     d->T1isSet=false;
     d->T2isSet=false;
@@ -227,7 +204,6 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     d->T1GdisSet=false;
     d->MaskisSet=false;
     d->ManuSegMaskisSet=false;
-    d->ExternalMaskisSet=false;
 
     d->cont1isFree=true;
     d->cont2isFree=true;
@@ -404,7 +380,22 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     d->heuristicGroupBox->setLayout(heuristicLayout);
 
 
+
     /* ---------------------------------------------- Segmentations Parameters ---------------------------------------------- */
+
+
+    medTriggerParameter *clearManuButton = new medTriggerParameter("Remove Mask Manu", this);
+    clearManuButton->setButtonText("Remove Mask");
+
+    d->ManuSegMaskParameter = new medDataIndexParameter("Manu", this);
+    d->ManuSegMaskParameter->setToolTip(tr("Drag-and-drop a seed mask for the graph cut from the database or click here (1=sources, 2=sinks)."));
+    d->ManuSegMaskParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here to open \n a seed mask."));
+    d->ManuSegMaskParameter->getDropSite()->setDisabled(true);
+
+    QVBoxLayout *ManuMaskLayout = new QVBoxLayout;
+    ManuMaskLayout->addWidget(d->ManuSegMaskParameter->getWidget(), 0, Qt::AlignCenter);
+    ManuMaskLayout->addWidget(clearManuButton->getPushButton(), 0, Qt::AlignCenter);
+
 
     d->enableAuto = new medBoolParameter("auto", this);
     d->enableAuto->setToolTip("Enable automatic segmentation");
@@ -413,17 +404,29 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     d->useFormerSegModel = new medBoolParameter("useFormer", this);
     d->useFormerSegModel->setToolTip("Keep former NABT estination");
     d->useFormerSegModel->getCheckBox()->setCheckState(Qt::Unchecked);
+    d->useFormerSegModel->getCheckBox()->setCheckable(false);
 
     medStringParameter *AutoText = new medStringParameter("Enable automatic computation",this);
     medStringParameter *KeepSegText = new medStringParameter("Keep former NABT estimation",this);
 
+    medStringParameter *manuText = new medStringParameter("Enable manual masks",this);
+    d->enableManu = new medBoolParameter("manu",this);
+    d->enableManu->setToolTip("Enable manual masks as entries");
+    d->enableManu->getCheckBox()->setCheckState(Qt::Unchecked);
+
     QFormLayout *enableAutoLayout = new QFormLayout();
     enableAutoLayout->addRow(AutoText->getLabel(),d->enableAuto->getWidget());
     enableAutoLayout->addRow(KeepSegText->getLabel(),d->useFormerSegModel->getWidget());
+    enableAutoLayout->addRow(manuText->getLabel(),d->enableManu->getWidget());
+
+    QVBoxLayout *aaa =  new QVBoxLayout;
+    aaa->addLayout(enableAutoLayout);
+    aaa->addLayout(ManuMaskLayout);
 
 
     d->AutoGroupBox = new QGroupBox(tr("Use automatic seg"));
-    d->AutoGroupBox->setLayout(enableAutoLayout);
+    d->AutoGroupBox->setLayout(aaa);
+
 
     d->init = new medStringListParameter("init", this);
     d->init->setToolTip("Type of initialisation");
@@ -559,9 +562,7 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     d->useSpectralGrad = new medBoolParameter("useSepc",this);
     d->useSpectralGrad->getCheckBox()->setChecked(true);
 
-    d->enableManu = new medBoolParameter("manu",this);
-    d->enableManu->setToolTip("Enable manual masks as entries");
-    d->enableManu->getCheckBox()->setCheckState(Qt::Unchecked);
+
 
     d->multiVarSources = new medDoubleParameter("varSources", this);
     d->multiVarSources->setToolTip("xx");
@@ -584,7 +585,6 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     medStringParameter *alphaText = new medStringParameter("Alpha",this);
     medStringParameter *sigmaText = new medStringParameter("Sigma",this);
     medStringParameter *specText = new medStringParameter("Use Spectral Gradient",this);
-    medStringParameter *manuText = new medStringParameter("Enable manual masks",this);
     medStringParameter *multiSourcesText = new medStringParameter("Multiply source variance factor",this);
     medStringParameter *multiSinksText = new medStringParameter("Multiply sink variance factor",this);
     medStringParameter *NbItGcText = new medStringParameter("Number iterations GC",this);
@@ -594,41 +594,38 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     gcParamBoxLayout->addRow(sigmaText->getLabel(),d->sigma->getWidget());
     gcParamBoxLayout->addRow(NbItGcText->getLabel(),d->NbItGc->getWidget());
     gcParamBoxLayout->addRow(specText->getLabel(),d->useSpectralGrad->getWidget());
-    gcParamBoxLayout->addRow(manuText->getLabel(),d->enableManu->getWidget());
+    //gcParamBoxLayout->addRow(manuText->getLabel(),d->enableManu->getWidget());
     gcParamBoxLayout->addRow(multiSourcesText->getLabel(),d->multiVarSources->getWidget());
     gcParamBoxLayout->addRow(multiSinksText->getLabel(),d->multiVarSinks->getWidget());
 
-    d->ManuSegMaskParameter = new medDataIndexParameter("Manu", this);
-    d->ManuSegMaskParameter->setToolTip(tr("Drag-and-drop a seed mask for the graph cut from the database or click here (1=sources, 2=sinks)."));
-    d->ManuSegMaskParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here to open \n a seed mask."));
-    d->ManuSegMaskParameter->getDropSite()->setDisabled(true);
 
-    d->ExternalMaskParameter = new medDataIndexParameter("External", this);
+
+    /*d->ExternalMaskParameter = new medDataIndexParameter("External", this);
     d->ExternalMaskParameter->setToolTip(tr("Drag-and-drop a seed mask for the graph cut from the database or click here (1=sources, 2=sinks)."));
     d->ExternalMaskParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here to open \n a seed mask."));
-    d->ExternalMaskParameter->getDropSite()->setDisabled(true);
+    d->ExternalMaskParameter->getDropSite()->setDisabled(true);*/
 
-    medTriggerParameter *clearManuButton = new medTriggerParameter("Remove Mask Manu", this);
-    clearManuButton->setButtonText("Remove Mask");
+   // medTriggerParameter *clearManuButton = new medTriggerParameter("Remove Mask Manu", this);
+   // clearManuButton->setButtonText("Remove Mask");
 
-    medTriggerParameter *clearExtButton = new medTriggerParameter("Remove Mask Ext", this);
-    clearExtButton->setButtonText("Remove Mask");
+    //medTriggerParameter *clearExtButton = new medTriggerParameter("Remove Mask Ext", this);
+    //clearExtButton->setButtonText("Remove Mask");
 
-    QVBoxLayout *ManuMaskLayout = new QVBoxLayout;
+    /*QVBoxLayout *ManuMaskLayout = new QVBoxLayout;
     ManuMaskLayout->addWidget(d->ManuSegMaskParameter->getWidget(), 0, Qt::AlignCenter);
-    ManuMaskLayout->addWidget(clearManuButton->getPushButton(), 0, Qt::AlignCenter);
+    ManuMaskLayout->addWidget(clearManuButton->getPushButton(), 0, Qt::AlignCenter);*/
 
-    QVBoxLayout *ExtMaskLayout = new QVBoxLayout;
+    /*QVBoxLayout *ExtMaskLayout = new QVBoxLayout;
     ExtMaskLayout->addWidget(d->ExternalMaskParameter->getWidget(), 0, Qt::AlignCenter);
-    ExtMaskLayout->addWidget(clearExtButton->getPushButton(), 0, Qt::AlignCenter);
+    ExtMaskLayout->addWidget(clearExtButton->getPushButton(), 0, Qt::AlignCenter);*/
 
-    QHBoxLayout *seedMasksLayout = new QHBoxLayout;
-    seedMasksLayout->addLayout(ManuMaskLayout);
-    seedMasksLayout->addLayout(ExtMaskLayout);
+    //QHBoxLayout *seedMasksLayout = new QHBoxLayout;
+   // seedMasksLayout->addLayout(ManuMaskLayout);
+    //seedMasksLayout->addLayout(ExtMaskLayout);
 
     QVBoxLayout *gcBoxLayout = new QVBoxLayout();
     gcBoxLayout->addLayout(gcParamBoxLayout);
-    gcBoxLayout->addLayout(seedMasksLayout);
+    //gcBoxLayout->addLayout(seedMasksLayout);
 
     d->gcGroupBox = new QGroupBox(tr("Graph Cut Parameters"));
     d->gcGroupBox->setLayout(gcBoxLayout);
@@ -667,20 +664,18 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     d->widgetTab->addTab(d->page2, "Segmentation Parameters");
 
     /* ---------------------------------------------- connect ---------------------------------------------- */
-    connect(d->MaskParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onMaskDropped(const medDataIndex &)));
-    connect(d->T1Parameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onT1Dropped(const medDataIndex &)));
-    connect(d->T2Parameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onT2Dropped(const medDataIndex &)));
+    connect(d->MaskParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(MaskDropped(const medDataIndex &)));
+    connect(d->T1Parameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(T1Dropped(const medDataIndex &)));
+    connect(d->T2Parameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(T2Dropped(const medDataIndex &)));
 
-    connect(d->DPParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onDPDropped(const medDataIndex &)));
-    connect(d->FLAIRParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onFLAIRDropped(const medDataIndex &)));
-    connect(d->T1GdParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onT1GdDropped(const medDataIndex &)));
+    connect(d->DPParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(DPDropped(const medDataIndex &)));
+    connect(d->FLAIRParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(FLAIRDropped(const medDataIndex &)));
+    connect(d->T1GdParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(T1GdDropped(const medDataIndex &)));
 
-    connect(d->ManuSegMaskParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onManuSegMaskDropped(const medDataIndex &)));
-    connect(d->ExternalMaskParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(onExternalMaskDropped(const medDataIndex &)));
+    connect(d->ManuSegMaskParameter, SIGNAL(valueChanged(const medDataIndex &)),this,SLOT(ManuSegMaskDropped(const medDataIndex &)));
 
-    connect(clearImagesButton,SIGNAL(triggered()),this,SLOT(onClearImagesClicked()));
-    connect(clearManuButton,SIGNAL(triggered()),this,SLOT(onClearManuSegMaskClicked()));
-    connect(clearExtButton,SIGNAL(triggered()),this,SLOT(onClearExternalMaskClicked()));
+    connect(clearImagesButton,SIGNAL(triggered()),this,SLOT(ClearImagesClicked()));
+    connect(clearManuButton,SIGNAL(triggered()),this,SLOT(ClearManuSegMaskClicked()));
 
     connect(d->chooseT1, SIGNAL(valueChanged(bool)),this, SLOT(chooseT1changed(bool)));
     connect(d->chooseT2, SIGNAL(valueChanged(bool)),this, SLOT(chooseT2changed(bool)));
@@ -786,9 +781,9 @@ medViewContainerSplitter* animaLesionsSegmentation::viewContainerSplitter()
         d->containerImage3 = containerForInputPort[dataPort3];
     }
 
-   // connect(d->containerImage1, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView1()));
-  //  connect(d->containerImage2, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView2()));
-  //  connect(d->containerImage3, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView3()));
+   connect(d->containerImage1, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView1()));
+   connect(d->containerImage2, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView2()));
+   connect(d->containerImage3, SIGNAL(viewContentChanged()),this,SLOT(viewContentChangedSlotView3()));
 
     return viewContainerSplitter;
 }
@@ -829,53 +824,43 @@ void animaLesionsSegmentation::viewContentChangedSlotView1()
         if(referenceData2)
           referenceData2->addAttachedData(existingMaskAnnData1);
     }
-
-
-        /*medAbstractData *data2 =  dynamic_cast <medAbstractData *> ( data );
-
-        dtkSmartPointer <medAbstractImageData> imageData = dynamic_cast <medAbstractImageData *> ( data2 );
-        if(!imageData)
-        {
-             qDebug() << "Image Data null";
-             return;
-        }
-
-        typedef itk::Image <unsigned char,3> InputImageTypeUC;
-        typedef InputImageTypeUC::Pointer InputImagePointerUC;
-
-        InputImagePointerUC input = NULL;
-        input= this->createInputMasks(imageData);*/
 }
 
 void animaLesionsSegmentation::viewContentChangedSlotView2()
 {
+
     medAbstractView *view2 = d->containerImage2->view();
     medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
     if(!imageView2)
         return;
 
-    medAbstractData *data = imageView2->layerData(imageView2->layersCount()-1);
-    if(!data)
+    medImageMaskAnnotationData * existingMaskAnnData2 = dynamic_cast<medImageMaskAnnotationData *>(imageView2->layerData(1));
+    if(!existingMaskAnnData2)
     {
-         return;
+        std::cout << "non mask in change view2" << std::endl;
+        return;
     }
 
     medAbstractView *view3 = d->containerImage3->view();
     medAbstractImageView * imageView3 = dynamic_cast<medAbstractImageView *>(view3);
-    if(!imageView3)
-        return;
+    if(imageView3)
+    {
+        imageView3->addLayer(existingMaskAnnData2);
 
-    imageView3->addLayer(data);
-
-
+        medAbstractData * referenceData3 = imageView3->layerData(0);
+        if(referenceData3)
+          referenceData3->addAttachedData(existingMaskAnnData2);
+    }
 
     medAbstractView *view1 = d->containerImage1->view();
     medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
-    if(!imageView1)
-        return;
-
-    imageView1->addLayer(data);
-
+    if(imageView1)
+    {
+        imageView1->addLayer(existingMaskAnnData2);
+        medAbstractData * referenceData1 = imageView1->layerData(0);
+        if(referenceData1)
+          referenceData1->addAttachedData(existingMaskAnnData2);
+    }
 }
 
 void animaLesionsSegmentation::viewContentChangedSlotView3()
@@ -885,26 +870,33 @@ void animaLesionsSegmentation::viewContentChangedSlotView3()
     if(!imageView3)
         return;
 
-    medAbstractData *data = imageView3->layerData(imageView3->layersCount()-1);
-    if(!data)
+    medImageMaskAnnotationData * existingMaskAnnData3 = dynamic_cast<medImageMaskAnnotationData *>(imageView3->layerData(1));
+    if(!existingMaskAnnData3)
     {
-         return;
+        std::cout << "non mask in change view3" << std::endl;
+        return;
+    }
+
+    medAbstractView *view2 = d->containerImage2->view();
+    medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
+    if(imageView2)
+    {
+        imageView2->addLayer(existingMaskAnnData3);
+
+        medAbstractData * referenceData2 = imageView2->layerData(0);
+        if(referenceData2)
+          referenceData2->addAttachedData(existingMaskAnnData3);
     }
 
     medAbstractView *view1 = d->containerImage1->view();
     medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
-    if(!imageView1)
-        return;
-
-    imageView1->addLayer(data);
-
-
-    medAbstractView *view2 = d->containerImage2->view();
-    medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
-    if(!imageView2)
-        return;
-
-    imageView2->addLayer(data);
+    if(imageView1)
+    {
+        imageView1->addLayer(existingMaskAnnData3);
+        medAbstractData * referenceData1 = imageView1->layerData(0);
+        if(referenceData1)
+          referenceData1->addAttachedData(existingMaskAnnData3);
+    }
 }
 
 void animaLesionsSegmentation::displayWarnings()
@@ -945,7 +937,7 @@ void animaLesionsSegmentation::displayWarnings()
         return;
     }
 
-    if(  d->enableManu->getCheckBox()->isChecked() && ( !d->ExternalMaskisSet && !d->ManuSegMaskisSet ) )
+    if(  d->enableManu->getCheckBox()->isChecked() && (!d->ManuSegMaskisSet) )
     {
         QMessageBox::warning(d->parameterWidget, "Missing inputs", "There is no seed mask input. \n Add at least one manual sources and sink mask or choose automatic seed computation only.");
         return;
@@ -1108,7 +1100,7 @@ void animaLesionsSegmentation::removeSeq(int &pos)
     checkNbSequences();
 }
 
-void animaLesionsSegmentation::onClearManuSegMaskClicked()
+void animaLesionsSegmentation::ClearManuSegMaskClicked()
 {
     if(d->ManuSegMaskisSet) // first remove form the view if already set before
     {
@@ -1140,40 +1132,7 @@ void animaLesionsSegmentation::onClearManuSegMaskClicked()
     d->ManuSegMaskisSet=false;
 }
 
-void animaLesionsSegmentation::onClearExternalMaskClicked()
-{
-    if(d->ExternalMaskisSet) // first remove form the view if already set before
-    {
-        medAbstractView *view1 = d->containerImage1->view();
-        medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
-        if(!imageView1)
-            return;
-
-        imageView1->removeData(d->ExternalMaskData);
-
-        medAbstractView *view2 = d->containerImage2->view();
-        medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
-        if(!imageView2)
-            return;
-
-        imageView2->removeData(d->ExternalMaskData);
-
-        medAbstractView *view3 = d->containerImage3->view();
-        medAbstractImageView * imageView3 = dynamic_cast<medAbstractImageView *>(view3);
-        if(!imageView3)
-            return;
-
-        imageView3->removeData(d->ExternalMaskData);
-
-    }
-
-    d->ExternalMaskParameter->clear();
-    d->ExternalMaskParameter->setToolTip(tr("Drag-and-drop a seed mask for the graph cut from the database or click here (1=sources, 2=sinks)."));
-    d->ExternalMaskParameter->setText(tr("Drag-and-drop\nfrom the database\nor click here to open \n a seed mask."));
-    d->ExternalMaskisSet=false;
-}
-
-void animaLesionsSegmentation::onClearImagesClicked()
+void animaLesionsSegmentation::ClearImagesClicked()
 {
     // clear medDropSite and put text again
     d->T1Parameter->clear();
@@ -1221,55 +1180,26 @@ void animaLesionsSegmentation::onClearImagesClicked()
 
 void animaLesionsSegmentation::displayOutputs()
 {
-
     medAbstractView *view1 = d->containerImage1->view();
     medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
     if(!imageView1)
         return;
 
-
-    medImageMaskAnnotationData *existingMaskAnnData1 = new medImageMaskAnnotationData;
-    if(!existingMaskAnnData1)
-    {
-        std::cout << "no data 1" << std::endl;
-        return;
-    }
-
-
-    medAbstractData *data = d->outputLesions;
-    if(!data)
-    {
-         std::cout << "no data 2" << std::endl;
-        return;
-    }
-    medAbstractImageData *dataImage = dynamic_cast <medAbstractImageData *> ( data );
-    if(!dataImage)
-    {
-        std::cout << "no data 3" << std::endl;
-        return;
-    }
-    existingMaskAnnData1->setMaskData(dataImage);
-    //existingMaskAnnData1->setData(dataImage);
-
-    if(imageView1)
-    {
-        std::cout << "add layer" << std::endl;
-        imageView1->addLayer(data);
-       // d->containerImage1->addData(existingMaskAnnData1);
-
-        medAbstractData * referenceData1 = imageView1->layerData(0);
-        if(referenceData1)
-          referenceData1->addAttachedData(existingMaskAnnData1);
-    }
-
-
-
-    // ------------------------------------------------------------
-    /*medAbstractView *view1 = d->containerImage1->view();
-    medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
-    if(!imageView1)
+    medAbstractView *view2 = d->containerImage2->view();
+    medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
+    if(!imageView2)
         return;
 
+    medAbstractView *view3 = d->containerImage3->view();
+    medAbstractImageView * imageView3 = dynamic_cast<medAbstractImageView *>(view3);
+    if(!imageView3)
+        return;
+
+
+    QString SeriesDescription = d->maskData->metadata ( medMetaDataKeys::SeriesDescription.key() );
+    d->useFormerSegModel->getCheckBox()->setCheckable(true);
+
+    // clean data if necessary
     if(imageView1->contains(d->outputCSF))
     {
         imageView1->removeData(d->outputCSF);
@@ -1282,43 +1212,6 @@ void animaLesionsSegmentation::displayOutputs()
     {
         imageView1->removeData(d->outputWM);
     }
-    if(imageView1->contains(d->outputLesions))
-    {
-        imageView1->removeData(d->outputLesions);
-    }*/
-
-
-    // mettre les CSF, GM et WM en image normal, mettre les lesions en annotation
-
-    //d->containerImage1->addData(d->outputLesions);
-
-
-   /*// dtkSmartPointer <medAbstractData> outputLesions;
-    medAbstractData *outputLesions = d->outputLesions;
-
-    medImageMaskAnnotationData * existingMaskAnnData1 = dynamic_cast<medImageMaskAnnotationData *>(d->outputLesions);
-    if(!existingMaskAnnData1){
-        std::cout << "non annott data" << std::endl;
-        return;
-    }
-
-    imageView1->addLayer(existingMaskAnnData1);*/
-
-
-    /*if(d->enableAuto->getCheckBox()->isChecked())
-    {
-        d->containerImage1->addData(d->outputCSF);
-        d->containerImage1->addData(d->outputGM);
-        d->containerImage1->addData(d->outputWM);
-    }*/
-
-
-
-/*
-    medAbstractView *view2 = d->containerImage2->view();
-    medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
-    if(!imageView2)
-        return;
 
     if(imageView2->contains(d->outputCSF))
     {
@@ -1332,25 +1225,6 @@ void animaLesionsSegmentation::displayOutputs()
     {
         imageView2->removeData(d->outputWM);
     }
-    if(imageView2->contains(d->outputLesions))
-    {
-        imageView2->removeData(d->outputLesions);
-    }
-
-
-    d->containerImage2->addData(d->outputLesions);
-    if(d->enableAuto->getCheckBox()->isChecked())
-    {
-        d->containerImage2->addData(d->outputCSF);
-        d->containerImage2->addData(d->outputGM);
-        d->containerImage2->addData(d->outputWM);
-    }
-
-
-    medAbstractView *view3 = d->containerImage3->view();
-    medAbstractImageView * imageView3 = dynamic_cast<medAbstractImageView *>(view3);
-    if(!imageView3)
-        return;
 
     if(imageView3->contains(d->outputCSF))
     {
@@ -1364,18 +1238,82 @@ void animaLesionsSegmentation::displayOutputs()
     {
         imageView3->removeData(d->outputWM);
     }
-    if(imageView3->contains(d->outputLesions))
+
+    if(imageView1->contains(d->lesionAnnData))
     {
-        imageView3->removeData(d->outputLesions);
+        imageView1->removeData(d->lesionAnnData);
     }
 
-    d->containerImage3->addData(d->outputLesions);
+    if(imageView2->contains(d->lesionAnnData))
+    {
+        imageView2->removeData(d->lesionAnnData);
+    }
+
+    if(imageView3->contains(d->lesionAnnData))
+    {
+        imageView3->removeData(d->lesionAnnData);
+    }
+
+
+    // Manage lesions annotation data
+    d->lesionAnnData = new medImageMaskAnnotationData;
+    if(!d->lesionAnnData)
+    {
+        std::cout << "no lesion data annot" << std::endl;
+        return;
+    }
+
+    medAbstractData *data = d->outputLesions;
+    dtkSmartPointer <medAbstractImageData> outputLesionImageData = dynamic_cast <medAbstractImageData *> (data);
+
+    medAbstractImageData *dataImage = outputLesionImageData;
+    d->lesionAnnData->setMaskData(dataImage);
+
+    medImageMaskAnnotationData::ColorMapType colorMap = generateLabelColorMap(10);
+    d->lesionAnnData->setColorMap(colorMap);
+
+    imageView1->addLayer(d->lesionAnnData);
+
+    medAbstractData *referenceData1 = imageView1->layerData(0);
+    if(referenceData1)
+        referenceData1->addAttachedData(d->lesionAnnData);
+
+    QString seriesDescriptionLesions = "Lesions_" + SeriesDescription;
+    d->lesionAnnData->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionLesions );
+    medDataManager::instance()->importData(d->lesionAnnData);
+
+
+    // Manage NABT outputs (no annotations data)
+    // import data in database
+    QString seriesDescriptionCSF, seriesDescriptionGM, seriesDescriptionWM;
+
     if(d->enableAuto->getCheckBox()->isChecked())
     {
+        seriesDescriptionCSF += "CSF_" + SeriesDescription;
+        d->outputCSF->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionCSF );
+
+        seriesDescriptionGM += "GM_" + SeriesDescription;
+        d->outputGM->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionGM );
+
+        seriesDescriptionWM += "WM_" + SeriesDescription;
+        d->outputWM->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionWM );
+
+        medDataManager::instance()->importData(d->outputCSF);
+        medDataManager::instance()->importData(d->outputGM);
+        medDataManager::instance()->importData(d->outputWM);
+
+        d->containerImage1->addData(d->outputCSF);
+        d->containerImage1->addData(d->outputGM);
+        d->containerImage1->addData(d->outputWM);
+
+        d->containerImage2->addData(d->outputCSF);
+        d->containerImage2->addData(d->outputGM);
+        d->containerImage2->addData(d->outputWM);
+
         d->containerImage3->addData(d->outputCSF);
         d->containerImage3->addData(d->outputGM);
         d->containerImage3->addData(d->outputWM);
-    }*/
+    }
 }
 
 bool animaLesionsSegmentation::registered()
@@ -1392,10 +1330,7 @@ void animaLesionsSegmentation::setDataInContainer(medAbstractData *data, int &po
 {
     if(d->cont1isFree)
     {
-        medProcessIOPort *inputPort1 = this->inputs()[0];
-        medInputDataPort *dataPort1 = dynamic_cast<medInputDataPort*> (inputPort1);
         d->containerImage1->addData(data);
-        std::cout << "dat cont " << std::endl;
         pos = 1;
         d->cont1isFree = false;
         d->cont1mod=mod;
@@ -1450,7 +1385,7 @@ void animaLesionsSegmentation::setDataInContainer(medAbstractData *data, int &po
     }
 }
 
-void animaLesionsSegmentation::onT1Dropped(const medDataIndex& index)
+void animaLesionsSegmentation::T1Dropped(const medDataIndex& index)
 {
     if (!index.isValid()){
         return;
@@ -1466,7 +1401,7 @@ void animaLesionsSegmentation::onT1Dropped(const medDataIndex& index)
     }
 }
 
-void animaLesionsSegmentation::onT2Dropped(const medDataIndex& index)
+void animaLesionsSegmentation::T2Dropped(const medDataIndex& index)
 {
     if (!index.isValid()){
         return;
@@ -1481,7 +1416,7 @@ void animaLesionsSegmentation::onT2Dropped(const medDataIndex& index)
     }
 }
 
-void animaLesionsSegmentation::onDPDropped(const medDataIndex& index)
+void animaLesionsSegmentation::DPDropped(const medDataIndex& index)
 {
     if (!index.isValid()){
         return;
@@ -1497,7 +1432,7 @@ void animaLesionsSegmentation::onDPDropped(const medDataIndex& index)
     }
 }
 
-void animaLesionsSegmentation::onFLAIRDropped(const medDataIndex& index)
+void animaLesionsSegmentation::FLAIRDropped(const medDataIndex& index)
 {
     if (!index.isValid()){
         return;
@@ -1513,7 +1448,7 @@ void animaLesionsSegmentation::onFLAIRDropped(const medDataIndex& index)
 
 }
 
-void animaLesionsSegmentation::onT1GdDropped(const medDataIndex& index)
+void animaLesionsSegmentation::T1GdDropped(const medDataIndex& index)
 {
     if (!index.isValid()){
         return;
@@ -1528,20 +1463,23 @@ void animaLesionsSegmentation::onT1GdDropped(const medDataIndex& index)
 
 }
 
-void animaLesionsSegmentation::onMaskDropped(const medDataIndex& index)
-{
-    if (!index.isValid()){
-        return;
-    }   
-    d->maskImageData = dynamic_cast <medAbstractImageData *> ( medDataManager::instance()->retrieveData(index));
-    d->MaskisSet=true;
-}
-
-void animaLesionsSegmentation::onManuSegMaskDropped(const medDataIndex& index)
+void animaLesionsSegmentation::MaskDropped(const medDataIndex& index)
 {
     if (!index.isValid()){
         return;
     }
+    d->maskData = medDataManager::instance()->retrieveData(index);
+    d->maskImageData = dynamic_cast <medAbstractImageData *> ( medDataManager::instance()->retrieveData(index));
+    d->MaskisSet=true;
+}
+
+
+void animaLesionsSegmentation::ManuSegMaskDropped(const medDataIndex& index)
+{
+    if (!index.isValid()){
+        return;
+    }
+
 
     /*if(d->ManuSegMaskisSet) // first remove form the view if already set before
     {
@@ -1567,7 +1505,7 @@ void animaLesionsSegmentation::onManuSegMaskDropped(const medDataIndex& index)
         imageView3->removeData(d->ManuSegMaskData);
 
     }*/
-
+/*
     d->ManuSegMaskisSet=true;
 
     d->ManuSegMaskData = medDataManager::instance()->retrieveData(index);
@@ -1576,8 +1514,8 @@ void animaLesionsSegmentation::onManuSegMaskDropped(const medDataIndex& index)
     d->ManuSegMask = dynamic_cast <medAbstractImageData *> (data);
 
    // d->containerImage1->addData(data);
-    d->containerImage2->addData(data);
-    d->containerImage3->addData(data);
+   // d->containerImage2->addData(data);
+   // d->containerImage3->addData(data);
 
 
     medAbstractView *view1 = d->containerImage1->view();
@@ -1586,23 +1524,26 @@ void animaLesionsSegmentation::onManuSegMaskDropped(const medDataIndex& index)
         return;
 
 
-    d->existingMaskAnnData11 = new medImageMaskAnnotationData;
-    if(!d->existingMaskAnnData11)
+
+
+    dtkSmartPointer <medImageMaskAnnotationData> existingMaskAnnData11 = new medImageMaskAnnotationData;
+    if(!existingMaskAnnData11)
     {
         std::cout << "no data annot" << std::endl;
         return;
     }
 
     medAbstractImageData *dataImage = d->ManuSegMask;
-    d->existingMaskAnnData11->setMaskData(dataImage);
-
+    existingMaskAnnData11->setMaskData(dataImage);
     medImageMaskAnnotationData::ColorMapType colorMap = generateLabelColorMap(10);
-    d->existingMaskAnnData11->setColorMap(colorMap);
+    existingMaskAnnData11->setColorMap(colorMap);
 
 
         std::cout << "add layer" << std::endl;
-        //imageView1->addLayer(d->existingMaskAnnData11);
-        d->containerImage1->addData(d->existingMaskAnnData11);
+        imageView1->addLayer(existingMaskAnnData11);
+        //d->containerImage1->addData(existingMaskAnnData11);
+        //d->containerImage2->addData(existingMaskAnnData11);
+        //d->containerImage3->addData(existingMaskAnnData11);
 
        // imageView->addLayer(m_maskAnnotationData);
        // setOutputMetadata(m_imageData, m_maskData);
@@ -1610,20 +1551,20 @@ void animaLesionsSegmentation::onManuSegMaskDropped(const medDataIndex& index)
 
         medAbstractData *referenceData1 = imageView1->layerData(0);
         if(referenceData1)
-          referenceData1->addAttachedData(d->existingMaskAnnData11);
+            referenceData1->addAttachedData(existingMaskAnnData11);
+
+*/
 
 
-
-
-        QString seriesDescriptionLesions;
-        QString SeriesDescription = d->parent->input<medAbstractData>(0)->metadata ( medMetaDataKeys::SeriesDescription.key() );
+      /*  QString seriesDescriptionLesions;
+       QString SeriesDescription = referenceData1->metadata ( medMetaDataKeys::SeriesDescription.key() );
 
         seriesDescriptionLesions += "Lesions " + SeriesDescription;
 
 
-        d->existingMaskAnnData11->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionLesions );
+        existingMaskAnnData11->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionLesions );
 
-        medDataManager::instance()->importData(d->existingMaskAnnData11);
+        medDataManager::instance()->importData(existingMaskAnnData11);*/
 
 
 }
@@ -1649,45 +1590,6 @@ medImageMaskAnnotationData::ColorMapType animaLesionsSegmentation::generateLabel
     return colorMap;
 }
 
-void animaLesionsSegmentation::onExternalMaskDropped(const medDataIndex& index)
-{
-    if (!index.isValid()){
-        return;
-    }
-
-    if(d->ExternalMaskisSet) // first remove form the view if already set before
-    {
-        medAbstractView *view1 = d->containerImage1->view();
-        medAbstractImageView * imageView1 = dynamic_cast<medAbstractImageView *>(view1);
-        if(!imageView1)
-            return;
-
-        imageView1->removeData(d->ExternalMaskData);
-
-        medAbstractView *view2 = d->containerImage2->view();
-        medAbstractImageView * imageView2 = dynamic_cast<medAbstractImageView *>(view2);
-        if(!imageView2)
-            return;
-
-        imageView2->removeData(d->ExternalMaskData);
-
-        medAbstractView *view3 = d->containerImage3->view();
-        medAbstractImageView * imageView3 = dynamic_cast<medAbstractImageView *>(view3);
-        if(!imageView3)
-            return;
-
-        imageView3->removeData(d->ExternalMaskData);
-    }
-
-    d->ExternalMask = dynamic_cast <medAbstractImageData *> ( medDataManager::instance()->retrieveData(index));
-    d->ExternalMaskisSet=true;
-
-    d->containerImage1->addData(medDataManager::instance()->retrieveData(index));
-    d->containerImage2->addData(medDataManager::instance()->retrieveData(index));
-    d->containerImage3->addData(medDataManager::instance()->retrieveData(index));
-
-    d->ExternalMaskData = medDataManager::instance()->retrieveData(index);
-}
 
 QList<medAbstractParameter*> animaLesionsSegmentation::parameters()
 {
@@ -1734,7 +1636,7 @@ int animaLesionsSegmentation::update()
     InputImagePointerUC brainMask = NULL;
 
     InputImagePointerUC ManuSegMask = NULL;
-    InputImagePointerUC ExternalMask = NULL;
+    //InputImagePointerUC ExternalMask = NULL;
 
 
     if(!d->MaskisSet)
@@ -1850,7 +1752,7 @@ int animaLesionsSegmentation::update()
         inputSinksMaskManu = binaryFilterSinks->GetOutput();
 
     }
-    if(d->ExternalMaskisSet)
+    /*if(d->ExternalMaskisSet)
     {
         ExternalMask = this->createInputMasks(d->ExternalMask);
         BinaryFilterType::Pointer binaryFilterSources = BinaryFilterType::New();
@@ -1871,9 +1773,9 @@ int animaLesionsSegmentation::update()
         binaryFilterSinks->Update();
         inputSinksMaskExt = binaryFilterSinks->GetOutput();
 
-    }
+    }*/
 
-    if(d->ExternalMaskisSet || d->ManuSegMaskisSet) //&& images valid avec au moins 1 et 2 tags
+   /* if(d->ExternalMaskisSet || d->ManuSegMaskisSet) //&& images valid avec au moins 1 et 2 tags
     {
         MaximumFilterType::Pointer maximumFilterSources = MaximumFilterType::New();
         maximumFilterSources->SetInput(0, inputSourcesMaskManu);
@@ -1902,7 +1804,7 @@ int animaLesionsSegmentation::update()
 
         //TODO: check if there is at least one sources pixels and one sinks pixel
 
-    }
+    }*/
 
     // Set parameters
     segFilter->SetSegAutoEnable( d->enableAuto->getCheckBox()->isChecked() );
@@ -1982,28 +1884,13 @@ int animaLesionsSegmentation::update()
     d->lesionLoad = segFilter->GetLesionLoad();
     d->lesionLoadVector = segFilter->GetLesionLoadVector();
 
-    QString seriesDescriptionLesions, seriesDescriptionCSF, seriesDescriptionGM, seriesDescriptionWM;
-    QString SeriesDescription = d->parent->input<medAbstractData>(0)->metadata ( medMetaDataKeys::SeriesDescription.key() );
-
-    d->LesionsSeg = segFilter->GetOutputLesions();
     d->outputLesions->setData ( segFilter->GetOutputLesions() );
-    seriesDescriptionLesions += "Lesions " + SeriesDescription;
-    d->outputLesions->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionLesions );
 
     if(d->enableAuto->getCheckBox()->isChecked())
     {
-
         d->outputCSF->setData ( segFilter->GetOutputCSF() );
-        seriesDescriptionCSF += "CSF " + SeriesDescription;
-        d->outputCSF->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionCSF );
-
         d->outputGM->setData ( segFilter->GetOutputGM() );
-        seriesDescriptionGM += "GM " + SeriesDescription;
-        d->outputGM->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionGM );
-
         d->outputWM->setData ( segFilter->GetOutputWM() );
-        seriesDescriptionWM += "WM " + SeriesDescription;
-        d->outputWM->addMetaData ( medMetaDataKeys::SeriesDescription.key(), seriesDescriptionWM );
     }
 
     return(0);
@@ -2343,7 +2230,6 @@ void animaLesionsSegmentation::ChangeManuState(bool state)
     {
         d->multiVarSources->getSpinBox()->setDisabled(false);
         d->multiVarSinks->getSpinBox()->setDisabled(false);
-        d->ExternalMaskParameter->getDropSite()->setDisabled(false);
         d->ManuSegMaskParameter->getDropSite()->setDisabled(false);
     }
 
@@ -2353,7 +2239,6 @@ void animaLesionsSegmentation::ChangeManuState(bool state)
         d->enableAuto->getCheckBox()->setChecked(true);
         d->multiVarSources->getSpinBox()->setDisabled(true);
         d->multiVarSinks->getSpinBox()->setDisabled(true);
-        d->ExternalMaskParameter->getDropSite()->setDisabled(true);
         d->ManuSegMaskParameter->getDropSite()->setDisabled(true);
     }
 }
