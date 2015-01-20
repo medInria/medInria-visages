@@ -121,6 +121,7 @@ public:
     medBoolParameter *enableAuto;
     medBoolParameter *enableManu;
     medBoolParameter *useFormerSegModel;
+    QVBoxLayout *ReRunProcessLayout;
 
     medStringListParameter *algoEM;
     medStringListParameter *init;
@@ -406,26 +407,29 @@ animaLesionsSegmentation::animaLesionsSegmentation(): medAbstractSegmentationPro
     d->useFormerSegModel->getCheckBox()->setCheckState(Qt::Unchecked);
     d->useFormerSegModel->getCheckBox()->setCheckable(false);
 
-    medStringParameter *AutoText = new medStringParameter("Enable automatic computation",this);
+    //medStringParameter *AutoText = new medStringParameter("Enable automatic computation",this);
     medStringParameter *KeepSegText = new medStringParameter("Keep former NABT estimation",this);
 
-    medStringParameter *manuText = new medStringParameter("Enable manual masks",this);
+    medStringParameter *manuText = new medStringParameter("Use lesions as new entry",this);
     d->enableManu = new medBoolParameter("manu",this);
-    d->enableManu->setToolTip("Enable manual masks as entries");
+    d->enableManu->setToolTip("Use lesions as new entry");
     d->enableManu->getCheckBox()->setCheckState(Qt::Unchecked);
+    d->enableManu->getCheckBox()->setCheckable(false);
 
     QFormLayout *enableAutoLayout = new QFormLayout();
-    enableAutoLayout->addRow(AutoText->getLabel(),d->enableAuto->getWidget());
+    //enableAutoLayout->addRow(AutoText->getLabel(),d->enableAuto->getWidget());
     enableAutoLayout->addRow(KeepSegText->getLabel(),d->useFormerSegModel->getWidget());
     enableAutoLayout->addRow(manuText->getLabel(),d->enableManu->getWidget());
 
-    QVBoxLayout *aaa =  new QVBoxLayout;
-    aaa->addLayout(enableAutoLayout);
-    aaa->addLayout(ManuMaskLayout);
+    d->ReRunProcessLayout =  new QVBoxLayout;
+    d->ReRunProcessLayout->addLayout(enableAutoLayout);
+    d->ReRunProcessLayout->addLayout(ManuMaskLayout);
+   // d->ReRunProcessLayout->setEnabled(true);
 
 
     d->AutoGroupBox = new QGroupBox(tr("Use automatic seg"));
-    d->AutoGroupBox->setLayout(aaa);
+    d->AutoGroupBox->setLayout( d->ReRunProcessLayout );
+    d->AutoGroupBox->setEnabled(false);
 
 
     d->init = new medStringListParameter("init", this);
@@ -1198,6 +1202,8 @@ void animaLesionsSegmentation::displayOutputs()
 
     QString SeriesDescription = d->maskData->metadata ( medMetaDataKeys::SeriesDescription.key() );
     d->useFormerSegModel->getCheckBox()->setCheckable(true);
+    d->enableManu->getCheckBox()->setCheckable(true);
+    d->ReRunProcessLayout->setEnabled(true);
 
     // clean data if necessary
     if(imageView1->contains(d->outputCSF))
@@ -1618,10 +1624,10 @@ int animaLesionsSegmentation::update()
     typedef itk::Image <unsigned char,3> InputImageTypeUC;
     typedef InputImageTypeUC::Pointer InputImagePointerUC;
 
-    unsigned char sourcesLabel = 255;
+    /*unsigned char sourcesLabel = 1;
     unsigned char sinksLabel = 2;
     typedef itk::BinaryThresholdImageFilter<InputImageTypeUC, InputImageTypeUC > BinaryFilterType;
-    typedef itk::MaximumImageFilter<InputImageTypeUC, InputImageTypeUC, InputImageTypeUC> MaximumFilterType;
+    typedef itk::MaximumImageFilter<InputImageTypeUC, InputImageTypeUC, InputImageTypeUC> MaximumFilterType;*/
 
     // Create instance of segmentation filter
     typedef anima::SegmentationFilter<InputImageTypeF,InputImageTypeUC>  FilterTypeSeg;
@@ -1635,8 +1641,7 @@ int animaLesionsSegmentation::update()
 
     InputImagePointerUC brainMask = NULL;
 
-    InputImagePointerUC ManuSegMask = NULL;
-    //InputImagePointerUC ExternalMask = NULL;
+    //InputImagePointerUC ManuSegMask = NULL;
 
 
     if(!d->MaskisSet)
@@ -1706,7 +1711,23 @@ int animaLesionsSegmentation::update()
         segFilter->SetInputImageT1Gd( inputT1Gd );
     }
 
-    InputImagePointerUC inputSourcesMaskManu  = InputImageTypeUC::New();
+
+    if(d->tour==0)
+    {
+        segFilter->SetSegAutoEnable( true );
+        segFilter->SetSegManuEnable( false );
+    }
+    /*else
+    {
+
+    }
+    if( (d->tour>0) && d->enableManu->getCheckBox()->isChecked())
+    {
+
+    }*/
+
+
+    /*InputImagePointerUC inputSourcesMaskManu  = InputImageTypeUC::New();
     inputSourcesMaskManu->SetRegions(brainMask->GetLargestPossibleRegion());
     inputSourcesMaskManu->CopyInformation(brainMask);
     inputSourcesMaskManu->Allocate();
@@ -1718,17 +1739,6 @@ int animaLesionsSegmentation::update()
     inputSinksMaskManu->Allocate();
     inputSinksMaskManu->FillBuffer(0);
 
-    InputImagePointerUC inputSourcesMaskExt  = InputImageTypeUC::New();
-    inputSourcesMaskExt->SetRegions(brainMask->GetLargestPossibleRegion());
-    inputSourcesMaskExt->CopyInformation(brainMask);
-    inputSourcesMaskExt->Allocate();
-    inputSourcesMaskExt->FillBuffer(0);
-
-    InputImagePointerUC inputSinksMaskExt  = InputImageTypeUC::New();
-    inputSinksMaskExt->SetRegions(brainMask->GetLargestPossibleRegion());
-    inputSinksMaskExt->CopyInformation(brainMask);
-    inputSinksMaskExt->Allocate();
-    inputSinksMaskExt->FillBuffer(0);
 
     if(d->ManuSegMaskisSet)
     {
@@ -1751,29 +1761,8 @@ int animaLesionsSegmentation::update()
         binaryFilterSinks->Update();
         inputSinksMaskManu = binaryFilterSinks->GetOutput();
 
-    }
-    /*if(d->ExternalMaskisSet)
-    {
-        ExternalMask = this->createInputMasks(d->ExternalMask);
-        BinaryFilterType::Pointer binaryFilterSources = BinaryFilterType::New();
-        binaryFilterSources->SetInput( ExternalMask );
-        binaryFilterSources->SetOutsideValue( 0 );
-        binaryFilterSources->SetInsideValue( 1 );
-        binaryFilterSources->SetLowerThreshold( sourcesLabel );
-        binaryFilterSources->SetUpperThreshold( sourcesLabel );
-        binaryFilterSources->Update();
-        inputSourcesMaskExt = binaryFilterSources->GetOutput();
-
-        BinaryFilterType::Pointer binaryFilterSinks = BinaryFilterType::New();
-        binaryFilterSinks->SetInput( ExternalMask );
-        binaryFilterSinks->SetOutsideValue( 0 );
-        binaryFilterSinks->SetInsideValue( 1 );
-        binaryFilterSinks->SetLowerThreshold( sinksLabel );
-        binaryFilterSinks->SetUpperThreshold( sinksLabel );
-        binaryFilterSinks->Update();
-        inputSinksMaskExt = binaryFilterSinks->GetOutput();
-
     }*/
+
 
    /* if(d->ExternalMaskisSet || d->ManuSegMaskisSet) //&& images valid avec au moins 1 et 2 tags
     {
@@ -1807,8 +1796,6 @@ int animaLesionsSegmentation::update()
     }*/
 
     // Set parameters
-    segFilter->SetSegAutoEnable( d->enableAuto->getCheckBox()->isChecked() );
-    segFilter->SetSegManuEnable( d->enableManu->getCheckBox()->isChecked() );
     segFilter->SetVerbose(true);
     segFilter->SetNumberOfThreads( d->threads->value() );
 
@@ -1860,7 +1847,6 @@ int animaLesionsSegmentation::update()
     try
     {
         segFilter->Update();
-        //segFilter->WriteOutputs();
     }
     catch( std::exception & err )
     {
