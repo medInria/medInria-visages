@@ -10,11 +10,12 @@
 //
 // /////////////////////////////////////////////////////////////////
 
-#include "itkImageRegistrationMethod.h"
+#include <itkImageRegistrationMethod.h>
 
-#include "itkImage.h"
-#include "itkResampleImageFilter.h"
-#include "itkCastImageFilter.h"
+#include <itkImage.h>
+#include <itkResampleImageFilter.h>
+#include <itkCastImageFilter.h>
+#include <itkStationaryVelocityFieldTransform.h>
 
 
 #include "time.h"
@@ -23,6 +24,10 @@
 #include <rpiAnimaDenseBMRegistration.h>
 #include <rpiCommonTools.hxx>
 
+#include <animaDenseBMRegistrationToolBox.h>
+#include <medAbstractDataFactory.h>
+#include <medSVFTransformation.h>
+#include <medToolBoxHeader.h>
 
 
 // /////////////////////////////////////////////////////////////////
@@ -45,38 +50,8 @@ public:
     static void eventCallback ( itk::Object *caller, const itk::EventObject& event, void *clientData );
     
     void * registrationMethod;
-    
-    unsigned int blockSize;
-    unsigned int blockSpacing;
-    float stDevThreshold;
-    unsigned int transform;
-    unsigned int metric;  
-    unsigned int optimizer;
-    unsigned int maximumIterations;
-    float minimalTransformError;
-    unsigned int optimizerMaximumIterations;
-    double searchRadius;
-    double searchAngleRadius;
-    double searchSkewRadius;
-    double searchScaleRadius;
-    double finalRadius;
-    double stepSize;
-    double translateUpperBound;
-    double angleUpperBound;
-    double skewUpperBound;
-    double scaleUpperBound;
-    unsigned int agregator;
-    double extrapolationSigma;
-    double elasticSigma;
-    double outlierSigma;
-    double mEstimateConvergenceThreshold;
-    double neighborhoodApproximation;
-    bool useTransformationDam;
-    double damDistance;
-    unsigned int numberOfPyramidLevels;
-    unsigned int lastPyramidLevel;
-    double percentageKept;
-    unsigned int numberOfThreads;
+
+    animaDenseBMRegistrationToolBox *toolbox;
     
     animaDenseBMRegistration* parent;
     itk::CStyleCommand::Pointer callback;
@@ -92,40 +67,12 @@ animaDenseBMRegistration::animaDenseBMRegistration(void) : itkProcessRegistratio
     d->proc = this;
     d->registrationMethod = NULL;
     
-    d->blockSize = 5;
-    d->blockSpacing = 2;
-    d->stDevThreshold = 5;
-    d->transform = Translation;
-    d->metric = SquaredCorrelation;  
-    d->optimizer = Bobyqa;
-    d->maximumIterations = 10;
-    d->minimalTransformError = 0.01;
-    d->optimizerMaximumIterations = 100;
-    d->searchRadius = 1;
-    d->searchAngleRadius = 5;
-    d->searchSkewRadius = 5;
-    d->searchScaleRadius = 0.1;
-    d->finalRadius = 0.001;
-    d->stepSize = 1;
-    d->translateUpperBound = 10;
-    d->angleUpperBound = 180;
-    d->skewUpperBound = 45;
-    d->scaleUpperBound = 3;
-    d->agregator = Baloo;
-    d->extrapolationSigma = 2;
-    d->elasticSigma = 2;
-    d->outlierSigma = 3;
-    d->mEstimateConvergenceThreshold = 0.01;
-    d->neighborhoodApproximation = 2.5;
-    d->useTransformationDam = true;
-    d->damDistance = 2.5;
-    d->numberOfPyramidLevels = 3;
-    d->lastPyramidLevel = 0;
-    d->percentageKept = 0.8;
-    d->numberOfThreads = 2;
-    
     d->parent = this;
     this->setProperty("transformType","nonRigid");
+
+    d->toolbox = new animaDenseBMRegistrationToolBox();
+    d->toolbox->addWidget(itkProcessRegistration::toolbox());
+    itkProcessRegistration::toolbox()->header()->hide();
 }
 
 animaDenseBMRegistration::~animaDenseBMRegistration(void)
@@ -146,7 +93,7 @@ animaDenseBMRegistration::~animaDenseBMRegistration(void)
 bool animaDenseBMRegistration::registered(void)
 {
     return dtkAbstractProcessFactory::instance()->registerProcessType("animaDenseBMRegistration",
-                                                                      createAnimaDenseBMRegistration);
+                                                                      createAnimaDenseBMRegistration, "medAbstractEstimateTransformationProcess");
 }
 
 QString animaDenseBMRegistration::description(void) const
@@ -192,6 +139,11 @@ QString animaDenseBMRegistration::getTitleAndParameters()
     return titleAndParameters;
 }
 
+medToolBox* animaDenseBMRegistration::toolbox()
+{
+    return d->toolbox;
+}
+
 // /////////////////////////////////////////////////////////////////
 // Templated Version of update
 // /////////////////////////////////////////////////////////////////
@@ -233,37 +185,37 @@ int animaDenseBMRegistrationPrivate::update(void)
     registration->SetFixedImage((const FixedImageType*) proc->fixedImage().GetPointer());
     registration->SetMovingImage((const MovingImageType*) proc->movingImages()[0].GetPointer());
     
-    registration->SetBlockSize (blockSize);
-    registration->SetBlockSpacing (blockSpacing);
-    registration->SetStDevThreshold (stDevThreshold);
-    registration->SetTransform (transform);
-    registration->SetMetric (metric);
-    registration->SetOptimizer (optimizer);
-    registration->SetMaximumIterations (maximumIterations);
-    registration->SetMinimalTransformError (minimalTransformError);
-    registration->SetOptimizerMaximumIterations (optimizerMaximumIterations);
-    registration->SetSearchRadius (searchRadius);
-    registration->SetSearchAngleRadius (searchAngleRadius);
-    registration->SetSearchSkewRadius (searchSkewRadius);
-    registration->SetSearchScaleRadius (searchScaleRadius);
-    registration->SetFinalRadius (finalRadius);
-    registration->SetStepSize (stepSize);
-    registration->SetTranslateUpperBound (translateUpperBound);
-    registration->SetAngleUpperBound (angleUpperBound);
-    registration->SetSkewUpperBound (skewUpperBound);
-    registration->SetScaleUpperBound (scaleUpperBound);
-    registration->SetAgregator (agregator);
-    registration->SetExtrapolationSigma (extrapolationSigma);
-    registration->SetElasticSigma (elasticSigma);
-    registration->SetOutlierSigma (outlierSigma);
-    registration->SetMEstimateConvergenceThreshold (mEstimateConvergenceThreshold);
-    registration->SetNeighborhoodApproximation (neighborhoodApproximation);
-    registration->SetUseTransformationDam (useTransformationDam);
-    registration->SetDamDistance (damDistance);
-    registration->SetNumberOfPyramidLevels (numberOfPyramidLevels);
-    registration->SetLastPyramidLevel (lastPyramidLevel);
-    registration->SetPercentageKept (percentageKept);
-    registration->SetNumberOfThreads (numberOfThreads);
+    registration->SetBlockSize (toolbox->blockSize());
+    registration->SetBlockSpacing (toolbox->blockSpacing());
+    registration->SetStDevThreshold (toolbox->stDevThreshold());
+    registration->SetTransform (toolbox->transform());
+    registration->SetMetric (toolbox->metric());
+    registration->SetOptimizer (toolbox->optimizer());
+    registration->SetMaximumIterations (toolbox->maximumIterations());
+    registration->SetMinimalTransformError (toolbox->minimalTransformError());
+    registration->SetOptimizerMaximumIterations (toolbox->optimizerMaximumIterations());
+    registration->SetSearchRadius (toolbox->searchRadius());
+    registration->SetSearchAngleRadius (toolbox->searchAngleRadius());
+    registration->SetSearchSkewRadius (toolbox->searchSkewRadius());
+    registration->SetSearchScaleRadius (toolbox->searchScaleRadius());
+    registration->SetFinalRadius (toolbox->finalRadius());
+    registration->SetStepSize (toolbox->stepSize());
+    registration->SetTranslateUpperBound (toolbox->translateUpperBound());
+    registration->SetAngleUpperBound (toolbox->angleUpperBound());
+    registration->SetSkewUpperBound (toolbox->skewUpperBound());
+    registration->SetScaleUpperBound (toolbox->scaleUpperBound());
+    registration->SetAgregator (toolbox->agregator());
+    registration->SetExtrapolationSigma (toolbox->extrapolationSigma());
+    registration->SetElasticSigma (toolbox->elasticSigma());
+    registration->SetOutlierSigma (toolbox->outlierSigma());
+    registration->SetMEstimateConvergenceThreshold (toolbox->mEstimateConvergenceThreshold());
+    registration->SetNeighborhoodApproximation (toolbox->neighborhoodApproximation());
+    registration->SetUseTransformationDam (toolbox->useTransformationDam());
+    registration->SetDamDistance (toolbox->damDistance());
+    registration->SetNumberOfPyramidLevels (toolbox->numberOfPyramidLevels());
+    registration->SetLastPyramidLevel (toolbox->lastPyramidLevel());
+    registration->SetPercentageKept (toolbox->percentageKept());
+    registration->SetNumberOfThreads (toolbox->numberOfThreads());
     
     // Run the registration
     time_t t1 = clock();
@@ -280,30 +232,23 @@ int animaDenseBMRegistrationPrivate::update(void)
     
     qDebug() << "Elasped time: " << (double)(t2-t1)/(double)CLOCKS_PER_SEC;
     
-    typedef itk::ResampleImageFilter< MovingImageType,MovingImageType,double >    ResampleFilterType;
-    typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
-    resampler->SetTransform(registration->GetTransformation());
-    resampler->SetInput((const MovingImageType*)proc->movingImages()[0].GetPointer());
-    resampler->SetSize( proc->fixedImage()->GetLargestPossibleRegion().GetSize() );
-    resampler->SetOutputOrigin( proc->fixedImage()->GetOrigin() );
-    resampler->SetOutputSpacing( proc->fixedImage()->GetSpacing() );
-    resampler->SetOutputDirection( proc->fixedImage()->GetDirection() );
-    resampler->SetDefaultPixelValue( 0 );
-    
-    
-    try {
-        resampler->Update();
+    medAbstractData *imageTransfo = medAbstractDataFactory::instance()->create("medItkVectorDouble3ImageData");
+
+    itk::StationaryVelocityFieldTransform<double> *rpiTransfo =
+            dynamic_cast< itk::StationaryVelocityFieldTransform<double>* >(static_cast<itk::Object*>(registration->GetTransformation()) );
+
+    if(rpiTransfo)
+    {
+        typedef itk::StationaryVelocityFieldTransform<double>::VectorFieldType VectorFieldType;
+        VectorFieldType::Pointer temp = const_cast<VectorFieldType*>(rpiTransfo->GetParametersAsVectorField());
+        imageTransfo->setData(temp);
     }
-    catch (itk::ExceptionObject &e) {
-        qDebug() << e.GetDescription();
-        return 1;
-    }
-    
-    itk::ImageBase<3>::Pointer result = resampler->GetOutput();
-    result->DisconnectPipeline();
-    
-    if (proc->output())
-        proc->output()->setData (result);
+
+    medSVFTransformation *transfo = new medSVFTransformation;
+    transfo->setParameter(imageTransfo);
+
+    proc->setOutput(transfo, 0);
+
     return 0;
 }
 
@@ -327,7 +272,9 @@ bool animaDenseBMRegistrationPrivate::writeTransform(const QString& file)
     {
         try
         {
-            rpi::writeDisplacementFieldTransformation<TransformScalarType, 3>(registration->GetTransformation(), file.toStdString());
+
+            //rpi::writeDisplacementFieldTransformation<TransformScalarType, 3>(registration->GetTransformation(), file.toStdString());
+            rpi::writeStationaryVelocityFieldTransformation<TransformScalarType, 3>(registration->GetTransformation(), file.toStdString());
             
         }
         catch (std::exception)
@@ -343,6 +290,13 @@ bool animaDenseBMRegistrationPrivate::writeTransform(const QString& file)
     
 }
 
+
+/**
+ * @brief
+ *
+ * @param file The path to the file is assumed to be existing. However the file may not exist beforehand.
+ * @return bool successful or not.
+ */
 bool animaDenseBMRegistration::writeTransform(const QString& file)
 {
     if(d->registrationMethod == NULL)
@@ -369,161 +323,6 @@ void animaDenseBMRegistration::onCanceled (void)
 {   
     if(d->registrationMethod != NULL)
         d->abort<float>();
-}
-
-void animaDenseBMRegistration::setBlockSize(int blockSize)
-{
-    d->blockSize=blockSize;
-}
-
-void animaDenseBMRegistration::setBlockSpacing(unsigned int blockSpacing) 
-{
-    d->blockSpacing=blockSpacing;
-}
-
-void animaDenseBMRegistration::setStDevThreshold(float StDevThreshold) 
-{
-    d->stDevThreshold=StDevThreshold;
-}
-
-void animaDenseBMRegistration::setTransform(unsigned int transform) 
-{
-    d->transform=transform;
-}
-
-void animaDenseBMRegistration::setMetric(unsigned int metric) 
-{
-    d->metric=metric;
-}
-
-void animaDenseBMRegistration::setOptimizer(unsigned int optimizer)
-{
-    d->optimizer=optimizer;
-}
-
-void animaDenseBMRegistration::setMaximumIterations(unsigned int MaximumIterations) 
-{
-    d->maximumIterations=MaximumIterations;
-}
-
-void animaDenseBMRegistration::setMinimalTransformError(float MinimalTransformError) 
-{
-    d->minimalTransformError=MinimalTransformError;
-}
-
-void animaDenseBMRegistration::setOptimizerMaximumIterations(unsigned int OptimizerMaximumIterations) 
-{
-    d->optimizerMaximumIterations=OptimizerMaximumIterations;
-}
-
-void animaDenseBMRegistration::setSearchRadius(double SearchRadius) 
-{
-    d->searchRadius=SearchRadius;
-}
-
-void animaDenseBMRegistration::setSearchAngleRadius(double SearchAngleRadius) 
-{
-    d->searchAngleRadius=SearchAngleRadius;
-}
-
-void animaDenseBMRegistration::setSearchSkewRadius(double SearchSkewRadius) 
-{
-    d->searchSkewRadius=SearchSkewRadius;
-}
-
-void animaDenseBMRegistration::setSearchScaleRadius(double SearchScaleRadius) 
-{
-    d->searchScaleRadius=SearchScaleRadius;
-}
-
-void animaDenseBMRegistration::setFinalRadius(double FinalRadius) 
-{
-    d->finalRadius=FinalRadius;
-}
-
-void animaDenseBMRegistration::setStepSize(double StepSize) 
-{
-    d->stepSize=StepSize;
-}
-
-void animaDenseBMRegistration::setTranslateUpperBound(double TranslateUpperBound)
-{
-    d->translateUpperBound=TranslateUpperBound;
-}
-
-void animaDenseBMRegistration::setAngleUpperBound(double AngleUpperBound) 
-{
-    d->angleUpperBound=AngleUpperBound;
-}
-
-void animaDenseBMRegistration::setSkewUpperBound(double SkewUpperBound)
-{
-    d->skewUpperBound=SkewUpperBound;
-}
-
-void animaDenseBMRegistration::setScaleUpperBound(double ScaleUpperBound) 
-{
-    d->scaleUpperBound=ScaleUpperBound;
-}
-
-void animaDenseBMRegistration::setAgregator(unsigned int agregator)
-{
-    d->agregator=agregator;
-}
-
-void animaDenseBMRegistration::setExtrapolationSigma(double extrapolationSigma)
-{
-    d->extrapolationSigma = extrapolationSigma;
-}
-
-void animaDenseBMRegistration::setElasticSigma(double elasticSigma)
-{
-    d->elasticSigma = elasticSigma;
-}
-
-void animaDenseBMRegistration::setOutlierSigma(double outlierSigma)
-{
-    d->outlierSigma = outlierSigma;
-}
-
-void animaDenseBMRegistration::setMEstimateConvergenceThreshold(double mEstimateConvergenceThreshold)
-{
-    d->mEstimateConvergenceThreshold = mEstimateConvergenceThreshold;
-}
-
-void animaDenseBMRegistration::setNeighborhoodApproximation(double neighborhoodApproximation)
-{
-    d->neighborhoodApproximation = neighborhoodApproximation;
-}
-
-void animaDenseBMRegistration::setUseTransformationDam(bool useTransformationDam)
-{
-    d->useTransformationDam = useTransformationDam;
-}
-
-void animaDenseBMRegistration::setDamDistance(double damDistance)
-{
-    d->damDistance = damDistance;
-}
-
-void animaDenseBMRegistration::setNumberOfPyramidLevels(unsigned int NumberOfPyramidLevels)
-{
-    d->numberOfPyramidLevels=NumberOfPyramidLevels;
-}
-
-void animaDenseBMRegistration::setLastPyramidLevel(unsigned int LastPyramidLevel) 
-{
-    d->lastPyramidLevel=LastPyramidLevel;
-}
-
-void animaDenseBMRegistration::setPercentageKept(double PercentageKept)
-{
-    d->percentageKept=PercentageKept;
-}
-
-void animaDenseBMRegistration::setNumberOfThreads(int numberOfThreads) 
-{
-    d->numberOfThreads=numberOfThreads;
 }
 
 

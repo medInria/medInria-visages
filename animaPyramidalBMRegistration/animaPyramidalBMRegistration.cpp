@@ -4,13 +4,7 @@
 
 #include "animaPyramidalBMRegistration.h"
 
-#include <dtkCore/dtkAbstractData.h>
-#include <dtkCore/dtkAbstractDataFactory.h>
 #include <dtkCore/dtkAbstractProcessFactory.h>
-
-// /////////////////////////////////////////////////////////////////
-//
-// /////////////////////////////////////////////////////////////////
 
 #include "itkImageRegistrationMethod.h"
 
@@ -18,13 +12,16 @@
 #include "itkResampleImageFilter.h"
 #include "itkCastImageFilter.h"
 
-
 #include "time.h"
 
 // Include specific RPI implementation of the registration method
 #include <rpiAnimaPyramidalBMRegistration.h>
 #include <rpiCommonTools.hxx>
 
+#include <animaPyramidalBMRegistrationToolBox.h>
+#include <medAbstractDataFactory.h>
+#include <medLinearTransformation.h>
+#include <medToolBoxHeader.h>
 
 
 // /////////////////////////////////////////////////////////////////
@@ -49,34 +46,8 @@ public:
     void * registrationMethod;
     
     QString initTransformFile;
-    unsigned int blockSize;
-    unsigned int blockSpacing;
-    float stDevThreshold;
-    unsigned int transform;
-    unsigned int metric;  
-    unsigned int optimizer;
-    unsigned int maximumIterations;
-    float minimalTransformError;
-    unsigned int optimizerMaximumIterations;
-    double searchRadius;
-    double searchAngleRadius;
-    double searchSkewRadius;
-    double searchScaleRadius;
-    double finalRadius;
-    double stepSize;
-    double translateUpperBound;
-    double angleUpperBound;
-    double skewUpperBound;
-    double scaleUpperBound;
-    unsigned int agregator;
-    unsigned int outputTransformType;
-    float agregThreshold;
-    float seStoppingThreshold;
-    unsigned int numberOfPyramidLevels;
-    unsigned int lastPyramidLevel;
-    double percentageKept;
-    bool initializeOnCenterOfGravity;
-    unsigned int numberOfThreads;
+
+    animaPyramidalBMRegistrationToolBox *toolbox;
     
     animaPyramidalBMRegistration* parent;
     itk::CStyleCommand::Pointer callback;
@@ -92,37 +63,12 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->proc = this;
     d->registrationMethod = NULL;
     
-    d->blockSize = 5;
-    d->blockSpacing = 5;
-    d->stDevThreshold = 5;
-    d->transform = Translation;
-    d->metric = SquaredCorrelation;  
-    d->optimizer = Bobyqa;
-    d->maximumIterations = 10;
-    d->minimalTransformError = 0.01;
-    d->optimizerMaximumIterations = 100;
-    d->searchRadius = 2;
-    d->searchAngleRadius = 5;
-    d->searchSkewRadius = 5;
-    d->searchScaleRadius = 0.1;
-    d->finalRadius = 0.001;
-    d->stepSize = 1;
-    d->translateUpperBound = 50;
-    d->angleUpperBound = 180;
-    d->skewUpperBound = 45;
-    d->scaleUpperBound = 3;
-    d->agregator = MEstimation;
-    d->outputTransformType = outRigid;
-    d->agregThreshold = 0.5;
-    d->seStoppingThreshold = 0.01;
-    d->numberOfPyramidLevels = 3;
-    d->lastPyramidLevel = 0;
-    d->percentageKept = 0.8;
-    d->initializeOnCenterOfGravity = false;
-    d->numberOfThreads = 2;
-    
     d->parent = this;
     this->setProperty("transformType","rigid");
+
+    d->toolbox = new animaPyramidalBMRegistrationToolBox();
+    d->toolbox->addWidget(itkProcessRegistration::toolbox());
+    itkProcessRegistration::toolbox()->header()->hide();
 }
 
 animaPyramidalBMRegistration::~animaPyramidalBMRegistration(void)
@@ -143,7 +89,7 @@ animaPyramidalBMRegistration::~animaPyramidalBMRegistration(void)
 bool animaPyramidalBMRegistration::registered(void)
 {
     return dtkAbstractProcessFactory::instance()->registerProcessType("animaPyramidalBMRegistration",
-                                                                 createAnimaPyramidalBMRegistration);
+                                                                 createAnimaPyramidalBMRegistration, "medAbstractEstimateTransformationProcess");
 }
 
 QString animaPyramidalBMRegistration::description(void) const
@@ -187,6 +133,12 @@ QString animaPyramidalBMRegistration::getTitleAndParameters()
 
     //TO DO : add transform type and optimizer used to parameters given
     return titleAndParameters;
+}
+
+
+medToolBox* animaPyramidalBMRegistration::toolbox()
+{
+    return d->toolbox;
 }
 
 // /////////////////////////////////////////////////////////////////
@@ -233,34 +185,34 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     if(!initTransformFile.isEmpty())
        registration->SetInitialTransform( initTransformFile.toStdString() );
     
-    registration->SetBlockSize( blockSize);
-    registration->SetBlockSpacing( blockSpacing);
-    registration->SetStDevThreshold( stDevThreshold);
-    registration->SetTransform( transform);
-    registration->SetMetric( metric);
-    registration->SetOptimizer( optimizer);
-    registration->SetMaximumIterations( maximumIterations);
-    registration->SetMinimalTransformError( minimalTransformError);   
-    registration->SetOptimizerMaximumIterations( optimizerMaximumIterations);
-    registration->SetSearchRadius( searchRadius);
-    registration->SetSearchAngleRadius( searchAngleRadius);
-    registration->SetSearchSkewRadius( searchSkewRadius);
-    registration->SetSearchScaleRadius( searchScaleRadius);
-    registration->SetFinalRadius( finalRadius);
-    registration->SetStepSize( stepSize);
-    registration->SetTranslateUpperBound( translateUpperBound);
-    registration->SetAngleUpperBound( angleUpperBound);
-    registration->SetSkewUpperBound( skewUpperBound);
-    registration->SetScaleUpperBound( scaleUpperBound);
-    registration->SetAgregator( agregator);
-    registration->SetOutputTransformType( outputTransformType);    
-    registration->SetAgregThreshold( agregThreshold);    
-    registration->SetSeStoppingThreshold( seStoppingThreshold);
-    registration->SetNumberOfPyramidLevels( numberOfPyramidLevels);
-    registration->SetLastPyramidLevel( lastPyramidLevel);
-    registration->SetPercentageKept( percentageKept);
-    registration->SetInitializeOnCenterOfGravity( initializeOnCenterOfGravity);
-    registration->SetNumberOfThreads( numberOfThreads);
+    registration->SetBlockSize( toolbox->blockSize());
+    registration->SetBlockSpacing( toolbox->blockSpacing());
+    registration->SetStDevThreshold( toolbox->stDevThreshold());
+    registration->SetTransform( toolbox->transform());
+    registration->SetMetric( toolbox->metric());
+    registration->SetOptimizer( toolbox->optimizer());
+    registration->SetMaximumIterations( toolbox->maximumIterations());
+    registration->SetMinimalTransformError( toolbox->minimalTransformError());
+    registration->SetOptimizerMaximumIterations( toolbox->optimizerMaximumIterations());
+    registration->SetSearchRadius( toolbox->searchRadius());
+    registration->SetSearchAngleRadius( toolbox->searchAngleRadius());
+    registration->SetSearchSkewRadius( toolbox->searchSkewRadius());
+    registration->SetSearchScaleRadius( toolbox->searchScaleRadius());
+    registration->SetFinalRadius( toolbox->finalRadius());
+    registration->SetStepSize( toolbox->stepSize());
+    registration->SetTranslateUpperBound( toolbox->translateUpperBound());
+    registration->SetAngleUpperBound( toolbox->angleUpperBound());
+    registration->SetSkewUpperBound( toolbox->skewUpperBound());
+    registration->SetScaleUpperBound( toolbox->scaleUpperBound());
+    registration->SetAgregator( toolbox->agregator());
+    registration->SetOutputTransformType( toolbox->outputTransformType());
+    registration->SetAgregThreshold( toolbox->agregThreshold());
+    registration->SetSeStoppingThreshold( toolbox->seStoppingThreshold());
+    registration->SetNumberOfPyramidLevels( toolbox->numberOfPyramidLevels());
+    registration->SetLastPyramidLevel( toolbox->lastPyramidLevel());
+    registration->SetPercentageKept( toolbox->percentageKept());
+    registration->SetInitializeOnCenterOfGravity( toolbox->initializeOnCenterOfGravity());
+    registration->SetNumberOfThreads( toolbox->numberOfThreads());
     
     
     // Run the registration
@@ -278,33 +230,35 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     
     qDebug() << "Elasped time: " << (double)(t2-t1)/(double)CLOCKS_PER_SEC;
     
-    typedef itk::ResampleImageFilter< MovingImageType,MovingImageType,double >    ResampleFilterType;
-    typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
-    resampler->SetTransform(registration->GetTransformation());
-    resampler->SetInput((const MovingImageType*)proc->movingImages()[0].GetPointer());
-    resampler->SetSize( proc->fixedImage()->GetLargestPossibleRegion().GetSize() );
-    resampler->SetOutputOrigin( proc->fixedImage()->GetOrigin() );
-    resampler->SetOutputSpacing( proc->fixedImage()->GetSpacing() );
-    resampler->SetOutputDirection( proc->fixedImage()->GetDirection() );
-    resampler->SetDefaultPixelValue( 0 );
-    
-    
-    try {
-        resampler->Update();
+
+    medLinearTransformation *transfo = new medLinearTransformation;
+    itk::AffineTransform<>* affineTransform = dynamic_cast<itk::AffineTransform<> *>(static_cast<itk::Object*>(registration->GetTransformation()));
+    if(affineTransform)
+    {
+        QMatrix4x4 qmatrix;
+        for(int i=0; i<3; i++)
+            for(int j=0; j<3; j++)
+                qmatrix(i,j) =  affineTransform->GetMatrix()[i][j];
+
+        for(int i=0; i<3; i++)
+            qmatrix(i,3) = affineTransform->GetOffset()[i];
+
+        qmatrix(3,3) = 1;
+
+      transfo->setMatrix(qmatrix);
     }
-    catch (itk::ExceptionObject &e) {
-        qDebug() << e.GetDescription();
-        return 1;
-    }
-    
-    itk::ImageBase<3>::Pointer result = resampler->GetOutput();
-    result->DisconnectPipeline();
-    
-    if (proc->output())
-        proc->output()->setData (result);
+
+    proc->setOutput(transfo, 0);
+
     return 0;
 }
 
+/**
+ * @brief Runs the process.
+ *
+ * @param ImageType the fixed image image type.
+ * @return int successful or not.
+ */
 int animaPyramidalBMRegistration::update(itkProcessRegistration::ImageType imgType)
 {
     if(fixedImage().IsNull() || movingImages()[0].IsNull())
@@ -342,6 +296,12 @@ bool animaPyramidalBMRegistrationPrivate::writeTransform(const QString& file)
     
 }
 
+/**
+ * @brief
+ *
+ * @param file The path to the file is assumed to be existing. However the file may not exist beforehand.
+ * @return bool successful or not.
+ */
 bool animaPyramidalBMRegistration::writeTransform(const QString& file)
 {
     if(d->registrationMethod == NULL)
@@ -376,146 +336,6 @@ void animaPyramidalBMRegistration::initTransformFile(QString initTransformFile)
     d->initTransformFile = initTransformFile;
 }
    
-void animaPyramidalBMRegistration::setBlockSize(int blockSize)
-{
-    d->blockSize=blockSize;
-}
-
-void animaPyramidalBMRegistration::setBlockSpacing(unsigned int blockSpacing) 
-{
-    d->blockSpacing=blockSpacing;
-}
-
-void animaPyramidalBMRegistration::setStDevThreshold(float StDevThreshold) 
-{
-    d->stDevThreshold=StDevThreshold;
-}
-
-void animaPyramidalBMRegistration::setTransform(unsigned int transform) 
-{
-    d->transform=transform;
-}
-
-void animaPyramidalBMRegistration::setMetric(unsigned int metric) 
-{
-    d->metric=metric;
-}
-
-void animaPyramidalBMRegistration::setOptimizer(unsigned int optimizer)
-{
-    d->optimizer=optimizer;
-}
-
-void animaPyramidalBMRegistration::setMaximumIterations(unsigned int MaximumIterations) 
-{
-    d->maximumIterations=MaximumIterations;
-}
-
-void animaPyramidalBMRegistration::setMinimalTransformError(float MinimalTransformError) 
-{
-    d->minimalTransformError=MinimalTransformError;
-}
-
-void animaPyramidalBMRegistration::setOptimizerMaximumIterations(unsigned int OptimizerMaximumIterations) 
-{
-    d->optimizerMaximumIterations=OptimizerMaximumIterations;
-}
-
-void animaPyramidalBMRegistration::setSearchRadius(double SearchRadius) 
-{
-    d->searchRadius=SearchRadius;
-}
-
-void animaPyramidalBMRegistration::setSearchAngleRadius(double SearchAngleRadius) 
-{
-    d->searchAngleRadius=SearchAngleRadius;
-}
-
-void animaPyramidalBMRegistration::setSearchSkewRadius(double SearchSkewRadius) 
-{
-    d->searchSkewRadius=SearchSkewRadius;
-}
-
-void animaPyramidalBMRegistration::setSearchScaleRadius(double SearchScaleRadius) 
-{
-    d->searchScaleRadius=SearchScaleRadius;
-}
-
-void animaPyramidalBMRegistration::setFinalRadius(double FinalRadius) 
-{
-    d->finalRadius=FinalRadius;
-}
-
-void animaPyramidalBMRegistration::setStepSize(double StepSize) 
-{
-    d->stepSize=StepSize;
-}
-
-void animaPyramidalBMRegistration::setTranslateUpperBound(double TranslateUpperBound)
-{
-    d->translateUpperBound=TranslateUpperBound;
-}
-
-void animaPyramidalBMRegistration::setAngleUpperBound(double AngleUpperBound) 
-{
-    d->angleUpperBound=AngleUpperBound;
-}
-
-void animaPyramidalBMRegistration::setSkewUpperBound(double SkewUpperBound)
-{
-    d->skewUpperBound=SkewUpperBound;
-}
-
-void animaPyramidalBMRegistration::setScaleUpperBound(double ScaleUpperBound) 
-{
-    d->scaleUpperBound=ScaleUpperBound;
-}
-
-void animaPyramidalBMRegistration::setAgregator(unsigned int agregator)
-{
-    d->agregator=agregator;
-}
-
-void animaPyramidalBMRegistration::setOutputTransformType(unsigned int outputTransform)
-{
-   d-> outputTransformType=outputTransform;
-}
-
-void animaPyramidalBMRegistration::setAgregThreshold(float AgregThreshold)
-{
-    d->agregThreshold=AgregThreshold;
-}
-
-void animaPyramidalBMRegistration::setSeStoppingThreshold(float SeStoppingThreshold)
-{
-    d->seStoppingThreshold=SeStoppingThreshold;
-}
-
-void animaPyramidalBMRegistration::setNumberOfPyramidLevels(unsigned int NumberOfPyramidLevels)
-{
-    d->numberOfPyramidLevels=NumberOfPyramidLevels;
-}
-
-void animaPyramidalBMRegistration::setLastPyramidLevel(unsigned int LastPyramidLevel) 
-{
-    d->lastPyramidLevel=LastPyramidLevel;
-}
-
-void animaPyramidalBMRegistration::setPercentageKept(double PercentageKept)
-{
-    d->percentageKept=PercentageKept;
-}
-
-void animaPyramidalBMRegistration::setInitializeOnCenterOfGravity(bool InitializeOnCenterOfGravity)
-{
-    d->initializeOnCenterOfGravity=InitializeOnCenterOfGravity;
-}
-
-void animaPyramidalBMRegistration::setNumberOfThreads(int numberOfThreads) 
-{
-    d->numberOfThreads=numberOfThreads;
-}
-
 
 // /////////////////////////////////////////////////////////////////
 // Type instanciation

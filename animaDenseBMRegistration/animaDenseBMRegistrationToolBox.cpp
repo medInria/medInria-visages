@@ -7,11 +7,8 @@
 
 #include <QtGui>
 
-#include <dtkCore/dtkAbstractProcessFactory.h>
-#include <medAbstractRegistrationProcess.h>
 #include <dtkCore/dtkSmartPointer.h>
 
-#include <medRunnableProcess.h>
 #include <medJobManager.h>
 
 #include <medAbstractImageData.h>
@@ -79,8 +76,6 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     //QToolBox *widget = new QToolBox(this);
     medToolBoxTab *widget = new medToolBoxTab(this);
 
-    QPushButton *runButton = new QPushButton(tr("Run"), this);
-
     this->setTitle("Pyramidal BM Registration");
 
     // progression stack
@@ -119,7 +114,7 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     QStringList metricList;
     metricList << "SquaredCorrelation" << "Correlation" << "MeanSquares";
     d->metric->addItems ( metricList );
-    
+        
     d->optimizer = new QComboBox;
     d->optimizer->setToolTip("Optimizer for optimal block search");
     QStringList optimizerList;
@@ -129,7 +124,7 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     
     d->maxIterations = new QSpinBox;
     d->maxIterations->setToolTip("Maximum Block Match Iteration");
-    d->maxIterations->setValue(10);
+    d->maxIterations->setValue(2);
     
     d->minError = new QDoubleSpinBox;
     d->minError->setToolTip("Minimal distance between consecutive estimated transforms");
@@ -196,13 +191,13 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     
     d->extrapolationSigma = new QDoubleSpinBox;
     d->extrapolationSigma->setToolTip("Sigma for dense field extrapolation (similar to fluid regularization)");
-    d->extrapolationSigma->setValue(3.0);
+    d->extrapolationSigma->setValue(2.0);
     d->extrapolationSigma->setDecimals(2);
     d->extrapolationSigma->setSingleStep(0.01);
     
     d->elasticSigma = new QDoubleSpinBox;
     d->elasticSigma->setToolTip("Sigma for transformation elastic smoothing");
-    d->elasticSigma->setValue(3.0);
+    d->elasticSigma->setValue(2.0);
     d->elasticSigma->setDecimals(2);
     d->elasticSigma->setSingleStep(0.01);
     
@@ -226,7 +221,7 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     
     d->useTransformationDam = new QCheckBox;
     d->useTransformationDam->setToolTip("Use dam to impose identity transform outside the image?");
-    d->useTransformationDam->setCheckState(Qt::Unchecked);
+    d->useTransformationDam->setCheckState(Qt::Checked);
     
     d->damDistance = new QDoubleSpinBox;
     d->damDistance->setToolTip("Distance in pixels from which the image is considered background");
@@ -317,7 +312,6 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     
     QWidget *header = new QWidget;
     QVBoxLayout *layoutheader = new QVBoxLayout(header);   
-    layoutheader->addWidget(runButton);
     layoutheader->addWidget(d->progression_stack);
     
     QWidget *page1 = new QWidget;
@@ -336,8 +330,6 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
    
     this->addWidget( header );
     this->addWidget( widget );
-
-    connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
     
     connect(d->optimizer, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMOptimizerParams(int)));
     connect(d->transform, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMTransformParams(int)));
@@ -369,92 +361,6 @@ bool animaDenseBMRegistrationToolBox::registered(void)
     registerToolBox<animaDenseBMRegistrationToolBox>();
 }
 
-void animaDenseBMRegistrationToolBox::run(void)
-{ 
-    if(!this->parentToolBox())
-        return;
-
-    dtkSmartPointer <medAbstractRegistrationProcess> process;
-
-    if (this->parentToolBox()->process() &&
-        (this->parentToolBox()->process()->identifier() == "animaDenseBMRegistration"))
-    {
-        process = this->parentToolBox()->process();   
-    }
-    else
-    {
-        process = dtkAbstractProcessFactory::instance()->createSmartPointer("animaDenseBMRegistration");
-
-        this->parentToolBox()->setProcess(process);
-    }
-    
-    dtkSmartPointer<medAbstractData> fixedData = this->parentToolBox()->fixedData();
-    dtkSmartPointer<medAbstractData> movingData = this->parentToolBox()->movingData();
-    
-    if (!fixedData || !movingData)
-        return;
-    
-    animaDenseBMRegistration *process_Registration = dynamic_cast<animaDenseBMRegistration *>(process.data());
-    if (!process_Registration)
-    {
-        qWarning() << "registration process doesn't exist" ;
-        return;
-    }
-
-    // Setting process arguments
-    process_Registration->setBlockSize( d->blockSize->value() );
-    process_Registration->setBlockSpacing( d->blockSpacing->value() );
-    process_Registration->setPercentageKept( d->percentageKept->value() );
-    process_Registration->setStDevThreshold( d->stdThreshold->value() );
-    process_Registration->setTransform( d->transform->currentIndex() );
-    process_Registration->setMetric( d->metric->currentIndex() );
-    process_Registration->setOptimizer( d->optimizer->currentIndex() );
-    process_Registration->setMaximumIterations( d->maxIterations->value() );
-    process_Registration->setMinimalTransformError( d->minError->value() );
-    process_Registration->setOptimizerMaximumIterations( d->optIterations->value() );
-    process_Registration->setSearchRadius( d->searchRadius->value() );
-    process_Registration->setSearchAngleRadius( d->searchAngleRadius->value() );
-    process_Registration->setSearchSkewRadius( d->searchSkewRadius->value() );
-    process_Registration->setSearchScaleRadius( d->searchScaleRadius->value() );
-    process_Registration->setStepSize( d->stepSize->value() );
-    process_Registration->setTranslateUpperBound( d->translateUpperBound->value() );
-    process_Registration->setAngleUpperBound( d->angleUpperBound->value() );
-    process_Registration->setSkewUpperBound( d->skewUpperBound->value() );
-    process_Registration->setScaleUpperBound( d->scaleUpperBound->value() );
-    process_Registration->setAgregator( d->agregator->currentIndex() );
-    process_Registration->setExtrapolationSigma (d->extrapolationSigma->value());
-    process_Registration->setElasticSigma (d->elasticSigma->value());
-    process_Registration->setOutlierSigma (d->outlierSigma->value());
-    process_Registration->setMEstimateConvergenceThreshold(d->mEstimateConvergenceThreshold->value());
-    process_Registration->setNeighborhoodApproximation(d->neighborhoodApproximation->value());
-    process_Registration->setUseTransformationDam(d->useTransformationDam->isChecked());
-    process_Registration->setDamDistance(d->damDistance->value());
-    process_Registration->setNumberOfPyramidLevels( d->pyramidLevels->value() );
-    process_Registration->setLastPyramidLevel( d->lastLevel->value() );
-    process_Registration->setNumberOfThreads( d->threads->value() );
-    
-    process->setFixedInput(fixedData);
-    process->setMovingInput(movingData);
-    
-    medRunnableProcess *runProcess = new medRunnableProcess;
-    runProcess->setProcess (process);
-    
-    d->progression_stack->addJobItem(runProcess, tr("Progress:"));
-    //If there is no observer to track the progression,
-    //make the progress bar spin:
-    //d->progression_stack->setActive(runProcess,true);
-    
-    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
-    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
-    connect (runProcess, SIGNAL (cancelled (QObject*)), this, SIGNAL (failure ()));
-    //First have the moving progress bar,
-    //and then display the remaining % when known
-    connect (runProcess, SIGNAL(activate(QObject*,bool)),
-             d->progression_stack, SLOT(setActive(QObject*,bool)));
-    
-    medJobManager::instance()->registerJobItem(runProcess);
-    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
-}
 
 void animaDenseBMRegistrationToolBox::updateBMOptimizerParams(int index)
 {
@@ -502,3 +408,159 @@ void animaDenseBMRegistrationToolBox::updateDamUsage(int index)
     
     d->damDistance->setEnabled(newState == Qt::Checked);
 }
+
+int animaDenseBMRegistrationToolBox::blockSize()
+{
+    return d->blockSize->value();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::blockSpacing()
+{
+    return d->blockSpacing->value();
+}
+
+float animaDenseBMRegistrationToolBox::stDevThreshold()
+{
+    return d->stdThreshold->value();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::transform()
+{
+    return d->transform->currentIndex();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::metric()
+{
+    return d->metric->currentIndex();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::optimizer()
+{
+    return d->optimizer->currentIndex();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::maximumIterations()
+{
+    return d->maxIterations->value();
+}
+
+float animaDenseBMRegistrationToolBox::minimalTransformError()
+{
+    return d->minError->value();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::optimizerMaximumIterations()
+{
+    return d->optIterations->value();
+}
+
+double animaDenseBMRegistrationToolBox::searchRadius()
+{
+    return d->searchRadius->value();
+}
+
+double animaDenseBMRegistrationToolBox::searchAngleRadius()
+{
+    return d->searchAngleRadius->value();
+}
+
+double animaDenseBMRegistrationToolBox::searchSkewRadius()
+{
+    return d->searchSkewRadius->value();
+}
+
+double animaDenseBMRegistrationToolBox::searchScaleRadius()
+{
+    return d->searchScaleRadius->value();
+}
+
+double animaDenseBMRegistrationToolBox::finalRadius()
+{
+    return d->finalRadius->value();
+}
+
+double animaDenseBMRegistrationToolBox::stepSize()
+{
+    return d->stepSize->value();
+}
+
+double animaDenseBMRegistrationToolBox::translateUpperBound()
+{
+    return d->translateUpperBound->value();
+}
+
+double animaDenseBMRegistrationToolBox::angleUpperBound()
+{
+    return d->angleUpperBound->value();
+}
+
+double animaDenseBMRegistrationToolBox::skewUpperBound()
+{
+    return d->skewUpperBound->value();
+}
+
+double animaDenseBMRegistrationToolBox::scaleUpperBound()
+{
+    return d->scaleUpperBound->value();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::agregator()
+{
+    return d->agregator->currentIndex();
+}
+
+double animaDenseBMRegistrationToolBox::extrapolationSigma()
+{
+    return d->extrapolationSigma->value();
+}
+
+double animaDenseBMRegistrationToolBox::elasticSigma()
+{
+    return d->elasticSigma->value();
+}
+
+double animaDenseBMRegistrationToolBox::outlierSigma()
+{
+    return d->outlierSigma->value();
+}
+
+double animaDenseBMRegistrationToolBox::mEstimateConvergenceThreshold()
+{
+    return d->mEstimateConvergenceThreshold->value();
+}
+
+double animaDenseBMRegistrationToolBox::neighborhoodApproximation()
+{
+    return d->neighborhoodApproximation->value();
+}
+
+bool animaDenseBMRegistrationToolBox::useTransformationDam()
+{
+    return d->useTransformationDam->isChecked();
+}
+
+double animaDenseBMRegistrationToolBox::damDistance()
+{
+    return d->damDistance->value();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::numberOfPyramidLevels()
+{
+    return d->pyramidLevels->value();
+}
+
+unsigned int animaDenseBMRegistrationToolBox::lastPyramidLevel()
+{
+    return d->lastLevel->value();
+}
+
+double animaDenseBMRegistrationToolBox::percentageKept()
+{
+    return d->percentageKept->value();
+}
+
+int animaDenseBMRegistrationToolBox::numberOfThreads()
+{
+    return d->threads->value();
+}
+

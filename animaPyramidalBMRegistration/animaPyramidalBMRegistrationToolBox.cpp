@@ -8,10 +8,8 @@
 #include <QtGui>
 
 #include <dtkCore/dtkAbstractProcessFactory.h>
-#include <medAbstractRegistrationProcess.h>
 #include <dtkCore/dtkSmartPointer.h>
 
-#include <medRunnableProcess.h>
 #include <medJobManager.h>
 
 #include <medAbstractImageData.h>
@@ -76,8 +74,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     //QWidget *widget = new QWidget(this);
     //QToolBox *widget = new QToolBox(this);
     medToolBoxTab *widget = new medToolBoxTab(this);
-
-    QPushButton *runButton = new QPushButton(tr("Run"), this);
 
     this->setTitle("Pyramidal BM Registration");
 
@@ -187,7 +183,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     
     d->initializeOnCenterOfGravity = new QCheckBox;
     d->initializeOnCenterOfGravity->setToolTip("Initialize the transformation on images centers of gravity?");
-    d->initializeOnCenterOfGravity->setCheckState(Qt::Checked);
+    d->initializeOnCenterOfGravity->setCheckState(Qt::Unchecked);
 
     // Agregation Parameters:
     d->agregator = new QComboBox;
@@ -204,7 +200,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     
     d->agregThreshold = new QDoubleSpinBox;
     d->agregThreshold->setToolTip("Agregator threshold value (for M-estimation or LTS)");
-    d->agregThreshold->setValue(0.7);
+    d->agregThreshold->setValue(0.5);
     d->agregThreshold->setMaximum(1.0);
     d->agregThreshold->setSingleStep(0.01);
     
@@ -217,11 +213,11 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     // Pyramid parameters:
     d->pyramidLevels = new QSpinBox;
     d->pyramidLevels->setToolTip("Number of pyramid levels");
-    d->pyramidLevels->setValue(4);
+    d->pyramidLevels->setValue(3);
     
     d->lastLevel = new QSpinBox;
     d->lastLevel->setToolTip("Index of the last pyramid level explored (0 is full resolution)");
-    d->lastLevel->setValue(1);
+    d->lastLevel->setValue(0);
     
      
     // Global Parameters:  
@@ -297,7 +293,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     
     QWidget *header = new QWidget;
     QVBoxLayout *layoutheader = new QVBoxLayout(header);   
-    layoutheader->addWidget(runButton);
     layoutheader->addWidget(d->progression_stack);
     
     QWidget *page1 = new QWidget;
@@ -317,8 +312,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     this->addWidget( header );
     this->addWidget( widget );
 
-    connect(runButton, SIGNAL(clicked()), this, SLOT(run()));
-    
     connect(d->optimizer, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMOptimizerParams(int)));
     connect(d->transform, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMTransformParams(int)));
     connect(d->agregator, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMAgregatorParams(int)));
@@ -347,89 +340,6 @@ bool animaPyramidalBMRegistrationToolBox::registered(void)
     registerToolBox<animaPyramidalBMRegistrationToolBox>();
 }
 
-void animaPyramidalBMRegistrationToolBox::run(void)
-{ 
-    if(!this->parentToolBox())
-        return;
-
-    dtkSmartPointer <medAbstractRegistrationProcess> process;
-
-    if (this->parentToolBox()->process() &&
-        (this->parentToolBox()->process()->identifier() == "animaPyramidalBMRegistration"))
-    {
-        process = this->parentToolBox()->process();   
-    }
-    else
-    {
-        process = dtkAbstractProcessFactory::instance()->createSmartPointer("animaPyramidalBMRegistration");
-
-        this->parentToolBox()->setProcess(process);
-    }
-    
-    dtkSmartPointer<medAbstractData> fixedData = this->parentToolBox()->fixedData();
-    dtkSmartPointer<medAbstractData> movingData = this->parentToolBox()->movingData();
-    
-    if (!fixedData || !movingData)
-        return;
-    
-    animaPyramidalBMRegistration *process_Registration = dynamic_cast<animaPyramidalBMRegistration *>(process.data());
-    if (!process_Registration)
-    {
-        qWarning() << "registration process doesn't exist" ;
-        return;
-    }
-
-    // Setting process arguments
-    process_Registration->setBlockSize( d->blockSize->value() );
-    process_Registration->setBlockSpacing( d->blockSpacing->value() );
-    process_Registration->setPercentageKept( d->percentageKept->value() );
-    process_Registration->setStDevThreshold( d->stdThreshold->value() );
-    process_Registration->setTransform( d->transform->currentIndex() );
-    process_Registration->setMetric( d->metric->currentIndex() );
-    process_Registration->setOptimizer( d->optimizer->currentIndex() );
-    process_Registration->setInitializeOnCenterOfGravity( d->initializeOnCenterOfGravity->checkState() == Qt::Checked );
-    process_Registration->setMaximumIterations( d->maxIterations->value() );
-    process_Registration->setMinimalTransformError( d->minError->value() );
-    process_Registration->setOptimizerMaximumIterations( d->optIterations->value() );
-    process_Registration->setSearchRadius( d->searchRadius->value() );
-    process_Registration->setSearchAngleRadius( d->searchAngleRadius->value() );
-    process_Registration->setSearchSkewRadius( d->searchSkewRadius->value() );
-    process_Registration->setSearchScaleRadius( d->searchScaleRadius->value() );
-    process_Registration->setStepSize( d->stepSize->value() );
-    process_Registration->setTranslateUpperBound( d->translateUpperBound->value() );
-    process_Registration->setAngleUpperBound( d->angleUpperBound->value() );
-    process_Registration->setSkewUpperBound( d->skewUpperBound->value() );
-    process_Registration->setScaleUpperBound( d->scaleUpperBound->value() );
-    process_Registration->setAgregator( d->agregator->currentIndex() );
-    process_Registration->setOutputTransformType( d->outputTransform->currentIndex() );
-    process_Registration->setAgregThreshold( d->agregThreshold->value() );
-    process_Registration->setSeStoppingThreshold( d->stoppingThreshold->value() );
-    process_Registration->setNumberOfPyramidLevels( d->pyramidLevels->value() );
-    process_Registration->setLastPyramidLevel( d->lastLevel->value() );
-    process_Registration->setNumberOfThreads( d->threads->value() );
-    
-    process->setFixedInput(fixedData);
-    process->setMovingInput(movingData);
-    
-    medRunnableProcess *runProcess = new medRunnableProcess;
-    runProcess->setProcess (process);
-    
-    d->progression_stack->addJobItem(runProcess, tr("Progress:"));
-    //If there is no observer to track the progression,
-    //make the progress bar spin:
-    //d->progression_stack->setActive(runProcess,true);
-    
-    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
-    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
-    connect (runProcess, SIGNAL (cancelled (QObject*)), this, SIGNAL (failure ()));
-    //First have the moving progress bar,
-    //and then display the remaining % when known
-    connect (runProcess, SIGNAL(activate(QObject*,bool)),
-             d->progression_stack, SLOT(setActive(QObject*,bool)));
-    
-    medJobManager::instance()->registerJobItem(runProcess);
-    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
-}
 
 void animaPyramidalBMRegistrationToolBox::updateBMOptimizerParams(int index)
 {
@@ -469,5 +379,145 @@ void animaPyramidalBMRegistrationToolBox::updateBMAgregatorParams(int index)
 
     d->agregThreshold->setEnabled( agreg != LeastSquares);
     d->stoppingThreshold->setEnabled( agreg != LeastSquares);
+}
+
+int animaPyramidalBMRegistrationToolBox::blockSize() const
+{
+    return d->blockSize->value();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::blockSpacing() const
+{
+    return d->blockSpacing->value();
+}
+
+float animaPyramidalBMRegistrationToolBox::stDevThreshold() const
+{
+    return d->stdThreshold->value();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::transform() const
+{
+    return d->transform->currentIndex();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::metric() const
+{
+    return d->metric->currentIndex();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::optimizer() const
+{
+    return d->optimizer->currentIndex();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::maximumIterations() const
+{
+    return d->maxIterations->value();
+}
+
+float animaPyramidalBMRegistrationToolBox::minimalTransformError() const
+{
+    return d->minError->value();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::optimizerMaximumIterations() const
+{
+    return d->optIterations->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::searchRadius() const
+{
+    return d->searchRadius->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::searchAngleRadius() const
+{
+    return d->searchAngleRadius->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::searchSkewRadius() const
+{
+    return d->searchSkewRadius->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::searchScaleRadius() const
+{
+    return d->searchScaleRadius->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::finalRadius() const
+{
+    return d->finalRadius->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::stepSize() const
+{
+    return d->stepSize->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::translateUpperBound() const
+{
+    return d->translateUpperBound->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::angleUpperBound() const
+{
+    return d->angleUpperBound->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::skewUpperBound() const
+{
+    return d->skewUpperBound->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::scaleUpperBound() const
+{
+    return d->scaleUpperBound->value();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::agregator() const
+{
+    return d->agregator->currentIndex();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::outputTransformType() const
+{
+    return d->outputTransform->currentIndex();
+}
+
+float animaPyramidalBMRegistrationToolBox::agregThreshold() const
+{
+    return d->agregThreshold->value();
+}
+
+float animaPyramidalBMRegistrationToolBox::seStoppingThreshold() const
+{
+    return d->stoppingThreshold->value();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::numberOfPyramidLevels() const
+{
+    return d->pyramidLevels->value();
+}
+
+unsigned int animaPyramidalBMRegistrationToolBox::lastPyramidLevel() const
+{
+    return d->lastLevel->value();
+}
+
+double animaPyramidalBMRegistrationToolBox::percentageKept() const
+{
+    return d->percentageKept->value();
+}
+
+bool animaPyramidalBMRegistrationToolBox::initializeOnCenterOfGravity() const
+{
+    return d->initializeOnCenterOfGravity->isChecked();
+}
+
+int animaPyramidalBMRegistrationToolBox::numberOfThreads() const
+{
+    return d->threads->value();
 }
 

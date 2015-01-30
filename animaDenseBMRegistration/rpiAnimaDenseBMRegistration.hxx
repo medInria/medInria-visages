@@ -53,7 +53,8 @@ namespace rpi
         
         matcher->Update();
         
-        this->m_transform = matcher->GetOutputDisplacementFieldTransform();
+        //this->m_transform = matcher->GetOutputDisplacementFieldTransform();
+        this->m_transform = matcher->GetOutputTransform();
     }
     
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >

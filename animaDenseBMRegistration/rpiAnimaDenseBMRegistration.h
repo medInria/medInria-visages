@@ -25,12 +25,13 @@ namespace rpi
      *
      */
     template < class TFixedImage, class TMovingImage, class TTransformScalarType=double >
-    class ITK_EXPORT AnimaDenseBMRegistration : public RegistrationMethod< TFixedImage, TMovingImage, TTransformScalarType >
+    class AnimaDenseBMRegistration : public RegistrationMethod< TFixedImage, TMovingImage, TTransformScalarType >
     {
 
     public:
 
-        typedef rpi::DisplacementFieldTransform <TTransformScalarType, TFixedImage::ImageDimension> TransformType;
+        //typedef rpi::DisplacementFieldTransform <TTransformScalarType, TFixedImage::ImageDimension> TransformType;
+        typedef itk::StationaryVelocityFieldTransform <TTransformScalarType, TFixedImage::ImageDimension> TransformType;
 
         typedef typename TransformType::Pointer TransformPointerType;
 

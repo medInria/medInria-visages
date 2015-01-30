@@ -22,34 +22,12 @@ class ANIMADENSEBMREGISTRATIONPLUGIN_EXPORT animaDenseBMRegistration : public it
     Q_OBJECT
     
 public:
-    /**
-     * @brief Constructor.
-     *
-     * @param void
-     */
+
     animaDenseBMRegistration(void);
-    
-    /**
-     * @brief
-     *
-     * @param void
-     */
     virtual ~animaDenseBMRegistration(void);
     
-    /**
-     * @brief Description of the plugin.
-     *
-     * @param void
-     * @return QString
-     */
     virtual QString description(void) const;
     
-    /**
-     * @brief tries to register the process with the factory.
-     *
-     * @param void
-     * @return bool true if it succeeded, false otherwise.
-     */
     static bool registered(void);
     
     virtual QString identifier(void) const;
@@ -58,12 +36,6 @@ public:
     virtual QString getTitleAndParameters();
 
 public:
-    /**
-     * @brief Runs the process.
-     *
-     * @param ImageType the fixed image image type.
-     * @return int successful or not.
-     */
     virtual int update(ImageType);
     
     void emitProgress(int prog);
@@ -73,75 +45,9 @@ public:
      */
     virtual void onCanceled (void);
     
-    void setBlockSize(int blockSize);
+    medToolBox* toolbox();
 
-    void setBlockSpacing(unsigned int blockSpacing);
-    
-    void setStDevThreshold(float StDevThreshold);
-    
-    void setTransform(unsigned int transform);
-    
-    void setMetric(unsigned int metric);
-    
-    void setOptimizer(unsigned int optimizer);
-    
-    void setMaximumIterations(unsigned int MaximumIterations);
-    
-    void setMinimalTransformError(float MinimalTransformError);   
-    
-    void setOptimizerMaximumIterations(unsigned int OptimizerMaximumIterations);    
-    
-    void setSearchRadius(double SearchRadius);
-    
-    void setSearchAngleRadius(double SearchAngleRadius);
-    
-    void setSearchSkewRadius(double SearchSkewRadius);
-    
-    void setSearchScaleRadius(double SearchScaleRadius);
-    
-    void setFinalRadius(double FinalRadius);
-    
-    void setStepSize(double StepSize);
-    
-    void setTranslateUpperBound(double TranslateUpperBound);
-    
-    void setAngleUpperBound(double AngleUpperBound);
-    
-    void setSkewUpperBound(double SkewUpperBound);
-    
-    void setScaleUpperBound(double ScaleUpperBound);
-    
-    void setAgregator(unsigned int agregator);
-    
-    void setExtrapolationSigma(double extrapolationSigma);
-    
-    void setElasticSigma(double elasticSigma);
-
-    void setOutlierSigma(double outlierSigma);
-    
-    void setMEstimateConvergenceThreshold(double mEstimateConvergenceThreshold);
-    
-    void setNeighborhoodApproximation(double neighborhoodApproximation);
-    
-    void setUseTransformationDam(bool useTransformationDam);
-    
-    void setDamDistance(double damDistance);
-    
-    void setNumberOfPyramidLevels(unsigned int NumberOfPyramidLevels);
-    
-    void setLastPyramidLevel(unsigned int LastPyramidLevel);
-    
-    void setPercentageKept(double PercentageKept);
-
-    void setNumberOfThreads(int numberOfThreads);
-    
 protected :
-    /**
-     * @brief
-     *
-     * @param file The path to the file is assumed to be existing. However the file may not exist beforehand.
-     * @return bool successful or not.
-     */
     virtual bool writeTransform(const QString& file);
     
 private:
@@ -149,10 +55,5 @@ private:
     
 };
 
-/**
- * @brief Function to instantiate the process from the factory.
- * @see registered()
- *
- * @param void
- */
+
 dtkAbstractProcess *createAnimaDenseBMRegistration(void);

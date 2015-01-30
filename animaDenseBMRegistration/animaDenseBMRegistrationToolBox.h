@@ -19,12 +19,43 @@ class ANIMADENSEBMREGISTRATIONPLUGIN_EXPORT animaDenseBMRegistrationToolBox : pu
 public:
     animaDenseBMRegistrationToolBox(QWidget *parent = 0);
     ~animaDenseBMRegistrationToolBox(void);
+
+    int blockSize();
+    unsigned int blockSpacing();
+    float stDevThreshold();
+    unsigned int transform();
+    unsigned int metric();
+    unsigned int optimizer();
+    unsigned int maximumIterations();
+    float minimalTransformError();
+    unsigned int optimizerMaximumIterations();
+    double searchRadius();
+    double searchAngleRadius();
+    double searchSkewRadius();
+    double searchScaleRadius();
+    double finalRadius();
+    double stepSize();
+    double translateUpperBound();
+    double angleUpperBound();
+    double skewUpperBound();
+    double scaleUpperBound();
+    unsigned int agregator();
+    double extrapolationSigma();
+    double elasticSigma();
+    double outlierSigma();
+    double mEstimateConvergenceThreshold();
+    double neighborhoodApproximation();
+    bool useTransformationDam();
+    double damDistance();
+    unsigned int numberOfPyramidLevels();
+    unsigned int lastPyramidLevel();
+    double percentageKept();
+    int numberOfThreads();
     
 public:
     static bool registered(void);
     
 public slots:
-    void run(void);
     void updateBMOptimizerParams(int);
     void updateBMTransformParams(int);
     void updateBMAgregatorParams(int);
