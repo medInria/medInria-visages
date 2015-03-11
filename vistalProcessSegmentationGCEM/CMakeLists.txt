@@ -38,8 +38,8 @@ find_package(Vistal REQUIRED)
 include(${VISTAL_USE_FILE})
 
 # medInria
-find_package(medInria REQUIRED)
-include(${medInria_USE_FILE})
+find_package(MEDINRIA REQUIRED)
+include(${MEDINRIA_USE_FILE})
 
 include_directories(${BOOST_INCLUDE_DIR})
 
@@ -97,8 +97,7 @@ target_link_libraries(${PROJECT_NAME}
   ${VISTAL_LIBS}
   dtkCore
   dtkLog
-  medCore
-  medGui)
+  medCore)
 
 dtk_build_doc(vistalProcessSegmentationGCEMPlugin)
 

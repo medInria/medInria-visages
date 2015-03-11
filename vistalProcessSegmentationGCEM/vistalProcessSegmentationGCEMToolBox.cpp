@@ -3,7 +3,7 @@
 #include "vistalProcessSegmentationGCEMToolBox.h"
 
 #include <dtkCore/dtkAbstractDataFactory.h>
-#include <dtkCore/dtkAbstractData.h>
+#include <medAbstractData.h>
 #include <dtkCore/dtkAbstractProcessFactory.h>
 #include <dtkCore/dtkAbstractProcess.h>
 #include <dtkCore/dtkAbstractViewFactory.h>
@@ -12,13 +12,15 @@
 
 #include <medRunnableProcess.h>
 #include <medJobManager.h>
-#include <medAbstractDataImage.h>
+#include <medPluginManager.h>
 
 #include <medToolBoxFactory.h>
 #include <medSegmentationSelectorToolBox.h>
 #include <medProgressionStack.h>
 #include <medDropSite.h>
 #include <medDataManager.h>
+
+#include <vistalProcessSegmentationGCEM.h>
 
 #include <QtGui>
 
@@ -54,19 +56,18 @@ public:
 
     int startLock;
 
-    dtkSmartPointer <dtkAbstractProcess> process;
+    dtkSmartPointer <vistalProcessSegmentationGCEM> process;
     medProgressionStack * progression_stack;
 
     /* Pointer to the data to be processed*/
-    dtkSmartPointer< dtkAbstractData > dataT1;
-    dtkSmartPointer< dtkAbstractData > dataPD;
-    dtkSmartPointer< dtkAbstractData > dataT2;
-    dtkSmartPointer< dtkAbstractData > dataMask;
+    dtkSmartPointer< medAbstractData > dataT1;
+    dtkSmartPointer< medAbstractData > dataPD;
+    dtkSmartPointer< medAbstractData > dataT2;
+    dtkSmartPointer< medAbstractData > dataMask;
 };
 
 
 vistalProcessSegmentationGCEMToolBoxPrivate::vistalProcessSegmentationGCEMToolBoxPrivate():
-
     runButton(0), startLock(0),
     process(0), progression_stack(0),
     dataT1(0), dataPD(0), dataT2(0), dataMask(0)
@@ -78,9 +79,16 @@ vistalProcessSegmentationGCEMToolBox::vistalProcessSegmentationGCEMToolBox(QWidg
 {
     /* Image Input */
     d->dropSiteT1 = new medDropSite;
+    d->dropSiteT1->setCanAutomaticallyChangeAppereance(false);
+
     d->dropSitePD = new medDropSite;
+    d->dropSitePD->setCanAutomaticallyChangeAppereance(false);
+
     d->dropSiteT2 = new medDropSite;
+    d->dropSiteT2->setCanAutomaticallyChangeAppereance(false);
+
     d->dropSiteMask = new medDropSite;
+    d->dropSiteMask->setCanAutomaticallyChangeAppereance(false);
 
     QGridLayout* imgL = new QGridLayout;
     imgL->addWidget(new QLabel("T1w Image"), 0,0);
@@ -270,12 +278,25 @@ vistalProcessSegmentationGCEMToolBox::~vistalProcessSegmentationGCEMToolBox(void
     d = NULL;
 }
 
-bool vistalProcessSegmentationGCEMToolBox::registered(void)
+bool vistalProcessSegmentationGCEMToolBox::registered()
 {
-    return medToolBoxFactory::instance()->registerToolBox <vistalProcessSegmentationGCEMToolBox>
-                            ("gcemSegmentation", "GCEM MS lesions segmentation",
-                             "GraphCut w. EM init + outliers",
-                             QStringList() << "segmentation");
+    return medToolBoxFactory::instance()->registerToolBox<vistalProcessSegmentationGCEMToolBox>();
+}
+
+dtkPlugin* vistalProcessSegmentationGCEMToolBox::plugin()
+{
+    medPluginManager* pm = medPluginManager::instance();
+    dtkPlugin* plugin = pm->plugin ( "vistalProcessSegmentationGCEMPlugin" );
+    return plugin;
+}
+
+medAbstractData* vistalProcessSegmentationGCEMToolBox::processOutput()
+{
+    if(!d->process)
+        return NULL;
+
+    medAbstractData *outputData = dynamic_cast <medAbstractData *> (d->process->output());
+    return outputData;
 }
 
 void vistalProcessSegmentationGCEMToolBox::run(void)
@@ -285,13 +306,10 @@ void vistalProcessSegmentationGCEMToolBox::run(void)
 
     d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("vistalProcessSegmentationGCEM");
 
-    //    if(!this->parent()->data())
-    //        return;
-
-    d->process->setInput(d->dataT1.data(), 0);
-    d->process->setInput(d->dataPD.data(), 1);
-    d->process->setInput(d->dataT2.data(), 2);
-    d->process->setInput(d->dataMask.data(), 3);
+    d->process->setInputImage(d->dataT1, 0);
+    d->process->setInputImage(d->dataPD, 1);
+    d->process->setInputImage(d->dataT2, 2);
+    d->process->setInputImage(d->dataMask, 3);
 
     d->process->setParameter((double)d->InitMethod->currentIndex(), 0);
     d->process->setParameter((double)d->rejRatio ->value(), 1);
@@ -306,7 +324,15 @@ void vistalProcessSegmentationGCEMToolBox::run(void)
     d->process->setParameter((double)d->minSize->value(), 8);
     d->process->setParameter((double)d->wmneighb->value(), 9);
 
-    this->segmentationToolBox()->run( d->process );
+    medRunnableProcess *runProcess = new medRunnableProcess;
+    runProcess->setProcess (d->process);
+
+    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
+    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
+    connect (runProcess, SIGNAL (cancelled (QObject*)),  this, SIGNAL (failure ()));
+
+    medJobManager::instance()->registerJobItem(runProcess);
+    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 }
 
 void vistalProcessSegmentationGCEMToolBox::onT1ImageDropped(const medDataIndex &index)
@@ -314,37 +340,35 @@ void vistalProcessSegmentationGCEMToolBox::onT1ImageDropped(const medDataIndex &
     if (!index.isValid())
         return;
 
-    d->dataT1 = medDataManager::instance()->data (index);
+    d->dataT1 = medDataManager::instance()->retrieveData(index);
 
     if (!d->dataT1)
         return;
+
+    d->dropSiteT1->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->dropSiteT1->sizeHint()));
 
     d->startLock |= 1;
 
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
-
-    //emit dataSelected(d->data);
 }
-
 
 void vistalProcessSegmentationGCEMToolBox::onPDImageDropped(const medDataIndex &index)
 {
     if (!index.isValid())
         return;
 
-    d->dataPD = medDataManager::instance()->data (index);
+    d->dataPD = medDataManager::instance()->retrieveData(index);
 
     if (!d->dataPD)
         return;
+
+    d->dropSitePD->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->dropSitePD->sizeHint()));
 
     d->startLock |= 2;
     
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
-
-
-    //emit dataSelected(d->data);
 }
 
 void vistalProcessSegmentationGCEMToolBox::onT2orFLAIRImageDropped(const medDataIndex &index)
@@ -352,17 +376,17 @@ void vistalProcessSegmentationGCEMToolBox::onT2orFLAIRImageDropped(const medData
     if (!index.isValid())
         return;
 
-    d->dataT2 = medDataManager::instance()->data (index);
-
+    d->dataT2 = medDataManager::instance()->retrieveData(index);
 
     if (!d->dataT2)
         return;
+
+    d->dropSiteT2->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->dropSiteT2->sizeHint()));
+
     d->startLock |= 4;
     
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
-
-    //emit dataSelected(d->data);
 }
 
 void vistalProcessSegmentationGCEMToolBox::onMaskImageDropped(const medDataIndex &index)
@@ -370,14 +394,15 @@ void vistalProcessSegmentationGCEMToolBox::onMaskImageDropped(const medDataIndex
     if (!index.isValid())
         return;
 
-    d->dataMask = medDataManager::instance()->data (index);
+    d->dataMask = medDataManager::instance()->retrieveData(index);
 
     if (!d->dataMask)
         return;
+
+    d->dropSiteMask->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->dropSiteMask->sizeHint()));
 
     d->startLock |= 6;
 
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
-    //emit dataSelected(d->data);
 }

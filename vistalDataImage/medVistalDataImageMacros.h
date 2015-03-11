@@ -93,26 +93,6 @@ template<typename DataType>
 	{ \
         return medAbstractDataFactory::instance()->registerDataType<vistalDataImage##suffix>(); \
 	} \
-    QImage & vistalDataImage##suffix::thumbnail(void) const \
-	{ \
-	     if (d->thumbnails.isEmpty()){\
-	              getThumbnail(d->image, d->defaultThumbnail);\
-	            }\
-	          else{\
-	              d->defaultThumbnail = d->thumbnails.at(int(d->image->nbz / 2));\
-	          }\
-		return d->defaultThumbnail; \
-	} \
-	QList<QImage> & vistalDataImage##suffix::thumbnails(void) const \
-	{ \
-	    generateThumbnails<type>(d->image, d->thumbnails);\
-		if (d->thumbnails.isEmpty()) \
-		{ \
-			for (int i = 0;i < d->image->nbz;++i) \
-				d->thumbnails.push_back(d->defaultThumbnail); \
-		} \
-		return d->thumbnails; \
-	} \
 	void * vistalDataImage##suffix::data() \
 	{ \
 		return d->image; \

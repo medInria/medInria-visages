@@ -3,7 +3,7 @@
 #include "Image3D.hh"
 
 #include <dtkCore/dtkAbstractData.h>
-#include <dtkCore/dtkAbstractDataFactory.h>
+#include <medAbstractDataFactory.h>
 #include "VistalConverters.h"
 //casting and intensity mapping
 #include "itkCastImageFilter.h"
@@ -27,7 +27,7 @@ vistal::converters::Parameters parameters; /* conversion parameters */ \
 parameters.copy = true; \
 vistal::converters::ConvertImages(*image, conv, parameters); \
 itkImage3D<TypeOut> vistalConverter(conv); \
-imageOut = dtkAbstractDataFactory::instance()->create("itkDataImage"#suffixOut); \
+imageOut = medAbstractDataFactory::instance()->create("itkDataImage"#suffixOut); \
 if (imageOut) imageOut->setData(vistalConverter.GetOutput()); \
 return; \
 }
@@ -52,7 +52,7 @@ vistal::Image3D<TypeOut> conv;\
 vistal::converters::Parameters parameters; /* conversion parameters */ \
 vistal::converters::ConvertImages(*image, conv, parameters); \
 itkImage3D<TypeOut> vistalConverter(conv); \
-imageOut = dtkAbstractDataFactory::instance()->create("itkDataImage"#suffixOut); \
+imageOut = medAbstractDataFactory::instance()->create("itkDataImage"#suffixOut); \
 if (imageOut) imageOut->setData(vistalConverter.GetOutput()); \
 return; \
 }
@@ -154,7 +154,7 @@ vistal::converters::Parameters parameters; /* conversion parameters */ \
 parameters.copy = true; \
 vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(conv, 0); \
 vistal::converters::ConvertImages(conv, *res, parameters); \
-if (res) imageOut = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
+if (res) imageOut = medAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
 if (imageOut) imageOut->setData(res); \
 return; \
 }
@@ -172,7 +172,7 @@ if (typeOut == ""#suffixOut &&typeIn == "itkDataImage"#suffix) \
         vistal::converters::Parameters parameters; /* conversion parameters */ \
         vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(conv, 0); \
         vistal::converters::ConvertImages(conv, *res, parameters); \
-        if (res) imageOut = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
+        if (res) imageOut = medAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
         if (imageOut) imageOut->setData(res); \
         return; \
 }
@@ -270,7 +270,7 @@ if (!res) return; \
 vistal::converters::Parameters parameters; /* conversion parameters */ \
 parameters.copy = true; \
 vistal::converters::ConvertImages(*image, *res, parameters); \
-if (res) imageOut = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
+if (res) imageOut = medAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
 if (imageOut) imageOut->setData(res); \
 return; \
 }
@@ -286,7 +286,7 @@ vistal::Image3D<TypeOut>* res = new vistal::Image3D<TypeOut>(*image, 0); \
 if (!res) return; \
 vistal::converters::Parameters parameters; /* conversion parameters */ \
 vistal::converters::ConvertImages(*image, *res, parameters); \
-if (res) imageOut = dtkAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
+if (res) imageOut = medAbstractDataFactory::instance()->create("vistalDataImage"#suffixOut); \
 if (imageOut) imageOut->setData(res); \
 return; \
 }

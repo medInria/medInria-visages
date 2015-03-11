@@ -5,9 +5,7 @@
 // The function taking medInria internal vistal names and converts to desired name
 
 #include "boost/function.hpp"
-
-
-
+#include <medAbstractDataFactory.h>
 
 // The converter toward Itk image data
 
@@ -20,7 +18,7 @@ vistalDataImageToItkDataImage##suffix##Converter::~vistalDataImageToItkDataImage
 {} \
 bool vistalDataImageToItkDataImage##suffix##Converter::registered(void) \
 { \
-return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("vistalDataImageToItkDataImage") + QString(""#suffix) + QString("Converter"), \
+return medAbstractDataFactory::instance()->registerDataConverterType(QString("vistalDataImageToItkDataImage") + QString(""#suffix) + QString("Converter"), \
 																	QStringList()	<< "vistalDataImageChar3" <<  "vistalDataImageUChar3" \
 																					<<  "vistalDataImageShort3" <<  "vistalDataImageUShort3" \
 																					<<  "vistalDataImageInt3" <<  "vistalDataImageUInt3"  \
@@ -70,7 +68,7 @@ itkDataImageToVistalDataImage##suffix##Converter::~itkDataImageToVistalDataImage
 { } \
 bool itkDataImageToVistalDataImage##suffix##Converter::registered(void) \
 { \
-return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("itkDataImageToVistalDataImage") + QString(""#suffix) + QString("Converter"), \
+return medAbstractDataFactory::instance()->registerDataConverterType(QString("itkDataImageToVistalDataImage") + QString(""#suffix) + QString("Converter"), \
 																	 QStringList()  << "itkDataImageChar3" <<  "itkDataImageUChar3" \
 																					<<  "itkDataImageShort3" <<  "itkDataImageUShort3" \
 																					<<  "itkDataImageInt3" <<  "itkDataImageUInt3"  \
@@ -122,7 +120,7 @@ VistalToVistal##suffix##Converter::~VistalToVistal##suffix##Converter(void) \
 } \
 bool VistalToVistal##suffix##Converter::registered(void) \
 { \
-return dtkAbstractDataFactory::instance()->registerDataConverterType(QString("VistalToVistal") + QString(""#suffix) + QString("Converter"), \
+return medAbstractDataFactory::instance()->registerDataConverterType(QString("VistalToVistal") + QString(""#suffix) + QString("Converter"), \
 																	 QStringList()	<< "vistalDataImageChar3" <<  "vistalDataImageUChar3" \
 																					<<  "vistalDataImageShort3" <<  "vistalDataImageUShort3" \
 																					<<  "vistalDataImageInt3" <<  "vistalDataImageUInt3"  \

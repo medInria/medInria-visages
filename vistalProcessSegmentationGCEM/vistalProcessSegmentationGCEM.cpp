@@ -5,8 +5,8 @@
 #include "vistalProcessSegmentationGCEM.h"
 
 #include <dtkCore/dtkAbstractProcessFactory.h>
-#include <dtkCore/dtkAbstractDataFactory.h>
-#include <dtkCore/dtkAbstractData.h>
+#include <medAbstractDataFactory.h>
+#include <medAbstractData.h>
 #include <dtkCore/dtkSmartPointer.h>
 
 #include <medMetaDataKeys.h>
@@ -67,7 +67,7 @@ public:
     vistalProcessSegmentationGCEMPrivate();
     ~vistalProcessSegmentationGCEMPrivate();
     // Channel 0 to 2
-    QList < dtkSmartPointer <dtkAbstractData> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
+    QList < dtkSmartPointer <medAbstractData> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
     vistal::Image3D<unsigned char> im1,im2, im3;
     // Channel 3
     vistal::Image3D<unsigned char> mask; // Mask image
@@ -91,7 +91,7 @@ public:
     double rulesMin, rulesMax;
     double alphap;
     
-    dtkSmartPointer <dtkAbstractData> output;
+    dtkSmartPointer <medAbstractData> output;
     
 };
 
@@ -138,7 +138,7 @@ QString vistalProcessSegmentationGCEM::description(void) const
     return "vistalProcessSegmentationGCEM";
 }
 
-void vistalProcessSegmentationGCEM::setInput(dtkAbstractData *data, int channel)
+void vistalProcessSegmentationGCEM::setInputImage(medAbstractData *data, int channel)
 {
     if (!data)	return;
     
@@ -151,7 +151,7 @@ void vistalProcessSegmentationGCEM::setInput(dtkAbstractData *data, int channel)
         d->input.push_back(NULL);
     }
     
-    dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
+    medAbstractData *dU8 = data->convert("vistalDataImageUChar3");
     
     if (!dU8)
     {
@@ -578,7 +578,7 @@ int vistalProcessSegmentationGCEM::update(void)
     vistal::Image3D<unsigned char> *fclassif = new vistal::Image3D<unsigned char>;
     rulesWM4lesions(*fclassif,noborderlesions,nclassif,solution.size()+1,d->wmneighbor,/*verbose=*/false);
     
-    dtkAbstractData *tmpData = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+    medAbstractData *tmpData = medAbstractDataFactory::instance()->create("vistalDataImageUChar3");
     tmpData->setData(fclassif);
     d->output = tmpData->convert("itkDataImageUChar3");
     

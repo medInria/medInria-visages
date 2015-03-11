@@ -23,9 +23,6 @@ public:
 
     static bool registered(void);
 	
-		virtual QImage &thumbnail(void)   const;
-		virtual QList<QImage> &thumbnails (void) const;
-	
 public slots:    
     void *output(void);
     void *data(void);

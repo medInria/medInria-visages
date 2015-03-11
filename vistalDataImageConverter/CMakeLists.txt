@@ -33,6 +33,9 @@ find_package(dtk REQUIRED)
 include(${dtk_USE_FILE})
 include(dtkPlugin)
 
+find_package(MEDINRIA REQUIRED)
+include(${MEDINRIA_USE_FILE})
+
 find_package(Vistal REQUIRED)
 find_package(ITK REQUIRED)
 include(${VISTAL_USE_FILE})
@@ -115,7 +118,8 @@ target_link_libraries(${PROJECT_NAME}
   ${VISTAL_LIBS}
   ${ITK_LIBRARIES}
   dtkCore
-  dtkLog)
+  dtkLog
+  medCore)
 
 dtk_build_doc(vistalDataImageConverterPlugin)
 

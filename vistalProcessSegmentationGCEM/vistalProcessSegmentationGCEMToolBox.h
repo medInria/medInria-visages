@@ -1,6 +1,4 @@
-
-#ifndef VISTALPROCESSSegmentationGCEMTOOLBOX_H
-#define VISTALPROCESSSegmentationGCEMTOOLBOX_H
+#pragma once
 
 #include <medSegmentationAbstractToolBox.h>
 #include <medDataIndex.h>
@@ -10,13 +8,18 @@ class vistalProcessSegmentationGCEMToolBoxPrivate;
 class vistalProcessSegmentationGCEMToolBox : public medSegmentationAbstractToolBox
 {
     Q_OBJECT
+    MED_TOOLBOX_INTERFACE("GCEM segmentation", "GCEM lesions segmentation",
+                          <<"segmentation")
 
 public:
      vistalProcessSegmentationGCEMToolBox(QWidget *parent = 0);
     ~vistalProcessSegmentationGCEMToolBox(void);
 
-public:
-    static bool registered(void);
+    static bool registered();
+
+    dtkPlugin* plugin();
+
+    medAbstractData* processOutput();
 
 public slots:
 
@@ -31,6 +34,3 @@ public slots:
 private:
     vistalProcessSegmentationGCEMToolBoxPrivate *d;
 };
-
-#endif
-
