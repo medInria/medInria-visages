@@ -3,7 +3,7 @@
 cd @CMAKE_INSTALL_PREFIX@
 
 # Copy medInria from somewhere else not to pollute it
-\cp -r @medInria_DIR@/bin/medInria.app .
+\cp -r @MEDINRIA_DIR@/bin/medInria.app .
 @dtk_DIR@/bin/dtkDeploy medInria.app -inject=@CMAKE_INSTALL_PREFIX@/plugins &>/dev/null
 
 \rm -fr plugins/*
