@@ -11,8 +11,8 @@
 
 =========================================================================*/
 
-#include <animaDESPOT1Relaxometry.h>
-#include <animaDESPOT1RelaxometryToolBox.h>
+#include <animaT2Relaxometry.h>
+#include <animaT2RelaxometryToolBox.h>
 #include <itkMultiThreader.h>
 
 #include <QtGui>
@@ -27,6 +27,7 @@
 #include <medAbstractView.h>
 #include <medRunnableProcess.h>
 #include <medJobManager.h>
+#include <medDropSite.h>
 
 #include <medAbstractImageData.h>
 
@@ -34,57 +35,59 @@
 #include <medFilteringSelectorToolBox.h>
 #include <medProgressionStack.h>
 #include <medPluginManager.h>
+#include <medDataManager.h>
 
-class animaDESPOT1RelaxometryToolBoxPrivate
+class animaT2RelaxometryToolBoxPrivate
 {
 public:
-    dtkSmartPointer <animaDESPOT1Relaxometry> process;
+    dtkSmartPointer <animaT2Relaxometry> process;
     medProgressionStack * progression_stack;
 
     QDoubleSpinBox *trTime;
-    QDoubleSpinBox *firstFlipAngle;
-    QDoubleSpinBox *secondFlipAngle;
+    QDoubleSpinBox *echoSpacing;
     QDoubleSpinBox *upperBoundM0;
-    QDoubleSpinBox *upperBoundT1;
+    QDoubleSpinBox *upperBoundT2;
     QDoubleSpinBox *backgroundSignalThreshold;
     QSpinBox *numberOfThreadsValue;
+
+    medDropSite *t1MapDropSite;
+    dtkSmartPointer <medAbstractImageData> t1Map;
 };
 
-animaDESPOT1RelaxometryToolBox::animaDESPOT1RelaxometryToolBox(QWidget *parent) : medFilteringAbstractToolBox(parent), d(new animaDESPOT1RelaxometryToolBoxPrivate)
+animaT2RelaxometryToolBox::animaT2RelaxometryToolBox(QWidget *parent) : medFilteringAbstractToolBox(parent), d(new animaT2RelaxometryToolBoxPrivate)
 {
     QWidget *widget = new QWidget(this);
     
     QPushButton *runButton = new QPushButton(tr("Run"), this);
     
-    this->setTitle("DESPOT1 Relaxometry");
+    this->setTitle("T2 Relaxometry");
     
     // progression stack
     d->progression_stack = new medProgressionStack(widget);
+
+    d->t1MapDropSite = new medDropSite;
+    d->t1MapDropSite->setCanAutomaticallyChangeAppereance(false);
+    connect(d->t1MapDropSite, SIGNAL(objectDropped(const medDataIndex &)), this, SLOT(setT1Map(const medDataIndex &)));
     
     d->trTime = new QDoubleSpinBox;
-    d->trTime->setValue(15);
-    d->trTime->setRange(0, 500);
-    d->trTime->setDecimals(2);
+    d->trTime->setRange(0, 10000);
+    d->trTime->setValue(4500);
+    d->trTime->setDecimals(1);
 
-    d->firstFlipAngle = new QDoubleSpinBox;
-    d->firstFlipAngle->setValue(5);
-    d->firstFlipAngle->setRange(0, 180);
-    d->firstFlipAngle->setDecimals(1);
-
-    d->secondFlipAngle = new QDoubleSpinBox;
-    d->secondFlipAngle->setValue(30);
-    d->secondFlipAngle->setRange(0, 180);
-    d->secondFlipAngle->setDecimals(1);
+    d->echoSpacing = new QDoubleSpinBox;
+    d->echoSpacing->setValue(10);
+    d->echoSpacing->setRange(0, 100);
+    d->echoSpacing->setDecimals(1);
 
     d->upperBoundM0 = new QDoubleSpinBox;
     d->upperBoundM0->setRange(0, 10000);
     d->upperBoundM0->setValue(5000);
     d->upperBoundM0->setDecimals(1);
 
-    d->upperBoundT1 = new QDoubleSpinBox;
-    d->upperBoundT1->setRange(0, 10000);
-    d->upperBoundT1->setValue(5000);
-    d->upperBoundT1->setDecimals(1);
+    d->upperBoundT2 = new QDoubleSpinBox;
+    d->upperBoundT2->setRange(0, 10000);
+    d->upperBoundT2->setValue(800);
+    d->upperBoundT2->setDecimals(1);
 
     d->backgroundSignalThreshold = new QDoubleSpinBox;
     d->backgroundSignalThreshold->setValue(10);
@@ -95,30 +98,30 @@ animaDESPOT1RelaxometryToolBox::animaDESPOT1RelaxometryToolBox(QWidget *parent) 
     d->numberOfThreadsValue->setValue(itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
     d->numberOfThreadsValue->setRange(1, itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
 
+    QVBoxLayout *t1DropLayout = new QVBoxLayout;
+    t1DropLayout->addWidget(d->t1MapDropSite);
+    t1DropLayout->addWidget(new QLabel("Initial T1 image"));
+    t1DropLayout->setAlignment(Qt::AlignCenter);
+
     QLabel *trTimeLabel = new QLabel(tr("Acq. TR time:"));
     QHBoxLayout *trTimeLayout = new QHBoxLayout;
     trTimeLayout->addWidget ( trTimeLabel );
     trTimeLayout->addWidget ( d->trTime );
 
-    QLabel *firstFALabel = new QLabel(tr("First flip angle:"));
-    QHBoxLayout *firstFALayout = new QHBoxLayout;
-    firstFALayout->addWidget ( firstFALabel );
-    firstFALayout->addWidget ( d->firstFlipAngle );
-
-    QLabel *secondFALabel = new QLabel(tr("Second flip angle:"));
-    QHBoxLayout *secondFALayout = new QHBoxLayout;
-    secondFALayout->addWidget ( secondFALabel );
-    secondFALayout->addWidget ( d->secondFlipAngle );
+    QLabel *echoSpacingLabel = new QLabel(tr("Echo spacing:"));
+    QHBoxLayout *echoSpacingLayout = new QHBoxLayout;
+    echoSpacingLayout->addWidget ( echoSpacingLabel );
+    echoSpacingLayout->addWidget ( d->echoSpacing );
 
     QLabel *upperBoundM0Label = new QLabel(tr("Upper bound M0:"));
     QHBoxLayout *upperBoundM0Layout = new QHBoxLayout;
     upperBoundM0Layout->addWidget ( upperBoundM0Label );
     upperBoundM0Layout->addWidget ( d->upperBoundM0 );
 
-    QLabel *upperBoundT1Label = new QLabel(tr("Upper bound T1:"));
-    QHBoxLayout *upperBoundT1Layout = new QHBoxLayout;
-    upperBoundT1Layout->addWidget ( upperBoundT1Label );
-    upperBoundT1Layout->addWidget ( d->upperBoundT1 );
+    QLabel *upperBoundT2Label = new QLabel(tr("Upper bound T2:"));
+    QHBoxLayout *upperBoundT2Layout = new QHBoxLayout;
+    upperBoundT2Layout->addWidget ( upperBoundT2Label );
+    upperBoundT2Layout->addWidget ( d->upperBoundT2 );
 
     QLabel *signalBckgdThrLabel = new QLabel(tr("Signal threshold:"));
     QHBoxLayout *signalBckgdThrLayout = new QHBoxLayout;
@@ -131,11 +134,11 @@ animaDESPOT1RelaxometryToolBox::animaDESPOT1RelaxometryToolBox(QWidget *parent) 
     threadsLayout->addWidget ( d->numberOfThreadsValue );
 
     QVBoxLayout *layout = new QVBoxLayout();
+    layout->addLayout(t1DropLayout);
     layout->addLayout(trTimeLayout);
-    layout->addLayout(firstFALayout);
-    layout->addLayout(secondFALayout);
+    layout->addLayout(echoSpacingLayout);
     layout->addLayout(upperBoundM0Layout);
-    layout->addLayout(upperBoundT1Layout);
+    layout->addLayout(upperBoundT2Layout);
     layout->addLayout(signalBckgdThrLayout);
     layout->addLayout(threadsLayout);
     layout->addWidget(runButton);
@@ -145,39 +148,43 @@ animaDESPOT1RelaxometryToolBox::animaDESPOT1RelaxometryToolBox(QWidget *parent) 
     this->addWidget(widget);
     
     connect(runButton, SIGNAL(clicked()), this, SLOT(run()), Qt::UniqueConnection);
-
-    // Add about plugin
-    medPluginManager* pm = medPluginManager::instance();
-    dtkPlugin* plugin = pm->plugin ( "animaRelaxometryPlugin" );
-    setAboutPluginButton ( plugin );
-    setAboutPluginVisibility( true );
 }
 
-animaDESPOT1RelaxometryToolBox::~animaDESPOT1RelaxometryToolBox()
+animaT2RelaxometryToolBox::~animaT2RelaxometryToolBox()
 {
     delete d;
     
     d = NULL;
 }
 
-bool animaDESPOT1RelaxometryToolBox::registered()
+void animaT2RelaxometryToolBox::setT1Map(const medDataIndex &index)
 {
-    return medToolBoxFactory::instance()->registerToolBox<animaDESPOT1RelaxometryToolBox>();
+    d->t1Map = dynamic_cast <medAbstractImageData *> (medDataManager::instance()->retrieveData(index));
+
+    if (!d->t1Map)
+        return;
+
+    d->t1MapDropSite->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->t1MapDropSite->sizeHint()));
 }
 
-dtkPlugin* animaDESPOT1RelaxometryToolBox::plugin()
+bool animaT2RelaxometryToolBox::registered()
+{
+    return medToolBoxFactory::instance()->registerToolBox<animaT2RelaxometryToolBox>();
+}
+
+dtkPlugin* animaT2RelaxometryToolBox::plugin()
 {
     medPluginManager* pm = medPluginManager::instance();
     dtkPlugin* plugin = pm->plugin ( "animaRelaxometryPlugin" );
     return plugin;
 }
 
-void animaDESPOT1RelaxometryToolBox::update(medAbstractData *data)
+void animaT2RelaxometryToolBox::update(medAbstractData *data)
 {
 
 }
 
-medAbstractData* animaDESPOT1RelaxometryToolBox::processOutput()
+medAbstractData* animaT2RelaxometryToolBox::processOutput()
 {
     if(!d->process)
         return NULL;
@@ -185,23 +192,24 @@ medAbstractData* animaDESPOT1RelaxometryToolBox::processOutput()
     return d->process->output();
 }
 
-void animaDESPOT1RelaxometryToolBox::run()
+void animaT2RelaxometryToolBox::run()
 {
     if(!this->parentToolBox())
         return;
     
-    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("animaDESPOT1Relaxometry");
+    d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("animaT2Relaxometry");
     
     if(!this->parentToolBox()->data())
         return;
     
     d->process->setInputImage(this->parentToolBox()->data());
     d->process->setTRTime(d->trTime->value());
-    d->process->setFirstFlipAngle(d->firstFlipAngle->value() * M_PI / 180.0);
-    d->process->setSecondFlipAngle(d->secondFlipAngle->value() * M_PI / 180.0);
+    d->process->setEchoSpacing(d->echoSpacing->value());
     d->process->setUpperBoundM0(d->upperBoundM0->value());
-    d->process->setUpperBoundT1(d->upperBoundT1->value());
+    d->process->setUpperBoundT2(d->upperBoundT2->value());
     d->process->setBackgroundSignalThreshold(d->backgroundSignalThreshold->value());
+    if (d->t1Map)
+        d->process->setT1Map(d->t1Map.data());
     d->process->setNumberOfThreads(d->numberOfThreadsValue->value());
 
     medRunnableProcess *runProcess = new medRunnableProcess;

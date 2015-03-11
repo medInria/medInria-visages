@@ -11,7 +11,7 @@
 
 =========================================================================*/
 
-#include <animaDESPOT1Relaxometry.h>
+#include <animaT2Relaxometry.h>
 
 #include <dtkCore/dtkAbstractProcess.h>
 #include <dtkCore/dtkAbstractProcessFactory.h>
@@ -22,36 +22,37 @@
 #include <medAbstractImageData.h>
 
 #include <animaReadWriteFunctions.h>
-#include <animaT1RelaxometryEstimationImageFilter.h>
+#include <animaT2RelaxometryEstimationImageFilter.h>
 
 // /////////////////////////////////////////////////////////////////
-// animaDESPOT1RelaxometryPrivate
+// animaT2RelaxometryPrivate
 // /////////////////////////////////////////////////////////////////
 
-class animaDESPOT1RelaxometryPrivate
+class animaT2RelaxometryPrivate
 {
 public:
     dtkSmartPointer <medAbstractData> input;
     dtkSmartPointer <medAbstractImageData> output;
+    dtkSmartPointer <medAbstractImageData> t1Map;
 
     template <class T> void update();
 
-    double firstFlipAngle, secondFlipAngle;
+    double echoSpacing;
     double trTime;
-    double upperBoundM0, upperBoundT1;
+    double upperBoundM0, upperBoundT2;
     double backgroundSignalThreshold;
     double nbThreads;
 };
 
 template <class T>
 void
-animaDESPOT1RelaxometryPrivate::update()
+animaT2RelaxometryPrivate::update()
 {
     typedef itk::Image <T, 3> InputImageType;
     typedef itk::Image <double, 3> OutputImageType;
     typedef itk::Image <T, 4> Image4DType;
 
-    typedef anima::T1RelaxometryEstimationImageFilter <InputImageType, OutputImageType> FilterType;
+    typedef anima::T2RelaxometryEstimationImageFilter <InputImageType, OutputImageType> FilterType;
 
     typename FilterType::Pointer mainFilter = FilterType::New();
 
@@ -61,14 +62,18 @@ animaDESPOT1RelaxometryPrivate::update()
     for (unsigned int i = 0;i < inputData.size();++i)
         mainFilter->SetInput(i,inputData[i]);
 
-    std::vector <double> flipAngles(2,0);
-    flipAngles[0] = firstFlipAngle;
-    flipAngles[1] = secondFlipAngle;
-    mainFilter->SetFlipAngles(flipAngles);
+    mainFilter->SetEchoSpacing(echoSpacing);
 
     mainFilter->SetTRValue(trTime);
     mainFilter->SetM0UpperBoundValue(upperBoundM0);
-    mainFilter->SetT1UpperBoundValue(upperBoundT1);
+    mainFilter->SetT2UpperBoundValue(upperBoundT2);
+
+    if (t1Map)
+    {
+        OutputImageType *t1MapData = dynamic_cast<OutputImageType *>((itk::Object*)(t1Map->data()));
+        if (t1MapData)
+            mainFilter->SetT1Map(t1MapData);
+    }
 
     mainFilter->SetAverageSignalThreshold(backgroundSignalThreshold);
     mainFilter->SetNumberOfThreads(nbThreads);
@@ -83,80 +88,83 @@ animaDESPOT1RelaxometryPrivate::update()
 }
 
 // /////////////////////////////////////////////////////////////////
-// animaDESPOT1Relaxometry
+// animaT2Relaxometry
 // /////////////////////////////////////////////////////////////////
 
-animaDESPOT1Relaxometry::animaDESPOT1Relaxometry() : dtkAbstractProcess(), d(new animaDESPOT1RelaxometryPrivate)
+animaT2Relaxometry::animaT2Relaxometry() : dtkAbstractProcess(), d(new animaT2RelaxometryPrivate)
 {
-    d->firstFlipAngle = 5 * M_PI / 180.0;
-    d->secondFlipAngle = 30 * M_PI / 180.0;
-    d->trTime = 15;
+    d->echoSpacing = 10;
+    d->trTime = 4500;
     d->upperBoundM0 = 5000;
-    d->upperBoundT1 = 5000;
+    d->upperBoundT2 = 5000;
 
     d->backgroundSignalThreshold = 10;
     d->nbThreads = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
+    d->t1Map = 0;
 }
 
-animaDESPOT1Relaxometry::~animaDESPOT1Relaxometry()
+animaT2Relaxometry::~animaT2Relaxometry()
 {
     
 }
 
-bool animaDESPOT1Relaxometry::registered()
+bool animaT2Relaxometry::registered()
 {
-    return dtkAbstractProcessFactory::instance()->registerProcessType("animaDESPOT1Relaxometry", createAnimaDESPOT1Relaxometry);
+    return dtkAbstractProcessFactory::instance()->registerProcessType("animaT2Relaxometry", createAnimaT2Relaxometry);
 }
 
-QString animaDESPOT1Relaxometry::description() const
+QString animaT2Relaxometry::description() const
 {
-    return "animaDESPOT1Relaxometry";
+    return "animaT2Relaxometry";
 }
 
-void animaDESPOT1Relaxometry::setInputImage ( medAbstractData *data )
+void animaT2Relaxometry::setInputImage ( medAbstractData *data )
 {
     if ( !data )
         return;
-        
+
     d->input = data;
 }    
 
-void animaDESPOT1Relaxometry::setTRTime (double val)
+void animaT2Relaxometry::setT1Map ( medAbstractImageData *data )
+{
+    if ( !data )
+        return;
+
+    d->t1Map = data;
+}
+
+void animaT2Relaxometry::setTRTime (double val)
 {
     d->trTime = val;
 }
 
-void animaDESPOT1Relaxometry::setFirstFlipAngle (double val)
+void animaT2Relaxometry::setEchoSpacing (double val)
 {
-    d->firstFlipAngle = val;
+    d->echoSpacing = val;
 }
 
-void animaDESPOT1Relaxometry::setSecondFlipAngle (double val)
-{
-    d->secondFlipAngle = val;
-}
-
-void animaDESPOT1Relaxometry::setUpperBoundM0(double val)
+void animaT2Relaxometry::setUpperBoundM0(double val)
 {
     d->upperBoundM0 = val;
 }
 
-void animaDESPOT1Relaxometry::setUpperBoundT1(double val)
+void animaT2Relaxometry::setUpperBoundT2(double val)
 {
-    d->upperBoundT1 = val;
+    d->upperBoundT2 = val;
 }
 
-void animaDESPOT1Relaxometry::setBackgroundSignalThreshold (double val)
+void animaT2Relaxometry::setBackgroundSignalThreshold (double val)
 {
     d->backgroundSignalThreshold = val;
 }
 
-void animaDESPOT1Relaxometry::setNumberOfThreads(unsigned int val)
+void animaT2Relaxometry::setNumberOfThreads(unsigned int val)
 {
     d->nbThreads = val;
 }
 
-int animaDESPOT1Relaxometry::update()
+int animaT2Relaxometry::update()
 {
     if ( !d->input )
         return -1;
@@ -216,7 +224,7 @@ int animaDESPOT1Relaxometry::update()
     return EXIT_SUCCESS;
 }        
 
-medAbstractData * animaDESPOT1Relaxometry::output()
+medAbstractData * animaT2Relaxometry::output()
 {
     return ( d->output );
 }
@@ -225,7 +233,7 @@ medAbstractData * animaDESPOT1Relaxometry::output()
 // Type instantiation
 // /////////////////////////////////////////////////////////////////
 
-dtkAbstractProcess *createAnimaDESPOT1Relaxometry()
+dtkAbstractProcess *createAnimaT2Relaxometry()
 {
-    return new animaDESPOT1Relaxometry;
+    return new animaT2Relaxometry;
 }

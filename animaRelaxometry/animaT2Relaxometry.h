@@ -15,18 +15,19 @@
 
 #include <dtkCore/dtkAbstractProcess.h>
 #include <medAbstractData.h>
+#include <medAbstractImageData.h>
 
 #include <animaRelaxometryPluginExport.h>
 
-class animaDESPOT1RelaxometryPrivate;
+class animaT2RelaxometryPrivate;
 
-class ANIMARELAXOMETRYPLUGIN_EXPORT animaDESPOT1Relaxometry : public dtkAbstractProcess
+class ANIMARELAXOMETRYPLUGIN_EXPORT animaT2Relaxometry : public dtkAbstractProcess
 {
     Q_OBJECT
     
 public:
-    animaDESPOT1Relaxometry();
-    virtual ~animaDESPOT1Relaxometry();
+    animaT2Relaxometry();
+    virtual ~animaT2Relaxometry();
     
     virtual QString description() const;
     
@@ -34,12 +35,12 @@ public:
 
     // Parameters setting
     void setTRTime (double val);
-    void setFirstFlipAngle (double val);
-    void setSecondFlipAngle (double val);
+    void setEchoSpacing (double val);
     void setUpperBoundM0(double val);
-    void setUpperBoundT1(double val);
+    void setUpperBoundT2(double val);
     void setBackgroundSignalThreshold (double val);
     void setNumberOfThreads(unsigned int val);
+    void setT1Map(medAbstractImageData *t1Map);
     
 public slots:
     
@@ -54,9 +55,9 @@ public slots:
     
     
 private:
-    animaDESPOT1RelaxometryPrivate *d;
+    animaT2RelaxometryPrivate *d;
 };
 
-dtkAbstractProcess *createAnimaDESPOT1Relaxometry();
+dtkAbstractProcess *createAnimaT2Relaxometry();
 
 

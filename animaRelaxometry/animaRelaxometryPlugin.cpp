@@ -11,9 +11,11 @@
 
 =========================================================================*/
 
-#include <animaDESPOT1Relaxometry.h>
 #include <animaRelaxometryPlugin.h>
+#include <animaDESPOT1Relaxometry.h>
 #include <animaDESPOT1RelaxometryToolBox.h>
+#include <animaT2Relaxometry.h>
+#include <animaT2RelaxometryToolBox.h>
 
 #include <dtkLog/dtkLog.h>
 
@@ -54,6 +56,16 @@ bool animaRelaxometryPlugin::initialize()
     }
 
     if ( !animaDESPOT1RelaxometryToolBox::registered() )
+    {
+        dtkWarn() << "Unable to register animaDESPOT1Relaxometry toolbox";
+    }
+
+    if(!animaT2Relaxometry::registered())
+    {
+        dtkWarn() << "Unable to register animaDESPOT1Relaxometry type";
+    }
+
+    if ( !animaT2RelaxometryToolBox::registered() )
     {
         dtkWarn() << "Unable to register animaDESPOT1Relaxometry toolbox";
     }
