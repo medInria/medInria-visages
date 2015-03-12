@@ -11,7 +11,7 @@
 #include "Image3D.hh"
 
 class vistalProcessSegmentationSTREMPrivate;
-class dtkAbstractData;
+class medAbstractData;
 
 /**
 * @class vistalProcessSegmentation
@@ -34,7 +34,7 @@ public:
 
 public slots:
 
-    void setInput(dtkAbstractData *data, int channel);
+    void setInputImage(medAbstractData *data, int channel);
 
     void setParameter(double  data, int channel);
 

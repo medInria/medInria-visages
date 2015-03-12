@@ -5,7 +5,7 @@
 #include "vistalProcessSegmentationSTREM.h"
 
 #include <dtkCore/dtkAbstractProcessFactory.h>
-#include <dtkCore/dtkAbstractDataFactory.h>
+#include <medAbstractDataFactory.h>
 #include <dtkCore/dtkAbstractData.h>
 
 #include <QDebug>
@@ -17,7 +17,6 @@
 #include "mstoolsGaussian.h"
 #include "mstoolsStraInitializer.h"
 #include "mstoolsHierarchicalInitializer.h"
-
 
 #include "mstoolsClassificationFunctions.h"
 
@@ -73,10 +72,11 @@ public:
 
     /* nlesions parameterts*/
     double mahalanobisThreshold, rulesThreshold;
-    int minsize, wmneighbor;
+    int minsize;
+    double wmneighbor;
 
 
-    dtkSmartPointer <dtkAbstractData> output;
+    dtkSmartPointer <medAbstractData> output;
 
 };
 
@@ -123,7 +123,7 @@ QString vistalProcessSegmentationSTREM::description(void) const
     return "vistalProcessSegmentationSTREM";
 }
 
-void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel)
+void vistalProcessSegmentationSTREM::setInputImage(medAbstractData *data, int channel)
 {
     if (!data)	return;
 
@@ -135,7 +135,7 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
         d->input.push_back(NULL);
     }
 
-    dtkAbstractData *dU8 = data->convert("vistalDataImageUChar3");
+    medAbstractData *dU8 = data->convert("vistalDataImageUChar3");
 
     if (!dU8)
     {
@@ -143,9 +143,6 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
         return;
     }
     
-    //qDebug() << "channel:" << channel << "datapointers:"<< data;
-    //qDebug() << dU8;
-
     if (channel >= 0 && channel < 3)
     {
         d->input[channel] = dU8;
@@ -154,7 +151,6 @@ void vistalProcessSegmentationSTREM::setInput(dtkAbstractData *data, int channel
         d->mask = dU8;
 
     d->imported |= (1<< channel);
-
 }
 
 
@@ -445,16 +441,16 @@ int vistalProcessSegmentationSTREM::update(void)
     vistal::Image3D<unsigned char> *fclassif = new vistal::Image3D<unsigned char>;
     rulesWM4lesions(*fclassif,noborderlesions,nclassif,solution.size()+1,d->wmneighbor,/*verbose=*/false);
 
-    dtkAbstractData *tmpData = dtkAbstractDataFactory::instance()->create("vistalDataImageUChar3");
+    medAbstractData *tmpData = medAbstractDataFactory::instance()->create("vistalDataImageUChar3");
     tmpData->setData(fclassif);
     d->output = tmpData->convert("itkDataImageUChar3");
-    
+
     foreach(QString list, d->input[0]->metaDataList())
-    d->output->addMetaData(list, d->input[0]->metaDataValues(list));
-    
+        d->output->addMetaData(list, d->input[0]->metaDataValues(list));
+
     QString newSeriesDescription = d->output->metadata(medMetaDataKeys::SeriesDescription.key());
     newSeriesDescription += " STREM lesions segmentation";
-    
+
     d->output->setMetaData(medMetaDataKeys::SeriesDescription.key(),newSeriesDescription);
 
     return EXIT_SUCCESS;

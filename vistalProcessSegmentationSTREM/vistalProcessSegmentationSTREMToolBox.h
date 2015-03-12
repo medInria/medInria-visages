@@ -10,13 +10,18 @@ class vistalProcessSegmentationSTREMToolBoxPrivate;
 class vistalProcessSegmentationSTREMToolBox : public medSegmentationAbstractToolBox
 {
     Q_OBJECT
+    MED_TOOLBOX_INTERFACE("STREM segmentation", "Rob. EM based segmentation of MS lesions",
+                          <<"segmentation")
 
 public:
      vistalProcessSegmentationSTREMToolBox(QWidget *parent = 0);
     ~vistalProcessSegmentationSTREMToolBox(void);
 
-public:
     static bool registered(void);
+
+    dtkPlugin* plugin();
+
+    medAbstractData* processOutput();
 
 signals:
     void success(void);

@@ -2,7 +2,7 @@
 #include "vistalProcessSegmentationSTREM.h"
 #include "vistalProcessSegmentationSTREMToolBox.h"
 
-#include <dtkCore/dtkAbstractDataFactory.h>
+#include <medAbstractDataFactory.h>
 #include <dtkCore/dtkAbstractData.h>
 #include <dtkCore/dtkAbstractProcessFactory.h>
 #include <dtkCore/dtkAbstractProcess.h>
@@ -10,16 +10,17 @@
 #include <dtkCore/dtkAbstractView.h>
 #include <dtkCore/dtkAbstractViewInteractor.h>
 
-#include <medCore/medRunnableProcess.h>
-#include <medCore/medJobManager.h>
-#include <medAbstractDataImage.h>
+#include <medRunnableProcess.h>
+#include <medJobManager.h>
+#include <medAbstractImageData.h>
 
 #include <medToolBoxFactory.h>
 #include <medSegmentationSelectorToolBox.h>
 #include <medSegmentationAbstractToolBox.h>
 #include <medProgressionStack.h>
 #include <medDropSite.h>
-#include <medCore/medDataManager.h>
+#include <medDataManager.h>
+#include <medPluginManager.h>
 
 #include <dtkCore/dtkSmartPointer.h>
 
@@ -49,41 +50,18 @@ public:
     QDoubleSpinBox* minSize;
     QDoubleSpinBox* wmneighb;
 
-    /*
-        ENUM(5, initMethod, "I", "init-method", "Method for initialisation", (StraInit)(HierarchicalPD)(HierarchicalFLAIR), HierarchicalFLAIR);
-
-        OPTIONAL(6, double, rejectionRatio, "rej", "rejectionRatio", "Robust estimation rejection Ratio", ".2", InputArgument, "Image3D");
-
-        ENUM(7, EMAlgorithm, "EM", "EM-Algorithm", "EM Algorithm", (GaussianEM)(GaussianCeleuxREM)(GaussianREM), GaussianREM);
-
-        OPTIONAL(8, double, minDistance, "minD", "minDistance", "Minimum distance in EM (stoping criteria)", "1e-4", InputArgument, "");
-
-        OPTIONAL(9, int, emIter, "eit", "emIter", "Iterations of the EM Algorithm", "1e-4", InputArgument, "");
-
-        FLAG(10, strem, "st", "Strem", "Start the first iteration with STREM?", false);
-
-        //OPTIONAL(11, float, emIter, "eit", "emIter", "Iterations of the EM Algorithm", "10", InputArgument, "");
-
-
-        OPTIONAL(11, double, mahalanobisThreshold, "mTh", "mahalanobisThreshold", "Threshold in the Mahalanobis distance", ".4", InputArgument, "");
-        OPTIONAL(12, double, rulesThreshold, "rTh", "rulesThreshold", "Threshold to apply rules (in times of SD)", "3.", InputArgument, "");
-        OPTIONAL(13, double, minsize, "msize", "minsize", "minimum lesion size", "6", InputArgument, "");
-        OPTIONAL(14, double, wmneighbor, "wm", "wmneighbor", "neighborhing ratio", "0.05", InputArgument, "");
-
-      */
-
     QPushButton *runButton;
 
     int startLock;
 
-    dtkSmartPointer <dtkAbstractProcess> process;
+    dtkSmartPointer <vistalProcessSegmentationSTREM> process;
     medProgressionStack * progression_stack;
 
     /* Pointer to the data to be processed*/
-    dtkSmartPointer <dtkAbstractData> dataT1;
-    dtkSmartPointer <dtkAbstractData> dataPD;
-    dtkSmartPointer <dtkAbstractData> dataT2;
-    dtkSmartPointer <dtkAbstractData> dataMask;
+    dtkSmartPointer <medAbstractData> dataT1;
+    dtkSmartPointer <medAbstractData> dataPD;
+    dtkSmartPointer <medAbstractData> dataT2;
+    dtkSmartPointer <medAbstractData> dataMask;
 };
 
 
@@ -100,9 +78,16 @@ vistalProcessSegmentationSTREMToolBox::vistalProcessSegmentationSTREMToolBox(QWi
 {
     /* Image Input */
     d->dropSiteT1 = new medDropSite;
+    d->dropSiteT1->setCanAutomaticallyChangeAppereance(false);
+
     d->dropSitePD = new medDropSite;
+    d->dropSitePD->setCanAutomaticallyChangeAppereance(false);
+
     d->dropSiteT2 = new medDropSite;
+    d->dropSiteT2->setCanAutomaticallyChangeAppereance(false);
+
     d->dropSiteMask = new medDropSite;
+    d->dropSiteMask->setCanAutomaticallyChangeAppereance(false);
 
     QGridLayout* imgL = new QGridLayout;
     imgL->addWidget(new QLabel("T1w Image"), 0,0);
@@ -270,9 +255,23 @@ vistalProcessSegmentationSTREMToolBox::~vistalProcessSegmentationSTREMToolBox(vo
 
 bool vistalProcessSegmentationSTREMToolBox::registered(void)
 {
-    return medToolBoxFactory::instance()->registerToolBox <vistalProcessSegmentationSTREMToolBox> ("stremSegmentation", "STREM MS lesions segmentation",
-                                                          "Rob. EM Segm. with outliers detection",
-                                                          QStringList() << "segmentation");
+    return medToolBoxFactory::instance()->registerToolBox<vistalProcessSegmentationSTREMToolBox>();
+}
+
+dtkPlugin* vistalProcessSegmentationSTREMToolBox::plugin()
+{
+    medPluginManager* pm = medPluginManager::instance();
+    dtkPlugin* plugin = pm->plugin ( "vistalProcessSegmentationSTREMPlugin" );
+    return plugin;
+}
+
+medAbstractData* vistalProcessSegmentationSTREMToolBox::processOutput()
+{
+    if(!d->process)
+        return NULL;
+
+    medAbstractData *outputData = dynamic_cast <medAbstractData *> (d->process->output());
+    return outputData;
 }
 
 void vistalProcessSegmentationSTREMToolBox::run(void)
@@ -281,14 +280,11 @@ void vistalProcessSegmentationSTREMToolBox::run(void)
         return;
 
     d->process = dtkAbstractProcessFactory::instance()->createSmartPointer("vistalProcessSegmentationSTREM");
-
-//    if(!this->parent()->data())
-//        return;
     
-    d->process->setInput(d->dataT1.data(), 0);
-    d->process->setInput(d->dataPD.data(), 1);
-    d->process->setInput(d->dataT2.data(), 2);
-    d->process->setInput(d->dataMask.data(), 3);
+    d->process->setInputImage(d->dataT1, 0);
+    d->process->setInputImage(d->dataPD, 1);
+    d->process->setInputImage(d->dataT2, 2);
+    d->process->setInputImage(d->dataMask, 3);
 
     d->process->setParameter((double)d->InitMethod->currentIndex(), 0);
     d->process->setParameter((double)d->rejRatio ->value(), 1);
@@ -303,7 +299,15 @@ void vistalProcessSegmentationSTREMToolBox::run(void)
     d->process->setParameter((double)d->minSize->value(), 8);
     d->process->setParameter((double)d->wmneighb->value(), 9);
 
-    this->segmentationToolBox()->run( d->process );
+    medRunnableProcess *runProcess = new medRunnableProcess;
+    runProcess->setProcess (d->process);
+
+    connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
+    connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));
+    connect (runProcess, SIGNAL (cancelled (QObject*)),  this, SIGNAL (failure ()));
+
+    medJobManager::instance()->registerJobItem(runProcess);
+    QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 }
 
 void vistalProcessSegmentationSTREMToolBox::onT1ImageDropped(const medDataIndex &index)
@@ -311,18 +315,16 @@ void vistalProcessSegmentationSTREMToolBox::onT1ImageDropped(const medDataIndex 
     if (!index.isValid())
         return;
 
-    d->dataT1 = medDataManager::instance()->data (index);
+    d->dataT1 = medDataManager::instance()->retrieveData(index);
     
     if (!d->dataT1)
         return;
     
-    qDebug() << d->dataT1;
+    d->dropSiteT1->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->dropSiteT1->sizeHint()));
 
     d->startLock |= 1;
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
-
-    //emit dataSelected(d->data);
 }
 
 
@@ -331,17 +333,16 @@ void vistalProcessSegmentationSTREMToolBox::onPDImageDropped(const medDataIndex 
     if (!index.isValid())
         return;
 
-    d->dataPD = medDataManager::instance()->data (index);
+    d->dataPD = medDataManager::instance()->retrieveData(index);
 
     if (!d->dataPD)
         return;
 
+    d->dropSitePD->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->dropSitePD->sizeHint()));
+
     d->startLock |= 2;
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
-
-
-    //emit dataSelected(d->data);
 }
 
 void vistalProcessSegmentationSTREMToolBox::onT2orFLAIRImageDropped(const medDataIndex &index)
@@ -349,16 +350,16 @@ void vistalProcessSegmentationSTREMToolBox::onT2orFLAIRImageDropped(const medDat
     if (!index.isValid())
         return;
 
-    d->dataT2 = medDataManager::instance()->data (index);
-
+    d->dataT2 = medDataManager::instance()->retrieveData(index);
 
     if (!d->dataT2)
         return;
+
+    d->dropSiteT2->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->dropSiteT2->sizeHint()));
+
     d->startLock |= 4;
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
-
-    //emit dataSelected(d->data);
 }
 
 void vistalProcessSegmentationSTREMToolBox::onMaskImageDropped(const medDataIndex &index)
@@ -366,14 +367,15 @@ void vistalProcessSegmentationSTREMToolBox::onMaskImageDropped(const medDataInde
     if (!index.isValid())
         return;
 
-    d->dataMask = medDataManager::instance()->data (index);
+    d->dataMask = medDataManager::instance()->retrieveData(index);
 
     if (!d->dataMask)
         return;
+
+    d->dropSiteMask->setPixmap(medDataManager::instance()->thumbnail(index).scaled(d->dropSiteMask->sizeHint()));
 
     d->startLock |= 6;
 
     if (d->startLock & 15)
         d->runButton->setEnabled(true);
-    //emit dataSelected(d->data);
 }
