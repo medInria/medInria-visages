@@ -1,4 +1,3 @@
-
 #include "vistalProcessSegmentationGCEM.h"
 #include "vistalProcessSegmentationGCEMToolBox.h"
 
@@ -326,6 +325,11 @@ void vistalProcessSegmentationGCEMToolBox::run(void)
 
     medRunnableProcess *runProcess = new medRunnableProcess;
     runProcess->setProcess (d->process);
+
+    d->progression_stack->addJobItem(runProcess, "Progress:");
+    d->progression_stack->disableCancel(runProcess);
+    connect (runProcess, SIGNAL(activate(QObject*,bool)),
+             d->progression_stack, SLOT(setActive(QObject*,bool)));
 
     connect (runProcess, SIGNAL (success  (QObject*)),  this, SIGNAL (success ()));
     connect (runProcess, SIGNAL (failure  (QObject*)),  this, SIGNAL (failure ()));

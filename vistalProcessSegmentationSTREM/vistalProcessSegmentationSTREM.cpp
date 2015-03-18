@@ -55,9 +55,9 @@ public:
     vistalProcessSegmentationSTREMPrivate();
     ~vistalProcessSegmentationSTREMPrivate();
     // Channel 0 to 2
-    QList < dtkSmartPointer <dtkAbstractData> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
+    QList < dtkSmartPointer <medAbstractData> > input; // Expected Input image to segment (T1, PD , {T2, FLAIR} )
     // Channel 3
-    dtkSmartPointer <dtkAbstractData> mask;
+    dtkSmartPointer <medAbstractData> mask;
     int imported;
 
     enum InitialisationMethod { StraInit, HierarchicalPD, HierarchicalFLAIR } initMethod; // Type of initialisation for the EM, D. Garcia used Hierachical PD or FLAIR depending on the input
