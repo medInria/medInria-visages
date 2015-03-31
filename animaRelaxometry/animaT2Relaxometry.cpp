@@ -37,6 +37,12 @@ public:
 
     template <class T> void update();
 
+    itk::CStyleCommand::Pointer callback;
+    static void eventCallback(itk::Object* caller, const itk::EventObject& event, void* clientData);
+
+    animaT2Relaxometry *parent;
+    animaT2RelaxometryPrivate(): parent(NULL) {}
+
     double echoSpacing;
     double trTime;
     double upperBoundM0, upperBoundT2;
@@ -48,6 +54,10 @@ template <class T>
 void
 animaT2RelaxometryPrivate::update()
 {
+    callback = itk::CStyleCommand::New();
+    callback->SetClientData((void*) this);
+    callback->SetCallback(animaT2RelaxometryPrivate::eventCallback);
+
     typedef itk::Image <T, 3> InputImageType;
     typedef itk::Image <double, 3> OutputImageType;
     typedef itk::Image <T, 4> Image4DType;
@@ -78,6 +88,7 @@ animaT2RelaxometryPrivate::update()
     mainFilter->SetAverageSignalThreshold(backgroundSignalThreshold);
     mainFilter->SetNumberOfThreads(nbThreads);
 
+    mainFilter->AddObserver(itk::ProgressEvent(), callback );
     mainFilter->Update();
 
     OutputImageType::Pointer outputData = mainFilter->GetOutput();
@@ -87,12 +98,22 @@ animaT2RelaxometryPrivate::update()
     output->setData(outputData);
 }
 
+void
+animaT2RelaxometryPrivate::eventCallback(itk::Object* caller, const itk::EventObject& event, void* clientData)
+{
+    animaT2RelaxometryPrivate *d = reinterpret_cast<animaT2RelaxometryPrivate *> (clientData);
+    itk::ProcessObject * processObject = ( itk::ProcessObject* ) caller;
+    d->parent->emitProgressed ( static_cast<int>( (processObject->GetProgress() * 100)));
+}
+
 // /////////////////////////////////////////////////////////////////
 // animaT2Relaxometry
 // /////////////////////////////////////////////////////////////////
 
 animaT2Relaxometry::animaT2Relaxometry() : dtkAbstractProcess(), d(new animaT2RelaxometryPrivate)
 {
+    d->parent = this;
+
     d->echoSpacing = 10;
     d->trTime = 4500;
     d->upperBoundM0 = 5000;
@@ -227,6 +248,11 @@ int animaT2Relaxometry::update()
 medAbstractData * animaT2Relaxometry::output()
 {
     return ( d->output );
+}
+
+void animaT2Relaxometry::emitProgressed(int progression)
+{
+    emit progressed(progression);
 }
 
 // /////////////////////////////////////////////////////////////////

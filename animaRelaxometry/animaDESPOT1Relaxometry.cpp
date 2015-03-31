@@ -36,6 +36,12 @@ public:
 
     template <class T> void update();
 
+    itk::CStyleCommand::Pointer callback;
+    static void eventCallback(itk::Object* caller, const itk::EventObject& event, void* clientData);
+
+    animaDESPOT1Relaxometry *parent;
+    animaDESPOT1RelaxometryPrivate(): parent(NULL) {}
+
     double firstFlipAngle, secondFlipAngle;
     double trTime;
     double upperBoundM0, upperBoundT1;
@@ -47,6 +53,10 @@ template <class T>
 void
 animaDESPOT1RelaxometryPrivate::update()
 {
+    callback = itk::CStyleCommand::New();
+    callback->SetClientData((void*) this);
+    callback->SetCallback(animaDESPOT1RelaxometryPrivate::eventCallback);
+
     typedef itk::Image <T, 3> InputImageType;
     typedef itk::Image <double, 3> OutputImageType;
     typedef itk::Image <T, 4> Image4DType;
@@ -73,6 +83,7 @@ animaDESPOT1RelaxometryPrivate::update()
     mainFilter->SetAverageSignalThreshold(backgroundSignalThreshold);
     mainFilter->SetNumberOfThreads(nbThreads);
 
+    mainFilter->AddObserver(itk::ProgressEvent(), callback );
     mainFilter->Update();
 
     OutputImageType::Pointer outputData = mainFilter->GetOutput();
@@ -82,12 +93,22 @@ animaDESPOT1RelaxometryPrivate::update()
     output->setData(outputData);
 }
 
+void
+animaDESPOT1RelaxometryPrivate::eventCallback(itk::Object* caller, const itk::EventObject& event, void* clientData)
+{
+    animaDESPOT1RelaxometryPrivate *d = reinterpret_cast<animaDESPOT1RelaxometryPrivate *> (clientData);
+    itk::ProcessObject * processObject = ( itk::ProcessObject* ) caller;
+    d->parent->emitProgressed ( static_cast<int>( (processObject->GetProgress() * 100)));
+}
+
 // /////////////////////////////////////////////////////////////////
 // animaDESPOT1Relaxometry
 // /////////////////////////////////////////////////////////////////
 
 animaDESPOT1Relaxometry::animaDESPOT1Relaxometry() : dtkAbstractProcess(), d(new animaDESPOT1RelaxometryPrivate)
 {
+    d->parent = this;
+
     d->firstFlipAngle = 5 * M_PI / 180.0;
     d->secondFlipAngle = 30 * M_PI / 180.0;
     d->trTime = 15;
@@ -219,6 +240,11 @@ int animaDESPOT1Relaxometry::update()
 medAbstractData * animaDESPOT1Relaxometry::output()
 {
     return ( d->output );
+}
+
+void animaDESPOT1Relaxometry::emitProgressed(int progression)
+{
+    emit progressed(progression);
 }
 
 // /////////////////////////////////////////////////////////////////

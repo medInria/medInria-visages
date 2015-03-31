@@ -85,7 +85,7 @@ QString animaRelaxometryPlugin::name() const
 
 QString animaRelaxometryPlugin::description() const
 {
-    return tr("AnimaRelaxometry");
+    return tr("T1 and T2 relaxometry");
 }
 
 QString animaRelaxometryPlugin::version() const
@@ -95,13 +95,12 @@ QString animaRelaxometryPlugin::version() const
 
 QString animaRelaxometryPlugin::contact() const
 {
-    return "";
+    return "Olivier Commowick <Olivier.Commowick@inria.fr>";
 }
 
 QStringList animaRelaxometryPlugin::authors() const
 {
-    QStringList list;
-    return list;
+    return QStringList() << "Olivier Commowick" << "Fang Cao" << "Benoit Combes";
 }
 
 QStringList animaRelaxometryPlugin::contributors() const

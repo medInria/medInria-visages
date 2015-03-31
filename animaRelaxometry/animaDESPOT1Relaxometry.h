@@ -29,6 +29,8 @@ public:
     virtual ~animaDESPOT1Relaxometry();
     
     virtual QString description() const;
+
+    void emitProgressed(int progression);
     
     static bool registered();
 
