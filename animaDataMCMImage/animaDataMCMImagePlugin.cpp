@@ -89,7 +89,7 @@ QString animaDataMCMImagePlugin::version() const
 
 QString animaDataMCMImagePlugin::description() const
 {
-    return "Multi-compartment models dat aand visualization";
+    return "Multi-compartment models data and visualization";
 }
 
 QStringList animaDataMCMImagePlugin::tags() const
