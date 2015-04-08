@@ -47,6 +47,7 @@ option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocal
 option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-PyramidalBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_DENSEBMREGISTRATION_PLUGIN     "Build anima-DenseBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN     "Build vistalProcessGraphCutSeg plugin" "OFF")
+option(MEDINRIA_BUILD_ANIMA_MCMDATAIMAGE_PLUGIN     "Build anima-MCMDataImage plugin" "ON")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 option(BUILD_EXAMPLES "Build examples" OFF)
@@ -72,35 +73,39 @@ if (MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN)
 endif()
 
 if (MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN)
-    subdirs(vistalProcessBiasFiltering)
+    add_subdirectory(vistalProcessBiasFiltering)
 endif()
 
 if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN)
-        subdirs(vistalProcessSegmentationGCEM)
+        add_subdirectory(vistalProcessSegmentationGCEM)
 endif()
 
 if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN)
-    subdirs(vistalProcessSegmentationSTREM)
+    add_subdirectory(vistalProcessSegmentationSTREM)
 endif()
 
 if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN)
-        subdirs(vistalProcessGraphCutSeg)
+        add_subdirectory(vistalProcessGraphCutSeg)
 endif()
 
 if (MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN)
-    subdirs(animaSymmetryPlane)
+    add_subdirectory(animaSymmetryPlane)
 endif()
 
 if (MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN)
-    subdirs(animaNonLocalMeansFilter)
+    add_subdirectory(animaNonLocalMeansFilter)
 endif()
 
 if (MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN)
-    subdirs(animaPyramidalBMRegistration)
+    add_subdirectory(animaPyramidalBMRegistration)
 endif()
 
 if (MEDINRIA_BUILD_ANIMA_DENSEBMREGISTRATION_PLUGIN)
-    subdirs(animaDenseBMRegistration)
+    add_subdirectory(animaDenseBMRegistration)
+endif()
+
+if (MEDINRIA_BUILD_ANIMA_MCMDATAIMAGE_PLUGIN)
+    add_subdirectory(animaDataMCMImage)
 endif()
 
 if (APPLE)
