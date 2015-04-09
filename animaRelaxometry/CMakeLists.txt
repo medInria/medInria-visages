@@ -85,6 +85,8 @@ target_link_libraries(${PROJECT_NAME}
   dtkCore
   medCore
   ${ITKIO_LIBRARIES}
+  AnimaOptimizers
+  ${NLOPT_LIBRARY}
   )
 
 

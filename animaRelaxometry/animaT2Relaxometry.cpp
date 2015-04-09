@@ -72,7 +72,13 @@ animaT2RelaxometryPrivate::update()
     for (unsigned int i = 0;i < inputData.size();++i)
         mainFilter->SetInput(i,inputData[i]);
 
-    mainFilter->SetEchoSpacing(echoSpacing);
+    unsigned int numInputs = mainFilter->GetNumberOfIndexedInputs();
+    std::vector<double> echoTime(numInputs);
+
+    for(unsigned int index = 0;index < echoTime.size();++index)
+        echoTime[index]=(index+1)*(echoSpacing);
+
+    mainFilter->SetEchoTime(echoTime);
 
     mainFilter->SetTRValue(trTime);
     mainFilter->SetM0UpperBoundValue(upperBoundM0);
