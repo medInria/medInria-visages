@@ -64,6 +64,9 @@ bool animaDataMCMImageReader::canRead (const QString &path)
     itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO(path.toAscii().constData(),
                                                                            itk::ImageIOFactory::ReadMode);
 
+    if (!imageIO)
+        return false;
+
     imageIO->SetFileName(path.toAscii().constData());
     try
     {
