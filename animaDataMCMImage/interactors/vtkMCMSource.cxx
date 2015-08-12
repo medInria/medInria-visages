@@ -46,8 +46,7 @@ vtkMCMSource::vtkMCMSource(const int tess)
     sphereT = vtkTessellatedSphereSource::New();
     sphereT->SetResolution(Tesselation);
 
-    MCMData = 0;
-    NumberOfCompartments = 0;
+    MCMData.SetSize(0);
 }
 
 vtkMCMSource::~vtkMCMSource()
@@ -57,12 +56,6 @@ vtkMCMSource::~vtkMCMSource()
 
     if(RotationMatrix)
         RotationMatrix->Delete();
-
-    // TO DO : check this is not causing crashes
-    if (MCMData)
-        delete[] MCMData;
-
-    MCMData = 0;
 }
 
 void vtkMCMSource::SetRotationMatrix(vtkMatrix4x4 *mat)
@@ -100,7 +93,12 @@ int vtkMCMSource::RequestData(vtkInformation *vtkNotUsed(request),vtkInformation
     sValues->SetNumberOfTuples(N);
     sValues->SetNumberOfComponents(1);
 
-    if (!MCMData)
+    referenceMCM->SetModelVector(MCMData);
+    double sumWeightsMCM = 0;
+    for (unsigned int i = 0;i < referenceMCM->GetNumberOfCompartments();++i)
+        sumWeightsMCM += referenceMCM->GetCompartmentWeight(i);
+
+    if (sumWeightsMCM == 0)
     {
         for (unsigned int i=0;i < N;++i)
             sValues->SetTuple1(i,0);
@@ -119,9 +117,6 @@ int vtkMCMSource::RequestData(vtkInformation *vtkNotUsed(request),vtkInformation
 
     vtkPoints* vertices = sphereT->GetOutput()->GetPoints();
     vnl_vector_fixed <double,3> point;
-
-    unsigned int dataSize = NumberOfCompartments * anima::CompartmentSize + 4;
-    std::vector <double> dataMCM(dataSize,0);
 
     double maxSValue = 0;
     double minSValue = VTK_DOUBLE_MAX;
@@ -144,10 +139,7 @@ int vtkMCMSource::RequestData(vtkInformation *vtkNotUsed(request),vtkInformation
 
         point *= Radius;
 
-        for (unsigned int j = 0;j < dataSize;++j)
-            dataMCM[j] = MCMData[j];
-
-        double sValue = anima::ComputeDDIPdf(point, dataMCM);
+        double sValue = referenceMCM->GetDiffusionProfile(point);
 
         if (i % 10000 == 0)
         {
@@ -221,11 +213,9 @@ int vtkMCMSource::RequestInformation(vtkInformation*,vtkInformationVector**,vtkI
     return 1;
 }
 
-void vtkMCMSource::SetMCMData(double *_arg, unsigned int size)
+void vtkMCMSource::SetMCMData(MCModelVectorType &_arg)
 {
     MCMData = _arg;
-    NumberOfCompartments = (size - 4) / anima::CompartmentSize;
-
     Modified();
 }
 

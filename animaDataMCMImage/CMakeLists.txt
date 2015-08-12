@@ -6,7 +6,7 @@ project(animaDataMCMImagePlugin)
 ## Setup version numbering
 ## #############################################################################
 
-set(${PROJECT_NAME}_VERSION_MAJOR 1 CACHE STRING "${PROJECT_NAME} major version number." FORCE)
+set(${PROJECT_NAME}_VERSION_MAJOR 2 CACHE STRING "${PROJECT_NAME} major version number." FORCE)
 set(${PROJECT_NAME}_VERSION_MINOR 0 CACHE STRING "${PROJECT_NAME} minor version number." FORCE)
 set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build version number." FORCE)
 set(${PROJECT_NAME}_VERSION
@@ -36,8 +36,8 @@ include(${ITK_USE_FILE})
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
-find_package(ANIMA REQUIRED)
-include(${ANIMA_USE_FILE})
+find_package(ANIMA-PRIVATE REQUIRED)
+include(${ANIMA-PRIVATE_USE_FILE})
 
 ## #############################################################################
 ## Qt Automoc
@@ -64,9 +64,7 @@ set(${PROJECT_NAME}_HEADERS
   datas/animaDataMCMImageFloat3.h
   datas/animaDataMCMImageDouble3.h
   readers/animaDataMCMImageReader.h
-  writers/animaDataMCMImageWriterBase.h
-  writers/animaMetaDataMCMImageWriter.h
-  writers/animaNiftiDataMCMImageWriter.h
+  writers/animaDataMCMImageWriter.h
   interactors/animaMCMITKToVTKFilter.h
   interactors/animaMCMITKToVTKFilter.hxx
   interactors/vtkMCMGlyph.h
@@ -81,9 +79,7 @@ set(${PROJECT_NAME}_SOURCES
   datas/animaDataMCMImageFloat3.cpp
   datas/animaDataMCMImageDouble3.cpp
   readers/animaDataMCMImageReader.cpp
-  writers/animaDataMCMImageWriterBase.cpp
-  writers/animaMetaDataMCMImageWriter.cpp
-  writers/animaNiftiDataMCMImageWriter.cpp
+  writers/animaDataMCMImageWriter.cpp
   interactors/vtkMCMGlyph.cxx
   interactors/vtkMCMSource.cxx
   interactors/vtkMCMManager.cxx
@@ -114,7 +110,9 @@ target_link_libraries(${PROJECT_NAME}
   medVtkInria
   vtkCommon
   vtkRendering
+  AnimaMCM
   AnimaSpecialFunctions
+  ${TinyXML2_LIBRARY}
   )
 
 ## #############################################################################

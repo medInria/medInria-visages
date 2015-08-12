@@ -1,6 +1,7 @@
 #pragma once
 
 #include <animaDataMCMImagePluginExport.h>
+#include <animaMultiCompartmentModel.h>
 
 #include <vtkObject.h>
 #include <vtkRenderWindowInteractor.h>
@@ -30,6 +31,12 @@ public:
     vtkGetObjectMacro(MCMVisuManagerAxial, vtkMCMVisuManager);
     vtkGetObjectMacro(MCMVisuManagerSagittal, vtkMCMVisuManager);
     vtkGetObjectMacro(MCMVisuManagerCoronal, vtkMCMVisuManager);
+
+    typedef anima::MultiCompartmentModel MCModelType;
+    typedef MCModelType::ModelOutputVectorType MCModelVectorType;
+    typedef MCModelType::Pointer MCModelPointer;
+
+    void SetReferenceMCM(MCModelPointer &model);
 
     /** Set a scaling factor for the glyphs. */
     void SetGlyphScale(const float& f);

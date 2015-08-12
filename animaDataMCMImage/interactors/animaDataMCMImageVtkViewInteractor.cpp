@@ -20,6 +20,9 @@
 #include <medVtkViewBackend.h>
 
 #include <animaMCMITKToVTKFilter.h>
+#include <animaMultiCompartmentModel.h>
+#include <animaDataMCMImageFloat3.h>
+#include <animaDataMCMImageDouble3.h>
 
 #include <itkImage.h>
 #include <itkVectorImage.h>
@@ -52,8 +55,12 @@ public:
     animaMCMITKToVTKFilter<itk::VectorImage<float,3> >::Pointer  filterFloat;
     animaMCMITKToVTKFilter<itk::VectorImage<double,3> >::Pointer filterDouble;
 
+    typedef anima::MultiCompartmentModel MCModelType;
+    typedef MCModelType::Pointer MCModelPointer;
+
     template <typename MCM_IMAGE>
-    void setVTKFilter(medAbstractData* d,typename animaMCMITKToVTKFilter<MCM_IMAGE>::Pointer& filter)
+    void setVTKFilter(medAbstractData* d,typename animaMCMITKToVTKFilter<MCM_IMAGE>::Pointer& filter,
+                      MCModelPointer &referenceMCM)
     {
         MCM_IMAGE* dataset = static_cast<MCM_IMAGE*>(d->data());
 
@@ -84,6 +91,7 @@ public:
             v_spacing[i] = dataset->GetSpacing()[i];
 
         manager->SetInput(filter->GetVTKMCMData());
+        manager->SetReferenceMCM(referenceMCM);
         manager->SetDirectionMatrix(filter->GetDirectionMatrix());
 
         manager->ResetPosition();
@@ -187,9 +195,15 @@ void animaDataMCMImageVtkViewInteractor::setInputData(medAbstractData *data)
 
     const QString& identifier = data->identifier();
     if (identifier=="animaDataMCMImageFloat3")
-        d->setVTKFilter<itk::VectorImage<float,3> >(data,d->filterFloat);
+    {
+        animaDataMCMImageFloat3 *mcmData = dynamic_cast <animaDataMCMImageFloat3 *> (data);
+        d->setVTKFilter<itk::VectorImage<float,3> >(data,d->filterFloat,mcmData->getReferenceModel());
+    }
     else if (identifier=="animaDataMCMImageDouble3")
-        d->setVTKFilter<itk::VectorImage<double,3> >(data,d->filterDouble);
+    {
+        animaDataMCMImageDouble3 *mcmData = dynamic_cast <animaDataMCMImageDouble3 *> (data);
+        d->setVTKFilter<itk::VectorImage<double,3> >(data,d->filterDouble,mcmData->getReferenceModel());
+    }
     else
     {
         qDebug() << "Unrecognized MCM data type: " << identifier;

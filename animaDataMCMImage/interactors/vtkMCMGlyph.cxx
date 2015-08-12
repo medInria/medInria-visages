@@ -241,6 +241,8 @@ int vtkMCMGlyph::RequestData(vtkInformation*,vtkInformationVector** inputVector,
     vtkTransform* trans = vtkTransform::New();
     trans->PreMultiply();
 
+    vtkMCMSource::MCModelVectorType mcm(inScalars->GetNumberOfComponents());
+
     double x[4];
     for (vtkIdType inPtId=0,inPtIdReal=0;inPtId<numPts;++inPtId)
     {
@@ -252,15 +254,18 @@ int vtkMCMGlyph::RequestData(vtkInformation*,vtkInformationVector** inputVector,
         }
 
         // Get the MCM vector.
-        double* mcm = new double[inScalars->GetNumberOfComponents()];
-        inScalars->GetTuple(inPtId,mcm);
+        double* tmpMCM = new double[inScalars->GetNumberOfComponents()];
+        inScalars->GetTuple(inPtId,tmpMCM);
 
-        if (!isZero(mcm,inScalars->GetNumberOfComponents()))
+        if (!isZero(tmpMCM,inScalars->GetNumberOfComponents()))
         {
+            for (unsigned int i = 0;i < inScalars->GetNumberOfComponents();++i)
+                mcm[i] = tmpMCM[i];
+
             const vtkIdType ptIncr = numDirs*inPtIdReal*numSourcePts;
 
             // Set harmonics and compute spherical function.
-            MCMSource->SetMCMData(mcm, inScalars->GetNumberOfComponents());
+            MCMSource->SetMCMData(mcm);
             MCMSource->Update();
 
             vtkPoints* deformPts = MCMSource->GetOutput()->GetPoints();
@@ -284,7 +289,7 @@ int vtkMCMGlyph::RequestData(vtkInformation*,vtkInformationVector** inputVector,
             inPtIdReal++;
         }
 
-        delete[] mcm;
+        delete[] tmpMCM;
     }
 
     output->SetPoints(newPts);

@@ -8,6 +8,8 @@
 #include <itkVector.h>
 #include <vtkTessellatedSphereSource.h>
 
+#include <animaMultiCompartmentModel.h>
+
 class vtkMatrix4x4;
 
 class ANIMADATAMCMIMAGEPLUGIN_EXPORT vtkMCMSource: public vtkPolyDataAlgorithm
@@ -41,8 +43,12 @@ public:
         Tetrahedron
     } TesselationMode;
 
-    void SetMCMData(double* coeff, unsigned int size);
-    double *GetMCMData() { return MCMData; }
+    typedef anima::MultiCompartmentModel MCModelType;
+    typedef MCModelType::ModelOutputVectorType MCModelVectorType;
+    typedef MCModelType::Pointer MCModelPointer;
+
+    void SetReferenceMCM(MCModelPointer &model) {referenceMCM = model;}
+    void SetMCMData(MCModelVectorType &coeff);
     
     vtkSetClampMacro(Radius,double,0.0,VTK_DOUBLE_MAX);
     vtkGetMacro(Radius,double);
@@ -100,8 +106,8 @@ protected:
 
     /** MCM representation */
 
-    double *MCMData;
-    unsigned int NumberOfCompartments;
+    MCModelVectorType MCMData;
+    MCModelPointer referenceMCM;
 
     /** Type of tesselation : cube, dodecahedron, icosahedron, octahedron, tetrahedron
       * determines the angular sampling scheme*/

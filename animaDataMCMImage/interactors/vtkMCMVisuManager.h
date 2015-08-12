@@ -1,6 +1,8 @@
 #pragma once
 
 #include <animaDataMCMImagePluginExport.h>
+#include <animaMultiCompartmentModel.h>
+
 #include <vtkMCMSource.h>
 
 class vtkMCMSource;
@@ -41,6 +43,10 @@ public:
     void SetVOI(const int&,const int&,const int&,const int&,const int&,const int&);
 
     void SetInput (vtkImageData*);
+
+    typedef anima::MultiCompartmentModel MCModelType;
+    typedef MCModelType::Pointer MCModelPointer;
+    void SetReferenceMCM(MCModelPointer &model);
 
     /** Get the object that computes the MCM glyph*/
     vtkGetObjectMacro (MCMSource, vtkMCMSource);

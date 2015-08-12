@@ -131,6 +131,21 @@ void vtkMCMManager::Update()
     }
 }
 
+void vtkMCMManager::SetReferenceMCM(MCModelPointer &model)
+{
+    MCMVisuManagerAxial->SetReferenceMCM(model);
+
+    MCModelPointer sagittalMCM = MCModelType::New();
+    sagittalMCM->CloneMultiCompartmentModel(model);
+
+    MCMVisuManagerSagittal->SetReferenceMCM(sagittalMCM);
+
+    MCModelPointer coronalMCM = MCModelType::New();
+    coronalMCM->CloneMultiCompartmentModel(model);
+
+    MCMVisuManagerCoronal->SetReferenceMCM(coronalMCM);
+}
+
 void vtkMCMManager::SetDirectionMatrix(vtkMatrix4x4 *mat)
 {
     if (!mat)

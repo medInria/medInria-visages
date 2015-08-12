@@ -16,7 +16,10 @@ class animaDataMCMImageDouble3Private
 {
 public:
     typedef itk::VectorImage<double, 3> MCMImageType;
+    typedef anima::MultiCompartmentModel::Pointer MCModelPointer;
+
     MCMImageType::Pointer mcmImage;
+    MCModelPointer referenceModel;
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -26,6 +29,7 @@ public:
 animaDataMCMImageDouble3::animaDataMCMImageDouble3(): medAbstractTypedDiffusionModelImageData<3,double>(), d(new animaDataMCMImageDouble3Private)
 {
     d->mcmImage = 0;
+    d->referenceModel = 0;
 }
 
 animaDataMCMImageDouble3::~animaDataMCMImageDouble3()
@@ -58,6 +62,16 @@ void animaDataMCMImageDouble3::setData(void *data)
     }
     else
       qDebug() << "Cannot cast pointer to correct SH double type";
+}
+
+void animaDataMCMImageDouble3::setReferenceModel(MCModelPointer &model)
+{
+    d->referenceModel = model;
+}
+
+animaDataMCMImageDouble3::MCModelPointer &animaDataMCMImageDouble3::getReferenceModel()
+{
+    return d->referenceModel;
 }
 
 int animaDataMCMImageDouble3::xDimension()

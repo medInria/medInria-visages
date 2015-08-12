@@ -143,3 +143,8 @@ void vtkMCMVisuManager::SetNormalization (const int& a)
 {
     MCMSource->SetNormalization(a);
 }
+
+void vtkMCMVisuManager::SetReferenceMCM(MCModelPointer &model)
+{
+    MCMSource->SetReferenceMCM(model);
+}
