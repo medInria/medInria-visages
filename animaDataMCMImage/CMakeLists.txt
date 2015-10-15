@@ -36,8 +36,8 @@ include(${ITK_USE_FILE})
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
-find_package(ANIMA REQUIRED)
-include(${ANIMA_USE_FILE})
+find_package(ANIMA-PRIVATE REQUIRED)
+include(${ANIMA-PRIVATE_USE_FILE})
 
 ## #############################################################################
 ## Qt Automoc
