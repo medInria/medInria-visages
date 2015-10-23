@@ -1,6 +1,7 @@
 #pragma once
 
 #include <medAbstractTypedDiffusionModelImageData.h>
+#include <animaMultiCompartmentModel.h>
 
 #include <animaDataMCMImagePluginExport.h>
 
@@ -16,6 +17,12 @@ public:
     virtual ~animaDataMCMImageFloat3();
 
     static bool registered();
+
+    typedef anima::MultiCompartmentModel MCModelType;
+    typedef MCModelType::Pointer MCModelPointer;
+
+    void setReferenceModel(MCModelPointer &model);
+    MCModelPointer &getReferenceModel();
 
 public slots:
     // derived from dtkAbstractData

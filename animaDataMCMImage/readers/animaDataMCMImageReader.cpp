@@ -1,14 +1,12 @@
 #include <animaDataMCMImageReader.h>
 
-#include <animaDDIDistribution.h>
+#include <animaMCMFileReader.h>
 
 #include <medAbstractData.h>
 #include <medAbstractDataFactory.h>
 
-#include <itkImageFileReader.h>
-#include <itkObjectFactoryBase.h>
-#include <itkImageRegionConstIteratorWithIndex.h>
-#include <itkImageRegionIteratorWithIndex.h>
+#include <animaDataMCMImageFloat3.h>
+#include <animaDataMCMImageDouble3.h>
 
 // /////////////////////////////////////////////////////////////////
 // animaDataMCMImageReader
@@ -24,8 +22,7 @@ animaDataMCMImageReader::~animaDataMCMImageReader()
 
 QStringList animaDataMCMImageReader::handled() const
 {
-    return QStringList() << "animaDataMCMImageDouble3"
-                         << "animaDataMCMImageFloat3";
+    return s_handled();
 }
 
 QStringList animaDataMCMImageReader::s_handled()
@@ -47,7 +44,7 @@ QString animaDataMCMImageReader::identifier() const
 
 QString animaDataMCMImageReader::description() const
 {
-    return "Reader for Anima MCM images";
+    return "Reader for MCM images";
 }
 
 bool animaDataMCMImageReader::canRead (const QStringList &paths)
@@ -59,29 +56,10 @@ bool animaDataMCMImageReader::canRead (const QStringList &paths)
 
 bool animaDataMCMImageReader::canRead (const QString &path)
 {
-    // TO DO : add part to read initial XML file and see if it's conform after
+    if (path.endsWith(".mcm"))
+        return true;
 
-    itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO(path.toAscii().constData(),
-                                                                           itk::ImageIOFactory::ReadMode);
-
-    if (!imageIO)
-        return false;
-
-    imageIO->SetFileName(path.toAscii().constData());
-    try
-    {
-        imageIO->ReadImageInformation();
-    }
-    catch (itk::ExceptionObject &e)
-    {
-        qDebug() << e.GetDescription();
-        return false;
-    }
-
-    if ((imageIO->GetNumberOfComponents() - 4) % anima::CompartmentSize != 0)
-        return false;
-
-    return true;
+    return false;
 }
 
 bool animaDataMCMImageReader::readInformation (const QStringList &paths)
@@ -94,27 +72,13 @@ bool animaDataMCMImageReader::readInformation (const QStringList &paths)
 
 bool animaDataMCMImageReader::readInformation (const QString &path)
 {
-    // TO DO : add part to read initial XML file and see if it's conform after
-
-    itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO(path.toAscii().constData(),
-                                                                           itk::ImageIOFactory::ReadMode);
-
-    imageIO->SetFileName(path.toAscii().constData());
-    try
-    {
-        imageIO->ReadImageInformation();
-    }
-    catch (itk::ExceptionObject &e)
-    {
-        qDebug() << e.GetDescription();
-        return false;
-    }
+    itk::ImageIOBase::IOComponentType componentType = anima::GetMCMComponentType(path.toStdString());
     
     medAbstractData* medData = dynamic_cast<medAbstractData*>(this->data());
 
     if (!medData)
     {
-        switch (imageIO->GetComponentType())
+        switch (componentType)
         {
         case itk::ImageIOBase::FLOAT:
             medData = medAbstractDataFactory::instance()->create ("animaDataMCMImageFloat3");
@@ -129,15 +93,13 @@ bool animaDataMCMImageReader::readInformation (const QString &path)
             break;
 
         default:
-            qDebug() << "Unsupported component type";
+            qDebug() << "Unsupported component type in MCM readInformation";
             return false ;
         }
     }
 
     if (medData)
-    {
         medData->addMetaData ("FilePath", QStringList() << path);
-    }
 
     return true;
 }
@@ -159,48 +121,41 @@ bool animaDataMCMImageReader::read (const QString &path)
     {
         if (medData->identifier() == "animaDataMCMImageDouble3")
         {
-            typedef itk::VectorImage<double, 3> MCMImageType;
+            anima::MCMFileReader <double, 3> mcmReader;
+            mcmReader.SetFileName(path.toStdString());
 
-            typedef itk::ImageFileReader<MCMImageType> ReaderType;
-
-            MCMImageType::Pointer image = 0;
-
-            ReaderType::Pointer reader = ReaderType::New();
-            reader->SetFileName ( path.toAscii().constData() );
             try
             {
-                reader->Update();
+                mcmReader.Update();
             }
             catch (itk::ExceptionObject &e)
             {
                 qDebug() << e.GetDescription();
                 return false;
             }
-            image = reader->GetOutput();
-            medData->setData (image);
+
+            medData->setData (mcmReader.GetModelVectorImage());
+            animaDataMCMImageDouble3 *mcmData = dynamic_cast <animaDataMCMImageDouble3 *> (medData);
+            mcmData->setReferenceModel(mcmReader.GetReferenceModel());
         }
         else if (medData->identifier()=="animaDataMCMImageFloat3")
         {
-            typedef itk::VectorImage<float, 3> MCMImageType;
+            anima::MCMFileReader <float, 3> mcmReader;
+            mcmReader.SetFileName(path.toStdString());
 
-            typedef itk::ImageFileReader<MCMImageType> ReaderType;
-
-            MCMImageType::Pointer image = 0;
-
-            ReaderType::Pointer reader = ReaderType::New();
-            reader->SetFileName ( path.toAscii().constData() );
             try
             {
-                reader->Update();
+                mcmReader.Update();
             }
             catch (itk::ExceptionObject &e)
             {
                 qDebug() << e.GetDescription();
                 return false;
             }
-            image = reader->GetOutput();
-            medData->setData (image);
 
+            medData->setData (mcmReader.GetModelVectorImage());
+            animaDataMCMImageFloat3 *mcmData = dynamic_cast <animaDataMCMImageFloat3 *> (medData);
+            mcmData->setReferenceModel(mcmReader.GetReferenceModel());
         }
         else
         {

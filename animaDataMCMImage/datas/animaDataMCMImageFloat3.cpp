@@ -17,7 +17,10 @@ class animaDataMCMImageFloat3Private
 {
 public:
     typedef itk::VectorImage<float, 3> MCMImageType;
+    typedef anima::MultiCompartmentModel::Pointer MCModelPointer;
+
     MCMImageType::Pointer mcmImage;
+    MCModelPointer referenceModel;
 };
 
 // /////////////////////////////////////////////////////////////////
@@ -27,6 +30,7 @@ public:
 animaDataMCMImageFloat3::animaDataMCMImageFloat3(): medAbstractTypedDiffusionModelImageData<3,float>(), d(new animaDataMCMImageFloat3Private)
 {
     d->mcmImage = 0;
+    d->referenceModel = 0;
 }
 
 animaDataMCMImageFloat3::~animaDataMCMImageFloat3()
@@ -59,6 +63,16 @@ void animaDataMCMImageFloat3::setData(void *data)
     }
     else
       qDebug() << "Cannot cast pointer to correct MCM float type";
+}
+
+void animaDataMCMImageFloat3::setReferenceModel(MCModelPointer &model)
+{
+    d->referenceModel = model;
+}
+
+animaDataMCMImageFloat3::MCModelPointer &animaDataMCMImageFloat3::getReferenceModel()
+{
+    return d->referenceModel;
 }
 
 int animaDataMCMImageFloat3::xDimension()

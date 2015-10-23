@@ -5,8 +5,7 @@
 #include <animaDataMCMImageVtkViewInteractor.h>
 
 #include <animaDataMCMImageReader.h>
-#include <animaMetaDataMCMImageWriter.h>
-#include <animaNiftiDataMCMImageWriter.h>
+#include <animaDataMCMImageWriter.h>
 
 #include <dtkLog/dtkLog.h>
 #include <itkLogForwarder.h>
@@ -49,8 +48,7 @@ bool animaDataMCMImagePlugin::initialize()
     if (!animaDataMCMImageVtkViewInteractor::registered()) { dtkWarn() << "Unable to register animaDataMCMImageVtkViewInteractor type"; }
 
     if (!animaDataMCMImageReader::registered()) { dtkWarn() << "Unable to register animaDataMCMImageReader type"; }
-    if (!animaMetaDataMCMImageWriter::registered()) { dtkWarn() << "Unable to register animaMetaDataMCMImageWriter type"; }
-    if (!animaNiftiDataMCMImageWriter::registered()) { dtkWarn() << "Unable to register animaNiftiDataMCMImageWriter type"; }
+    if (!animaDataMCMImageWriter::registered()) { dtkWarn() << "Unable to register animaDataMCMImageWriter type"; }
 
     return true;
 }
