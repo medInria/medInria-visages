@@ -15,7 +15,7 @@ class vtkMatrix4x4;
 class ANIMADATAMCMIMAGEPLUGIN_EXPORT vtkMCMSource: public vtkPolyDataAlgorithm
 {
 public:
-    vtkTypeRevisionMacro(vtkMCMSource,vtkPolyDataAlgorithm);
+    vtkTypeMacro(vtkMCMSource,vtkPolyDataAlgorithm);
     void PrintSelf(ostream& os,vtkIndent indent);
 
     static vtkMCMSource* New();

@@ -10,11 +10,11 @@
 #include <vtkProperty.h>
 
 #include <medAbstractData.h>
-#include <medAbstractParameter.h>
-#include <medStringListParameter.h>
-#include <medIntParameter.h>
-#include <medBoolParameter.h>
-#include <medDoubleParameter.h>
+#include <medAbstractParameterL.h>
+#include <medStringListParameterL.h>
+#include <medIntParameterL.h>
+#include <medBoolParameterL.h>
+#include <medDoubleParameterL.h>
 #include <medAbstractImageView.h>
 #include <medViewFactory.h>
 #include <medVtkViewBackend.h>
@@ -27,6 +27,10 @@
 #include <itkImage.h>
 #include <itkVectorImage.h>
 
+#include <QSlider>
+#include <QFormLayout>
+#include <QLabel>
+
 class animaDataMCMImageVtkViewInteractorPrivate
 {
 public:
@@ -38,14 +42,14 @@ public:
     vtkRenderWindow *render;
     vtkMatrix4x4 *orientationMatrix;
 
-    QList <medAbstractParameter*> parameters;
+    QList <medAbstractParameterL*> parameters;
     vtkMCMManager *manager;
     double imageBounds[6];
 
     int minorScaling;
     int majorScalingExponent;
 
-    medIntParameter *slicingParameter;
+    medIntParameterL *slicingParameter;
 
     typedef vtkSmartPointer <vtkProperty>  PropertySmartPointer;
     PropertySmartPointer actorProperty;
@@ -69,6 +73,7 @@ public:
 
         filter = animaMCMITKToVTKFilter<MCM_IMAGE>::New();
         filter->SetInput(dataset);
+        filter->UpdateOutputInformation();
         filter->Update();
 
         itk::ImageBase<3>::DirectionType directions = dataset->GetDirection();
@@ -144,7 +149,7 @@ animaDataMCMImageVtkViewInteractor::animaDataMCMImageVtkViewInteractor(medAbstra
     connect(d->view->positionBeingViewedParameter(), SIGNAL(valueChanged(QVector3D)),
             this, SLOT(setPosition(QVector3D)));
 
-    d->slicingParameter = new medIntParameter("Slicing", this);
+    d->slicingParameter = new medIntParameterL("Slicing", this);
 }
 
 animaDataMCMImageVtkViewInteractor::~animaDataMCMImageVtkViewInteractor()
@@ -228,34 +233,34 @@ void animaDataMCMImageVtkViewInteractor::setupParameters()
 {
     QStringList tesselationTypeList;
     tesselationTypeList << "Icosahedron" << "Octahedron" << "Tetrahedron";
-    medStringListParameter *tesselationTypeParam = new medStringListParameter("Tesselation Type", this);
+    medStringListParameterL *tesselationTypeParam = new medStringListParameterL("Tesselation Type", this);
     tesselationTypeParam->addItems(tesselationTypeList);
 
     //  Control sample rate
-    medIntParameter *sampleRateParam = new medIntParameter("Sample Rate", this);
+    medIntParameterL *sampleRateParam = new medIntParameterL("Sample Rate", this);
     sampleRateParam->setRange(1,10);
     sampleRateParam->setValue(1);
 
     //  flipX, flipY, flipZ and Enhance checkboxes
-    medBoolParameter *flipXParam = new medBoolParameter("FlipX", this);
-    medBoolParameter *flipYParam = new medBoolParameter("FlipY", this);
-    medBoolParameter *flipZParam = new medBoolParameter("FlipZ", this);
+    medBoolParameterL *flipXParam = new medBoolParameterL("FlipX", this);
+    medBoolParameterL *flipYParam = new medBoolParameterL("FlipY", this);
+    medBoolParameterL *flipZParam = new medBoolParameterL("FlipZ", this);
 
     // Normalize parameter
-    medBoolParameter *enhanceParam = new medBoolParameter("Enhance", this);
+    medBoolParameterL *enhanceParam = new medBoolParameterL("Enhance", this);
 
     //  Control glyph resolution
-    medIntParameter *glyphResolutionParam = new medIntParameter("Resolution", this);
+    medIntParameterL *glyphResolutionParam = new medIntParameterL("Resolution", this);
     glyphResolutionParam->setRange(0,10);
     glyphResolutionParam->setValue(2);
 
     //  Minor scaling
-    medIntParameter *minorScalingParam = new medIntParameter("Scale", this);
+    medIntParameterL *minorScalingParam = new medIntParameterL("Scale", this);
     minorScalingParam->setRange(1,10);
     minorScalingParam->setValue(1);
 
     //  Major scaling
-    medIntParameter *majorScalingParam = new medIntParameter("x10^", this);
+    medIntParameterL *majorScalingParam = new medIntParameterL("x10^", this);
     majorScalingParam->setRange(-10,10);
     majorScalingParam->setValue(0);
 
@@ -464,7 +469,7 @@ QWidget* animaDataMCMImageVtkViewInteractor::buildToolBoxWidget()
 {
     QWidget *toolbox = new QWidget;
     QFormLayout *layout = new QFormLayout(toolbox);
-    foreach(medAbstractParameter *parameter, d->parameters)
+    foreach(medAbstractParameterL *parameter, d->parameters)
         layout->addRow(parameter->getLabel(), parameter->getWidget());
 
     return toolbox;
@@ -476,17 +481,17 @@ QWidget* animaDataMCMImageVtkViewInteractor::buildToolBarWidget()
     return d->slicingParameter->getSlider();
 }
 
-QList<medAbstractParameter*> animaDataMCMImageVtkViewInteractor::linkableParameters()
+QList<medAbstractParameterL*> animaDataMCMImageVtkViewInteractor::linkableParameters()
 {
-    QList <medAbstractParameter*> linkableParams = d->parameters;
+    QList <medAbstractParameterL*> linkableParams = d->parameters;
     linkableParams << this->visibilityParameter() << this->opacityParameter();
     return linkableParams;
 }
 
-QList<medBoolParameter*> animaDataMCMImageVtkViewInteractor::mouseInteractionParameters()
+QList<medBoolParameterL*> animaDataMCMImageVtkViewInteractor::mouseInteractionParameters()
 {
     // no parameters related to mouse interactions
-    return QList<medBoolParameter*>();
+    return QList<medBoolParameterL*>();
 }
 
 void animaDataMCMImageVtkViewInteractor::update()

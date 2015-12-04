@@ -1,125 +1,104 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.1.0)
 
-project(animaDataMCMImagePlugin)
+set(TARGET_NAME animaDataMCMImagePlugin)
 
 ## #############################################################################
 ## Setup version numbering
 ## #############################################################################
 
-set(${PROJECT_NAME}_VERSION_MAJOR 2 CACHE STRING "${PROJECT_NAME} major version number." FORCE)
-set(${PROJECT_NAME}_VERSION_MINOR 0 CACHE STRING "${PROJECT_NAME} minor version number." FORCE)
-set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build version number." FORCE)
-set(${PROJECT_NAME}_VERSION
-  "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_BUILD}")
+set(${TARGET_NAME}_VERSION_MAJOR 3 CACHE STRING "${TARGET_NAME} major version number." FORCE)
+set(${TARGET_NAME}_VERSION_MINOR 0 CACHE STRING "${TARGET_NAME} minor version number." FORCE)
+set(${TARGET_NAME}_VERSION_BUILD 0 CACHE STRING "${TARGET_NAME} build version number." FORCE)
+set(${TARGET_NAME}_VERSION
+  "${${TARGET_NAME}_VERSION_MAJOR}.${${TARGET_NAME}_VERSION_MINOR}.${${TARGET_NAME}_VERSION_BUILD}")
 
-mark_as_advanced(${PROJECT_NAME}_VERSION_MAJOR)
-mark_as_advanced(${PROJECT_NAME}_VERSION_MINOR)
+mark_as_advanced(${TARGET_NAME}_VERSION_MAJOR)
+mark_as_advanced(${TARGET_NAME}_VERSION_MINOR)
+mark_as_advanced(${TARGET_NAME}_VERSION_BUILD)
 
-string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UP)
-add_definitions(-D${PROJECT_NAME_UP}_VERSION="${${PROJECT_NAME}_VERSION}")
+string(TOUPPER ${TARGET_NAME} TARGET_NAME_UP)
+add_definitions(-D${TARGET_NAME_UP}_VERSION="${${TARGET_NAME}_VERSION}")
 
 
 ## #############################################################################
 ## Resolve dependencies
 ## #############################################################################
 
-find_package(dtk REQUIRED)
-include(${dtk_USE_FILE})
-include(dtkPlugin)
-
-find_package(MEDINRIA REQUIRED)
-include(${MEDINRIA_USE_FILE})
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
 
 find_package(ITK REQUIRED)
 include(${ITK_USE_FILE})
 
-find_package(VTK REQUIRED)
-include(${VTK_USE_FILE})
-
-find_package(ANIMA-PRIVATE REQUIRED)
-include(${ANIMA-PRIVATE_USE_FILE})
-
-## #############################################################################
-## Qt Automoc
-## #############################################################################
-
-set(CMAKE_AUTOMOC ON)
-#   Find includes in corresponding build (and source) directories
-#   (needed for generated files)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(ANIMA_PRIVATE REQUIRED)
+include(${ANIMA_PRIVATE_USE_FILE})
 
 ## #############################################################################
 ## List Sources
 ## #############################################################################
 
-INCLUDE_DIRECTORIES(
+list_source_files(${TARGET_NAME}
+  .
   datas
   interactors
   readers
   writers
   )
 
-set(${PROJECT_NAME}_HEADERS
-  animaDataMCMImagePlugin.h
-  datas/animaDataMCMImageFloat3.h
-  datas/animaDataMCMImageDouble3.h
-  readers/animaDataMCMImageReader.h
-  writers/animaDataMCMImageWriter.h
-  interactors/animaMCMITKToVTKFilter.h
-  interactors/animaMCMITKToVTKFilter.hxx
-  interactors/vtkMCMGlyph.h
-  interactors/vtkMCMSource.h
-  interactors/vtkMCMManager.h
-  interactors/vtkMCMVisuManager.h
-  interactors/animaDataMCMImageVtkViewInteractor.h
-  )
-
-set(${PROJECT_NAME}_SOURCES
-  animaDataMCMImagePlugin.cpp
-  datas/animaDataMCMImageFloat3.cpp
-  datas/animaDataMCMImageDouble3.cpp
-  readers/animaDataMCMImageReader.cpp
-  writers/animaDataMCMImageWriter.cpp
-  interactors/vtkMCMGlyph.cxx
-  interactors/vtkMCMSource.cxx
-  interactors/vtkMCMManager.cxx
-  interactors/vtkMCMVisuManager.cxx
-  interactors/animaDataMCMImageVtkViewInteractor.cpp
+list_header_directories_to_include(${TARGET_NAME}
+  ${${TARGET_NAME}_HEADERS}
   )
 
 ## #############################################################################
 ## Build rules
 ## #############################################################################
 
-add_library(${PROJECT_NAME} SHARED
-  ${${PROJECT_NAME}_SOURCES}
-  ${${PROJECT_NAME}_HEADERS}
+add_library(${TARGET_NAME} SHARED
+  ${${TARGET_NAME}_CFILES}
+  ${${TARGET_NAME}_QRC}
   )
 
 ## #############################################################################
-## Links.
+## include directories.
 ## #############################################################################
 
-target_link_libraries(${PROJECT_NAME}
-  ${QT_LIBRARIES}
-  dtkCore
+target_include_directories(${TARGET_NAME}
+  PRIVATE ${${TARGET_NAME}_INCLUDE_DIRS}
+  )
+# PRIVATE because plugins are not supposed to be used somewhere else
+
+## #############################################################################
+## Link
+## #############################################################################
+
+target_link_libraries(${TARGET_NAME}
+  Qt5::Core
+  dtkCoreSupport
   dtkLog
   ${ITKIO_LIBRARIES}
-  medCore
+  medCoreLegacy
   medLog
   medVtkInria
-  vtkCommon
-  vtkRendering
+  vtkCommonCore
+  vtkInteractionStyle
+  vtkRenderingCore
+  vtkRenderingFreeType
+  vtkRenderingOpenGL
+  vtkRenderingVolumeOpenGL
   AnimaMCM
   AnimaSpecialFunctions
   ${TinyXML2_LIBRARY}
+  )
+
+set_target_properties(${TARGET_NAME} PROPERTIES
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins
   )
 
 ## #############################################################################
 ## Install rules
 ## #############################################################################
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${TARGET_NAME}
   RUNTIME DESTINATION plugins
   LIBRARY DESTINATION plugins
   ARCHIVE DESTINATION lib

@@ -19,7 +19,6 @@
 
 #include <animaDDIDistribution.h>
 
-vtkCxxRevisionMacro(vtkMCMSource,"$Revision: 0 $");
 vtkStandardNewMacro(vtkMCMSource);
 
 vtkMCMSource::vtkMCMSource(const int tess)
@@ -143,7 +142,7 @@ int vtkMCMSource::RequestData(vtkInformation *vtkNotUsed(request),vtkInformation
 
         if (i % 10000 == 0)
         {
-            UpdateProgress ((vtkFloatingPointType)i/N);
+            UpdateProgress ((float)i/N);
             if (GetAbortExecute())
                 break;
         }
@@ -204,11 +203,7 @@ int vtkMCMSource::RequestInformation(vtkInformation*,vtkInformationVector**,vtkI
     // Get the info object
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
-                 Center[0]-0.5,Center[0]+0.4,
-            Center[1]-0.4,Center[1]+0.4,
-            Center[2]-0.4,Center[2]+0.4);
+    outInfo->Set(CAN_HANDLE_PIECE_REQUEST(), 1);
 
     return 1;
 }

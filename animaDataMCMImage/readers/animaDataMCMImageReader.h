@@ -1,6 +1,6 @@
 #pragma once
 
-#include <dtkCore/dtkAbstractDataReader.h>
+#include <dtkCoreSupport/dtkAbstractDataReader.h>
 #include <animaDataMCMImagePluginExport.h>
 
 class ANIMADATAMCMIMAGEPLUGIN_EXPORT animaDataMCMImageReader : public dtkAbstractDataReader

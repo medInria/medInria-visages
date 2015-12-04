@@ -1,6 +1,6 @@
 #pragma once
 
-#include <dtkCore/dtkPlugin.h>
+#include <dtkCoreSupport/dtkPlugin.h>
 #include <animaDataMCMImagePluginExport.h>
 
 class ANIMADATAMCMIMAGEPLUGIN_EXPORT animaDataMCMImagePluginPrivate;
@@ -8,6 +8,7 @@ class ANIMADATAMCMIMAGEPLUGIN_EXPORT animaDataMCMImagePluginPrivate;
 class ANIMADATAMCMIMAGEPLUGIN_EXPORT animaDataMCMImagePlugin : public dtkPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "fr.inria.animaDataMCMImagePlugin" FILE "animaDataMCMImagePlugin.json")
     Q_INTERFACES(dtkPlugin)
 
 public:

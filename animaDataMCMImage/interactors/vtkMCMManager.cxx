@@ -2,7 +2,6 @@
 #include <vtkObjectFactory.h>
 #include <vtkMath.h>
 
-vtkCxxRevisionMacro(vtkMCMManager, "$Revision: 477 $");
 vtkStandardNewMacro(vtkMCMManager);
 
 vtkMCMManager::vtkMCMManager()
@@ -135,13 +134,11 @@ void vtkMCMManager::SetReferenceMCM(MCModelPointer &model)
 {
     MCMVisuManagerAxial->SetReferenceMCM(model);
 
-    MCModelPointer sagittalMCM = MCModelType::New();
-    sagittalMCM->CloneMultiCompartmentModel(model);
+    MCModelPointer sagittalMCM = model->Clone();
 
     MCMVisuManagerSagittal->SetReferenceMCM(sagittalMCM);
 
-    MCModelPointer coronalMCM = MCModelType::New();
-    coronalMCM->CloneMultiCompartmentModel(model);
+    MCModelPointer coronalMCM = model->Clone();
 
     MCMVisuManagerCoronal->SetReferenceMCM(coronalMCM);
 }

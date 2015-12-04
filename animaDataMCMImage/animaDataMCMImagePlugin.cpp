@@ -103,4 +103,4 @@ QStringList animaDataMCMImagePlugin::types() const
                          << "animaDataMCMImageWriter";
 }
 
-Q_EXPORT_PLUGIN2(animaDataMCMImagePlugin, animaDataMCMImagePlugin)
+//Q_EXPORT_PLUGIN2(animaDataMCMImagePlugin, animaDataMCMImagePlugin)
