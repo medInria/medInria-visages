@@ -25,7 +25,7 @@
 #include <animaDataMCMImageDouble3.h>
 
 #include <itkImage.h>
-#include <itkVectorImage.h>
+#include <animaMCMImage.h>
 
 #include <QSlider>
 #include <QFormLayout>
@@ -56,17 +56,17 @@ public:
 
     //  The filters will convert from itk MCM image format to vtkStructuredPoint (format handled by the MCM manager)
 
-    animaMCMITKToVTKFilter<itk::VectorImage<float,3> >::Pointer  filterFloat;
-    animaMCMITKToVTKFilter<itk::VectorImage<double,3> >::Pointer filterDouble;
+    animaMCMITKToVTKFilter<anima::MCMImage<float,3> >::Pointer  filterFloat;
+    animaMCMITKToVTKFilter<anima::MCMImage<double,3> >::Pointer filterDouble;
 
     typedef anima::MultiCompartmentModel MCModelType;
     typedef MCModelType::Pointer MCModelPointer;
 
     template <typename MCM_IMAGE>
-    void setVTKFilter(medAbstractData* d,typename animaMCMITKToVTKFilter<MCM_IMAGE>::Pointer& filter,
-                      MCModelPointer &referenceMCM)
+    void setVTKFilter(medAbstractData* d,typename animaMCMITKToVTKFilter<MCM_IMAGE>::Pointer& filter)
     {
         MCM_IMAGE* dataset = static_cast<MCM_IMAGE*>(d->data());
+        MCModelPointer referenceMCM = dataset->GetDescriptionModel();
 
         if (filter)
             filter->Delete();
@@ -200,16 +200,10 @@ void animaDataMCMImageVtkViewInteractor::setInputData(medAbstractData *data)
 
     const QString& identifier = data->identifier();
     if (identifier=="animaDataMCMImageFloat3")
-    {
-        animaDataMCMImageFloat3 *mcmData = dynamic_cast <animaDataMCMImageFloat3 *> (data);
-        d->setVTKFilter<itk::VectorImage<float,3> >(data,d->filterFloat,mcmData->getReferenceModel());
-    }
+        d->setVTKFilter<anima::MCMImage<float,3> >(data,d->filterFloat);
     else if (identifier=="animaDataMCMImageDouble3")
-    {
-        animaDataMCMImageDouble3 *mcmData = dynamic_cast <animaDataMCMImageDouble3 *> (data);
-        d->setVTKFilter<itk::VectorImage<double,3> >(data,d->filterDouble,mcmData->getReferenceModel());
-    }
-    else
+        d->setVTKFilter<anima::MCMImage<double,3> >(data,d->filterDouble);
+     else
     {
         qDebug() << "Unrecognized MCM data type: " << identifier;
         return;

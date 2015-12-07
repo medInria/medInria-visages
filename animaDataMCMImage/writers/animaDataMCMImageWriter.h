@@ -32,7 +32,7 @@ public slots:
     bool canWrite (const QString& path);
 
 private:
-    template <class PixelType> bool write(const QString& path, PixelType dummyArgument, MCModelPointer &referenceModel);
+    template <class PixelType> bool write(const QString& path, PixelType dummyArgument);
 };
 
 dtkAbstractDataWriter *createAnimaDataMCMImageWriter();

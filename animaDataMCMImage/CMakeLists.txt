@@ -91,7 +91,7 @@ target_link_libraries(${TARGET_NAME}
   )
 
 set_target_properties(${TARGET_NAME} PROPERTIES
-  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins_legacy
   )
 
 ## #############################################################################

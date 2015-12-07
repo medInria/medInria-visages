@@ -8,7 +8,7 @@
 #include <animaDataMCMImageFloat3.h>
 #include <animaDataMCMImageDouble3.h>
 
-#include <itkVectorImage.h>
+#include <animaMCMImage.h>
 
 QStringList animaDataMCMImageWriter::s_handled()
 {
@@ -73,16 +73,14 @@ bool animaDataMCMImageWriter::write(const QString& path)
         if(medData->identifier()=="animaDataMCMImageFloat3")
         {
             float dummy = 0;
-            animaDataMCMImageFloat3 *mcmData = dynamic_cast <animaDataMCMImageFloat3 *> (medData);
-            write(path, dummy, mcmData->getReferenceModel());
+            write(path, dummy);
         }
 
         else if(medData->identifier()=="animaDataMCMImageDouble3")
         {
 
             double dummy = 0;
-            animaDataMCMImageDouble3 *mcmData = dynamic_cast <animaDataMCMImageDouble3 *> (medData);
-            write(path, dummy, mcmData->getReferenceModel());
+            write(path, dummy);
         }
 
         else
@@ -96,13 +94,12 @@ bool animaDataMCMImageWriter::write(const QString& path)
 }
 
 template <class PixelType>
-bool animaDataMCMImageWriter::write(const QString& path, PixelType dummyArgument, MCModelPointer &referenceModel)
+bool animaDataMCMImageWriter::write(const QString& path, PixelType dummyArgument)
 {
     anima::MCMFileWriter <PixelType, 3> mcmWriter;
     mcmWriter.SetFileName(path.toStdString());
-    mcmWriter.SetReferenceModel(referenceModel);
 
-    typedef typename itk::VectorImage<PixelType, 3> MCMImageType;
+    typedef typename anima::MCMImage<PixelType, 3> MCMImageType;
     typedef typename MCMImageType::Pointer MCMImageTypePointer;
     MCMImageTypePointer image = dynamic_cast<MCMImageType *> ((itk::Object*)(this->data()->output()));
 
