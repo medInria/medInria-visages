@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>animaMCMEstimationPlugin.json</file>
+    </qresource>
+</RCC>
