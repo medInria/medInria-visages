@@ -262,37 +262,22 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
     for (unsigned int i = 0;i < images.size();++i)
         filter->SetInput(i,images[i]);
 
-    int gradientCount;
-    if (this->input()->hasMetaData("DiffusionGradientList"))
-    {
-        QStringList diffusionGradients = this->input()->metaDataValues ("DiffusionGradientList");
-        gradientCount = diffusionGradients.count() / 3;
+    unsigned int gradientCount = this->gradients().size();
+    vnl_vector_fixed <double,3> grad;
 
-        if (diffusionGradients.count()%3==0)
-        {
-            for (int i=0; i<gradientCount; i++)
-            {
-                vnl_vector_fixed <double,3> grad;
-                grad[0] = diffusionGradients[3*i+0].toDouble();
-                grad[1] = diffusionGradients[3*i+1].toDouble();
-                grad[2] = diffusionGradients[3*i+2].toDouble();
-                filter->AddGradientDirection(i,grad);
-            }
-        }
-        else
-        {
-            qDebug() << "Diffusion gradient list is not a multiple of 3";
-            return medAbstractJob::MED_JOB_EXIT_FAILURE;
-        }
-    }
-    else
+    for (unsigned int i = 0;i < gradientCount;++i)
     {
-        qDebug() << "DiffusionGradientList is not set";
-        return medAbstractJob::MED_JOB_EXIT_FAILURE;
+        for (unsigned int j = 0;j < 3;++j)
+            grad[j] = this->gradients()[i][j];
+
+        filter->AddGradientDirection(i,grad);
     }
 
-    std::vector <double> bValsList(gradientCount,1000);
+    VectorType bValsList(gradientCount,1000);
     bValsList[0] = 0;
+    if (this->bvalues().size() != 0)
+        bValsList = this->bvalues();
+
     filter->SetBValuesList(bValsList);
     filter->SetB0Threshold(1);
 
