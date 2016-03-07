@@ -287,7 +287,6 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
 
     std::string optType = "bobyqa";
     filter->SetOptimizer(optType);
-    filter->SetMaxEval(100);
     filter->SetNumberOfRandomRestarts(m_nbRandomRestarts->value());
     filter->SetMaximumNumberOfOptimizationRestarts(m_nbOptRestarts->value());
     filter->SetAbsoluteCostChange(0.01);

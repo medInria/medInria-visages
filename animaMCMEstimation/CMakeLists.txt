@@ -6,6 +6,7 @@ set(TARGET_NAME animaMCMEstimationPlugin)
 
 find_package(ANIMA_PRIVATE REQUIRED)
 include(${ANIMA_PRIVATE_USE_FILE})
+include(ITKLibs)
 
 find_package(ITK)
 include(${ITK_USE_FILE})
@@ -50,7 +51,10 @@ target_link_libraries(${TARGET_NAME}
   dtkCore
   dtkCoreSupport
   AnimaMCM
+  AnimaRandom
   AnimaPrivateOptimizers
+  AnimaSpecialFunctions
+  ${NLOPT_LIBRARY}
   ITKOptimizers
   ${ITKIO_LIBRARIES}
   medCore

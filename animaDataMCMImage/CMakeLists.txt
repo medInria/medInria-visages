@@ -19,7 +19,6 @@ mark_as_advanced(${TARGET_NAME}_VERSION_BUILD)
 string(TOUPPER ${TARGET_NAME} TARGET_NAME_UP)
 add_definitions(-D${TARGET_NAME_UP}_VERSION="${${TARGET_NAME}_VERSION}")
 
-
 ## #############################################################################
 ## Resolve dependencies
 ## #############################################################################
@@ -32,6 +31,7 @@ include(${ITK_USE_FILE})
 
 find_package(ANIMA_PRIVATE REQUIRED)
 include(${ANIMA_PRIVATE_USE_FILE})
+include(ITKLibs)
 
 ## #############################################################################
 ## List Sources

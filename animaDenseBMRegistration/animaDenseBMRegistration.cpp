@@ -4,11 +4,7 @@
 
 #include "animaDenseBMRegistration.h"
 
-#include <dtkCore/dtkAbstractProcessFactory.h>
-
-// /////////////////////////////////////////////////////////////////
-//
-// /////////////////////////////////////////////////////////////////
+#include <dtkCoreSupport/dtkAbstractProcessFactory.h>
 
 #include "itkImageRegistrationMethod.h"
 

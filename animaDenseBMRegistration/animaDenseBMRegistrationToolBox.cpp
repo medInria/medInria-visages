@@ -7,12 +7,12 @@
 
 #include <QtGui>
 
-#include <dtkCore/dtkAbstractProcessFactory.h>
+#include <dtkCoreSupport/dtkAbstractProcessFactory.h>
 #include <medAbstractRegistrationProcess.h>
-#include <dtkCore/dtkSmartPointer.h>
+#include <dtkCoreSupport/dtkSmartPointer.h>
 
 #include <medRunnableProcess.h>
-#include <medJobManager.h>
+#include <medJobManagerL.h>
 
 #include <medAbstractImageData.h>
 
@@ -452,7 +452,7 @@ void animaDenseBMRegistrationToolBox::run(void)
     connect (runProcess, SIGNAL(activate(QObject*,bool)),
              d->progression_stack, SLOT(setActive(QObject*,bool)));
     
-    medJobManager::instance()->registerJobItem(runProcess);
+    medJobManagerL::instance()->registerJobItem(runProcess);
     QThreadPool::globalInstance()->start(dynamic_cast<QRunnable*>(runProcess));
 }
 
