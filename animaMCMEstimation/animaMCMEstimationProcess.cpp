@@ -168,6 +168,7 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::run()
 
     if(this->input())
     {
+        this->extractGradientsFromInformation();
         QString id =  this->input()->identifier();
 
 //        if ( id == "itkDataImageChar4" )

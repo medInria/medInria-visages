@@ -41,9 +41,12 @@ medAbstractDiffusionModelEstimationProcess* animaMCMEstimationProcessPresenter::
 
 QWidget *animaMCMEstimationProcessPresenter::buildToolBoxWidget()
 {
-    QWidget *tbWidget = new QWidget;
-    QVBoxLayout *tbLayout = new QVBoxLayout;
-    tbWidget->setLayout(tbLayout);
+    bool saveUseRunControls = this->useRunControls();
+
+    this->setUseRunControls(false);
+    QWidget *tbWidget = medAbstractDiffusionModelEstimationProcessPresenter::buildToolBoxWidget();
+    QVBoxLayout *tbLayout = qobject_cast <QVBoxLayout *> (tbWidget->layout());
+    this->setUseRunControls(saveUseRunControls);
 
     QHBoxLayout *nbFascLayout = new QHBoxLayout;
     QLabel *nbFascLabel = new QLabel(m_nbFascicles->parameter()->caption());
@@ -82,9 +85,12 @@ QWidget *animaMCMEstimationProcessPresenter::buildToolBoxWidget()
     tbLayout->addWidget(m_commonKappa->buildWidget());
     tbLayout->addWidget(m_commonEAF->buildWidget());
 
-    tbLayout->addWidget(this->buildRunButton());
-    tbLayout->addWidget(this->buildCancelButton());
-    tbLayout->addWidget(m_progressionPresenter->buildProgressBar());
+    if (this->useRunControls())
+    {
+        tbLayout->addWidget(this->buildRunButton());
+        tbLayout->addWidget(this->buildCancelButton());
+        tbLayout->addWidget(m_progressionPresenter->buildProgressBar());
+    }
 
     return tbWidget;
 }
