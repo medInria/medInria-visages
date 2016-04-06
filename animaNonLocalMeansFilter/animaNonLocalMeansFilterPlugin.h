@@ -3,8 +3,6 @@
 #include <medAbstractImageDenoisingProcess.h>
 #include "animaNonLocalMeansFilterPluginExport.h"
 
-class ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT animaNonLocalMeansFilterPluginPrivate;
-
 class ANIMANONLOCALMEANSFILTERPLUGIN_EXPORT animaNonLocalMeansFilterPlugin : public medAbstractSingleFilterOperationProcessPlugin
 {
     Q_OBJECT

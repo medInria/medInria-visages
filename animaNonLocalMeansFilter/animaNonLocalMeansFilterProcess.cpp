@@ -133,7 +133,7 @@ medAbstractJob::medJobExitStatus animaNonLocalMeansFilterProcess::run()
     medAbstractImageData *out = qobject_cast <medAbstractImageData *> (medAbstractDataFactory::instance()->create(type));
     this->setOutput(out);
 
-    if ( type.contains("itkDataImageChar"))
+    if (type.contains("itkDataImageChar"))
     {
         return switchDimension<char>(nbDimension);
     }
