@@ -24,14 +24,14 @@
 class ANIMADATAMCMIMAGEPLUGIN_EXPORT vtkMCMGlyph : public vtkPolyDataAlgorithm
 {
 public:   
-    vtkTypeRevisionMacro(vtkMCMGlyph,vtkPolyDataAlgorithm);
+    vtkTypeMacro(vtkMCMGlyph,vtkPolyDataAlgorithm);
     void PrintSelf(ostream& os,vtkIndent indent);
 
     /** Construct object with scale factor 1.0. */
     static vtkMCMGlyph* New();
 
     /** Specify the geometry to copy to each point. Old style. See SetSourceConnection.*/
-    void SetSource(vtkPolyData* source) { this->SetInput(1,source); }
+    void SetSource(vtkPolyData* source) { this->SetInputData(1,source); }
     vtkPolyData *GetSource();
 
     /** Specify the MCM Source that the glyph needs to draw a deform

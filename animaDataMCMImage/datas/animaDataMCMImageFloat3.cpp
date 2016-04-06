@@ -6,31 +6,19 @@
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkImageFileWriter.h>
-#include <itkVectorImage.h>
+#include <animaMCMImage.h>
 #include <itkVector.h>
-
-// /////////////////////////////////////////////////////////////////
-// itkDataSHImagePrivate
-// /////////////////////////////////////////////////////////////////
 
 class animaDataMCMImageFloat3Private
 {
 public:
-    typedef itk::VectorImage<float, 3> MCMImageType;
-    typedef anima::MultiCompartmentModel::Pointer MCModelPointer;
-
+    typedef anima::MCMImage<float, 3> MCMImageType;
     MCMImageType::Pointer mcmImage;
-    MCModelPointer referenceModel;
 };
-
-// /////////////////////////////////////////////////////////////////
-// itkDataSHImage
-// /////////////////////////////////////////////////////////////////
 
 animaDataMCMImageFloat3::animaDataMCMImageFloat3(): medAbstractTypedDiffusionModelImageData<3,float>(), d(new animaDataMCMImageFloat3Private)
 {
     d->mcmImage = 0;
-    d->referenceModel = 0;
 }
 
 animaDataMCMImageFloat3::~animaDataMCMImageFloat3()
@@ -63,16 +51,6 @@ void animaDataMCMImageFloat3::setData(void *data)
     }
     else
       qDebug() << "Cannot cast pointer to correct MCM float type";
-}
-
-void animaDataMCMImageFloat3::setReferenceModel(MCModelPointer &model)
-{
-    d->referenceModel = model;
-}
-
-animaDataMCMImageFloat3::MCModelPointer &animaDataMCMImageFloat3::getReferenceModel()
-{
-    return d->referenceModel;
 }
 
 int animaDataMCMImageFloat3::xDimension()

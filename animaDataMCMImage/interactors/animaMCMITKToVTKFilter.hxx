@@ -99,7 +99,8 @@ animaMCMITKToVTKFilter<TMCMImage>::GenerateData()
     m_VTKMCMData->GetPointData()->AddArray(mcm_array);
 
     mcm_array->Delete();
-    m_VTKMCMData->Update();
+    //TODO check
+    //m_VTKMCMData->Update();
 }
 
 template <class TMCMImage>

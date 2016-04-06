@@ -21,9 +21,6 @@ public:
     typedef anima::MultiCompartmentModel MCModelType;
     typedef MCModelType::Pointer MCModelPointer;
 
-    void setReferenceModel(MCModelPointer &model);
-    MCModelPointer &getReferenceModel();
-
 public slots:
     // derived from dtkAbstractData
     void *output();

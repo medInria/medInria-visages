@@ -16,7 +16,7 @@ class ANIMADATAMCMIMAGEPLUGIN_EXPORT vtkMCMVisuManager : public vtkObject
 {
 public:
     static vtkMCMVisuManager *New();
-    vtkTypeRevisionMacro(vtkMCMVisuManager, vtkObject);
+    vtkTypeMacro(vtkMCMVisuManager, vtkObject);
 
     void SetGlyphScale (const float& scale);
 

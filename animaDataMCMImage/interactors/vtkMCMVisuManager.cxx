@@ -9,7 +9,6 @@
 #include <vtkLookupTable.h>
 #include <vtkProperty.h>
 
-vtkCxxRevisionMacro(vtkMCMVisuManager, "$Revision: 0 $");
 vtkStandardNewMacro(vtkMCMVisuManager);
 
 vtkMCMVisuManager::vtkMCMVisuManager()
@@ -26,14 +25,14 @@ vtkMCMVisuManager::vtkMCMVisuManager()
     MCMSource->SetNormalization(false);
     MCMSource->UpdateMCMSource();
 
-    MCMGlyph->SetSource (MCMSource->GetOutput());
+    MCMGlyph->SetSourceConnection(MCMSource->GetOutputPort());
     MCMGlyph->SetScaleFactor(1.0);
     MCMGlyph->SetMCMSource(MCMSource);
     MCMGlyph->GetOutput()->GetPointData()->SetActiveScalars(vtkMCMGlyph::GetRGBArrayName());
 
     VOI->ReleaseDataFlagOn();
 
-    MCMGlyph->SetInput(VOI->GetOutput());
+    MCMGlyph->SetInputConnection(VOI->GetOutputPort());
 
     vtkLookupTable *lut = vtkLookupTable::New();
     //lut->SetHueRange(0.667, 0.0);
@@ -41,7 +40,7 @@ vtkMCMVisuManager::vtkMCMVisuManager()
     lut->SetRange(0.0, 1.0);
     lut->Build();
 
-    Mapper->SetInput(MCMGlyph->GetOutput());
+    Mapper->SetInputConnection(MCMGlyph->GetOutputPort());
     Mapper->ScalarVisibilityOn();
     Mapper->SetColorModeToMapScalars();
     Mapper->SetScalarModeToUsePointData();
@@ -83,7 +82,8 @@ void vtkMCMVisuManager::SetInput (vtkImageData* vtkMCM)
     if (!vtkMCM)
         return;
 
-    VOI->SetInput (vtkMCM);
+    VOI->SetInputData (vtkMCM);
+    VOI->Update();
 }
 
 void vtkMCMVisuManager::SetVOI(const int& imin, const int& imax,

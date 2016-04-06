@@ -17,7 +17,7 @@ class ANIMADATAMCMIMAGEPLUGIN_EXPORT vtkMCMManager: public vtkObject
 {
 public:
     static vtkMCMManager *New();
-    vtkTypeRevisionMacro(vtkMCMManager, vtkObject);
+    vtkTypeMacro(vtkMCMManager, vtkObject);
 
     void SetRenderWindowInteractor(vtkRenderWindowInteractor*, vtkRenderer* ren=0);
     vtkGetObjectMacro(RenderWindowInteractor, vtkRenderWindowInteractor);

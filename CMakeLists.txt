@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.1)
+cmake_minimum_required(VERSION 3.1)
 
 project(medInria-visages-plugins)
 
@@ -33,11 +33,29 @@ mark_as_advanced(${PROJECT_NAME}_VERSION_BUGFIX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(DEPENDS_ON_DTK 1)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_MACOSX_RPATH OFF)
+
+## #############################################################################
+## enable c++ 11
+## #############################################################################
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(dtk REQUIRED)
+include_directories(${dtk_INCLUDE_DIRS})
+
+find_package(medInria REQUIRED)
+
+include(list_source_files)
+include(list_header_directories_to_include)
 
 option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "OFF")
-option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "ON")
+option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN     "Build vistalProcessSegmentationSTREM plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProcessSegmentationGCEM plugin" "OFF")
@@ -46,9 +64,10 @@ option(MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN     "Build animaSymmetryPlane p
 option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-PyramidalBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_DENSEBMREGISTRATION_PLUGIN     "Build anima-DenseBMRegistration plugin" "ON")
-option(MEDINRIA_BUILD_ANIMA_RELAXOMETRY_PLUGIN     "Build anima-Relaxometry plugin" "ON")
+option(MEDINRIA_BUILD_ANIMA_RELAXOMETRY_PLUGIN     "Build anima-Relaxometry plugin" "OFF")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN     "Build vistalProcessGraphCutSeg plugin" "OFF")
-option(MEDINRIA_BUILD_ANIMA_MCMDATAIMAGE_PLUGIN     "Build anima-MCMDataImage plugin" "ON")
+option(MEDINRIA_BUILD_ANIMA_MCMDATAIMAGE_PLUGIN     "Build animaMCMDataImage plugin" "OFF")
+option(MEDINRIA_BUILD_ANIMA_MCMESTIMATION_PLUGIN     "Build animaMCMEstimation plugin" "OFF")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 option(BUILD_EXAMPLES "Build examples" OFF)
@@ -107,6 +126,10 @@ endif()
 
 if (MEDINRIA_BUILD_ANIMA_MCMDATAIMAGE_PLUGIN)
     add_subdirectory(animaDataMCMImage)
+endif()
+
+if (MEDINRIA_BUILD_ANIMA_MCMESTIMATION_PLUGIN)
+    add_subdirectory(animaMCMEstimation)
 endif()
 
 if (MEDINRIA_BUILD_ANIMA_RELAXOMETRY_PLUGIN)

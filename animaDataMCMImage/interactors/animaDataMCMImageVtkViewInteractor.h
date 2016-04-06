@@ -47,8 +47,8 @@ public:
     virtual QWidget* buildLayerWidget();
     virtual QWidget* buildToolBoxWidget();
     virtual QWidget* buildToolBarWidget();
-    virtual QList<medAbstractParameter*> linkableParameters();
-    virtual QList<medBoolParameter*> mouseInteractionParameters();
+    virtual QList<medAbstractParameterL*> linkableParameters();
+    virtual QList<medBoolParameterL*> mouseInteractionParameters();
 
     void removeData();
 

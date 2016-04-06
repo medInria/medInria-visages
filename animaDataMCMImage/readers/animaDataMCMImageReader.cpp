@@ -135,8 +135,6 @@ bool animaDataMCMImageReader::read (const QString &path)
             }
 
             medData->setData (mcmReader.GetModelVectorImage());
-            animaDataMCMImageDouble3 *mcmData = dynamic_cast <animaDataMCMImageDouble3 *> (medData);
-            mcmData->setReferenceModel(mcmReader.GetReferenceModel());
         }
         else if (medData->identifier()=="animaDataMCMImageFloat3")
         {
@@ -154,8 +152,6 @@ bool animaDataMCMImageReader::read (const QString &path)
             }
 
             medData->setData (mcmReader.GetModelVectorImage());
-            animaDataMCMImageFloat3 *mcmData = dynamic_cast <animaDataMCMImageFloat3 *> (medData);
-            mcmData->setReferenceModel(mcmReader.GetReferenceModel());
         }
         else
         {

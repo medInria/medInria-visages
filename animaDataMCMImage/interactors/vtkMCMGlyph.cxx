@@ -23,7 +23,6 @@
 
 #include <vtkMCMGlyph.h>
 
-vtkCxxRevisionMacro(vtkMCMGlyph,"$Revision: 0 $");
 vtkStandardNewMacro(vtkMCMGlyph);
 
 // Function taken from 3D Slicer, SuperquadricTensorGlyph
@@ -248,7 +247,7 @@ int vtkMCMGlyph::RequestData(vtkInformation*,vtkInformationVector** inputVector,
     {
         if (inPtId%10000==0)
         {
-            UpdateProgress (static_cast<vtkFloatingPointType>(inPtId)/numPts);
+            UpdateProgress ((float)inPtId/numPts);
             if (GetAbortExecute())
                 break;
         }
