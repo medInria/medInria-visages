@@ -176,7 +176,6 @@ template <class PixelType>
 medAbstractJob::medJobExitStatus animaSymmetryPlaneProcess::_run()
 {
     typedef itk::Image <PixelType,3> InputImageType;
-    typedef itk::Image <float,3> OutImageType;
     typedef anima::PyramidalSymmetryBridge <PixelType, double> PyramidSymType;
 
     typename PyramidSymType::Pointer matcher = PyramidSymType::New();

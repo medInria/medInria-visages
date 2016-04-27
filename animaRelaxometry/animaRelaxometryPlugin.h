@@ -1,50 +1,20 @@
-/*=========================================================================
-
- medInria
-
- Copyright (c) INRIA 2013 - 2014. All rights reserved.
- See LICENSE.txt for details.
- 
-  This software is distributed WITHOUT ANY WARRANTY; without even
-  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-  PURPOSE.
-
-=========================================================================*/
-
 #pragma once
 
-#include <dtkCore/dtkPlugin.h>
-
+#include <medAbstractRelaxometryEstimationProcess.h>
 #include <animaRelaxometryPluginExport.h>
 
-class ANIMARELAXOMETRYPLUGIN_EXPORT animaRelaxometryPluginPrivate;
-
-class ANIMARELAXOMETRYPLUGIN_EXPORT animaRelaxometryPlugin : public dtkPlugin
+class ANIMARELAXOMETRYPLUGIN_EXPORT animaRelaxometryPlugin : public medAbstractSingleFilterOperationProcessPlugin
 {
     Q_OBJECT
-    Q_INTERFACES(dtkPlugin)
-    
+    Q_INTERFACES(medAbstractSingleFilterOperationProcessPlugin)
+    Q_PLUGIN_METADATA(IID "fr.inria.animaRelaxometryPlugin" FILE "animaRelaxometryPlugin.json")
+
 public:
-    animaRelaxometryPlugin(QObject *parent = 0);
-    ~animaRelaxometryPlugin();
+    animaRelaxometryPlugin() {}
+    virtual ~animaRelaxometryPlugin() {}
     
-    virtual bool initialize();
-    virtual bool uninitialize();
-    
-    virtual QString name() const;
-    virtual QString identifier() const;
-    virtual QString description() const;
-    virtual QString contact() const;
-    virtual QString version() const;
-    virtual QStringList authors() const;
-    virtual QStringList contributors() const;
-    virtual QStringList dependencies() const;
-    
-    virtual QStringList tags() const;
-    virtual QStringList types() const;
-    
-private:
-    animaRelaxometryPluginPrivate *d;
+    virtual void initialize();
+    virtual void uninitialize();
 };
 
 

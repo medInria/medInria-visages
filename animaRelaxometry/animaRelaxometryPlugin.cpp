@@ -1,131 +1,33 @@
-/*=========================================================================
-
- medInria
-
- Copyright (c) INRIA 2013 - 2014. All rights reserved.
- See LICENSE.txt for details.
- 
-  This software is distributed WITHOUT ANY WARRANTY; without even
-  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-  PURPOSE.
-
-=========================================================================*/
-
 #include <animaRelaxometryPlugin.h>
-#include <animaDESPOT1Relaxometry.h>
-#include <animaDESPOT1RelaxometryToolBox.h>
-#include <animaT2Relaxometry.h>
-#include <animaT2RelaxometryToolBox.h>
 
-#include <dtkLog/dtkLog.h>
+#include <medCore.h>
+#include <medWidgets.h>
 
-// /////////////////////////////////////////////////////////////////
-// animaRelaxometryPluginPrivate
-// /////////////////////////////////////////////////////////////////
+#include <animaDESPOT1RelaxometryProcess.h>
+#include <animaDESPOT1RelaxometryProcessPresenter.h>
+#include <animaT2RelaxometryProcess.h>
+#include <animaT2RelaxometryProcessPresenter.h>
 
-class animaRelaxometryPluginPrivate
+void animaRelaxometryPlugin::initialize()
 {
-public:
-    // Class variables go here.
-    static const char *s_Name;
-};
+    medCore::singleFilterOperation::relaxometryEstimation::pluginFactory().record(animaDESPOT1RelaxometryProcess::staticMetaObject.className(),
+                                                                                  animaDESPOT1RelaxometryProcessCreator);
 
-const char * animaRelaxometryPluginPrivate::s_Name = "animaRelaxometry";
+    medWidgets::singleFilterOperation::relaxometryEstimation::presenterFactory().record(animaDESPOT1RelaxometryProcess::staticMetaObject.className(),
+                                                                                        animaDESPOT1RelaxometryProcessPresenterCreator);
 
-// /////////////////////////////////////////////////////////////////
-// animaRelaxometryPlugin
-// /////////////////////////////////////////////////////////////////
+    medCore::singleFilterOperation::relaxometryEstimation::pluginFactory().record(animaT2RelaxometryProcess::staticMetaObject.className(),
+                                                                                  animaT2RelaxometryProcessCreator);
 
-animaRelaxometryPlugin::animaRelaxometryPlugin(QObject *parent) : dtkPlugin(parent), d(new animaRelaxometryPluginPrivate)
-{
-    
+    medWidgets::singleFilterOperation::relaxometryEstimation::presenterFactory().record(animaT2RelaxometryProcess::staticMetaObject.className(),
+                                                                                        animaT2RelaxometryProcessPresenterCreator);
 }
 
-animaRelaxometryPlugin::~animaRelaxometryPlugin()
+void animaRelaxometryPlugin::uninitialize()
 {
-    delete d;
-    
-    d = NULL;
 }
 
-bool animaRelaxometryPlugin::initialize()
-{
-    if(!animaDESPOT1Relaxometry::registered())
-    {
-        dtkWarn() << "Unable to register animaDESPOT1Relaxometry type";
-    }
-
-    if ( !animaDESPOT1RelaxometryToolBox::registered() )
-    {
-        dtkWarn() << "Unable to register animaDESPOT1Relaxometry toolbox";
-    }
-
-    if(!animaT2Relaxometry::registered())
-    {
-        dtkWarn() << "Unable to register animaDESPOT1Relaxometry type";
-    }
-
-    if ( !animaT2RelaxometryToolBox::registered() )
-    {
-        dtkWarn() << "Unable to register animaDESPOT1Relaxometry toolbox";
-    }
-
-    return true;
-}
-
-bool animaRelaxometryPlugin::uninitialize()
-{
-    return true;
-}
-
-QString animaRelaxometryPlugin::name() const
-{
-    return "animaRelaxometryPlugin";
-}
-
-QString animaRelaxometryPlugin::description() const
-{
-    return tr("T1 and T2 relaxometry");
-}
-
-QString animaRelaxometryPlugin::version() const
-{
-    return ANIMARELAXOMETRYPLUGIN_VERSION;
-}
-
-QString animaRelaxometryPlugin::contact() const
-{
-    return "Olivier Commowick <Olivier.Commowick@inria.fr>";
-}
-
-QStringList animaRelaxometryPlugin::authors() const
-{
-    return QStringList() << "Olivier Commowick" << "Fang Cao" << "Benoit Combes";
-}
-
-QStringList animaRelaxometryPlugin::contributors() const
-{
-    QStringList list;
-    return list;
-}
-
-QString animaRelaxometryPlugin::identifier() const
-{
-    return animaRelaxometryPluginPrivate::s_Name;
-}
-
-
-QStringList animaRelaxometryPlugin::tags() const
-{
-    return QStringList();
-}
-
-QStringList animaRelaxometryPlugin::types() const
-{
-    return QStringList() << "animaRelaxometry";
-}
-QStringList animaRelaxometryPlugin::dependencies() const
-{
-    return QStringList();
-}
-Q_EXPORT_PLUGIN2(animaRelaxometryPlugin, animaRelaxometryPlugin)
+DTK_DEFINE_PLUGIN(animaDESPOT1RelaxometryProcess)
+DTK_DEFINE_PLUGIN(animaDESPOT1RelaxometryProcessPresenter)
+DTK_DEFINE_PLUGIN(animaT2RelaxometryProcess)
+DTK_DEFINE_PLUGIN(animaT2RelaxometryProcessPresenter)
