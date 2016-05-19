@@ -66,6 +66,12 @@ set_target_properties(${TARGET_NAME} PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins
   )
 
+if (WIN32)
+  set_target_properties(${TARGET_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins
+    )
+endif()
+
 ## #################################################################
 ## Install rules
 ## #################################################################

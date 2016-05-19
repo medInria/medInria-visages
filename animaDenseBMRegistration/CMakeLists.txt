@@ -79,12 +79,18 @@ set_target_properties(${TARGET_NAME} PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins_legacy
   )
 
+if (WIN32)
+  set_target_properties(${TARGET_NAME} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/plugins_legacy
+    )
+endif()
+
 ## #################################################################
 ## Install rules
 ## #################################################################
 
 install(TARGETS ${TARGET_NAME}
-  RUNTIME DESTINATION plugins
-  LIBRARY DESTINATION plugins
+  RUNTIME DESTINATION plugins_legacy
+  LIBRARY DESTINATION plugins_legacy
   ARCHIVE DESTINATION lib
   )
