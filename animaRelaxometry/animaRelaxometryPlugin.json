@@ -1,5 +1,6 @@
 {
             "name" : "animaRelaxometryPlugin",
+         "concept" : "medAbstractRelaxometryEstimationProcess",
          "version" : "3.0.0", 	
     "dependencies" : []
 }

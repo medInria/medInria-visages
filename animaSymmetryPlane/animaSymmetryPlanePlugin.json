@@ -1,5 +1,6 @@
 {
             "name" : "animaSymmetryPlanePlugin",
+         "concept" : "medAbstractSymmetryPlaneAlignmentProcess",
          "version" : "3.0.0", 	
     "dependencies" : []
 }
