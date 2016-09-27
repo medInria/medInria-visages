@@ -38,10 +38,6 @@ namespace rpi
         if ( this->m_movingImage.IsNull() )
             throw std::runtime_error ( "Moving image has not been set." );
         
-        
-        // Type definition
-        typedef  typename  TransformType::ScalarType ScalarType;
-        
         // Local images
         typename  TFixedImage::ConstPointer   fixedImage  = this->m_fixedImage;
         typename  TMovingImage::ConstPointer  movingImage = this->m_movingImage;
