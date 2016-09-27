@@ -51,8 +51,9 @@ target_link_libraries(${TARGET_NAME}
   dtkCore
   dtkCoreSupport
   AnimaMCM
+  AnimaMCMPrivate
   AnimaRandom
-  AnimaPrivateOptimizers
+  AnimaOptimizers
   AnimaSpecialFunctions
   ${NLOPT_LIBRARY}
   ITKOptimizers

@@ -21,18 +21,20 @@ private:
     animaMCMEstimationProcess *m_process;
 
     medIntParameterPresenter *m_nbFascicles;
+
     medBoolParameterPresenter *m_freeWaterCompartment;
+    medBoolParameterPresenter *m_irWaterCompartment;
+    medBoolParameterPresenter *m_stationaryWaterCompartment;
+    medBoolParameterPresenter *m_modelSelection;
 
     medIntParameterPresenter *m_nbRandomRestarts;
-    medIntParameterPresenter *m_nbOptRestarts;
 
     medBoolParameterPresenter *m_fixWeights;
     medBoolParameterPresenter *m_fixDiff;
-    medBoolParameterPresenter *m_fixFWDiff;
+    medBoolParameterPresenter *m_fixIsoDiffs;
     medBoolParameterPresenter *m_fixKappa;
     medBoolParameterPresenter *m_fixEAF;
 
-    medBoolParameterPresenter *m_commonCompartmentWeights;
     medBoolParameterPresenter *m_commonDiffusivities;
     medBoolParameterPresenter *m_commonKappa;
     medBoolParameterPresenter *m_commonEAF;

@@ -1,6 +1,6 @@
 #include <animaDataMCMImageReader.h>
 
-#include <animaMCMFileReader.h>
+#include <animaMCMPrivateFileReader.h>
 
 #include <medAbstractData.h>
 #include <medAbstractDataFactory.h>
@@ -121,7 +121,7 @@ bool animaDataMCMImageReader::read (const QString &path)
     {
         if (medData->identifier() == "animaDataMCMImageDouble3")
         {
-            anima::MCMFileReader <double, 3> mcmReader;
+            anima::MCMPrivateFileReader <double, 3> mcmReader;
             mcmReader.SetFileName(path.toStdString());
 
             try
@@ -138,7 +138,7 @@ bool animaDataMCMImageReader::read (const QString &path)
         }
         else if (medData->identifier()=="animaDataMCMImageFloat3")
         {
-            anima::MCMFileReader <float, 3> mcmReader;
+            anima::MCMPrivateFileReader <float, 3> mcmReader;
             mcmReader.SetFileName(path.toStdString());
 
             try

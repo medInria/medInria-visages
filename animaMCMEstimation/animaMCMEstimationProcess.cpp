@@ -25,17 +25,26 @@ animaMCMEstimationProcess::animaMCMEstimationProcess(QObject *parent)
     m_freeWaterCompartment->setDescription("Estimated MCM with free water compartment");
     m_freeWaterCompartment->setValue(true);
 
+    m_irWaterCompartment = new medBoolParameter("iso_restricted_water_comp",this);
+    m_irWaterCompartment->setCaption("Isotropic restricted water compartment");
+    m_irWaterCompartment->setDescription("Estimated MCM with IR water compartment");
+    m_irWaterCompartment->setValue(true);
+
+    m_stationaryWaterCompartment = new medBoolParameter("stationary_water_comp",this);
+    m_stationaryWaterCompartment->setCaption("Stationary water compartment");
+    m_stationaryWaterCompartment->setDescription("Estimated MCM with stationary water compartment");
+    m_stationaryWaterCompartment->setValue(false);
+
+    m_modelSelection = new medBoolParameter("model_selection",this);
+    m_modelSelection->setCaption("Model selection");
+    m_modelSelection->setDescription("Perform AIC based model selection (number of fascicles will be the maximal number of fascicles)");
+    m_modelSelection->setValue(false);
+
     m_nbRandomRestarts = new medIntParameter("nb_rand_restarts");
     m_nbRandomRestarts->setCaption("Number of random restarts");
     m_nbRandomRestarts->setDescription("Number of whole optimization random restarts");
     m_nbRandomRestarts->setRange(0,50);
-    m_nbRandomRestarts->setValue(20);
-
-    m_nbOptRestarts = new medIntParameter("nb_opt_restarts");
-    m_nbOptRestarts->setCaption("Number of optimization restarts");
-    m_nbOptRestarts->setDescription("Number of single optimization restarts");
-    m_nbOptRestarts->setRange(0,50);
-    m_nbOptRestarts->setValue(10);
+    m_nbRandomRestarts->setValue(4);
 
     m_fixWeights = new medBoolParameter("fix_weights",this);
     m_fixWeights->setCaption("Fixed compartment weights");
@@ -47,10 +56,10 @@ animaMCMEstimationProcess::animaMCMEstimationProcess(QObject *parent)
     m_fixDiff->setDescription("Fix compartment diffusivities in estimation");
     m_fixDiff->setValue(true);
 
-    m_fixFWDiff = new medBoolParameter("fix_fw_diffs",this);
-    m_fixFWDiff->setCaption("Fixed free water diffusivity");
-    m_fixFWDiff->setDescription("Fix free water diffusivity in estimation");
-    m_fixFWDiff->setValue(true);
+    m_fixIsoDiffs = new medBoolParameter("fix_iso_diffs",this);
+    m_fixIsoDiffs->setCaption("Fixed isotropic water diffusivities");
+    m_fixIsoDiffs->setDescription("Fix isotropic water diffusivities in estimation");
+    m_fixIsoDiffs->setValue(true);
 
     m_fixKappa = new medBoolParameter("fix_kappa",this);
     m_fixKappa->setCaption("Fixed compartment kappas");
@@ -61,11 +70,6 @@ animaMCMEstimationProcess::animaMCMEstimationProcess(QObject *parent)
     m_fixEAF->setCaption("Fixed compartment EAF");
     m_fixEAF->setDescription("Fix extra-axonal fraction in estimation (only for DDI)");
     m_fixEAF->setValue(false);
-
-    m_commonCompartmentWeights = new medBoolParameter("common_weights",this);
-    m_commonCompartmentWeights->setCaption("Common compartment weights");
-    m_commonCompartmentWeights->setDescription("Shared compartment weights (one parameter for all compartments)");
-    m_commonCompartmentWeights->setValue(true);
 
     m_commonDiffusivities = new medBoolParameter("common_diffs",this);
     m_commonDiffusivities->setCaption("Common compartment diffusivities");
@@ -107,14 +111,24 @@ medBoolParameter *animaMCMEstimationProcess::freeWaterCompartment() const
     return m_freeWaterCompartment;
 }
 
+medBoolParameter *animaMCMEstimationProcess::irWaterCompartment() const
+{
+    return m_irWaterCompartment;
+}
+
+medBoolParameter *animaMCMEstimationProcess::stationaryWaterCompartment() const
+{
+    return m_stationaryWaterCompartment;
+}
+
+medBoolParameter *animaMCMEstimationProcess::modelSelection() const
+{
+    return m_modelSelection;
+}
+
 medIntParameter *animaMCMEstimationProcess::nbRandomRestarts() const
 {
     return m_nbRandomRestarts;
-}
-
-medIntParameter *animaMCMEstimationProcess::nbOptRestarts() const
-{
-    return m_nbOptRestarts;
 }
 
 medBoolParameter *animaMCMEstimationProcess::fixWeights() const
@@ -127,9 +141,9 @@ medBoolParameter *animaMCMEstimationProcess::fixDiff() const
     return m_fixDiff;
 }
 
-medBoolParameter *animaMCMEstimationProcess::fixFWDiff() const
+medBoolParameter *animaMCMEstimationProcess::fixIsoDiffs() const
 {
-    return m_fixFWDiff;
+    return m_fixIsoDiffs;
 }
 
 medBoolParameter *animaMCMEstimationProcess::fixKappa() const
@@ -140,11 +154,6 @@ medBoolParameter *animaMCMEstimationProcess::fixKappa() const
 medBoolParameter *animaMCMEstimationProcess::fixEAF() const
 {
     return m_fixEAF;
-}
-
-medBoolParameter *animaMCMEstimationProcess::commonCompartmentWeights() const
-{
-    return m_commonCompartmentWeights;
 }
 
 medBoolParameter *animaMCMEstimationProcess::commonDiffusivities() const
@@ -223,8 +232,6 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
     typedef itk::Image <inputType,3> SingleDWIImageType;
     typename DWIImageType::Pointer inData = dynamic_cast<DWIImageType *>((itk::Object*)(this->input()->data()));
 
-    typedef itk::VectorImage<inputType, 3> TensorImageType;
-
     if (!inData)
         return medAbstractJob::MED_JOB_EXIT_FAILURE;
 
@@ -283,28 +290,33 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
     filter->SetB0Threshold(1);
 
     filter->SetModelWithFreeWaterComponent(m_freeWaterCompartment->value());
+    filter->SetModelWithRestrictedWaterComponent(m_irWaterCompartment->value());
+    filter->SetModelWithStationaryWaterComponent(m_stationaryWaterCompartment->value());
+
     filter->SetCompartmentType(m_compartmentType);
     filter->SetNumberOfCompartments(m_nbFascicles->value());
+    filter->SetFindOptimalNumberOfCompartments(m_modelSelection->value());
 
-    std::string optType = "bobyqa";
+    filter->SetMLEstimationStrategy(FilterType::MaximumLikelihoodEstimationMode::VariableProjection);
+    std::string optType = "levenberg";
     filter->SetOptimizer(optType);
     filter->SetNumberOfRandomRestarts(m_nbRandomRestarts->value());
-    filter->SetMaximumNumberOfOptimizationRestarts(m_nbOptRestarts->value());
     filter->SetAbsoluteCostChange(0.01);
 
     filter->SetUseConcentrationBoundsFromDTI(false);
     filter->SetUseFixedWeights(m_fixWeights->value());
     filter->SetFreeWaterProportionFixedValue(0.1);
+    filter->SetStationaryWaterProportionFixedValue(0.05);
+    filter->SetRestrictedWaterProportionFixedValue(0.1);
 
     filter->SetUseConstrainedDiffusivity(m_fixDiff->value());
-    filter->SetUseConstrainedFreeWaterDiffusivity(m_fixFWDiff->value());
+    filter->SetUseConstrainedFreeWaterDiffusivity(m_fixIsoDiffs->value());
+    filter->SetUseConstrainedIRWDiffusivity(m_fixIsoDiffs->value());
 
     if (!m_fixDiff->value())
         filter->SetUseCommonDiffusivities(m_commonDiffusivities->value());
     else
         filter->SetUseCommonDiffusivities(false);
-
-    filter->SetUseCommonWeights(m_commonCompartmentWeights->value());
 
     m_estimationfilter = filter;
 

@@ -66,8 +66,8 @@ option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-Pyra
 option(MEDINRIA_BUILD_ANIMA_DENSEBMREGISTRATION_PLUGIN     "Build anima-DenseBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_RELAXOMETRY_PLUGIN     "Build anima-Relaxometry plugin" "ON")
 option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN     "Build vistalProcessGraphCutSeg plugin" "OFF")
-option(MEDINRIA_BUILD_ANIMA_MCMDATAIMAGE_PLUGIN     "Build animaMCMDataImage plugin" "OFF")
-option(MEDINRIA_BUILD_ANIMA_MCMESTIMATION_PLUGIN     "Build animaMCMEstimation plugin" "OFF")
+option(MEDINRIA_BUILD_ANIMA_MCMDATAIMAGE_PLUGIN     "Build animaMCMDataImage plugin" "ON")
+option(MEDINRIA_BUILD_ANIMA_MCMESTIMATION_PLUGIN     "Build animaMCMEstimation plugin" "ON")
 
 option(BUILD_DOCUMENTATION "Build documentation")
 option(BUILD_EXAMPLES "Build examples" OFF)

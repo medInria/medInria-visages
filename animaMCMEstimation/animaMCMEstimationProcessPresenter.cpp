@@ -15,18 +15,20 @@ animaMCMEstimationProcessPresenter::animaMCMEstimationProcessPresenter(medAbstra
     m_process = qobject_cast <animaMCMEstimationProcess *> (parent);
 
     m_nbFascicles = new medIntParameterPresenter(m_process->nbFascicles());
+
     m_freeWaterCompartment = new medBoolParameterPresenter(m_process->freeWaterCompartment());
+    m_irWaterCompartment = new medBoolParameterPresenter(m_process->irWaterCompartment());
+    m_stationaryWaterCompartment = new medBoolParameterPresenter(m_process->stationaryWaterCompartment());
+    m_modelSelection = new medBoolParameterPresenter(m_process->modelSelection());
 
     m_nbRandomRestarts = new medIntParameterPresenter(m_process->nbRandomRestarts());
-    m_nbOptRestarts = new medIntParameterPresenter(m_process->nbOptRestarts());
 
     m_fixWeights = new medBoolParameterPresenter(m_process->fixWeights());
     m_fixDiff = new medBoolParameterPresenter(m_process->fixDiff());
-    m_fixFWDiff = new medBoolParameterPresenter(m_process->fixFWDiff());
+    m_fixIsoDiffs = new medBoolParameterPresenter(m_process->fixIsoDiffs());
     m_fixKappa = new medBoolParameterPresenter(m_process->fixKappa());
     m_fixEAF = new medBoolParameterPresenter(m_process->fixEAF());
 
-    m_commonCompartmentWeights = new medBoolParameterPresenter(m_process->commonCompartmentWeights());
     m_commonDiffusivities = new medBoolParameterPresenter(m_process->commonDiffusivities());
     m_commonKappa = new medBoolParameterPresenter(m_process->commonKappa());
     m_commonEAF = new medBoolParameterPresenter(m_process->commonEAF());
@@ -56,7 +58,10 @@ QWidget *animaMCMEstimationProcessPresenter::buildToolBoxWidget()
     nbFascLayout->addWidget(nbFascWidget);
 
     tbLayout->addLayout(nbFascLayout);
+    tbLayout->addWidget(m_modelSelection->buildWidget());
     tbLayout->addWidget(m_freeWaterCompartment->buildWidget());
+    tbLayout->addWidget(m_irWaterCompartment->buildWidget());
+    tbLayout->addWidget(m_stationaryWaterCompartment->buildWidget());
 
     QHBoxLayout *nbRandomRestartsLayout = new QHBoxLayout;
     QLabel *nbRandomRestartsLabel = new QLabel(m_nbRandomRestarts->parameter()->caption());
@@ -66,21 +71,12 @@ QWidget *animaMCMEstimationProcessPresenter::buildToolBoxWidget()
     nbRandomRestartsLayout->addWidget(nbRandomRestartsWidget);
     tbLayout->addLayout(nbRandomRestartsLayout);
 
-    QHBoxLayout *nbOptRestartsLayout = new QHBoxLayout;
-    QLabel *nbOptRestartsLabel = new QLabel(m_nbOptRestarts->parameter()->caption());
-    QWidget *nbOptRestartsWidget = m_nbOptRestarts->buildWidget();
-    nbOptRestartsWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    nbOptRestartsLayout->addWidget(nbOptRestartsLabel);
-    nbOptRestartsLayout->addWidget(nbOptRestartsWidget);
-    tbLayout->addLayout(nbOptRestartsLayout);
-
     tbLayout->addWidget(m_fixWeights->buildWidget());
     tbLayout->addWidget(m_fixDiff->buildWidget());
-    tbLayout->addWidget(m_fixFWDiff->buildWidget());
+    tbLayout->addWidget(m_fixIsoDiffs->buildWidget());
     tbLayout->addWidget(m_fixKappa->buildWidget());
     tbLayout->addWidget(m_fixEAF->buildWidget());
 
-    tbLayout->addWidget(m_commonCompartmentWeights->buildWidget());
     tbLayout->addWidget(m_commonDiffusivities->buildWidget());
     tbLayout->addWidget(m_commonKappa->buildWidget());
     tbLayout->addWidget(m_commonEAF->buildWidget());

@@ -32,18 +32,20 @@ public:
     virtual QString description() const;
 
     medIntParameter *nbFascicles() const;
+
     medBoolParameter *freeWaterCompartment() const;
+    medBoolParameter *irWaterCompartment() const;
+    medBoolParameter *stationaryWaterCompartment() const;
+    medBoolParameter *modelSelection() const;
 
     medIntParameter *nbRandomRestarts() const;
-    medIntParameter *nbOptRestarts() const;
 
     medBoolParameter *fixWeights() const;
     medBoolParameter *fixDiff() const;
-    medBoolParameter *fixFWDiff() const;
+    medBoolParameter *fixIsoDiffs() const;
     medBoolParameter *fixKappa() const;
     medBoolParameter *fixEAF() const;
 
-    medBoolParameter *commonCompartmentWeights() const;
     medBoolParameter *commonDiffusivities() const;
     medBoolParameter *commonKappa() const;
     medBoolParameter *commonEAF() const;
@@ -56,18 +58,20 @@ private:
 
     anima::DiffusionModelCompartmentType m_compartmentType;
     medIntParameter *m_nbFascicles;
+
     medBoolParameter *m_freeWaterCompartment;
+    medBoolParameter *m_irWaterCompartment;
+    medBoolParameter *m_stationaryWaterCompartment;
+    medBoolParameter *m_modelSelection;
 
     medIntParameter *m_nbRandomRestarts;
-    medIntParameter *m_nbOptRestarts;
 
     medBoolParameter *m_fixWeights;
     medBoolParameter *m_fixDiff;
-    medBoolParameter *m_fixFWDiff;
+    medBoolParameter *m_fixIsoDiffs;
     medBoolParameter *m_fixKappa;
     medBoolParameter *m_fixEAF;
 
-    medBoolParameter *m_commonCompartmentWeights;
     medBoolParameter *m_commonDiffusivities;
     medBoolParameter *m_commonKappa;
     medBoolParameter *m_commonEAF;

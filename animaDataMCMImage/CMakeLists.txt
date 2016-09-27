@@ -86,6 +86,7 @@ target_link_libraries(${TARGET_NAME}
   vtkRenderingOpenGL
   vtkRenderingVolumeOpenGL
   AnimaMCM
+  AnimaMCMPrivate
   AnimaSpecialFunctions
   ${TinyXML2_LIBRARY}
   )
