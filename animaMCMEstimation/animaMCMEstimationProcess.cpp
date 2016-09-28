@@ -54,7 +54,7 @@ animaMCMEstimationProcess::animaMCMEstimationProcess(QObject *parent)
     m_fixDiff = new medBoolParameter("fix_diffs",this);
     m_fixDiff->setCaption("Fixed compartment diffusivities");
     m_fixDiff->setDescription("Fix compartment diffusivities in estimation");
-    m_fixDiff->setValue(true);
+    m_fixDiff->setValue(false);
 
     m_fixIsoDiffs = new medBoolParameter("fix_iso_diffs",this);
     m_fixIsoDiffs->setCaption("Fixed isotropic water diffusivities");
@@ -74,17 +74,17 @@ animaMCMEstimationProcess::animaMCMEstimationProcess(QObject *parent)
     m_commonDiffusivities = new medBoolParameter("common_diffs",this);
     m_commonDiffusivities->setCaption("Common compartment diffusivities");
     m_commonDiffusivities->setDescription("Shared compartment diffusivities (one parameter for all compartments)");
-    m_commonDiffusivities->setValue(true);
+    m_commonDiffusivities->setValue(false);
 
     m_commonKappa = new medBoolParameter("common_kappa",this);
     m_commonKappa->setCaption("Common compartment kappa");
     m_commonKappa->setDescription("Shared compartment concentrations (one parameter for all compartments, only for DDI)");
-    m_commonKappa->setValue(true);
+    m_commonKappa->setValue(false);
 
     m_commonEAF = new medBoolParameter("common_eaf",this);
     m_commonEAF->setCaption("Common compartment EAF");
     m_commonEAF->setDescription("Shared compartment extra-axonal fractions (one parameter for all compartments, only for DDI)");
-    m_commonEAF->setValue(true);
+    m_commonEAF->setValue(false);
 }
 
 animaMCMEstimationProcess::~animaMCMEstimationProcess()
@@ -233,7 +233,10 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
     typename DWIImageType::Pointer inData = dynamic_cast<DWIImageType *>((itk::Object*)(this->input()->data()));
 
     if (!inData)
+    {
+        qDebug() << "No input data to MCM estimation";
         return medAbstractJob::MED_JOB_EXIT_FAILURE;
+    }
 
     typedef anima::MCMEstimatorImageFilter <inputType> FilterType;
 
@@ -324,8 +327,9 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
     {
         m_estimationfilter->Update();
     }
-    catch(itk::ProcessAborted &e)
+    catch(itk::ExceptionObject &e)
     {
+        qDebug() << "Error in MCM estimation process" << e.GetDescription();
         return medAbstractJob::MED_JOB_EXIT_FAILURE;
     }
 
