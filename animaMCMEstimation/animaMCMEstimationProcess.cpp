@@ -180,38 +180,38 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::run()
         this->extractGradientsFromInformation();
         QString id =  this->input()->identifier();
 
-//        if ( id == "itkDataImageChar4" )
-//        {
-//            jobExitSatus = this->_run<char>();
-//        }
-//        else if ( id == "itkDataImageUChar4" )
-//        {
-//            jobExitSatus = this->_run<unsigned char>();
-//        }
-//        else if ( id == "itkDataImageShort4" )
-//        {
-//            jobExitSatus = this->_run<short>();
-//        }
-//        else if ( id == "itkDataImageUShort4" )
-//        {
-//            jobExitSatus = this->_run<unsigned short>();
-//        }
-//        else if ( id == "itkDataImageInt4" )
-//        {
-//            jobExitSatus = this->_run<int>();
-//        }
-//        else if ( id == "itkDataImageUInt4" )
-//        {
-//            jobExitSatus = this->_run<unsigned int>();
-//        }
-//        else if ( id == "itkDataImageLong4" )
-//        {
-//            jobExitSatus = this->_run<long>();
-//        }
-//        else if ( id== "itkDataImageULong4" )
-//        {
-//            jobExitSatus = this->_run<unsigned long>();
-//        }
+        if ( id == "itkDataImageChar4" )
+        {
+            jobExitSatus = this->_run<char>();
+        }
+        else if ( id == "itkDataImageUChar4" )
+        {
+            jobExitSatus = this->_run<unsigned char>();
+        }
+        else if ( id == "itkDataImageShort4" )
+        {
+            jobExitSatus = this->_run<short>();
+        }
+        else if ( id == "itkDataImageUShort4" )
+        {
+            jobExitSatus = this->_run<unsigned short>();
+        }
+        else if ( id == "itkDataImageInt4" )
+        {
+            jobExitSatus = this->_run<int>();
+        }
+        else if ( id == "itkDataImageUInt4" )
+        {
+            jobExitSatus = this->_run<unsigned int>();
+        }
+        else if ( id == "itkDataImageLong4" )
+        {
+            jobExitSatus = this->_run<long>();
+        }
+        else if ( id== "itkDataImageULong4" )
+        {
+            jobExitSatus = this->_run<unsigned long>();
+        }
         if ( id == "itkDataImageFloat4" )
         {
             jobExitSatus = this->_run<float>();
@@ -238,14 +238,14 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
         return medAbstractJob::MED_JOB_EXIT_FAILURE;
     }
 
-    typedef anima::MCMEstimatorImageFilter <inputType> FilterType;
+    typedef anima::MCMEstimatorImageFilter <inputType,float> FilterType;
 
     typename FilterType::Pointer filter;
     if (m_compartmentType != anima::DDI)
         filter = FilterType::New();
     else
     {
-        typedef anima::MCMDDIEstimatorImageFilter <inputType> DDIFilterType;
+        typedef anima::MCMDDIEstimatorImageFilter <inputType,float> DDIFilterType;
         typename DDIFilterType::Pointer tmpFilter = DDIFilterType::New();
 
         tmpFilter->SetUseConstrainedOrientationConcentration(m_fixKappa->value());
