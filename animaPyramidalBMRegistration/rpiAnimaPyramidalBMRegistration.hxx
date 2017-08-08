@@ -1,4 +1,5 @@
 #pragma once
+#include "rpiAnimaPyramidalBMRegistration.h"
 
 // Namespace RPI : Registration Programming Interface
 namespace rpi
@@ -117,21 +118,21 @@ template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetTransform ( unsigned int transform )
 {
-    matcher->SetTransform ( ( Transform ) transform );
+    matcher->SetTransform ( ( typename PyramidBMType::Transform ) transform );
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetMetric ( unsigned int metric )
 {
-    matcher->SetMetric ( ( Metric ) metric );
+    matcher->SetMetric ( ( typename PyramidBMType::Metric ) metric );
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetOptimizer ( unsigned int optimizer )
 {
-    matcher->SetOptimizer ( ( Optimizer ) optimizer );
+    matcher->SetOptimizer ( ( typename PyramidBMType::Optimizer ) optimizer );
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
@@ -236,14 +237,14 @@ template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetAgregator ( unsigned int agregator )
 {
-    matcher->SetAgregator ( ( Agregator ) agregator );
+    matcher->SetAgregator ( ( typename PyramidBMType::Agregator ) agregator );
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetOutputTransformType ( unsigned int outputTransform )
 {
-    matcher->SetOutputTransformType ( ( OutputTransform ) outputTransform );
+    matcher->SetOutputTransformType ( ( typename PyramidBMType::OutputTransform ) outputTransform );
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >

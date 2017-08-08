@@ -83,8 +83,10 @@ target_link_libraries(${TARGET_NAME}
   vtkInteractionStyle
   vtkRenderingCore
   vtkRenderingFreeType
-  vtkRenderingOpenGL
-  vtkRenderingVolumeOpenGL
+  vtkRenderingOpenGL2
+  vtkRenderingVolumeOpenGL2
+  AnimaMCMBase
+  AnimaMCMPrivateBase
   AnimaMCM
   AnimaMCMPrivate
   AnimaSpecialFunctions

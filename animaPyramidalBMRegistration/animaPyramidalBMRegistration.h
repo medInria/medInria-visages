@@ -6,6 +6,7 @@
 
 #include <itkProcessRegistration.h>
 #include "animaPyramidalBMRegistrationPluginExport.h"
+#include <rpiAnimaPyramidalBMRegistration.h>
 
 class animaPyramidalBMRegistrationPrivate;
 
@@ -56,6 +57,12 @@ public:
     
     virtual itk::Transform<double,3,3>::Pointer getTransform();
     virtual QString getTitleAndParameters();
+
+    typedef float PixelType;
+    typedef double TransformScalarType;
+    typedef itk::Image< PixelType, 3 > RegImageType;
+    //normaly should use long switch cases, but here we know we work with float3 data.
+    typedef rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> RegistrationType;
 
 public:
     /**

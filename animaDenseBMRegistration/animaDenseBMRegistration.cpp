@@ -16,7 +16,6 @@
 #include "time.h"
 
 // Include specific RPI implementation of the registration method
-#include <rpiAnimaDenseBMRegistration.h>
 #include <rpiCommonTools.hxx>
 
 
@@ -91,9 +90,9 @@ animaDenseBMRegistration::animaDenseBMRegistration(void) : itkProcessRegistratio
     d->blockSize = 5;
     d->blockSpacing = 2;
     d->stDevThreshold = 5;
-    d->transform = Translation;
-    d->metric = SquaredCorrelation;  
-    d->optimizer = Bobyqa;
+    d->transform = RegistrationType::BMRegistrationType::Translation;
+    d->metric = RegistrationType::BMRegistrationType::SquaredCorrelation;
+    d->optimizer = RegistrationType::BMRegistrationType::Bobyqa;
     d->maximumIterations = 10;
     d->minimalTransformError = 0.01;
     d->optimizerMaximumIterations = 100;
@@ -107,7 +106,7 @@ animaDenseBMRegistration::animaDenseBMRegistration(void) : itkProcessRegistratio
     d->angleUpperBound = 180;
     d->skewUpperBound = 45;
     d->scaleUpperBound = 3;
-    d->agregator = Baloo;
+    d->agregator = RegistrationType::BMRegistrationType::Baloo;
     d->extrapolationSigma = 2;
     d->elasticSigma = 2;
     d->outlierSigma = 3;
@@ -157,12 +156,8 @@ QString animaDenseBMRegistration::identifier(void) const
 
 itk::Transform<double,3,3>::Pointer animaDenseBMRegistration::getTransform()
 {
-    typedef float PixelType;
-    typedef double TransformScalarType;
-    typedef itk::Image< PixelType, 3 > RegImageType;
-    //normaly should use long switch cases, but here we know we work with float3 data.
-    if (rpi::AnimaDenseBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
-        static_cast<rpi::AnimaDenseBMRegistration<RegImageType,RegImageType,TransformScalarType> *>(d->registrationMethod))
+    if (RegistrationType * registration =
+        static_cast<RegistrationType *>(d->registrationMethod))
     {
         return registration->GetTransformation();
     }
@@ -172,11 +167,6 @@ itk::Transform<double,3,3>::Pointer animaDenseBMRegistration::getTransform()
 
 QString animaDenseBMRegistration::getTitleAndParameters()
 {
-    typedef float PixelType;
-    typedef double TransformScalarType;
-    typedef itk::Image< PixelType, 3 > RegImageType;
-    //normaly should use long switch cases, but here we know we work with float3 data.
-    typedef rpi::AnimaDenseBMRegistration<RegImageType,RegImageType,TransformScalarType> RegistrationType;
     RegistrationType * registration = static_cast<RegistrationType *>(d->registrationMethod);
     
     QString titleAndParameters;
@@ -211,12 +201,8 @@ void animaDenseBMRegistration::emitProgress(int prog)
 
 template <typename PixelType>
 int animaDenseBMRegistrationPrivate::update(void)
-{
-    typedef itk::Image< PixelType, 3 >  FixedImageType;
-    typedef itk::Image< PixelType, 3 >  MovingImageType;
-        
-    typename rpi::AnimaDenseBMRegistration<FixedImageType,MovingImageType, double> * registration =
-    new rpi::AnimaDenseBMRegistration<FixedImageType,MovingImageType,double> ();
+{        
+    typename animaDenseBMRegistration::RegistrationType * registration = new animaDenseBMRegistration::RegistrationType ();
     
     // set callback
     callback = itk::CStyleCommand::New();
@@ -226,8 +212,8 @@ int animaDenseBMRegistrationPrivate::update(void)
     
     registrationMethod = registration;
     
-    registration->SetFixedImage((const FixedImageType*) proc->fixedImage().GetPointer());
-    registration->SetMovingImage((const MovingImageType*) proc->movingImages()[0].GetPointer());
+    registration->SetFixedImage((const animaDenseBMRegistration::RegImageType*) proc->fixedImage().GetPointer());
+    registration->SetMovingImage((const animaDenseBMRegistration::RegImageType*) proc->movingImages()[0].GetPointer());
     
     registration->SetBlockSize (blockSize);
     registration->SetBlockSpacing (blockSpacing);
@@ -276,10 +262,10 @@ int animaDenseBMRegistrationPrivate::update(void)
     
     qDebug() << "Elasped time: " << (double)(t2-t1)/(double)CLOCKS_PER_SEC;
     
-    typedef itk::ResampleImageFilter< MovingImageType,MovingImageType,double >    ResampleFilterType;
+    typedef itk::ResampleImageFilter< animaDenseBMRegistration::RegImageType,animaDenseBMRegistration::RegImageType,double > ResampleFilterType;
     typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
     resampler->SetTransform(registration->GetTransformation());
-    resampler->SetInput((const MovingImageType*)proc->movingImages()[0].GetPointer());
+    resampler->SetInput((const animaDenseBMRegistration::RegImageType*)proc->movingImages()[0].GetPointer());
     resampler->SetSize( proc->fixedImage()->GetLargestPossibleRegion().GetSize() );
     resampler->SetOutputOrigin( proc->fixedImage()->GetOrigin() );
     resampler->SetOutputSpacing( proc->fixedImage()->GetSpacing() );
@@ -314,17 +300,14 @@ int animaDenseBMRegistration::update(itkProcessRegistration::ImageType imgType)
 
 template <typename PixelType>
 bool animaDenseBMRegistrationPrivate::writeTransform(const QString& file)
-{
-    typedef double TransformScalarType;
-    typedef itk::Image< PixelType, 3 > RegImageType;
-    
-    if (rpi::AnimaDenseBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
-        static_cast<rpi::AnimaDenseBMRegistration<RegImageType,RegImageType,TransformScalarType> *>(registrationMethod))
+{    
+    if (typename animaDenseBMRegistration::RegistrationType * registration =
+        static_cast<animaDenseBMRegistration::RegistrationType *>(registrationMethod))
     {
         try
         {
-            rpi::writeDisplacementFieldTransformation<TransformScalarType, 3>(registration->GetTransformation(), file.toStdString());
-            
+            rpi::writeDisplacementFieldTransformation<animaDenseBMRegistration::TransformScalarType, 3>(registration->GetTransformation(),
+                                                                                                        file.toStdString());
         }
         catch (std::exception)
         {
@@ -351,11 +334,8 @@ bool animaDenseBMRegistration::writeTransform(const QString& file)
 template <typename PixelType>
 void animaDenseBMRegistrationPrivate::abort (void)
 {  
-    typedef double TransformScalarType;
-    typedef itk::Image< PixelType, 3 > RegImageType;
-    
-    if (rpi::AnimaDenseBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
-        static_cast<rpi::AnimaDenseBMRegistration<RegImageType,RegImageType,TransformScalarType> *>(registrationMethod)) 
+    if (typename animaDenseBMRegistration::RegistrationType * registration =
+        static_cast<animaDenseBMRegistration::RegistrationType *>(registrationMethod))
     {
         registration->Abort();   
     }

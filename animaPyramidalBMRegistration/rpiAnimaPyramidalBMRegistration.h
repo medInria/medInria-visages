@@ -41,6 +41,7 @@ public:
     typedef typename TransformType::Pointer
     TransformPointerType;
 
+    typedef anima::PyramidalBlockMatchingBridge <TFixedImage::ImageDimension> PyramidBMType;
 
 protected:
 
@@ -138,10 +139,7 @@ public:
 
 
 private:
-
-    typedef anima::PyramidalBlockMatchingBridge <TFixedImage::ImageDimension> PyramidBMType;
     typename PyramidBMType::Pointer matcher;
-
 };
 
 } // End of namespace

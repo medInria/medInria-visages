@@ -458,42 +458,51 @@ void animaDenseBMRegistrationToolBox::run(void)
 
 void animaDenseBMRegistrationToolBox::updateBMOptimizerParams(int index)
 {
+    typedef typename animaDenseBMRegistration::RegistrationType::BMRegistrationType BMRegistrationType;
+    typedef typename BMRegistrationType::Optimizer Optimizer;
+
     Optimizer opt = (Optimizer) d->optimizer->currentIndex();
 
-    d->translateUpperBound->setEnabled( opt == Bobyqa );
-    d->angleUpperBound->setEnabled( d->angleUpperBound->isEnabled() && opt == Bobyqa );
-    d->scaleUpperBound->setEnabled( d->scaleUpperBound->isEnabled() && opt == Bobyqa );
-    d->skewUpperBound->setEnabled( d->skewUpperBound->isEnabled() && opt == Bobyqa );
+    d->translateUpperBound->setEnabled( opt == BMRegistrationType::Bobyqa );
+    d->angleUpperBound->setEnabled( d->angleUpperBound->isEnabled() && opt == BMRegistrationType::Bobyqa );
+    d->scaleUpperBound->setEnabled( d->scaleUpperBound->isEnabled() && opt == BMRegistrationType::Bobyqa );
+    d->skewUpperBound->setEnabled( d->skewUpperBound->isEnabled() && opt == BMRegistrationType::Bobyqa );
     
-    d->stepSize->setEnabled( opt == Exhaustive);
+    d->stepSize->setEnabled( opt == BMRegistrationType::Exhaustive);
     
-    d->searchAngleRadius->setEnabled(d->searchAngleRadius->isEnabled() && opt != Exhaustive );
-    d->searchScaleRadius->setEnabled(d->searchScaleRadius->isEnabled() && opt != Exhaustive );
-    d->searchSkewRadius->setEnabled( d->searchSkewRadius->isEnabled() && opt != Exhaustive );
+    d->searchAngleRadius->setEnabled(d->searchAngleRadius->isEnabled() && opt != BMRegistrationType::Exhaustive );
+    d->searchScaleRadius->setEnabled(d->searchScaleRadius->isEnabled() && opt != BMRegistrationType::Exhaustive );
+    d->searchSkewRadius->setEnabled( d->searchSkewRadius->isEnabled() && opt != BMRegistrationType::Exhaustive );
     
-    d->finalRadius->setEnabled( opt != Exhaustive );
+    d->finalRadius->setEnabled( opt != BMRegistrationType::Exhaustive );
 }
 
 void animaDenseBMRegistrationToolBox::updateBMTransformParams(int index)
 {
+    typedef typename animaDenseBMRegistration::RegistrationType::BMRegistrationType BMRegistrationType;
+    typedef typename BMRegistrationType::Transform Transform;
+
     Transform tr = (Transform) d->transform->currentIndex();
     
-    d->searchAngleRadius->setEnabled(tr == Affine || tr == Rigid);
-    d->angleUpperBound->setEnabled( tr == Affine || tr == Rigid);
+    d->searchAngleRadius->setEnabled(tr == BMRegistrationType::Affine || tr == BMRegistrationType::Rigid);
+    d->angleUpperBound->setEnabled( tr == BMRegistrationType::Affine || tr == BMRegistrationType::Rigid);
     
-    d->searchScaleRadius->setEnabled(tr == Affine);
-    d->scaleUpperBound->setEnabled(tr == Affine);
+    d->searchScaleRadius->setEnabled(tr == BMRegistrationType::Affine);
+    d->scaleUpperBound->setEnabled(tr == BMRegistrationType::Affine);
     
-    d->searchSkewRadius->setEnabled(tr == Affine);
-    d->skewUpperBound->setEnabled(tr == Affine);
+    d->searchSkewRadius->setEnabled(tr == BMRegistrationType::Affine);
+    d->skewUpperBound->setEnabled(tr == BMRegistrationType::Affine);
 }
 
 void animaDenseBMRegistrationToolBox::updateBMAgregatorParams(int index)
 {
+    typedef typename animaDenseBMRegistration::RegistrationType::BMRegistrationType BMRegistrationType;
+    typedef typename BMRegistrationType::Agregator Agregator;
+
     Agregator agreg = (Agregator) d->agregator->currentIndex();
     
-    d->mEstimateConvergenceThreshold->setEnabled(agreg == MSmoother);
-    d->neighborhoodApproximation->setEnabled(agreg == MSmoother);
+    d->mEstimateConvergenceThreshold->setEnabled(agreg == BMRegistrationType::MSmoother);
+    d->neighborhoodApproximation->setEnabled(agreg == BMRegistrationType::MSmoother);
 }
 
 void animaDenseBMRegistrationToolBox::updateDamUsage(int index)

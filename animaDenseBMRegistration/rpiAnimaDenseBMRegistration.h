@@ -30,6 +30,7 @@ namespace rpi
 
     public:
 
+        typedef anima::PyramidalDenseSVFMatchingBridge <TFixedImage::ImageDimension> BMRegistrationType;
         typedef rpi::DisplacementFieldTransform <TTransformScalarType, TFixedImage::ImageDimension> TransformType;
 
         typedef typename TransformType::Pointer TransformPointerType;
@@ -134,7 +135,6 @@ namespace rpi
 
     private:
 
-        typedef anima::PyramidalDenseSVFMatchingBridge <TFixedImage::ImageDimension> BMRegistrationType;
         typename BMRegistrationType::Pointer matcher;
     };
 

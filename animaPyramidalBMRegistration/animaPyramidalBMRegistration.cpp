@@ -16,10 +16,7 @@
 #include "time.h"
 
 // Include specific RPI implementation of the registration method
-#include <rpiAnimaPyramidalBMRegistration.h>
 #include <rpiCommonTools.hxx>
-
-
 
 // /////////////////////////////////////////////////////////////////
 // animaPyramidalBMRegistrationPrivate
@@ -89,9 +86,9 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->blockSize = 5;
     d->blockSpacing = 5;
     d->stDevThreshold = 5;
-    d->transform = Translation;
-    d->metric = SquaredCorrelation;  
-    d->optimizer = Bobyqa;
+    d->transform = RegistrationType::PyramidBMType::Translation;
+    d->metric = RegistrationType::PyramidBMType::SquaredCorrelation;
+    d->optimizer = RegistrationType::PyramidBMType::Bobyqa;
     d->maximumIterations = 10;
     d->minimalTransformError = 0.01;
     d->optimizerMaximumIterations = 100;
@@ -105,8 +102,8 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->angleUpperBound = 180;
     d->skewUpperBound = 45;
     d->scaleUpperBound = 3;
-    d->agregator = MEstimation;
-    d->outputTransformType = outRigid;
+    d->agregator = RegistrationType::PyramidBMType::MEstimation;
+    d->outputTransformType = RegistrationType::PyramidBMType::outRigid;
     d->agregThreshold = 0.5;
     d->seStoppingThreshold = 0.01;
     d->numberOfPyramidLevels = 3;
@@ -152,12 +149,8 @@ QString animaPyramidalBMRegistration::identifier(void) const
 
 itk::Transform<double,3,3>::Pointer animaPyramidalBMRegistration::getTransform()
 {
-    typedef float PixelType;
-    typedef double TransformScalarType;
-    typedef itk::Image< PixelType, 3 > RegImageType;
-    //normaly should use long switch cases, but here we know we work with float3 data.
-    if (rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
-        static_cast<rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> *>(d->registrationMethod))
+    if (RegistrationType * registration =
+        static_cast<RegistrationType *>(d->registrationMethod))
     {
         return registration->GetTransformation();
     }
@@ -167,11 +160,6 @@ itk::Transform<double,3,3>::Pointer animaPyramidalBMRegistration::getTransform()
 
 QString animaPyramidalBMRegistration::getTitleAndParameters()
 {
-    typedef float PixelType;
-    typedef double TransformScalarType;
-    typedef itk::Image< PixelType, 3 > RegImageType;
-    //normaly should use long switch cases, but here we know we work with float3 data.
-    typedef rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> RegistrationType;
     RegistrationType * registration = static_cast<RegistrationType *>(d->registrationMethod);
     
     QString titleAndParameters;
@@ -207,11 +195,7 @@ void animaPyramidalBMRegistration::emitProgress(int prog)
 template <typename PixelType>
 int animaPyramidalBMRegistrationPrivate::update(void)
 {
-    typedef itk::Image< PixelType, 3 >  FixedImageType;
-    typedef itk::Image< PixelType, 3 >  MovingImageType;
-        
-    typename rpi::AnimaPyramidalBMRegistration<FixedImageType,MovingImageType, double> * registration =
-    new rpi::AnimaPyramidalBMRegistration<FixedImageType,MovingImageType,double> ();
+    typename animaPyramidalBMRegistration::RegistrationType * registration = new animaPyramidalBMRegistration::RegistrationType ();
     
     // set callback
     callback = itk::CStyleCommand::New();
@@ -221,8 +205,8 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     
     registrationMethod = registration;
     
-    registration->SetFixedImage((const FixedImageType*) proc->fixedImage().GetPointer());
-    registration->SetMovingImage((const MovingImageType*) proc->movingImages()[0].GetPointer());
+    registration->SetFixedImage((const animaPyramidalBMRegistration::RegImageType*) proc->fixedImage().GetPointer());
+    registration->SetMovingImage((const animaPyramidalBMRegistration::RegImageType*) proc->movingImages()[0].GetPointer());
     
     if(!initTransformFile.isEmpty())
        registration->SetInitialTransform( initTransformFile.toStdString() );
@@ -272,10 +256,10 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     
     qDebug() << "Elasped time: " << (double)(t2-t1)/(double)CLOCKS_PER_SEC;
     
-    typedef itk::ResampleImageFilter< MovingImageType,MovingImageType,double >    ResampleFilterType;
+    typedef itk::ResampleImageFilter< animaPyramidalBMRegistration::RegImageType,animaPyramidalBMRegistration::RegImageType,double >    ResampleFilterType;
     typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
     resampler->SetTransform(registration->GetTransformation());
-    resampler->SetInput((const MovingImageType*)proc->movingImages()[0].GetPointer());
+    resampler->SetInput((const animaPyramidalBMRegistration::RegImageType*)proc->movingImages()[0].GetPointer());
     resampler->SetSize( proc->fixedImage()->GetLargestPossibleRegion().GetSize() );
     resampler->SetOutputOrigin( proc->fixedImage()->GetOrigin() );
     resampler->SetOutputSpacing( proc->fixedImage()->GetSpacing() );
@@ -311,16 +295,13 @@ int animaPyramidalBMRegistration::update(itkProcessRegistration::ImageType imgTy
 template <typename PixelType>
 bool animaPyramidalBMRegistrationPrivate::writeTransform(const QString& file)
 {
-    typedef double TransformScalarType;
-    typedef itk::Image< PixelType, 3 > RegImageType;
-    
-    if (rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
-        static_cast<rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> *>(registrationMethod))
+    if (animaPyramidalBMRegistration::RegistrationType * registration =
+        static_cast<animaPyramidalBMRegistration::RegistrationType *>(registrationMethod))
     {
         try
         {
-            rpi::writeLinearTransformation<TransformScalarType, 3>(registration->GetTransformation(),
-                                                                              file.toStdString());
+            rpi::writeLinearTransformation<animaPyramidalBMRegistration::TransformScalarType, 3>(registration->GetTransformation(),
+                                                                                                 file.toStdString());
             
         }
         catch (std::exception)
@@ -348,11 +329,8 @@ bool animaPyramidalBMRegistration::writeTransform(const QString& file)
 template <typename PixelType>
 void animaPyramidalBMRegistrationPrivate::abort (void)
 {  
-    typedef double TransformScalarType;
-    typedef itk::Image< PixelType, 3 > RegImageType;
-    
-    if (rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> * registration =
-        static_cast<rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> *>(registrationMethod)) 
+    if (animaPyramidalBMRegistration::RegistrationType * registration =
+        static_cast<animaPyramidalBMRegistration::RegistrationType *>(registrationMethod))
     {
         registration->Abort();   
     }

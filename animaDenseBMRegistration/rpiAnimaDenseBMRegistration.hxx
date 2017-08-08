@@ -1,4 +1,5 @@
 #pragma once
+#include "rpiAnimaDenseBMRegistration.h"
 
 // Namespace RPI : Registration Programming Interface
 namespace rpi
@@ -96,21 +97,21 @@ namespace rpi
     void AnimaDenseBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::SetTransform ( unsigned int transform )
     {
-        matcher->SetTransform ( ( Transform ) transform );
+        matcher->SetTransform ( ( typename BMRegistrationType::Transform ) transform );
     }
     
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >
     void AnimaDenseBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::SetMetric ( unsigned int metric )
     {
-        matcher->SetMetric ( ( Metric ) metric );
+        matcher->SetMetric ( ( typename BMRegistrationType::Metric ) metric );
     }
     
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >
     void AnimaDenseBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::SetOptimizer ( unsigned int optimizer )
     {
-        matcher->SetOptimizer ( ( Optimizer ) optimizer );
+        matcher->SetOptimizer ( ( typename BMRegistrationType::Optimizer ) optimizer );
     }
     
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >
@@ -215,7 +216,7 @@ namespace rpi
     void AnimaDenseBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::SetAgregator ( unsigned int agregator )
     {
-        matcher->SetAgregator ( ( Agregator ) agregator );
+        matcher->SetAgregator ( ( typename BMRegistrationType::Agregator ) agregator );
     }
     
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >

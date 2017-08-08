@@ -50,9 +50,11 @@ target_link_libraries(${TARGET_NAME}
   Qt5::Widgets
   dtkCore
   dtkCoreSupport
+  AnimaStatistics
+  AnimaMCMBase
+  AnimaMCMPrivateBase
   AnimaMCM
   AnimaMCMPrivate
-  AnimaRandom
   AnimaOptimizers
   AnimaSpecialFunctions
   ${NLOPT_LIBRARY}
