@@ -79,8 +79,6 @@ namespace rpi
 
         void SetSearchAngleRadius ( double SearchAngleRadius );
 
-        void SetSearchSkewRadius ( double SearchSkewRadius );
-
         void SetSearchScaleRadius ( double SearchScaleRadius );
 
         void SetFinalRadius ( double FinalRadius );
@@ -90,8 +88,6 @@ namespace rpi
         void SetTranslateUpperBound ( double TranslateUpperBound );
 
         void SetAngleUpperBound ( double AngleUpperBound );
-
-        void SetSkewUpperBound ( double SkewUpperBound );
 
         void SetScaleUpperBound ( double ScaleUpperBound );
 

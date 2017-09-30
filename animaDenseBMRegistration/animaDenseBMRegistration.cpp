@@ -52,13 +52,11 @@ public:
     unsigned int optimizerMaximumIterations;
     double searchRadius;
     double searchAngleRadius;
-    double searchSkewRadius;
     double searchScaleRadius;
     double finalRadius;
     double stepSize;
     double translateUpperBound;
     double angleUpperBound;
-    double skewUpperBound;
     double scaleUpperBound;
     unsigned int agregator;
     double extrapolationSigma;
@@ -98,13 +96,11 @@ animaDenseBMRegistration::animaDenseBMRegistration(void) : itkProcessRegistratio
     d->optimizerMaximumIterations = 100;
     d->searchRadius = 1;
     d->searchAngleRadius = 5;
-    d->searchSkewRadius = 5;
     d->searchScaleRadius = 0.1;
     d->finalRadius = 0.001;
     d->stepSize = 1;
     d->translateUpperBound = 10;
     d->angleUpperBound = 180;
-    d->skewUpperBound = 45;
     d->scaleUpperBound = 3;
     d->agregator = RegistrationType::BMRegistrationType::Baloo;
     d->extrapolationSigma = 2;
@@ -226,13 +222,11 @@ int animaDenseBMRegistrationPrivate::update(void)
     registration->SetOptimizerMaximumIterations (optimizerMaximumIterations);
     registration->SetSearchRadius (searchRadius);
     registration->SetSearchAngleRadius (searchAngleRadius);
-    registration->SetSearchSkewRadius (searchSkewRadius);
     registration->SetSearchScaleRadius (searchScaleRadius);
     registration->SetFinalRadius (finalRadius);
     registration->SetStepSize (stepSize);
     registration->SetTranslateUpperBound (translateUpperBound);
     registration->SetAngleUpperBound (angleUpperBound);
-    registration->SetSkewUpperBound (skewUpperBound);
     registration->SetScaleUpperBound (scaleUpperBound);
     registration->SetAgregator (agregator);
     registration->SetExtrapolationSigma (extrapolationSigma);
@@ -402,11 +396,6 @@ void animaDenseBMRegistration::setSearchAngleRadius(double SearchAngleRadius)
     d->searchAngleRadius=SearchAngleRadius;
 }
 
-void animaDenseBMRegistration::setSearchSkewRadius(double SearchSkewRadius) 
-{
-    d->searchSkewRadius=SearchSkewRadius;
-}
-
 void animaDenseBMRegistration::setSearchScaleRadius(double SearchScaleRadius) 
 {
     d->searchScaleRadius=SearchScaleRadius;
@@ -430,11 +419,6 @@ void animaDenseBMRegistration::setTranslateUpperBound(double TranslateUpperBound
 void animaDenseBMRegistration::setAngleUpperBound(double AngleUpperBound) 
 {
     d->angleUpperBound=AngleUpperBound;
-}
-
-void animaDenseBMRegistration::setSkewUpperBound(double SkewUpperBound)
-{
-    d->skewUpperBound=SkewUpperBound;
 }
 
 void animaDenseBMRegistration::setScaleUpperBound(double ScaleUpperBound) 

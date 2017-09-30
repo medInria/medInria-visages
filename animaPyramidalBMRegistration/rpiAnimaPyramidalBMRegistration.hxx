@@ -179,13 +179,6 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-::SetSearchSkewRadius ( double SearchSkewRadius )
-{
-    matcher->SetSearchSkewRadius ( SearchSkewRadius );
-}
-
-template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetSearchScaleRadius ( double SearchScaleRadius )
 {
     matcher->SetSearchScaleRadius ( SearchScaleRadius );
@@ -217,13 +210,6 @@ void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarTy
 ::SetAngleUpperBound ( double AngleUpperBound )
 {
     matcher->SetAngleUpperBound ( AngleUpperBound );
-}
-
-template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-::SetSkewUpperBound ( double SkewUpperBound )
-{
-    matcher->SetSkewUpperBound ( SkewUpperBound );
 }
 
 template < class TFixedImage, class TMovingImage, class TTransformScalarType >

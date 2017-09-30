@@ -102,8 +102,6 @@ public:
     
     void setSearchAngleRadius(double SearchAngleRadius);
     
-    void setSearchSkewRadius(double SearchSkewRadius);
-    
     void setSearchScaleRadius(double SearchScaleRadius);
     
     void setFinalRadius(double FinalRadius);
@@ -113,8 +111,6 @@ public:
     void setTranslateUpperBound(double TranslateUpperBound);
     
     void setAngleUpperBound(double AngleUpperBound);
-    
-    void setSkewUpperBound(double SkewUpperBound);
     
     void setScaleUpperBound(double ScaleUpperBound);
     

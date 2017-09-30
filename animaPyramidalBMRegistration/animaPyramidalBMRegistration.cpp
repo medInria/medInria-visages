@@ -51,13 +51,11 @@ public:
     unsigned int optimizerMaximumIterations;
     double searchRadius;
     double searchAngleRadius;
-    double searchSkewRadius;
     double searchScaleRadius;
     double finalRadius;
     double stepSize;
     double translateUpperBound;
     double angleUpperBound;
-    double skewUpperBound;
     double scaleUpperBound;
     unsigned int agregator;
     unsigned int outputTransformType;
@@ -94,13 +92,11 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->optimizerMaximumIterations = 100;
     d->searchRadius = 2;
     d->searchAngleRadius = 5;
-    d->searchSkewRadius = 5;
     d->searchScaleRadius = 0.1;
     d->finalRadius = 0.001;
     d->stepSize = 1;
     d->translateUpperBound = 50;
     d->angleUpperBound = 180;
-    d->skewUpperBound = 45;
     d->scaleUpperBound = 3;
     d->agregator = RegistrationType::PyramidBMType::MEstimation;
     d->outputTransformType = RegistrationType::PyramidBMType::outRigid;
@@ -222,13 +218,11 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     registration->SetOptimizerMaximumIterations( optimizerMaximumIterations);
     registration->SetSearchRadius( searchRadius);
     registration->SetSearchAngleRadius( searchAngleRadius);
-    registration->SetSearchSkewRadius( searchSkewRadius);
     registration->SetSearchScaleRadius( searchScaleRadius);
     registration->SetFinalRadius( finalRadius);
     registration->SetStepSize( stepSize);
     registration->SetTranslateUpperBound( translateUpperBound);
     registration->SetAngleUpperBound( angleUpperBound);
-    registration->SetSkewUpperBound( skewUpperBound);
     registration->SetScaleUpperBound( scaleUpperBound);
     registration->SetAgregator( agregator);
     registration->SetOutputTransformType( outputTransformType);    
@@ -403,11 +397,6 @@ void animaPyramidalBMRegistration::setSearchAngleRadius(double SearchAngleRadius
     d->searchAngleRadius=SearchAngleRadius;
 }
 
-void animaPyramidalBMRegistration::setSearchSkewRadius(double SearchSkewRadius) 
-{
-    d->searchSkewRadius=SearchSkewRadius;
-}
-
 void animaPyramidalBMRegistration::setSearchScaleRadius(double SearchScaleRadius) 
 {
     d->searchScaleRadius=SearchScaleRadius;
@@ -431,11 +420,6 @@ void animaPyramidalBMRegistration::setTranslateUpperBound(double TranslateUpperB
 void animaPyramidalBMRegistration::setAngleUpperBound(double AngleUpperBound) 
 {
     d->angleUpperBound=AngleUpperBound;
-}
-
-void animaPyramidalBMRegistration::setSkewUpperBound(double SkewUpperBound)
-{
-    d->skewUpperBound=SkewUpperBound;
 }
 
 void animaPyramidalBMRegistration::setScaleUpperBound(double ScaleUpperBound) 

@@ -44,13 +44,11 @@ public:
     QSpinBox *optIterations;
     QDoubleSpinBox * searchRadius;
     QDoubleSpinBox * searchAngleRadius;
-    QDoubleSpinBox * searchSkewRadius;
     QDoubleSpinBox * searchScaleRadius;
     QDoubleSpinBox * finalRadius;
     QDoubleSpinBox * stepSize;
     QDoubleSpinBox * translateUpperBound;
     QDoubleSpinBox * angleUpperBound;
-    QDoubleSpinBox * skewUpperBound;
     QDoubleSpinBox * scaleUpperBound;
     QCheckBox * initializeOnCenterOfGravity;
 
@@ -148,10 +146,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->searchAngleRadius->setToolTip("The search angle radius (rho start for newuoa on angles part)");
     d->searchAngleRadius->setValue(5);
     
-    d->searchSkewRadius = new QDoubleSpinBox;
-    d->searchSkewRadius->setToolTip("The search skew radius (rho start for newuoa on skews part)");
-    d->searchSkewRadius->setValue(5);
-    
     d->searchScaleRadius = new QDoubleSpinBox;
     d->searchScaleRadius->setToolTip("The search scale radius (rho start for newuoa on scales part)");
     d->searchScaleRadius->setValue(0.1);
@@ -175,11 +169,6 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->angleUpperBound->setToolTip("The upper bound on angles for bobyqa (in degrees)");
     d->angleUpperBound->setRange(0,360);
     d->angleUpperBound->setValue(180);
-    
-    d->skewUpperBound = new QDoubleSpinBox;
-    d->skewUpperBound->setToolTip("The upper bound on skews for bobyqa (in degrees)");
-    d->skewUpperBound->setRange(0,360);
-    d->skewUpperBound->setValue(45);
     
     d->scaleUpperBound = new QDoubleSpinBox;
     d->scaleUpperBound->setToolTip("The upper bound on scales for bobyqa");
@@ -252,13 +241,11 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     blockMatchLayout->addRow(new QLabel(tr("Optimizer Iterations"),this),d->optIterations);
     blockMatchLayout->addRow(new QLabel(tr("Search Radius"),this),d->searchRadius);
     blockMatchLayout->addRow(new QLabel(tr("Search Angle Radius"),this),d->searchAngleRadius);
-    blockMatchLayout->addRow(new QLabel(tr("Search Skew Radius"),this),d->searchSkewRadius);
     blockMatchLayout->addRow(new QLabel(tr("Seardch Scale Radius"),this),d->searchScaleRadius);
     blockMatchLayout->addRow(new QLabel(tr("Final Radius"),this),d->finalRadius);
     blockMatchLayout->addRow(new QLabel(tr("Step Size"),this),d->stepSize);
     blockMatchLayout->addRow(new QLabel(tr("Translate Upper"),this),d->translateUpperBound);
     blockMatchLayout->addRow(new QLabel(tr("Angle Upper"),this),d->angleUpperBound);
-    blockMatchLayout->addRow(new QLabel(tr("Skew Upper"),this),d->skewUpperBound);
     blockMatchLayout->addRow(new QLabel(tr("Scale Upper"),this),d->scaleUpperBound);
 
     QGroupBox *blockMatchGroupBox = new QGroupBox(tr("Block Match Parameters"));
@@ -393,12 +380,10 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     process_Registration->setOptimizerMaximumIterations( d->optIterations->value() );
     process_Registration->setSearchRadius( d->searchRadius->value() );
     process_Registration->setSearchAngleRadius( d->searchAngleRadius->value() );
-    process_Registration->setSearchSkewRadius( d->searchSkewRadius->value() );
     process_Registration->setSearchScaleRadius( d->searchScaleRadius->value() );
     process_Registration->setStepSize( d->stepSize->value() );
     process_Registration->setTranslateUpperBound( d->translateUpperBound->value() );
     process_Registration->setAngleUpperBound( d->angleUpperBound->value() );
-    process_Registration->setSkewUpperBound( d->skewUpperBound->value() );
     process_Registration->setScaleUpperBound( d->scaleUpperBound->value() );
     process_Registration->setAgregator( d->agregator->currentIndex() );
     process_Registration->setOutputTransformType( d->outputTransform->currentIndex() );
@@ -441,13 +426,11 @@ void animaPyramidalBMRegistrationToolBox::updateBMOptimizerParams(int index)
     d->translateUpperBound->setEnabled( opt == BMRegistrationType::Bobyqa );
     d->angleUpperBound->setEnabled( d->angleUpperBound->isEnabled() && opt == BMRegistrationType::Bobyqa );
     d->scaleUpperBound->setEnabled( d->scaleUpperBound->isEnabled() && opt == BMRegistrationType::Bobyqa );
-    d->skewUpperBound->setEnabled( d->skewUpperBound->isEnabled() && opt == BMRegistrationType::Bobyqa );
     
     d->stepSize->setEnabled( opt == BMRegistrationType::Exhaustive);
     
     d->searchAngleRadius->setEnabled(d->searchAngleRadius->isEnabled() && opt != BMRegistrationType::Exhaustive );
     d->searchScaleRadius->setEnabled(d->searchScaleRadius->isEnabled() && opt != BMRegistrationType::Exhaustive );
-    d->searchSkewRadius->setEnabled( d->searchSkewRadius->isEnabled() && opt != BMRegistrationType::Exhaustive );
     
     d->finalRadius->setEnabled( opt != BMRegistrationType::Exhaustive );
 }
@@ -464,9 +447,6 @@ void animaPyramidalBMRegistrationToolBox::updateBMTransformParams(int index)
     
     d->searchScaleRadius->setEnabled(tr == BMRegistrationType::Affine);
     d->scaleUpperBound->setEnabled(tr == BMRegistrationType::Affine);
-    
-    d->searchSkewRadius->setEnabled(tr == BMRegistrationType::Affine);
-    d->skewUpperBound->setEnabled(tr == BMRegistrationType::Affine);
 }
 
 void animaPyramidalBMRegistrationToolBox::updateBMAgregatorParams(int index)
