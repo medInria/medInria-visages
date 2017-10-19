@@ -89,7 +89,7 @@ target_link_libraries(${TARGET_NAME}
   AnimaMCMPrivateBase
   AnimaMCM
   AnimaMCMPrivate
-  AnimaIODiffusion
+  AnimaOptimizers
   AnimaSpecialFunctions
   ${TinyXML2_LIBRARY}
   )
