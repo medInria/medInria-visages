@@ -49,6 +49,7 @@ target_link_libraries(${TARGET_NAME}
   Qt5::Widgets
   dtkCore
   dtkCoreSupport
+  AnimaRelaxometry
   AnimaOptimizers
   ITKOptimizers
   ${NLOPT_LIBRARY}
