@@ -35,7 +35,6 @@ public:
     // Parameters setting
     medDoubleParameter *trTime() const;
     medDoubleParameter *echoSpacing() const;
-    medDoubleParameter *upperBoundM0() const;
     medDoubleParameter *upperBoundT2() const;
     medDoubleParameter *backgroundSignalThreshold() const;
     
@@ -49,7 +48,6 @@ private:
 
     medDoubleParameter *m_trTime;
     medDoubleParameter *m_echoSpacing;
-    medDoubleParameter *m_upperBoundM0;
     medDoubleParameter *m_upperBoundT2;
     medDoubleParameter *m_backgroundSignalThreshold;
 

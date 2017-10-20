@@ -17,7 +17,6 @@ animaT2RelaxometryProcessPresenter::animaT2RelaxometryProcessPresenter(medAbstra
 
     m_trTime = new medDoubleParameterPresenter(m_process->trTime());
     m_echoSpacing = new medDoubleParameterPresenter(m_process->echoSpacing());
-    m_upperBoundM0 = new medDoubleParameterPresenter(m_process->upperBoundM0());
     m_upperBoundT2 = new medDoubleParameterPresenter(m_process->upperBoundT2());
     m_backgroundSignalThreshold = new medDoubleParameterPresenter(m_process->backgroundSignalThreshold());
 
@@ -51,7 +50,6 @@ QWidget *animaT2RelaxometryProcessPresenter::buildToolBoxWidget()
 
     parametersLayout->addRow(m_trTime->parameter()->caption(), m_trTime->buildWidget());
     parametersLayout->addRow(m_echoSpacing->parameter()->caption(), m_echoSpacing->buildWidget());
-    parametersLayout->addRow(m_upperBoundM0->parameter()->caption(), m_upperBoundM0->buildWidget());
     parametersLayout->addRow(m_upperBoundT2->parameter()->caption(), m_upperBoundT2->buildWidget());
     parametersLayout->addRow(m_backgroundSignalThreshold->parameter()->caption(), m_backgroundSignalThreshold->buildWidget());
 

@@ -27,7 +27,6 @@ private:
 
     medDoubleParameterPresenter *m_trTime;
     medDoubleParameterPresenter *m_echoSpacing;
-    medDoubleParameterPresenter *m_upperBoundM0;
     medDoubleParameterPresenter *m_upperBoundT2;
     medDoubleParameterPresenter *m_backgroundSignalThreshold;
 

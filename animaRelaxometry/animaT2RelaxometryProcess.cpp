@@ -25,12 +25,6 @@ animaT2RelaxometryProcess::animaT2RelaxometryProcess(QObject *parent)
     m_echoSpacing->setRange(0,100);
     m_echoSpacing->setValue(10);
 
-    m_upperBoundM0 = new medDoubleParameter("m0_upper", this);
-    m_upperBoundM0->setCaption("Upper bound M0:");
-    m_upperBoundM0->setDescription("M0 upper bound value");
-    m_upperBoundM0->setRange(0,10000);
-    m_upperBoundM0->setValue(5000);
-
     m_upperBoundT2 = new medDoubleParameter("t2_upper", this);
     m_upperBoundT2->setCaption("Upper bound T2:");
     m_upperBoundT2->setDescription("T2 upper bound value");
@@ -59,11 +53,6 @@ medDoubleParameter *animaT2RelaxometryProcess::trTime() const
 medDoubleParameter *animaT2RelaxometryProcess::echoSpacing() const
 {
     return m_echoSpacing;
-}
-
-medDoubleParameter *animaT2RelaxometryProcess::upperBoundM0() const
-{
-    return m_upperBoundM0;
 }
 
 medDoubleParameter *animaT2RelaxometryProcess::upperBoundT2() const
@@ -174,10 +163,9 @@ medAbstractJob::medJobExitStatus animaT2RelaxometryProcess::_run()
     for(unsigned int index = 0;index < echoTime.size();++index)
         echoTime[index]=(index+1)*(m_echoSpacing->value());
 
-    mainFilter->SetEchoTime(echoTime);
+    mainFilter->SetEchoSpacing(m_echoSpacing->value());
 
     mainFilter->SetTRValue(m_trTime->value());
-    mainFilter->SetM0UpperBoundValue(m_upperBoundM0->value());
     mainFilter->SetT2UpperBoundValue(m_upperBoundT2->value());
 
     if (m_T1Map)
