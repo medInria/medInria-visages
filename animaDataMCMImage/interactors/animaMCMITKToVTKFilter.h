@@ -54,7 +54,7 @@ protected:
 
     /** Method that actually read the ITK data and convert it into a
      *  VTK structured point */
-    virtual void GenerateData();
+    virtual void GenerateData() ITK_OVERRIDE;
 
 private:
     animaMCMITKToVTKFilter(const Self&); //purposely not implemented

@@ -16,7 +16,7 @@ class ANIMADATAMCMIMAGEPLUGIN_EXPORT vtkMCMSource: public vtkPolyDataAlgorithm
 {
 public:
     vtkTypeMacro(vtkMCMSource,vtkPolyDataAlgorithm);
-    void PrintSelf(ostream& os,vtkIndent indent);
+    void PrintSelf(ostream& os,vtkIndent indent) VTK_OVERRIDE;
 
     static vtkMCMSource* New();
 
@@ -96,8 +96,8 @@ protected:
      vtkMCMSource(const int tess=2);
     ~vtkMCMSource();
     
-    int RequestData(vtkInformation*,vtkInformationVector**,vtkInformationVector*);
-    int RequestInformation(vtkInformation*,vtkInformationVector**,vtkInformationVector*);
+    int RequestData(vtkInformation*,vtkInformationVector**,vtkInformationVector*) VTK_OVERRIDE;
+    int RequestInformation(vtkInformation*,vtkInformationVector**,vtkInformationVector*) VTK_OVERRIDE;
 
     double Radius;
     double Center[3];

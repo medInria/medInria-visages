@@ -25,7 +25,7 @@ class ANIMADATAMCMIMAGEPLUGIN_EXPORT vtkMCMGlyph : public vtkPolyDataAlgorithm
 {
 public:   
     vtkTypeMacro(vtkMCMGlyph,vtkPolyDataAlgorithm);
-    void PrintSelf(ostream& os,vtkIndent indent);
+    void PrintSelf(ostream& os,vtkIndent indent) VTK_OVERRIDE;
 
     /** Construct object with scale factor 1.0. */
     static vtkMCMGlyph* New();
@@ -62,8 +62,8 @@ protected:
     vtkMCMGlyph();
     ~vtkMCMGlyph();
 
-    virtual int RequestData(vtkInformation*,vtkInformationVector**,vtkInformationVector*);
-    virtual int FillInputPortInformation(int port,vtkInformation *info);
+    virtual int RequestData(vtkInformation*,vtkInformationVector**,vtkInformationVector*) VTK_OVERRIDE;
+    virtual int FillInputPortInformation(int port,vtkInformation *info) VTK_OVERRIDE;
 
     // Scale factor to use to scale geometry
     double ScaleFactor;
