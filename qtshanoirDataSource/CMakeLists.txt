@@ -68,6 +68,7 @@ target_link_libraries(${TARGET_NAME}
   Qt5::Xml
   Qt5::Network
   ${QTSHANOIR_LIBS}
+  z
   medCoreLegacy
   dtkCoreSupport
   dtkLog
