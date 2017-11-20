@@ -8,8 +8,6 @@
 
 #include <dtkLog/dtkLog.h>
 
-#include <qtshanoirDataSourceDefinitions.h>
-
 // /////////////////////////////////////////////////////////////////
 // qtshanoirDataSourcePluginPrivate
 // /////////////////////////////////////////////////////////////////
@@ -85,7 +83,7 @@ QStringList qtshanoirDataSourcePlugin::dependencies ( void ) const
 
 QString qtshanoirDataSourcePlugin::version ( void ) const
 {
-    return PLUGIN_VERSION;
+    return QTSHANOIRDATASOURCEPLUGIN_VERSION;
 }
 
 QStringList qtshanoirDataSourcePlugin::tags(void) const
@@ -98,4 +96,4 @@ QStringList qtshanoirDataSourcePlugin::types(void) const
   return QStringList() << "qtshanoirDataSource";
 }
 
-Q_EXPORT_PLUGIN2(qtshanoirDataSourcePlugin, qtshanoirDataSourcePlugin)
+//Q_EXPORT_PLUGIN2(qtshanoirDataSourcePlugin, qtshanoirDataSourcePlugin)

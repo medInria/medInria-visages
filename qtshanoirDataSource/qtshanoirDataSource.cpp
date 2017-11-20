@@ -15,10 +15,10 @@
 #include <QtShanoirTreeWidget.h>
 #include <QtShanoirSettingsWidget.h>
 
-#include <dtkCore/dtkAbstractDataReader.h>
+#include <dtkCoreSupport/dtkAbstractDataReader.h>
 #include <medAbstractDataFactory.h>
 #include <medAbstractData.h>
-#include <dtkCore/dtkSmartPointer.h>
+#include <dtkCoreSupport/dtkSmartPointer.h>
 
 // /////////////////////////////////////////////////////////////////
 // qtshanoirDataSourcePrivate
