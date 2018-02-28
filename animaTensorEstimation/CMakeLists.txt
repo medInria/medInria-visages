@@ -11,6 +11,9 @@ include(ITKLibs)
 find_package(ITK)
 include(${ITK_USE_FILE})
 
+find_package(TTK)
+include(${TTK_USE_FILE})
+
 ## #############################################################################
 ## List Sources
 ## #############################################################################
@@ -53,6 +56,7 @@ target_link_libraries(${TARGET_NAME}
   AnimaOptimizers
   ${NLOPT_LIBRARY}
   ITKOptimizers
+  ITKTensor
   ${ITKIO_LIBRARIES}
   medCore
   medCoreLegacy

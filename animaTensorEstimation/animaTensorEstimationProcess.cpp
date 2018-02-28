@@ -7,6 +7,10 @@
 #include <animaDTIEstimationImageFilter.h>
 #include <animaReadWriteFunctions.h>
 
+#include <itkTensor.h>
+#include <itkImage.h>
+#include <itkImageRegionIterator.h>
+
 animaTensorEstimationProcess::animaTensorEstimationProcess(QObject *parent)
     : medAbstractDiffusionModelEstimationProcess(parent)
 {
@@ -90,7 +94,7 @@ medAbstractJob::medJobExitStatus animaTensorEstimationProcess::_run()
 
     if (!inData)
     {
-        qDebug() << "No input data to MCM estimation";
+        qDebug() << "No input data to tensor estimation";
         return medAbstractJob::MED_JOB_EXIT_FAILURE;
     }
 
@@ -141,13 +145,41 @@ medAbstractJob::medJobExitStatus animaTensorEstimationProcess::_run()
     }
 
     medAbstractDiffusionModelImageData *out;
+    out = qobject_cast<medAbstractDiffusionModelImageData *>(medAbstractDataFactory::instance()->create("itkDataTensorImageFloat3"));
 
-    if (this->input()->identifier().contains("Double"))
-        out = qobject_cast<medAbstractDiffusionModelImageData *>(medAbstractDataFactory::instance()->create("itkDataTensorImageDouble3"));
-    else
-        out = qobject_cast<medAbstractDiffusionModelImageData *>(medAbstractDataFactory::instance()->create("itkDataTensorImageFloat3"));
+    typedef itk::Tensor <float, 3> TensorType;
+    typedef itk::Image <TensorType, 3> TensorImageType;
 
-    out->setData(filter->GetOutput());
+    TensorImageType::Pointer outputTTKImage = TensorImageType::New();
+    outputTTKImage->Initialize();
+    outputTTKImage->SetRegions(filter->GetOutput()->GetLargestPossibleRegion());
+    outputTTKImage->SetSpacing (filter->GetOutput()->GetSpacing());
+    outputTTKImage->SetOrigin (filter->GetOutput()->GetOrigin());
+    outputTTKImage->SetDirection (filter->GetOutput()->GetDirection());
+    outputTTKImage->Allocate();
+
+    typedef itk::ImageRegionIterator <typename FilterType::OutputImageType> VectorIteratorType;
+    typedef itk::ImageRegionIterator <TensorImageType> TensorImageIteratorType;
+
+    TensorImageIteratorType outItr(outputTTKImage, outputTTKImage->GetLargestPossibleRegion());
+    VectorIteratorType vectorItr(filter->GetOutput(), outputTTKImage->GetLargestPossibleRegion());
+
+    typename FilterType::OutputImageType::PixelType outVector;
+    TensorType tmpTensor;
+    while (!vectorItr.IsAtEnd())
+    {
+        outVector = vectorItr.Get();
+
+        for (unsigned int i = 0;i < 6;++i)
+            tmpTensor[i] = outVector[i];
+
+        outItr.Set(tmpTensor);
+
+        ++vectorItr;
+        ++outItr;
+    }
+
+    out->setData(outputTTKImage);
     this->setOutput(out);
     return medAbstractJob::MED_JOB_EXIT_SUCCESS;
 }
