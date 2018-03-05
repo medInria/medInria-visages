@@ -119,13 +119,19 @@ QString animaSymmetryPlaneProcess::description() const
 
 medAbstractJob::medJobExitStatus animaSymmetryPlaneProcess::run()
 {
+    if (!this->input())
+    {
+        qDebug() << "No input, aborting symmetry plane alignment";
+        return medAbstractJob::MED_JOB_EXIT_FAILURE;
+    }
+
     QString type = this->input()->identifier();
     unsigned int nbDimension =(*(type.end() - 1)).digitValue();
 
     if (nbDimension != 3)
         return medAbstractJob::MED_JOB_EXIT_FAILURE;
 
-    medAbstractImageData *out = qobject_cast <medAbstractImageData *> (medAbstractDataFactory::instance()->create("itkDataImageDouble3"));
+    medAbstractImageData *out = qobject_cast <medAbstractImageData *> (medAbstractDataFactory::instance()->create("itkDataImageFloat3"));
     this->setOutput(out);
 
     if (type.contains("itkDataImageChar"))
