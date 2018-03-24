@@ -51,6 +51,7 @@ target_link_libraries(${TARGET_NAME}
   dtkCore
   dtkCoreSupport
   AnimaOptimizers
+  ${NLOPT_LIBRARY}
   ITKOptimizers
   ${ITKIO_LIBRARIES}
   ${ITK_TRANSFORM_LIBRARIES}
