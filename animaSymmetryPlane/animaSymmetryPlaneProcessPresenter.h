@@ -28,9 +28,8 @@ private:
     medIntParameterPresenter *m_histogramSize;
     medIntParameterPresenter *m_pyramidLevelsNumber;
 
-    medDoubleParameterPresenter *m_searchRadius;
-    medDoubleParameterPresenter *m_searchAngleRadius;
-    medDoubleParameterPresenter *m_finalRadius;
+    medDoubleParameterPresenter *m_upperBoundAngle;
+    medDoubleParameterPresenter *m_upperBoundDistance;
 
     medIntParameterPresenter *m_progressionPresenter;
 };

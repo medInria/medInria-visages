@@ -37,34 +37,29 @@ public:
     
     // Parameters setting
     int metric() const;
-    int optimizerType() const;
     medIntParameter *optimizerMaximumIterations() const;
     medIntParameter *histogramSize() const;
     medIntParameter *pyramidLevelsNumber() const;
 
-    medDoubleParameter *searchRadius() const;
-    medDoubleParameter *searchAngleRadius() const;
-    medDoubleParameter *finalRadius() const;
+    medDoubleParameter *upperBoundAngle() const;
+    medDoubleParameter *upperBoundDistance() const;
 
     TransformPointer &outputRealignTransform();
 
 public slots:
     void setMetric(int value);
-    void setOptimizerType(int opt);
 
 private:
     template <class PixelType> medAbstractJob::medJobExitStatus _run();
 
     itk::SmartPointer<itk::ProcessObject> m_symmetryplanebridge;
     int m_Metric;
-    int m_OptimizerType;
     medIntParameter *m_optimizerMaximumIterations;
     medIntParameter *m_histogramSize;
     medIntParameter *m_pyramidLevelsNumber;
 
-    medDoubleParameter *m_searchRadius;
-    medDoubleParameter *m_searchAngleRadius;
-    medDoubleParameter *m_finalRadius;
+    medDoubleParameter *m_upperBoundAngle;
+    medDoubleParameter *m_upperBoundDistance;
 
     TransformPointer m_outputRealignTransform;
 };

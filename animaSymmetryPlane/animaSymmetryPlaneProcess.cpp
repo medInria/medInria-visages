@@ -16,7 +16,6 @@ animaSymmetryPlaneProcess::animaSymmetryPlaneProcess(QObject *parent)
     m_outputRealignTransform = 0;
 
     m_Metric = 1;
-    m_OptimizerType = 0;
 
     m_optimizerMaximumIterations = new medIntParameter("max_opt_iter", this);
     m_optimizerMaximumIterations->setCaption("Max optimizer iterations");
@@ -36,35 +35,26 @@ animaSymmetryPlaneProcess::animaSymmetryPlaneProcess(QObject *parent)
     m_pyramidLevelsNumber->setRange(1,10);
     m_pyramidLevelsNumber->setValue(3);
 
-    m_searchRadius = new medDoubleParameter("search_rad", this);
-    m_searchRadius->setCaption("Search radius");
-    m_searchRadius->setDescription("Search radius");
-    m_searchRadius->setValue(2);
+    m_upperBoundAngle = new medDoubleParameter("upper_angle", this);
+    m_upperBoundAngle->setCaption("Angles upper");
+    m_upperBoundAngle->setDescription("Upper bound on angles");
+    m_upperBoundAngle->setRange(0.0,180.0);
+    m_upperBoundAngle->setValue(180.0);
 
-    m_searchAngleRadius = new medDoubleParameter("search_angle_rad", this);
-    m_searchAngleRadius->setCaption("Search angle radius");
-    m_searchAngleRadius->setDescription("Search angle radius");
-    m_searchAngleRadius->setValue(2);
-
-    m_finalRadius = new medDoubleParameter("final_radius", this);
-    m_finalRadius->setCaption("Final radius");
-    m_finalRadius->setDescription("Final radius (rho end for newuoa)");
-    m_finalRadius->setValue(0.001);
+    m_upperBoundDistance = new medDoubleParameter("upper_distance", this);
+    m_upperBoundDistance->setCaption("Translate upper");
+    m_upperBoundDistance->setDescription("Upper bound on distance (in voxels)");
+    m_upperBoundDistance->setRange(0.0,10.0);
+    m_upperBoundDistance->setValue(6.0);
 }
 
 animaSymmetryPlaneProcess::~animaSymmetryPlaneProcess()
 {
-
 }
 
 int animaSymmetryPlaneProcess::metric() const
 {
     return m_Metric;
-}
-
-int animaSymmetryPlaneProcess::optimizerType() const
-{
-    return m_OptimizerType;
 }
 
 medIntParameter *animaSymmetryPlaneProcess::optimizerMaximumIterations() const
@@ -82,29 +72,19 @@ medIntParameter *animaSymmetryPlaneProcess::pyramidLevelsNumber() const
     return m_pyramidLevelsNumber;
 }
 
-medDoubleParameter *animaSymmetryPlaneProcess::searchRadius() const
+medDoubleParameter *animaSymmetryPlaneProcess::upperBoundAngle() const
 {
-    return m_searchRadius;
+    return m_upperBoundAngle;
 }
 
-medDoubleParameter *animaSymmetryPlaneProcess::searchAngleRadius() const
+medDoubleParameter *animaSymmetryPlaneProcess::upperBoundDistance() const
 {
-    return m_searchAngleRadius;
-}
-
-medDoubleParameter *animaSymmetryPlaneProcess::finalRadius() const
-{
-    return m_finalRadius;
+    return m_upperBoundDistance;
 }
 
 void animaSymmetryPlaneProcess::setMetric(int value)
 {
     m_Metric = value;
-}
-
-void animaSymmetryPlaneProcess::setOptimizerType(int opt)
-{
-    m_OptimizerType = opt;
 }
 
 QString animaSymmetryPlaneProcess::caption() const
@@ -188,12 +168,10 @@ medAbstractJob::medJobExitStatus animaSymmetryPlaneProcess::_run()
 
     // set parameters
     matcher->SetMetric((Metric)m_Metric);
-    matcher->SetOptimizerType((OptimizerType)m_OptimizerType);
     matcher->SetOptimizerMaxIterations(m_optimizerMaximumIterations->value());
     matcher->SetHistogramSize(m_histogramSize->value());
-    matcher->SetSearchRadius(m_searchRadius->value());
-    matcher->SetSearchAngleRadius(m_searchAngleRadius->value());
-    matcher->SetFinalRadius(m_finalRadius->value());
+    matcher->SetUpperBoundAngle(m_upperBoundAngle->value());
+    matcher->SetUpperBoundDistance(m_upperBoundDistance->value());
     matcher->SetNumberOfPyramidLevels(m_pyramidLevelsNumber->value());
     matcher->SetNumberOfThreads(itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
 
