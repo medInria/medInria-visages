@@ -6,9 +6,9 @@ project(medInria-visages-plugins)
 ## Setup version numbering
 ## #################################################################
 
-set(${PROJECT_NAME}_VERSION_MAJOR 2 CACHE STRING "${PROJECT_NAME} major
+set(${PROJECT_NAME}_VERSION_MAJOR 3 CACHE STRING "${PROJECT_NAME} major
 version number.")
-set(${PROJECT_NAME}_VERSION_MINOR 1 CACHE STRING "${PROJECT_NAME} minor
+set(${PROJECT_NAME}_VERSION_MINOR 0 CACHE STRING "${PROJECT_NAME} minor
 version number.")
 set(${PROJECT_NAME}_VERSION_BUILD 0 CACHE STRING "${PROJECT_NAME} build
 version number." FORCE)
@@ -53,19 +53,12 @@ find_package(medInria REQUIRED)
 include(list_source_files)
 include(list_header_directories_to_include)
 
-option(MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN     "Build vistalDataImage plugin" "OFF")
-option(MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN     "Build vistalDataImageConverter plugin" "OFF")
 option(MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN     "Build qtshanoirDataSource plugin" "ON")
-option(MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN     "Build NLMEANS plugin" "OFF")
-option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN     "Build vistalProcessSegmentationSTREM plugin" "OFF")
-option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN     "Build vistalProcessSegmentationGCEM plugin" "OFF")
-option(MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN     "Build vistalProcessBiasRemoval plugin" "OFF")
 option(MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN     "Build animaSymmetryPlane plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_NONLOCALMEANSFILTER_PLUGIN     "Build anima-NonLocalMeansFilter plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_PYRAMIDALBMREGISTRATION_PLUGIN     "Build anima-PyramidalBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_DENSEBMREGISTRATION_PLUGIN     "Build anima-DenseBMRegistration plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_RELAXOMETRY_PLUGIN     "Build anima-Relaxometry plugin" "ON")
-option(MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN     "Build vistalProcessGraphCutSeg plugin" "OFF")
 option(MEDINRIA_BUILD_ANIMA_MCMDATAIMAGE_PLUGIN     "Build animaMCMDataImage plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_MCMESTIMATION_PLUGIN     "Build animaMCMEstimation plugin" "ON")
 option(MEDINRIA_BUILD_ANIMA_TENSORESTIMATION_PLUGIN     "Build animaTensorEstimation plugin" "ON")
@@ -73,40 +66,8 @@ option(MEDINRIA_BUILD_ANIMA_TENSORESTIMATION_PLUGIN     "Build animaTensorEstima
 option(BUILD_DOCUMENTATION "Build documentation")
 option(BUILD_EXAMPLES "Build examples" OFF)
 
-if (MEDINRIA_BUILD_VISTALDATAIMAGE_PLUGIN)
-    add_subdirectory(vistalDataImage)
-endif()
-
-if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
-    add_subdirectory(vistalDataImageConverter)
-endif()
-
-if (MEDINRIA_BUILD_VISTALDATAIMAGECONVERTER_PLUGIN)
-    set(MEDINRIA_REQUIRES_ITK TRUE)
-endif()
-
 if (MEDINRIA_BUILD_QTSHANOIRDATASOURCE_PLUGIN)
     add_subdirectory(qtshanoirDataSource)
-endif()
-
-if (MEDINRIA_BUILD_VISTALPROCESSDENOISINGNLMEANS_PLUGIN)
-    add_subdirectory(vistalProcessDenoisingNLMeans)
-endif()
-
-if (MEDINRIA_BUILD_VISTALPROCESSBIAS_REMOVAL_PLUGIN)
-    add_subdirectory(vistalProcessBiasFiltering)
-endif()
-
-if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGCEM_PLUGIN)
-        add_subdirectory(vistalProcessSegmentationGCEM)
-endif()
-
-if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONSTREM_PLUGIN)
-    add_subdirectory(vistalProcessSegmentationSTREM)
-endif()
-
-if (MEDINRIA_BUILD_VISTALPROCESSSEGMENTATIONGRAPHCUT_PLUGIN)
-        add_subdirectory(vistalProcessGraphCutSeg)
 endif()
 
 if (MEDINRIA_BUILD_ANIMA_SYMMETRYPLANE_PLUGIN)

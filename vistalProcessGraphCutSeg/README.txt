@@ -1,1 +1,0 @@
-Segmentation using Graph Cuts

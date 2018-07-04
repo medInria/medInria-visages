@@ -1,1 +1,0 @@
-Multimodal robust (trimmed estimator) EM based Segmentation for the segmentation of MS Lesions 
