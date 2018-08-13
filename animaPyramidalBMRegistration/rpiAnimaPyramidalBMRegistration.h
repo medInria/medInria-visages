@@ -38,6 +38,9 @@ public:
     typedef typename anima::PyramidalBlockMatchingBridge<TFixedImage::ImageDimension>::AffineTransformType
     TransformType;
 
+    typedef typename anima::PyramidalBlockMatchingBridge<TFixedImage::ImageDimension>::InitializationType
+    InitializationType;
+
     typedef typename TransformType::Pointer
     TransformPointerType;
 
@@ -116,7 +119,7 @@ public:
 
     void SetPercentageKept ( double PercentageKept );
 
-    void SetInitializeOnCenterOfGravity ( bool InitializeOnCenterOfGravity );
+    void SetTransformInitializationType (InitializationType InitializeOnCenterOfGravity);
 
     void SetNumberOfThreads ( int numberOfThreads );
 

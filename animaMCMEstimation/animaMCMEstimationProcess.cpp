@@ -4,8 +4,7 @@
 #include <medAbstractDiffusionModelImageData.h>
 #include <medAbstractDataFactory.h>
 
-#include <animaMCMEstimatorImageFilter.h>
-#include <animaMCMDDIEstimatorImageFilter.h>
+#include <animaPrivateMCMEstimatorImageFilter.h>
 
 animaMCMEstimationProcess::animaMCMEstimationProcess(QObject *parent)
     : medAbstractDiffusionModelEstimationProcess(parent)
@@ -238,30 +237,20 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
         return medAbstractJob::MED_JOB_EXIT_FAILURE;
     }
 
-    typedef anima::MCMEstimatorImageFilter <inputType,float> FilterType;
-
-    typename FilterType::Pointer filter;
-    if (m_compartmentType != anima::DDI)
-        filter = FilterType::New();
+    typedef anima::PrivateMCMEstimatorImageFilter <inputType,float> DDIFilterType;
+    typename DDIFilterType::Pointer filter = DDIFilterType::New();
+    
+    filter->SetUseConstrainedOrientationConcentration(m_fixKappa->value());
+    if (!m_fixKappa->value())
+        filter->SetUseCommonConcentrations(m_commonKappa->value());
     else
-    {
-        typedef anima::MCMDDIEstimatorImageFilter <inputType,float> DDIFilterType;
-        typename DDIFilterType::Pointer tmpFilter = DDIFilterType::New();
-
-        tmpFilter->SetUseConstrainedOrientationConcentration(m_fixKappa->value());
-        if (!m_fixKappa->value())
-            tmpFilter->SetUseCommonConcentrations(m_commonKappa->value());
-        else
-            tmpFilter->SetUseCommonConcentrations(false);
-
-        tmpFilter->SetUseConstrainedExtraAxonalFraction(m_fixEAF->value());
-        if (!m_fixEAF->value())
-            tmpFilter->SetUseCommonExtraAxonalFractions(m_commonEAF->value());
-        else
-            tmpFilter->SetUseCommonExtraAxonalFractions(false);
-
-        filter = tmpFilter;
-    }
+        filter->SetUseCommonConcentrations(false);
+    
+    filter->SetUseConstrainedExtraAxonalFraction(m_fixEAF->value());
+    if (!m_fixEAF->value())
+        filter->SetUseCommonExtraAxonalFractions(m_commonEAF->value());
+    else
+        filter->SetUseCommonExtraAxonalFractions(false);
 
     itk::CStyleCommand::Pointer callback = itk::CStyleCommand::New();
     callback->SetClientData((void*)this);
@@ -289,7 +278,10 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
     if (this->bvalues().size() != 0)
         bValsList = this->bvalues();
 
-    filter->SetBValuesList(bValsList);
+    for (unsigned int i = 0;i < bValsList.size();++i)
+        bValsList[i] = anima::GetGradientStrengthFromBValue(bValsList[i],anima::DiffusionSmallDelta, anima::DiffusionBigDelta);
+
+    filter->SetGradientStrengths(bValsList);
     filter->SetB0Threshold(1);
 
     filter->SetModelWithFreeWaterComponent(m_freeWaterCompartment->value());
@@ -300,17 +292,10 @@ medAbstractJob::medJobExitStatus animaMCMEstimationProcess::_run()
     filter->SetNumberOfCompartments(m_nbFascicles->value());
     filter->SetFindOptimalNumberOfCompartments(m_modelSelection->value());
 
-    filter->SetMLEstimationStrategy(FilterType::MaximumLikelihoodEstimationMode::VariableProjection);
+    filter->SetMLEstimationStrategy(DDIFilterType::MaximumLikelihoodEstimationMode::VariableProjection);
     std::string optType = "levenberg";
     filter->SetOptimizer(optType);
-    filter->SetNumberOfRandomRestarts(m_nbRandomRestarts->value());
     filter->SetAbsoluteCostChange(0.01);
-
-    filter->SetUseConcentrationBoundsFromDTI(false);
-    filter->SetUseFixedWeights(m_fixWeights->value());
-    filter->SetFreeWaterProportionFixedValue(0.1);
-    filter->SetStationaryWaterProportionFixedValue(0.05);
-    filter->SetRestrictedWaterProportionFixedValue(0.1);
 
     filter->SetUseConstrainedDiffusivity(m_fixDiff->value());
     filter->SetUseConstrainedFreeWaterDiffusivity(m_fixIsoDiffs->value());

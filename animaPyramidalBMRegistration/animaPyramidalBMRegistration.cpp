@@ -64,7 +64,7 @@ public:
     unsigned int numberOfPyramidLevels;
     unsigned int lastPyramidLevel;
     double percentageKept;
-    bool initializeOnCenterOfGravity;
+    animaPyramidalBMRegistration::InitializationType transformInitializationType;
     unsigned int numberOfThreads;
     
     animaPyramidalBMRegistration* parent;
@@ -105,7 +105,7 @@ animaPyramidalBMRegistration::animaPyramidalBMRegistration(void) : itkProcessReg
     d->numberOfPyramidLevels = 3;
     d->lastPyramidLevel = 0;
     d->percentageKept = 0.8;
-    d->initializeOnCenterOfGravity = false;
+    d->transformInitializationType = RegistrationType::PyramidBMType::Identity;
     d->numberOfThreads = 2;
     
     d->parent = this;
@@ -231,7 +231,7 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     registration->SetNumberOfPyramidLevels( numberOfPyramidLevels);
     registration->SetLastPyramidLevel( lastPyramidLevel);
     registration->SetPercentageKept( percentageKept);
-    registration->SetInitializeOnCenterOfGravity( initializeOnCenterOfGravity);
+    registration->SetTransformInitializationType(transformInitializationType);
     registration->SetNumberOfThreads( numberOfThreads);
     
     
@@ -250,7 +250,7 @@ int animaPyramidalBMRegistrationPrivate::update(void)
     
     qDebug() << "Elasped time: " << (double)(t2-t1)/(double)CLOCKS_PER_SEC;
     
-    typedef itk::ResampleImageFilter< animaPyramidalBMRegistration::RegImageType,animaPyramidalBMRegistration::RegImageType,double >    ResampleFilterType;
+    typedef itk::ResampleImageFilter< animaPyramidalBMRegistration::RegImageType,animaPyramidalBMRegistration::RegImageType,double > ResampleFilterType;
     typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
     resampler->SetTransform(registration->GetTransformation());
     resampler->SetInput((const animaPyramidalBMRegistration::RegImageType*)proc->movingImages()[0].GetPointer());
@@ -462,9 +462,9 @@ void animaPyramidalBMRegistration::setPercentageKept(double PercentageKept)
     d->percentageKept=PercentageKept;
 }
 
-void animaPyramidalBMRegistration::setInitializeOnCenterOfGravity(bool InitializeOnCenterOfGravity)
+void animaPyramidalBMRegistration::setTransformInitializationType(unsigned int initializationType)
 {
-    d->initializeOnCenterOfGravity=InitializeOnCenterOfGravity;
+    d->transformInitializationType = (InitializationType) initializationType;
 }
 
 void animaPyramidalBMRegistration::setNumberOfThreads(int numberOfThreads) 

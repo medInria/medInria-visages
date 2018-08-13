@@ -50,7 +50,7 @@ public:
     QDoubleSpinBox * translateUpperBound;
     QDoubleSpinBox * angleUpperBound;
     QDoubleSpinBox * scaleUpperBound;
-    QCheckBox * initializeOnCenterOfGravity;
+    QComboBox * transformInitializationType;
 
     //Agregation Parameters:
     QComboBox *agregator;
@@ -174,9 +174,12 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     d->scaleUpperBound->setToolTip("The upper bound on scales for bobyqa");
     d->scaleUpperBound->setValue(3);
     
-    d->initializeOnCenterOfGravity = new QCheckBox;
-    d->initializeOnCenterOfGravity->setToolTip("Initialize the transformation on images centers of gravity?");
-    d->initializeOnCenterOfGravity->setCheckState(Qt::Checked);
+    d->transformInitializationType = new QComboBox;
+    d->transformInitializationType->setToolTip("Initialize the transformation with identity, center of gravity translation or rotation?");
+    QStringList transformInitList;
+    transformInitList << "Identity" << "Centers translation" << "Closest transform";
+    d->transformInitializationType->addItems (transformInitList);
+    d->transformInitializationType->setCurrentIndex(1);
 
     // Agregation Parameters:
     d->agregator = new QComboBox;
@@ -235,7 +238,7 @@ animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget
     blockMatchLayout->addRow(new QLabel(tr("Transform"),this),d->transform);
     blockMatchLayout->addRow(new QLabel(tr("Metric"),this),d->metric);
     blockMatchLayout->addRow(new QLabel(tr("Optimizer"),this),d->optimizer);
-    blockMatchLayout->addRow(new QLabel(tr("Center of mass init"),this),d->initializeOnCenterOfGravity);
+    blockMatchLayout->addRow(new QLabel(tr("Center of mass init"),this),d->transformInitializationType);
     blockMatchLayout->addRow(new QLabel(tr("Max Iterations"),this),d->maxIterations);
     blockMatchLayout->addRow(new QLabel(tr("Min error"),this),d->minError);
     blockMatchLayout->addRow(new QLabel(tr("Optimizer Iterations"),this),d->optIterations);
@@ -374,7 +377,7 @@ void animaPyramidalBMRegistrationToolBox::run(void)
     process_Registration->setTransform( d->transform->currentIndex() );
     process_Registration->setMetric( d->metric->currentIndex() );
     process_Registration->setOptimizer( d->optimizer->currentIndex() );
-    process_Registration->setInitializeOnCenterOfGravity( d->initializeOnCenterOfGravity->checkState() == Qt::Checked );
+    process_Registration->setTransformInitializationType(d->transformInitializationType->currentIndex());
     process_Registration->setMaximumIterations( d->maxIterations->value() );
     process_Registration->setMinimalTransformError( d->minError->value() );
     process_Registration->setOptimizerMaximumIterations( d->optIterations->value() );

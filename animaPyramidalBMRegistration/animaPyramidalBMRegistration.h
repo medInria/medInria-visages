@@ -63,6 +63,7 @@ public:
     typedef itk::Image< PixelType, 3 > RegImageType;
     //normaly should use long switch cases, but here we know we work with float3 data.
     typedef rpi::AnimaPyramidalBMRegistration<RegImageType,RegImageType,TransformScalarType> RegistrationType;
+    typedef typename RegistrationType::InitializationType InitializationType;
 
 public:
     /**
@@ -130,7 +131,7 @@ public:
     
     void setPercentageKept(double PercentageKept);
     
-    void setInitializeOnCenterOfGravity(bool InitializeOnCenterOfGravity);
+    void setTransformInitializationType(unsigned int initializationType);
 
     void setNumberOfThreads(int numberOfThreads);
     
