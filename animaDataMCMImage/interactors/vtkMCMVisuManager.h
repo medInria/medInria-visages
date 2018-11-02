@@ -24,6 +24,8 @@ public:
 
     void SetTesselationType (const int& type);
 
+    void SetRadius(const double& value);
+
     /** Set the Polyhedron type to be tesselated */
 
     int GetTesselationType() const

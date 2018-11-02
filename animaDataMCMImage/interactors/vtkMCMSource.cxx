@@ -17,13 +17,11 @@
 #include <vtkMatrix4x4.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 
-#include <animaDDIDistribution.h>
-
 vtkStandardNewMacro(vtkMCMSource);
 
 vtkMCMSource::vtkMCMSource(const int tess)
 {
-    Radius = 1.0e-3;
+    Radius = 1.0;
     Center[0] = 0.0;
     Center[1] = 0.0;
     Center[2] = 0.0;

@@ -86,6 +86,7 @@ public slots:
     void setMajorScaling(int majorScalingExponent);
     void setMinorScaling(int minorScaling);
     void setScale(int minorScale, int majorScaleExponent);
+    void setRadius(double radius);
 
     void setOpacity(double opacity);
     void setVisibility(bool visibility);

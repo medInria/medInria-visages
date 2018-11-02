@@ -51,6 +51,8 @@ public:
     /** Set the Polyhedron type to be tesselated */
     void SetTesselationType(const int& type);
 
+    void SetRadius(const double& value);
+
     /** Flip Spherical Harmonic's along the X axis */
     void FlipX(const bool a);
 

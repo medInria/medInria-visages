@@ -21,7 +21,7 @@ vtkMCMVisuManager::vtkMCMVisuManager()
 
     MCMSource->SetTesselationType(vtkMCMSource::Icosahedron);
     MCMSource->SetTesselation(2);
-    MCMSource->SetRadius(0.06);
+    MCMSource->SetRadius(0.05);
     MCMSource->SetNormalization(false);
     MCMSource->UpdateMCMSource();
 
@@ -96,6 +96,12 @@ void vtkMCMVisuManager::SetVOI(const int& imin, const int& imax,
 void vtkMCMVisuManager::SetGlyphScale (const float& scale)
 {
     MCMGlyph->SetScaleFactor(scale);
+}
+
+void vtkMCMVisuManager::SetRadius(const double& value)
+{
+    MCMSource->SetRadius(value);
+    MCMSource->UpdateMCMSource();
 }
 
 void vtkMCMVisuManager::SetTesselationType (const int& type)

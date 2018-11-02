@@ -235,6 +235,13 @@ void vtkMCMManager::SetGlyphResolution(const int res)
     MCMVisuManagerCoronal->SetGlyphResolution(res);
 }
 
+void vtkMCMManager::SetRadius(const double& value)
+{
+    MCMVisuManagerAxial->SetRadius(value);
+    MCMVisuManagerSagittal->SetRadius(value);
+    MCMVisuManagerCoronal->SetRadius(value);
+}
+
 void vtkMCMManager::SetTesselationType(const int& type)
 {
     MCMVisuManagerAxial->SetTesselationType(type);

@@ -48,6 +48,7 @@ public:
 
     int minorScaling;
     int majorScalingExponent;
+    double radius;
 
     medIntParameterL *slicingParameter;
 
@@ -136,6 +137,7 @@ animaDataMCMImageVtkViewInteractor::animaDataMCMImageVtkViewInteractor(medAbstra
 
     d->minorScaling = 1;
     d->majorScalingExponent = 0;
+    d->radius = 0.05;
 
     //  Set default properties
     d->manager->SetTesselationType(0);
@@ -248,6 +250,12 @@ void animaDataMCMImageVtkViewInteractor::setupParameters()
     glyphResolutionParam->setRange(0,10);
     glyphResolutionParam->setValue(2);
 
+    //  Control glyph resolution
+    medDoubleParameterL *radiusParam = new medDoubleParameterL("Radius", this);
+    radiusParam->setRange(0.0,1.0);
+    radiusParam->setSingleStep(0.001);
+    radiusParam->setValue(0.05);
+
     //  Minor scaling
     medIntParameterL *minorScalingParam = new medIntParameterL("Scale", this);
     minorScalingParam->setRange(1,10);
@@ -265,6 +273,7 @@ void animaDataMCMImageVtkViewInteractor::setupParameters()
     d->parameters.append(flipZParam);
     d->parameters.append(enhanceParam);
     d->parameters.append(glyphResolutionParam);
+    d->parameters.append(radiusParam);
     d->parameters.append(minorScalingParam);
     d->parameters.append(majorScalingParam);
 
@@ -275,6 +284,7 @@ void animaDataMCMImageVtkViewInteractor::setupParameters()
     connect(flipZParam, SIGNAL(valueChanged(bool)), this, SLOT(setFlipZ(bool)));
     connect(enhanceParam, SIGNAL(valueChanged(bool)), this, SLOT(setNormalization(bool)));
     connect(glyphResolutionParam, SIGNAL(valueChanged(int)), this, SLOT(setGlyphResolution(int)));
+    connect(radiusParam, SIGNAL(valueChanged(double)), this, SLOT(setRadius(double)));
     connect(minorScalingParam, SIGNAL(valueChanged(int)), this, SLOT(setMinorScaling(int)));
     connect(majorScalingParam, SIGNAL(valueChanged(int)), this, SLOT(setMajorScaling(int)));
 
@@ -394,6 +404,12 @@ void animaDataMCMImageVtkViewInteractor::setMinorScaling(int minorScaling)
 {
     d->minorScaling = minorScaling;
     setScale(d->minorScaling, d->majorScalingExponent);
+}
+
+void animaDataMCMImageVtkViewInteractor::setRadius(double radius)
+{
+    d->radius = radius;
+    d->manager->SetRadius(d->radius);
 }
 
 void animaDataMCMImageVtkViewInteractor::setScale(int minorScale, int majorScaleExponent)
