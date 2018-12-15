@@ -60,7 +60,7 @@ QString animaDenseBMRegistrationPlugin::name(void) const
 
 QString animaDenseBMRegistrationPlugin::description(void) const
 {
-    return "ITK implementation of non linear block-matching based registration. \n It is based on papers by Commowick et al.: <a href=\"http://dx.doi.org/10.1007/978-3-642-33418-4_21\">http://dx.doi.org/10.1007/978-3-642-33418-4_21</a>, and Garcia et al.: <a href=\"http://hal.inria.fr/inria-00616148/en\">http://hal.inria.fr/inria-00616148/en</a>.";
+    return "ITK implementation of non linear block-matching based registration. \n It is based on papers by Commowick et al.: <a href=\"https://doi.org/10.1007/978-3-642-33418-4_21\">https://doi.org/10.1007/978-3-642-33418-4_21</a>, and Garcia et al.: <a href=\"http://hal.inria.fr/inria-00616148/en\">http://hal.inria.fr/inria-00616148/en</a>.";
 }
 
 QString animaDenseBMRegistrationPlugin::version(void) const
