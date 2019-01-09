@@ -45,6 +45,17 @@ set(CMAKE_MACOSX_RPATH OFF)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+## #############################################################################
+## Qt5
+## #############################################################################
+
+find_package(Qt5 COMPONENTS REQUIRED
+  Core
+  Gui
+  Network
+  Widgets
+)
+
 find_package(dtk REQUIRED)
 include_directories(${dtk_INCLUDE_DIRS})
 
