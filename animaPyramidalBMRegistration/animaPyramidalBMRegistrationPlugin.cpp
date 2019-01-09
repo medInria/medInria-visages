@@ -60,7 +60,7 @@ QString animaPyramidalBMRegistrationPlugin::name(void) const
 
 QString animaPyramidalBMRegistrationPlugin::description(void) const
 {
-    return "This plugin provides an ITK implementation of global linear block-matching registration.\n It is based on papers by Commowick et al.: <a href=\"http://dx.doi.org/10.1109/ISBI.2012.6235644\">http://dx.doi.org/10.1109/ISBI.2012.6235644</a>, and Ourselin et al.: <a href=\"http://dx.doi.org/10.1007/978-3-540-75757-3\">http://dx.doi.org/10.1007/978-3-540-75757-3</a>.";
+    return "This plugin provides an ITK implementation of global linear block-matching registration.\n It is based on papers by Commowick et al.: <a href=\"https://doi.org/10.1109/ISBI.2012.6235644\">https://doi.org/10.1109/ISBI.2012.6235644</a>, and Ourselin et al.: <a href=\"https://doi.org/10.1007/978-3-540-75757-3\">https://doi.org/10.1007/978-3-540-75757-3</a>.";
 }
 
 QString animaPyramidalBMRegistrationPlugin::version(void) const
