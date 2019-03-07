@@ -28,7 +28,6 @@ public slots:
     void updateBMOptimizerParams(int);
     void updateBMTransformParams(int);
     void updateBMAgregatorParams(int);
-    void updateDamUsage(int);
     
 private:
     animaDenseBMRegistrationToolBoxPrivate *d;

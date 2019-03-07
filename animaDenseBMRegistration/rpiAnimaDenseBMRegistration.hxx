@@ -242,20 +242,6 @@ namespace rpi
     
     template < class TFixedImage, class TMovingImage, class TTransformScalarType >
     void AnimaDenseBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-    ::SetUseTransformationDam(bool useTransformationDam)
-    {
-        matcher->SetUseTransformationDam(useTransformationDam);
-    }
-    
-    template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-    void AnimaDenseBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
-    ::SetDamDistance(double damDistance)
-    {
-        matcher->SetDamDistance(damDistance);
-    }
-    
-    template < class TFixedImage, class TMovingImage, class TTransformScalarType >
-    void AnimaDenseBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::SetNumberOfPyramidLevels ( unsigned int NumberOfPyramidLevels )
     {
         matcher->SetNumberOfPyramidLevels ( NumberOfPyramidLevels );

@@ -58,8 +58,6 @@ public:
     QDoubleSpinBox *outlierSigma;
     QDoubleSpinBox *mEstimateConvergenceThreshold;
     QDoubleSpinBox *neighborhoodApproximation;
-    QCheckBox *useTransformationDam;
-    QDoubleSpinBox *damDistance;
     
     //Pyramid parameters:
     QSpinBox *pyramidLevels;
@@ -213,16 +211,6 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     d->neighborhoodApproximation->setDecimals(2);
     d->neighborhoodApproximation->setSingleStep(0.01);
     
-    d->useTransformationDam = new QCheckBox;
-    d->useTransformationDam->setToolTip("Use dam to impose identity transform outside the image?");
-    d->useTransformationDam->setCheckState(Qt::Unchecked);
-    
-    d->damDistance = new QDoubleSpinBox;
-    d->damDistance->setToolTip("Distance in pixels from which the image is considered background");
-    d->damDistance->setValue(2.5);
-    d->damDistance->setDecimals(2);
-    d->damDistance->setSingleStep(0.01);
-    
     // Pyramid parameters:
     d->pyramidLevels = new QSpinBox;
     d->pyramidLevels->setToolTip("Number of pyramid levels");
@@ -281,8 +269,6 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     agregationParamLayout->addRow(new QLabel(tr("Outlier Sigma"),this),d->outlierSigma);
     agregationParamLayout->addRow(new QLabel(tr("M-smoother Threshold"),this),d->mEstimateConvergenceThreshold);
     agregationParamLayout->addRow(new QLabel(tr("M-smoother Neighborhood"),this),d->neighborhoodApproximation);
-    agregationParamLayout->addRow(new QLabel(tr("Use Transformation Dam"),this),d->useTransformationDam);
-    agregationParamLayout->addRow(new QLabel(tr("Dam Distance"),this),d->damDistance);
     
     QGroupBox *agregationParamGroupBox = new QGroupBox(tr("Agregation Parameters"));
     agregationParamGroupBox->setLayout(agregationParamLayout);
@@ -329,12 +315,10 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     connect(d->optimizer, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMOptimizerParams(int)));
     connect(d->transform, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMTransformParams(int)));
     connect(d->agregator, SIGNAL(currentIndexChanged(int)), this, SLOT(updateBMAgregatorParams(int)));
-    connect(d->useTransformationDam, SIGNAL(stateChanged(int)), this, SLOT(updateDamUsage(int)));
     
     updateBMOptimizerParams(0);
     updateBMTransformParams(0);
     updateBMAgregatorParams(0);
-    updateDamUsage(0);
     
     // Add about plugin
     medPluginManager* pm = medPluginManager::instance();
@@ -412,8 +396,6 @@ void animaDenseBMRegistrationToolBox::run(void)
     process_Registration->setOutlierSigma (d->outlierSigma->value());
     process_Registration->setMEstimateConvergenceThreshold(d->mEstimateConvergenceThreshold->value());
     process_Registration->setNeighborhoodApproximation(d->neighborhoodApproximation->value());
-    process_Registration->setUseTransformationDam(d->useTransformationDam->isChecked());
-    process_Registration->setDamDistance(d->damDistance->value());
     process_Registration->setNumberOfPyramidLevels( d->pyramidLevels->value() );
     process_Registration->setLastPyramidLevel( d->lastLevel->value() );
     process_Registration->setNumberOfThreads( d->threads->value() );
@@ -483,11 +465,4 @@ void animaDenseBMRegistrationToolBox::updateBMAgregatorParams(int index)
     
     d->mEstimateConvergenceThreshold->setEnabled(agreg == BMRegistrationType::MSmoother);
     d->neighborhoodApproximation->setEnabled(agreg == BMRegistrationType::MSmoother);
-}
-
-void animaDenseBMRegistrationToolBox::updateDamUsage(int index)
-{
-    Qt::CheckState newState = (Qt::CheckState) d->useTransformationDam->checkState();
-    
-    d->damDistance->setEnabled(newState == Qt::Checked);
 }

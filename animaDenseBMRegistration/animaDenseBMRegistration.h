@@ -126,10 +126,6 @@ public:
     
     void setNeighborhoodApproximation(double neighborhoodApproximation);
     
-    void setUseTransformationDam(bool useTransformationDam);
-    
-    void setDamDistance(double damDistance);
-    
     void setNumberOfPyramidLevels(unsigned int NumberOfPyramidLevels);
     
     void setLastPyramidLevel(unsigned int LastPyramidLevel);

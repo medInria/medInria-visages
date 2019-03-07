@@ -64,8 +64,6 @@ public:
     double outlierSigma;
     double mEstimateConvergenceThreshold;
     double neighborhoodApproximation;
-    bool useTransformationDam;
-    double damDistance;
     unsigned int numberOfPyramidLevels;
     unsigned int lastPyramidLevel;
     double percentageKept;
@@ -108,8 +106,6 @@ animaDenseBMRegistration::animaDenseBMRegistration(void) : itkProcessRegistratio
     d->outlierSigma = 3;
     d->mEstimateConvergenceThreshold = 0.01;
     d->neighborhoodApproximation = 2.5;
-    d->useTransformationDam = true;
-    d->damDistance = 2.5;
     d->numberOfPyramidLevels = 3;
     d->lastPyramidLevel = 0;
     d->percentageKept = 0.8;
@@ -234,8 +230,6 @@ int animaDenseBMRegistrationPrivate::update(void)
     registration->SetOutlierSigma (outlierSigma);
     registration->SetMEstimateConvergenceThreshold (mEstimateConvergenceThreshold);
     registration->SetNeighborhoodApproximation (neighborhoodApproximation);
-    registration->SetUseTransformationDam (useTransformationDam);
-    registration->SetDamDistance (damDistance);
     registration->SetNumberOfPyramidLevels (numberOfPyramidLevels);
     registration->SetLastPyramidLevel (lastPyramidLevel);
     registration->SetPercentageKept (percentageKept);
@@ -454,16 +448,6 @@ void animaDenseBMRegistration::setMEstimateConvergenceThreshold(double mEstimate
 void animaDenseBMRegistration::setNeighborhoodApproximation(double neighborhoodApproximation)
 {
     d->neighborhoodApproximation = neighborhoodApproximation;
-}
-
-void animaDenseBMRegistration::setUseTransformationDam(bool useTransformationDam)
-{
-    d->useTransformationDam = useTransformationDam;
-}
-
-void animaDenseBMRegistration::setDamDistance(double damDistance)
-{
-    d->damDistance = damDistance;
 }
 
 void animaDenseBMRegistration::setNumberOfPyramidLevels(unsigned int NumberOfPyramidLevels)

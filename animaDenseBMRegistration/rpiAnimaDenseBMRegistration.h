@@ -103,10 +103,6 @@ namespace rpi
 
         void SetNeighborhoodApproximation(double neighborhoodApproximation);
 
-        void SetUseTransformationDam(bool useTransformationDam);
-
-        void SetDamDistance(double damDistance);
-
         void SetNumberOfPyramidLevels ( unsigned int NumberOfPyramidLevels );
 
         void SetLastPyramidLevel ( unsigned int LastPyramidLevel );
