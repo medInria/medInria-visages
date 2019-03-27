@@ -23,7 +23,16 @@ add_definitions(-D${TARGET_NAME_UP}_VERSION="${${TARGET_NAME}_VERSION}")
 ## Resolve dependencies
 ## #############################################################################
 
-find_package(VTK REQUIRED)
+find_package(VTK REQUIRED COMPONENTS
+    vtkCommonCore
+    vtkInteractionStyle
+    vtkInteractionWidgets
+    vtkRenderingCore
+    vtkRenderingFreeType
+    vtkRenderingOpenGL2
+    vtkRenderingVolumeOpenGL2
+    )
+
 include(${VTK_USE_FILE})
 
 find_package(ITK REQUIRED)
