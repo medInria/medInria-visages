@@ -154,7 +154,7 @@ itk::Transform<double,3,3>::Pointer animaDenseBMRegistration::getTransform()
         return registration->GetTransformation();
     }
     else
-        return NULL;
+        return nullptr;
 }
 
 QString animaDenseBMRegistration::getTitleAndParameters()

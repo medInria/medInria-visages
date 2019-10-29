@@ -224,8 +224,8 @@ animaDenseBMRegistrationToolBox::animaDenseBMRegistrationToolBox(QWidget *parent
     // Global Parameters:  
     d->threads = new QSpinBox;
     d->threads->setToolTip("Number of Execution Threads");
-    d->threads->setValue(itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
-    d->threads->setRange(1, itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
+    d->threads->setValue(itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads());
+    d->threads->setRange(1, itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads());
 
     // Block Initialisation Parameters Layout
     QFormLayout *blockInitLayout = new QFormLayout();

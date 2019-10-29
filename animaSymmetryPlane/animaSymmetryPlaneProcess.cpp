@@ -12,8 +12,8 @@
 animaSymmetryPlaneProcess::animaSymmetryPlaneProcess(QObject *parent)
     : medAbstractSymmetryPlaneAlignmentProcess(parent)
 {
-    m_symmetryplanebridge = 0;
-    m_outputRealignTransform = 0;
+    m_symmetryplanebridge = nullptr;
+    m_outputRealignTransform = nullptr;
 
     m_Metric = 1;
 
@@ -173,7 +173,7 @@ medAbstractJob::medJobExitStatus animaSymmetryPlaneProcess::_run()
     matcher->SetUpperBoundAngle(m_upperBoundAngle->value());
     matcher->SetUpperBoundDistance(m_upperBoundDistance->value());
     matcher->SetNumberOfPyramidLevels(m_pyramidLevelsNumber->value());
-    matcher->SetNumberOfThreads(itk::MultiThreader::GetGlobalDefaultNumberOfThreads());
+    matcher->SetNumberOfWorkUnits(itk::MultiThreaderBase::GetGlobalDefaultNumberOfThreads());
 
     InputImageType *inputObject = dynamic_cast<InputImageType *> ((itk::Object *)this->input()->data());
 

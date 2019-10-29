@@ -151,7 +151,7 @@ itk::Transform<double,3,3>::Pointer animaPyramidalBMRegistration::getTransform()
         return registration->GetTransformation();
     }
     else
-        return NULL;
+        return nullptr;
 }
 
 QString animaPyramidalBMRegistration::getTitleAndParameters()

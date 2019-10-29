@@ -272,7 +272,7 @@ namespace rpi
     void AnimaDenseBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     ::SetNumberOfThreads ( int numberOfThreads )
     {
-        matcher->SetNumberOfThreads ( numberOfThreads );
+        matcher->SetNumberOfWorkUnits ( numberOfThreads );
     }
     
 } // End of namespace

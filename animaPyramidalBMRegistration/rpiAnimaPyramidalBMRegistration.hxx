@@ -286,7 +286,7 @@ template < class TFixedImage, class TMovingImage, class TTransformScalarType >
 void AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 ::SetNumberOfThreads ( int numberOfThreads )
 {
-    matcher->SetNumberOfThreads ( numberOfThreads );
+    matcher->SetNumberOfWorkUnits ( numberOfThreads );
 }
 
 } // End of namespace
