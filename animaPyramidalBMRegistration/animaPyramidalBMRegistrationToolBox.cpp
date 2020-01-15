@@ -69,7 +69,7 @@ public:
     medProgressionStack * progression_stack;
 };
 
-animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget *parent) : medRegistrationAbstractToolBox(parent), d(new animaPyramidalBMRegistrationToolBoxPrivate)
+animaPyramidalBMRegistrationToolBox::animaPyramidalBMRegistrationToolBox(QWidget *parent) : medAbstractSelectableToolBox(parent), d(new animaPyramidalBMRegistrationToolBoxPrivate)
 {
     //QWidget *widget = new QWidget(this);
     //QToolBox *widget = new QToolBox(this);
@@ -331,6 +331,13 @@ animaPyramidalBMRegistrationToolBox::~animaPyramidalBMRegistrationToolBox(void)
     d = NULL;
 }
 
+dtkPlugin * animaPyramidalBMRegistrationToolBox::plugin()
+{
+	medPluginManager* pm = medPluginManager::instance();
+	dtkPlugin* plugin = pm->plugin("Linear BM Registration");
+	return plugin;
+}
+
 bool animaPyramidalBMRegistrationToolBox::registered(void)
 {
     return medToolBoxFactory::instance()->
@@ -339,25 +346,25 @@ bool animaPyramidalBMRegistrationToolBox::registered(void)
 
 void animaPyramidalBMRegistrationToolBox::run(void)
 { 
-    if(!this->parentToolBox())
+	medRegistrationSelectorToolBox *parentTB = dynamic_cast<medRegistrationSelectorToolBox*>(selectorToolBox());
+	dtkSmartPointer <medAbstractRegistrationProcess> process;
+
+    if(parentTB == nullptr)
         return;
 
-    dtkSmartPointer <medAbstractRegistrationProcess> process;
-
-    if (this->parentToolBox()->process() &&
-        (this->parentToolBox()->process()->identifier() == "animaPyramidalBMRegistration"))
+    if (parentTB->process() && (parentTB->process()->identifier() == "animaPyramidalBMRegistration"))
     {
-        process = this->parentToolBox()->process();   
+        process = parentTB->process();
     }
     else
     {
         process = dtkAbstractProcessFactory::instance()->createSmartPointer("animaPyramidalBMRegistration");
 
-        this->parentToolBox()->setProcess(process);
+		parentTB->setProcess(process);
     }
     
-    dtkSmartPointer<medAbstractData> fixedData = this->parentToolBox()->fixedData();
-    dtkSmartPointer<medAbstractData> movingData = this->parentToolBox()->movingData();
+    dtkSmartPointer<medAbstractData> fixedData  = parentTB->fixedData();
+    dtkSmartPointer<medAbstractData> movingData = parentTB->movingData();
     
     if (!fixedData || !movingData)
         return;

@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <medRegistrationAbstractToolBox.h>
+#include <medAbstractSelectableToolBox.h>
 #include "animaDenseBMRegistrationPluginExport.h"
 
 class animaDenseBMRegistrationToolBoxPrivate;
 
-class ANIMADENSEBMREGISTRATIONPLUGIN_EXPORT animaDenseBMRegistrationToolBox : public medRegistrationAbstractToolBox
+class ANIMADENSEBMREGISTRATIONPLUGIN_EXPORT animaDenseBMRegistrationToolBox : public medAbstractSelectableToolBox
 {
     Q_OBJECT
     MED_TOOLBOX_INTERFACE("Dense Anatomical BM Registration",
@@ -18,13 +18,15 @@ class ANIMADENSEBMREGISTRATIONPLUGIN_EXPORT animaDenseBMRegistrationToolBox : pu
 
 public:
     animaDenseBMRegistrationToolBox(QWidget *parent = 0);
-    ~animaDenseBMRegistrationToolBox(void);
-    
-public:
+    ~animaDenseBMRegistrationToolBox();
+
+	dtkPlugin * plugin() override;
+	medAbstractData * processOutput() override;
+
     static bool registered(void);
     
 public slots:
-    void run(void);
+    void run();
     void updateBMOptimizerParams(int);
     void updateBMTransformParams(int);
     void updateBMAgregatorParams(int);
