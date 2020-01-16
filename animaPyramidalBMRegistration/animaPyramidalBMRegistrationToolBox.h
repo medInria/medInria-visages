@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <medRegistrationAbstractToolBox.h>
+#include <medAbstractSelectableToolBox.h>
 #include "animaPyramidalBMRegistrationPluginExport.h"
 
 class animaPyramidalBMRegistrationToolBoxPrivate;
 
-class ANIMAPYRAMIDALBMREGISTRATIONPLUGIN_EXPORT animaPyramidalBMRegistrationToolBox : public medRegistrationAbstractToolBox
+class ANIMAPYRAMIDALBMREGISTRATIONPLUGIN_EXPORT animaPyramidalBMRegistrationToolBox : public medAbstractSelectableToolBox
 {
     Q_OBJECT
     MED_TOOLBOX_INTERFACE("Linear BM Registration",
@@ -18,13 +18,15 @@ class ANIMAPYRAMIDALBMREGISTRATIONPLUGIN_EXPORT animaPyramidalBMRegistrationTool
 
 public:
     animaPyramidalBMRegistrationToolBox(QWidget *parent = 0);
-    ~animaPyramidalBMRegistrationToolBox(void);
-    
-public:
-    static bool registered(void);
+	~animaPyramidalBMRegistrationToolBox();
+
+	dtkPlugin * plugin() override;
+	medAbstractData * processOutput() override;
+
+    static bool registered();
     
 public slots:
-    void run(void);
+    void run();
     void updateBMOptimizerParams(int);
     void updateBMTransformParams(int);
     void updateBMAgregatorParams(int);
