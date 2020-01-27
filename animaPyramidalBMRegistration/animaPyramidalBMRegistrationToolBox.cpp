@@ -344,6 +344,24 @@ bool animaPyramidalBMRegistrationToolBox::registered(void)
     registerToolBox<animaPyramidalBMRegistrationToolBox>();
 }
 
+medAbstractData * animaPyramidalBMRegistrationToolBox::processOutput()
+{
+    // If called from pipelines, and run() not called before.
+    if ( static_cast<medRegistrationSelectorToolBox*>(selectorToolBox())->process() == nullptr)
+    {
+        run();
+    }
+
+    if (static_cast<medRegistrationSelectorToolBox*>(selectorToolBox())->process() != nullptr)
+    {
+        return static_cast<medRegistrationSelectorToolBox*>(selectorToolBox())->process()->output();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 void animaPyramidalBMRegistrationToolBox::run(void)
 { 
 	medRegistrationSelectorToolBox *parentTB = dynamic_cast<medRegistrationSelectorToolBox*>(selectorToolBox());
