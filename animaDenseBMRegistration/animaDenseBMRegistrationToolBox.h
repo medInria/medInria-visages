@@ -14,7 +14,7 @@ class ANIMADENSEBMREGISTRATIONPLUGIN_EXPORT animaDenseBMRegistrationToolBox : pu
     Q_OBJECT
     MED_TOOLBOX_INTERFACE("Dense Anatomical BM Registration",
                           "Dense non linear block-matching registration",
-                           << "registration")
+                           << "Registration")
 
 public:
     animaDenseBMRegistrationToolBox(QWidget *parent = 0);

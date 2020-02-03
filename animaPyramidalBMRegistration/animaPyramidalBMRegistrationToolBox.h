@@ -14,7 +14,7 @@ class ANIMAPYRAMIDALBMREGISTRATIONPLUGIN_EXPORT animaPyramidalBMRegistrationTool
     Q_OBJECT
     MED_TOOLBOX_INTERFACE("Linear BM Registration",
                           "Global linear block-matching registration",
-                           << "registration")
+                           << "Registration")
 
 public:
     animaPyramidalBMRegistrationToolBox(QWidget *parent = 0);
