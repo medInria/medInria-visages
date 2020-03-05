@@ -45,9 +45,9 @@ namespace rpi
         
         // Set the displacement field to the transformation object
         
-        matcher->SetReferenceImage ( this->m_fixedImage );
-        matcher->SetFloatingImage ( this->m_movingImage );
-        
+        matcher->SetReferenceImage ( const_cast<TFixedImage *> (this->m_fixedImage.GetPointer()) );
+        matcher->SetFloatingImage ( const_cast<TMovingImage *> (this->m_movingImage.GetPointer()) );
+
         matcher->Update();
         
         this->m_transform = matcher->GetOutputDisplacementFieldTransform();
