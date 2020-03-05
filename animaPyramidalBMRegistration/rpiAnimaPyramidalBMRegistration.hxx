@@ -45,8 +45,8 @@ AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
 
     // Set the displacement field to the transformation object
 
-    matcher->SetReferenceImage ( this->m_fixedImage.GetPointer() );
-    matcher->SetFloatingImage ( this->m_movingImage.GetPointer() );
+    matcher->SetReferenceImage ( const_cast<TFixedImage *> (this->m_fixedImage.GetPointer()) );
+    matcher->SetFloatingImage ( const_cast<TMovingImage *> (this->m_movingImage.GetPointer()) );
 
 
     typedef anima::BaseTransformAgregator < TFixedImage::ImageDimension > AgregatorType;
