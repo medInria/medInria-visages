@@ -118,7 +118,7 @@ endif()
 ## #############################################################################
 
 install(TARGETS ${TARGET_NAME}
-  RUNTIME DESTINATION plugins
-  LIBRARY DESTINATION plugins
+  RUNTIME DESTINATION plugins_legacy
+  LIBRARY DESTINATION plugins_legacy
   ARCHIVE DESTINATION lib
   )
