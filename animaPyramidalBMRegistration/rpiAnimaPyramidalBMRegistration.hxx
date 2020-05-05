@@ -43,11 +43,20 @@ AnimaPyramidalBMRegistration< TFixedImage, TMovingImage, TTransformScalarType >
     typename  TFixedImage::ConstPointer   fixedImage  = this->m_fixedImage;
     typename  TMovingImage::ConstPointer  movingImage = this->m_movingImage;
 
+    typedef itk::Image <double, 3> InternalImageType;
+    typedef itk::CastImageFilter <TFixedImage, InternalImageType> CastFilterType;
+
+    typename CastFilterType::Pointer castRefFilter = CastFilterType::New();
+    castRefFilter->SetInput(this->m_fixedImage);
+    castRefFilter->Update();
+    typename CastFilterType::Pointer castFloFilter = CastFilterType::New();
+    castFloFilter->SetInput(this->m_movingImage);
+    castFloFilter->Update();
+
     // Set the displacement field to the transformation object
 
-    matcher->SetReferenceImage ( const_cast<TFixedImage *> (this->m_fixedImage.GetPointer()) );
-    matcher->SetFloatingImage ( const_cast<TMovingImage *> (this->m_movingImage.GetPointer()) );
-
+    matcher->SetReferenceImage (castRefFilter->GetOutput());
+    matcher->SetFloatingImage (castFloFilter->GetOutput());
 
     typedef anima::BaseTransformAgregator < TFixedImage::ImageDimension > AgregatorType;
     typedef itk::AffineTransform<typename AgregatorType::ScalarType,TFixedImage::ImageDimension> AffineTransformType;
