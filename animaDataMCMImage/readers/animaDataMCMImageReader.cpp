@@ -72,7 +72,7 @@ bool animaDataMCMImageReader::readInformation (const QStringList &paths)
 
 bool animaDataMCMImageReader::readInformation (const QString &path)
 {
-    itk::ImageIOBase::IOComponentType componentType = anima::GetMCMComponentType(path.toStdString());
+    itk::IOComponentEnum componentType = anima::GetMCMComponentType(path.toStdString());
     
     medAbstractData* medData = dynamic_cast<medAbstractData*>(this->data());
 
@@ -80,13 +80,13 @@ bool animaDataMCMImageReader::readInformation (const QString &path)
     {
         switch (componentType)
         {
-        case itk::ImageIOBase::FLOAT:
+        case itk::IOComponentEnum::FLOAT:
             medData = medAbstractDataFactory::instance()->create ("animaDataMCMImageFloat3");
             if (medData)
                 this->setData ( medData );
             break;
 
-        case itk::ImageIOBase::DOUBLE:
+        case itk::IOComponentEnum::DOUBLE:
             medData = medAbstractDataFactory::instance()->create ("animaDataMCMImageDouble3");
             if (medData)
                 this->setData ( medData );
