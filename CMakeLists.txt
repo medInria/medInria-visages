@@ -54,6 +54,7 @@ find_package(Qt5 COMPONENTS REQUIRED
   Gui
   Network
   Widgets
+  Xml
 )
 
 find_package(dtk REQUIRED)
