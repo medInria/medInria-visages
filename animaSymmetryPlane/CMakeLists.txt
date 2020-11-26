@@ -55,6 +55,7 @@ target_link_libraries(${TARGET_NAME}
   ITKOptimizers
   ${ITKIO_LIBRARIES}
   ${ITK_TRANSFORM_LIBRARIES}
+  ITKSmoothing
   medCore
   medCoreLegacy
   medWidgets
