@@ -72,6 +72,7 @@ target_link_libraries(${TARGET_NAME}
   medRegistration
   AnimaOptimizers
   ITKOptimizers
+  ITKSmoothing
   ${ITKIO_LIBRARIES}
   ${ITK_TRANSFORM_LIBRARIES}
 )
